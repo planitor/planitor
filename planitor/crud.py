@@ -73,15 +73,21 @@ def get_or_create_case(db, serial, council):
     return case, created
 
 
+def get_geoname_from_address_and_municipality(db, address, municipality):
+    # if re.search(r'(\d+)')
+    pass
+
+
 def create_minute(db, meeting, **items):
-    case_serial = meeting.pop("case_serial")
+    case_serial = items.pop("case_serial")
+    case_address = items.pop("case_address")
     case, created = get_or_create_case(db, case_serial, meeting.council)
 
     for items in items.pop("entities", []):
         entity = get_or_create_entity(db, **items)
         if entity not in case.entities:
             case.entities.append(entity)
-    minute = Minute(case=case, **items)
 
+    minute = Minute(case=case, **items)
     db.add(minute)
     return minute
