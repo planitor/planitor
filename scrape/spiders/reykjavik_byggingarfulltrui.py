@@ -3,7 +3,6 @@ import re
 
 import scrapy
 from bs4 import BeautifulSoup as bs
-from dateutil import parser
 
 MEETING_URL = "http://gamli.rvk.is/vefur/owa/{}"
 YEAR_URL = "http://gamli.rvk.is/vefur/owa/edutils.parse_page?nafn=BN2MEN{}"
@@ -69,7 +68,7 @@ def get_minutes(response):
                     "address": address.strip(),
                 }
             )
-        data["id"] = link.get("href").split("=")[-1:][0]
+        data["serial"] = link.get("href").split("=")[-1:][0]
         data["case_address"] = link.text.lstrip('">').strip()
         tegund = link.find_next("i")
         data["headline"] = tegund.text.strip()
@@ -91,11 +90,15 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
     municipality_slug = "reykjavik"
     council_type_slug = "byggingarfulltrui"
 
+    name = "{}_{}".format(municipality_slug, council_type_slug)
+
     # start_urls = [YEAR_URL.format(year) for year in YEARS]
     start_urls = [YEAR_URL.format("20")]
 
     def parse(self, response):
-        for link in response.css("menu a"):
+        for i, link in enumerate(response.css("menu a")):
+            if i > 2:  # TODO remove limit of 2
+                continue
             yield response.follow(link, self.parse_meeting)
 
     def parse_meeting(self, response):

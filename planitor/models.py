@@ -19,6 +19,13 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
+"""
+from planitor.models import Base
+from planitor.database import engine
+Base.metadata.create_all(bind=engine)
+"""
+
+
 class CouncilTypeEnum(enum.Enum):
     byggingarfulltrui = {"short": "byggingarfulltrui", "long": "Byggingarfulltrúi"}
     skipulagsrad = {"short": "skipulagsrad", "long": "Skipulagsráð"}
@@ -37,6 +44,13 @@ class EntityTypeEnum(enum.Enum):
     company = {"short": "company", "long": "Fyrirtæki"}
 
 
+class CaseStatusEnum(enum.Enum):
+    delayed = {"short": "delayed", "long": "Frestað"}
+    approved = {"short": "approved", "long": "Samþykkt"}
+    answered_positive = {"short": "answered_positive", "long": "Jákvætt"}
+    answered_negative = {"short": "answered_negative", "long": "Neikvætt"}
+
+
 class Geoname(Base):
     __tablename__ = "geonames"
     osm_id = Column(String, primary_key=True, index=True)
@@ -44,6 +58,8 @@ class Geoname(Base):
     lon = Column(Numeric)
     lat = Column(Numeric)
     place_rank = Column(Integer)
+    city = Column(String)
+    importance = Column(Integer)
 
 
 class Housenumber(Base):
@@ -62,7 +78,7 @@ class Entity(Base):
     # As in "legal entity"; person or company
     __tablename__ = "entities"
 
-    kennitala = Column(DateTime, primary_key=True, index=True)
+    kennitala = Column(String, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
     name = Column(String)
     slug = Column(String, unique=True)
@@ -90,8 +106,8 @@ class Plan(Base):
     name = Column(String)
     created = Column(DateTime, server_default=func.now())
 
-    parent_id = Column(Integer, ForeignKey("plan.id"), nullable=True)
-    parent = relationship("Plan", remote_side=id, backref="sub_plans")
+    parent_id = Column(Integer, ForeignKey("plans.id"), nullable=True)
+    parent = relationship("Plan", remote_side=[id])
 
     minicipality_id = Column(Integer, ForeignKey(Municipality.id))
     minicipality = relationship(Municipality)
@@ -105,8 +121,8 @@ class Council(Base):
     name = Column(String)
     active = Column(Boolean, default=True)
 
-    minicipality_id = Column(Integer, ForeignKey(Municipality.id), nullable=True)
-    minicipality = relationship(Municipality)
+    municipality_id = Column(Integer, ForeignKey(Municipality.id), nullable=True)
+    municipality = relationship(Municipality)
 
     council_type = Column(Enum(CouncilTypeEnum))
 
@@ -143,8 +159,8 @@ class Tag(Base):
 case_entity_table = Table(
     "case_entities",
     Base.metadata,
-    Column("entity_id", Integer, ForeignKey("entity.kennitala"), primary_key=True),
-    Column("case_id", String, ForeignKey("case.id"), primary_key=True),
+    Column("entity_id", String, ForeignKey("entities.kennitala"), primary_key=True),
+    Column("case_id", Integer, ForeignKey("cases.id"), primary_key=True),
 )
 
 
@@ -152,11 +168,11 @@ class CaseAttachment(Base):
     # We want to collate all attachments to cases, but they can be associated with a
     # meeting minute about a case where they first appeared
     __tablename__ = "case_attachments"
-    attachment_id = Column(Integer, ForeignKey("attachment.id"), primary_key=True)
-    case_id = Column(String, ForeignKey("case.id"), primary_key=True)
+    attachment_id = Column(Integer, ForeignKey("attachments.id"), primary_key=True)
+    case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
     created = Column(DateTime, server_default=func.now())
 
-    minute_id = Column(Integer, ForeignKey("minute.id"))
+    minute_id = Column(Integer, ForeignKey("minutes.id"))
     minute = relationship("Minute")
 
 
@@ -164,13 +180,13 @@ class CaseTag(Base):
     # We want to collate all tags to cases, but they can be associated with a
     # meeting minute about a case where they first appeared
     __tablename__ = "case_tags"
-    tag_id = Column(Integer, ForeignKey("tag.name"), primary_key=True)
-    case_id = Column(String, ForeignKey("case.id"), primary_key=True)
+    tag_id = Column(String, ForeignKey("tags.name"), primary_key=True)
+    case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
     approved = Column(
         Boolean, default=False
     )  # We want to process suggested tags approved by an admin
 
-    minute_id = Column(Integer, ForeignKey("minute.id"))
+    minute_id = Column(Integer, ForeignKey("minutes.id"))
     minute = relationship("Minute")
 
 
@@ -181,6 +197,7 @@ class Case(Base):
     serial = Column(String)
     created = Column(DateTime, server_default=func.now())
     address = Column(String)
+    status = Column(Enum(CaseStatusEnum), nullable=True)
 
     geoname_osm_id = Column(Integer, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
@@ -206,8 +223,9 @@ class Minute(Base):
     __tablename__ = "minutes"
 
     id = Column(Integer, primary_key=True, index=True)
-    case_id = Column(Integer, ForeignKey(Council.id), nullable=True)
-    case = relationship(Council)
+    serial = Column(String, index=True)
+    case_id = Column(Integer, ForeignKey(Case.id), nullable=True)
+    case = relationship(Case)
     meeting_id = Column(Integer, ForeignKey(Meeting.id), nullable=True)
     meeting = relationship(Meeting)
     headline = Column(String)
