@@ -19,13 +19,6 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
-"""
-from planitor.models import Base
-from planitor.database import engine
-Base.metadata.create_all(bind=engine)
-"""
-
-
 class CouncilTypeEnum(enum.Enum):
     byggingarfulltrui = {"short": "byggingarfulltrui", "long": "Byggingarfulltrúi"}
     skipulagsrad = {"short": "skipulagsrad", "long": "Skipulagsráð"}
@@ -70,7 +63,7 @@ class Housenumber(Base):
     lat = Column(Numeric)
     housenumber = Column(String)
 
-    street_id = Column(Integer, ForeignKey(Geoname.osm_id))
+    street_id = Column(String, ForeignKey(Geoname.osm_id))
     street = relationship(Geoname)
 
 
@@ -84,8 +77,9 @@ class Entity(Base):
     slug = Column(String, unique=True)
     website_url = Column(String, nullable=True)
     entity_type = Column(Enum(EntityTypeEnum))
+    address = Column(String, nullable=True)
 
-    geoname_osm_id = Column(Integer, ForeignKey(Geoname.osm_id), nullable=True)
+    geoname_osm_id = Column(String, ForeignKey(Geoname.osm_id), nullable=True)
     geoname = relationship(Geoname)
 
 
@@ -95,7 +89,7 @@ class Municipality(Base):
     created = Column(DateTime, server_default=func.now())
     name = Column(String)
 
-    geoname_osm_id = Column(Integer, ForeignKey(Geoname.osm_id))
+    geoname_osm_id = Column(String, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
 
 
@@ -199,10 +193,10 @@ class Case(Base):
     address = Column(String)
     status = Column(Enum(CaseStatusEnum), nullable=True)
 
-    geoname_osm_id = Column(Integer, ForeignKey(Geoname.osm_id))
+    geoname_osm_id = Column(String, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
 
-    housenumber_osm_id = Column(Integer, ForeignKey(Housenumber.osm_id))
+    housenumber_osm_id = Column(String, ForeignKey(Housenumber.osm_id))
     housenumber = relationship(Housenumber)
 
     council_id = Column(Integer, ForeignKey(Council.id))

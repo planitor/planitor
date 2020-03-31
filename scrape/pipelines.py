@@ -1,13 +1,12 @@
 import os
 
-from reynir import Greynir
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from scrapy.exceptions import DropItem
 from scrapy.utils.project import get_project_settings
 
+from planitor import greynir
 from planitor.models import Base, CaseStatusEnum
 from planitor.crud import (
     get_or_create_municipality,
@@ -18,9 +17,6 @@ from planitor.crud import (
     get_or_create_case_tag,
     create_minute,
 )
-
-
-greynir = Greynir()
 
 
 def get_connection_string():
@@ -100,7 +96,7 @@ class DatabasePipeline(object):
         meeting.start = item["start"]
 
         # Go through minutes, update case status|entities|tags to reflect meeting minute
-        for data in item["minutes"][:2]:  # TODO remove limit of 2
+        for data in item["minutes"][:20]:  # TODO remove limit of 2
 
             entities = data.pop("entities", [])
 

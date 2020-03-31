@@ -14,6 +14,8 @@ from .models import (
     Tag,
 )
 
+from .utils.text import fold
+
 
 MUNICIPALITIES_OSM_IDS = {
     # These are `name`, `osm_id` tuples
@@ -65,7 +67,9 @@ def get_or_create_entity(db, kennitala, name, address):
     entity = db.query(Entity).filter_by(kennitala=kennitala).first()
     created = False
     if entity is None:
-        entity = Entity(kennitala=kennitala, name=name)
+        entity = Entity(
+            kennitala=kennitala, name=name, address=address, slug=fold(name)
+        )
         db.add(entity)
         created = True
     return entity, created

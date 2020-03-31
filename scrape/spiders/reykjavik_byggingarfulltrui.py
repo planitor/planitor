@@ -97,7 +97,7 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
 
     def parse(self, response):
         for i, link in enumerate(response.css("menu a")):
-            if i > 2:  # TODO remove limit of 2
+            if i > 4:  # TODO remove limit of 4
                 continue
             yield response.follow(link, self.parse_meeting)
 
