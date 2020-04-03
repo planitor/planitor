@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="is">
+  <head>
+    <meta charset="utf-8" />
+    <title>Planitor</title>
+    <link
+      href="{{ url_for('static', path='/dist/styles.css') }}"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="Planitor.is" />
+    <meta property="og:description" content="Gagnagrunnur með öllum rafhjól, hlaupahjólum og öðrum léttum rafknúnum farartækjum frá helstu söluaðilum." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.planitor.is/" />
+    {#
+    <link rel="icon" href="{{ url_for('static', path='/favicon.png') }}" sizes="32x32">
+    <link rel="icon" href="{{ url_for('static', path='/favicon.png') }}" sizes="192x192">
+    <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
+    #}
+  </head>
+
+  <body class="flex flex-col flex-wrap items-center min-h-screen">
+    <div class="w-full">
+      <nav
+        id="navigation"
+        class="flex items-center justify-between flex-wrap p-6 max-w-6xl mx-auto"
+      >
+        <a id="logo" href="/" class="mr-6 block" alt="Örflæði">Planitor</a>
+        <div class="block sm:hidden">
+          <button
+            id="hamburger"
+            class="flex items-center pl-3 py-2 rounded hover:text-gray-800 hover:border-gray-400"
+          >
+            <svg
+              class="fill-current h-4 w-4"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <title>Menu</title>
+              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+            </svg>
+          </button>
+        </div>
+        <div
+          id="hamburger-dropdown"
+          class="flex-grow bg-gray-100 shadow sm:shadow-none sm:bg-transparent w-full hidden sm:block sm:flex sm:items-center sm:w-auto p-6 sm:p-0"
+        >
+          <div class="text-sm sm:flex-grow">
+            <a
+              href="{{ url_for('get_index') }}"
+              class="nav-btn"
+            >
+              Forsíða
+            </a>
+          </div>
+          <div>
+            <a
+              href="#"
+              target="_blank"
+              class="font-bold inline-block text-sm px-4 py-2 leading-none border rounded border-white hover:border-gray shadow bg-white mt-4 sm:mt-0"
+              >Um Planitor</a
+            >
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="flex-grow w-full">
+      <div class="max-w-6xl mx-auto">
+      {% block body %}{% endblock body %}
+      </div>
+    </div>
+    <footer class="bg-gray-900 w-full mt-8">
+      <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 text-xs sm:text-sm">
+        <p class="my-1 text-gray-600">Planitor!</p>
+        <p class="my-1 text-gray-600"><a href="mailto:jokull@solberg.is" class="font-bold text-gray-500">jokull@solberg.is</a></p>
+      </div>
+    </footer>
+    <script src="{{ url_for('static', path='/dist/app.js') }}"></script>
+  </body>
+</html>

@@ -2,7 +2,7 @@ from planitor.crud import get_or_create_entity
 from planitor.language import (
     parse_icelandic_companies,
     lookup_icelandic_company_in_entities,
-    find_nominative_icelandic_companies,
+    extract_company_names,
     apply_title_casing,
     clean_company_name,
 )
@@ -34,16 +34,16 @@ def test_apply_title_case():
     assert apply_title_casing("BB", "AA") == "Aa"
 
 
-def test_find_nominative_icelandic_companies_person_entity_hybrid():
-    assert find_nominative_icelandic_companies(
+def test_extract_company_names_person_entity_hybrid():
+    assert extract_company_names(
         "Starfsmennirnir heimsóttu Hjólbarðaverkstæði Sigurjóns ehf. eldsnemma."
     ) == {"Hjólbarðaverkstæði Sigurjóns ehf."}
 
 
-def test_find_nominative_icelandic_companies_return_canonical():
+def test_extract_company_names_return_canonical():
 
     assert (
-        find_nominative_icelandic_companies(
+        extract_company_names(
             """Lögð fram fyrirspurn Björns Skaptasonar dags. 9. mars 2020 f.h.
             Guðmundar Jónassonar ehf. ásamt bréfi dags. 6. mars 2020 um breytingu
             á deiliskipulagi lóðarinnar nr. 34-36 við Borgartún sem felst í aukningu
@@ -54,7 +54,7 @@ def test_find_nominative_icelandic_companies_return_canonical():
     )
 
 
-def test_find_nominative_icelandic_companies_veitur():
+def test_extract_company_names_veitur():
 
     s = (
         "Að lokinni auglýsingu er lögð fram að nýju tillaga umhverfis- og "
@@ -66,7 +66,7 @@ def test_find_nominative_icelandic_companies_veitur():
         "bréf Skipulagsstofnunar dags. 13. desember 2019. "
     )
 
-    assert find_nominative_icelandic_companies(s) == {
+    assert extract_company_names(s) == {
         # "Faxaflóahafnir sf.",  # The reason this doesn’t work is that
         #                        # Greynir thinks "faxaflóahafna" indefinite is
         #                        # "Faxaflóahafið"
@@ -75,7 +75,7 @@ def test_find_nominative_icelandic_companies_veitur():
     }
 
 
-def test_find_nominative_icelandic_companies_fjogur():
+def test_extract_company_names_fjogur():
 
     s = (
         "Á embættisafgreiðslufundi skipulagsfulltrúa 18. maí 2018 var lagt fram bréf "
@@ -87,7 +87,7 @@ def test_find_nominative_icelandic_companies_fjogur():
     )
 
     print(s)
-    assert find_nominative_icelandic_companies(s) == {
+    assert extract_company_names(s) == {
         "Björgun ehf.",
     }
 

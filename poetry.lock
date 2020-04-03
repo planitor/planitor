@@ -248,6 +248,14 @@ python-versions = "*"
 version = "0.9.0"
 
 [[package]]
+category = "main"
+description = "Python implementation of hashids (http://www.hashids.org).Compatible with python 2.6-3."
+name = "hashids"
+optional = false
+python-versions = "*"
+version = "1.2.0"
+
+[[package]]
 category = "dev"
 description = "HTML parser based on the WHATWG HTML specification"
 name = "html5lib"
@@ -787,6 +795,17 @@ tokenizer = ">=2.0.4"
 
 [[package]]
 category = "dev"
+description = "a python refactoring library..."
+name = "rope"
+optional = false
+python-versions = "*"
+version = "0.16.0"
+
+[package.extras]
+dev = ["pytest"]
+
+[[package]]
+category = "dev"
 description = "A high-level Web Crawling and Web Scraping framework"
 name = "scrapy"
 optional = false
@@ -1046,7 +1065,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "f757fa68563fdb18b12aa34506b0a237c891ef5969f1881d249e5a7469da9b34"
+content-hash = "266b23359b03359509d78242d596a720ee8809fe39b38990b794e8ac6ee0d7be"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1188,6 +1207,9 @@ fold-to-ascii = [
 h11 = [
     {file = "h11-0.9.0-py2.py3-none-any.whl", hash = "sha256:4bc6d6a1238b7615b266ada57e0618568066f57dd6fa967d1290ec9309b2f2f1"},
     {file = "h11-0.9.0.tar.gz", hash = "sha256:33d4bca7be0fa039f4e84d50ab00531047e53d6ee8ffbc83501ea602c169cae1"},
+]
+hashids = [
+    {file = "hashids-1.2.0.tar.gz", hash = "sha256:6539b892a426e75747a9c0ad69409e9566f9c21b79310fc3424b5b6726f28da6"},
 ]
 html5lib = [
     {file = "html5lib-1.0.1-py2.py3-none-any.whl", hash = "sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3"},
@@ -1502,6 +1524,11 @@ reynir = [
     {file = "reynir-2.1.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:17272c6715e53bbf3316f25cd6d3f947282dcc1aaf8b23529102b4ee94c46841"},
     {file = "reynir-2.1.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:a3fe1e0f11bfae7f3da7c2cde2cfb76c96a0d6e8f8eeb46c642ac9c152ccd3c3"},
     {file = "reynir-2.1.0.tar.gz", hash = "sha256:5acf367e5e3e5e5f06205f047c9679f3330843a8f4814f0ca65f7f41f3547189"},
+]
+rope = [
+    {file = "rope-0.16.0-py2-none-any.whl", hash = "sha256:ae1fa2fd56f64f4cc9be46493ce54bed0dd12dee03980c61a4393d89d84029ad"},
+    {file = "rope-0.16.0-py3-none-any.whl", hash = "sha256:52423a7eebb5306a6d63bdc91a7c657db51ac9babfb8341c9a1440831ecf3203"},
+    {file = "rope-0.16.0.tar.gz", hash = "sha256:d2830142c2e046f5fc26a022fe680675b6f48f81c7fc1f03a950706e746e9dfe"},
 ]
 scrapy = [
     {file = "Scrapy-2.0.1-py2.py3-none-any.whl", hash = "sha256:7b0e207eae772dca55a56cce5182680b5d66b69a8e733edc59eee11ffb99300e"},

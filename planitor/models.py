@@ -152,6 +152,7 @@ class Meeting(Base):
     end = Column(DateTime, nullable=True)
     description = Column(String, nullable=True)
     attendant_names = Column(ARRAY(String), nullable=True)
+    url = Column(String)
 
     council_id = Column(Integer, ForeignKey(Council.id))
     council = relationship(Council)

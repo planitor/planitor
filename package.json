@@ -1,0 +1,22 @@
+{
+  "name": "empty-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "clean": "rm -rf static/dist/",
+    "build": "parcel build frontend/app.ts frontend/styles.css --out-dir static/dist/ --public-url /static/dist/",
+    "watch": "parcel watch frontend/app.ts frontend/styles.css --out-dir static/dist/ --public-url /static/dist/"
+  },
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^2.1.0",
+    "autoprefixer": "^9.7.4",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.0.2",
+    "tailwindcss": "^1.2.0",
+    "typescript": "^3.8.3"
+  }
+}

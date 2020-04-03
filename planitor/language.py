@@ -53,7 +53,7 @@ def apply_title_casing(left, right):
     return " ".join(parts)
 
 
-def find_nominative_icelandic_companies(text) -> Set:
+def extract_company_names(text) -> Set:
     """ Get company names with preserved plurality and in nominative form. The
     strategy is multipart:
 
@@ -156,9 +156,7 @@ def find_nominative_icelandic_companies(text) -> Set:
     return found_company_names
 
 
-def levenshtein_company_lookup(
-    db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE
-):
+def levenshtein_company_lookup(db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE):
     """ As described above, we may encounter similar looking inflections of company
     names. Instead of tokenizing and lemming words (which we could ...) we just use a
     simple Levenshtein distance calculation. This will also be useful for search.

@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block body %}
+<div class="px-6">
+  <div class="my-6 mt-4 sm:mt-8">
+    <div class="text-xl font-bold">
+      {{ municipality.name }}
+    </div>
+  </div>
+  <div class="meetings grid grid-cols-1 gap-4">
+    {% for meeting, minute_count in meetings %}
+    <a
+      href="{{ url_for('get_meeting', muni_id=h.encode(municipality.id), council_slug=meeting.council.council_type.value.slug, meeting_id=h.encode(meeting.id)) }}"
+      class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
+    >
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-center text-l mb-1">
+          <div class="name font-bold">
+            {{ meeting.council.name }} nr. {{ meeting.name }}
+          </div>
+          <div>{{ minute_count }} {% if minute_count == 1 %}fundarliður{% else %}fundarliðir{% endif %}</div>
+        </div>
+        {% if meeting.attendant_names %}
+        <div class="pb-5 pt-2 text-sm">{{ ', '.join(meeting.attendant_names) }}</div>
+        {% endif %}
+        <div class="flex justify-between items-center">
+          <div class="text-xs">{{ meeting.start.strftime('%Y-%m-%d') }}</div>
+          <div class="text-xs text-gray-700">{{ timeago(meeting.start) }}</div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock body %}

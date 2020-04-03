@@ -124,6 +124,7 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
         ).groups()
 
         yield {
+            "url": response.url,
             "name": name,
             "start": start,
             "description": description,

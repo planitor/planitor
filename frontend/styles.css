@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu,
+    Cantarell, Helvetica Neue;
+}
+
+@screen sm {
+  .munis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@screen md {
+  .munis {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@screen lg {
+  .munis {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+body {
+  background: #f7fafb;
+}
+
+footer {
+  background: #1b6588;
+}
