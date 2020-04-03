@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 
 from . import mapping
@@ -38,3 +39,11 @@ def fold(string, replacement=""):
         translate_table = default_translate_table
 
     return string.translate(translate_table).lower()
+
+
+def slugify(string):
+    string = fold(string).lower()
+    string = re.sub(r"[^\w]", "-", string)
+    string = re.sub(r"\-+", "-", string)
+    string = string.strip(" -")
+    return string

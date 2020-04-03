@@ -8,12 +8,22 @@ from planitor.models import Entity
 from planitor.utils.text import fold
 
 
-ICELANDIC_COMPANY_RE = (
-    r"([0-9A-ZÉÝÚÍÓÁÖÞÐÆ](?:(?:(?:[\w,/]+)|og|&|,|-) ){1,3}(?:ehf|slhf|sf|hses|hf)\.)"
+MAX_LEVENSHTEIN_DISTANCE = 5
+
+COMPANY_SUFFIXES = (
+    "ehf.",
+    "slhf.",
+    "sf.",
+    "hses.",
+    "hf.",
+    "ohf.",
 )
 
-
-MAX_LEVENSHTEIN_DISTANCE = 5
+ICELANDIC_COMPANY_RE = re.compile(
+    r"([0-9A-ZÉÝÚÍÓÁÖÞÐÆ](?:(?:(?:[\w,/]+)|og|&|,|-) ){{1,3}}(?:{})\.)".format(
+        "|".join(suff.strip(".") for suff in COMPANY_SUFFIXES)
+    )
+)
 
 
 def parse_icelandic_companies(text) -> Set:
@@ -33,15 +43,6 @@ def apply_title_casing(left, right):
             right_word = right_word.title()
         parts.append(right_word)
     return " ".join(parts)
-
-
-COMPANY_SUFFIXES = (
-    "ehf.",
-    "slhf.",
-    "sf.",
-    "hses.",
-    "hf.",
-)
 
 
 def find_nominative_icelandic_companies(text) -> Set:
@@ -68,10 +69,17 @@ def find_nominative_icelandic_companies(text) -> Set:
 
     found_company_names = set()
 
+    if not parse_icelandic_companies(text):
+        return found_company_names
+
     for sentence in greynir.parse(text)["sentences"]:
+
+        if not sentence.terminal_nodes:
+            continue
+
         # Must reparse in lowercase to get inflection of names like Plúsarkitektar
         inflected_company_names = (
-            parse_icelandic_companies(sentence.text) ^ found_company_names
+            parse_icelandic_companies(sentence.text) - found_company_names
         )
 
         if not inflected_company_names:
@@ -83,8 +91,14 @@ def find_nominative_icelandic_companies(text) -> Set:
                 break
             next_node = sentence.terminal_nodes[node.index + 1]
             if node.kind == "PERSON" and next_node.text in COMPANY_SUFFIXES:
-                inflected_company_names.remove(node.text + " {}".format(next_node.text))
-                found_company_names.add(node.canonical + " {}".format(next_node.text))
+                inflected_name = node.text + " {}".format(next_node.text)
+                if inflected_name not in inflected_company_names:
+                    # Skip if we caught "Sigurjóns ehf." in "Hjólbarðaverkstæði
+                    # Sigurjóns ehf."
+                    continue
+                inflected_company_names.remove(inflected_name)
+                name = node.canonical + " {}".format(next_node.text)
+                found_company_names.add(name)
 
         if not inflected_company_names:
             continue
@@ -100,6 +114,9 @@ def find_nominative_icelandic_companies(text) -> Set:
             sentence_text_with_lowercase_company_names
         ).terminal_nodes
 
+        if not nodes:
+            continue
+
         for inflected_name in inflected_company_names:
             for node in nodes:
                 if node.text not in COMPANY_SUFFIXES:
@@ -114,6 +131,8 @@ def find_nominative_icelandic_companies(text) -> Set:
                     lowercase_inflected = " ".join(
                         node.text for node in name_part_nodes
                     )
+                    if not inflected_name.lower().endswith(lowercase_inflected):
+                        break
                     if lowercase_inflected == inflected_name.lower():
                         nominative_name = " ".join(
                             node.indefinite for node in name_part_nodes
@@ -123,13 +142,15 @@ def find_nominative_icelandic_companies(text) -> Set:
                         )
                         break
                     steps += 1
-                    if steps >= 5:  # Limit leftward matching to 4 extra words
+                    if steps > 4:  # Limit leftward matching to 4 extra words
                         break
 
     return found_company_names
 
 
-def lookup_icelandic_company_in_entities(db, name):
+def lookup_icelandic_company_in_entities(
+    db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE
+):
     """ As described above, we may encounter similar looking inflections of company
     names. Instead of tokenizing and lemming words (which we could ...) we just use a
     simple Levenshtein distance calculation. This will also be useful for search.

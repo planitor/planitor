@@ -5,12 +5,8 @@ import scrapy
 from bs4 import BeautifulSoup as bs
 
 MEETING_URL = "http://gamli.rvk.is/vefur/owa/{}"
-YEAR_URL = "http://gamli.rvk.is/vefur/owa/edutils.parse_page?nafn=BN2MEN{}"
+YEAR_URL = "http://gamli.rvk.is/vefur/owa/edutils.parse_page?nafn=SN2MEN{}"
 YEARS = [
-    # "96",
-    # "97",
-    # "98",
-    # "99",
     # "00",
     # "01",
     # "02",
@@ -55,40 +51,28 @@ def get_minutes(response):
     links = soup.find_all(href=re.compile("edutils.parse_page"))
     for i, link in enumerate(links):
         data = {}
-        els = link.parent.previous_sibling.text.split("\n")
-        data["serial"] = els.pop(0).strip().replace("Umsókn nr. ", "")
-        entities = [el for el in els[1:-1] if el]
-        data["entities"] = []
-        for i in range(0, len(entities), 3):
-            kennitala, name, address = entities[i : i + 3]
-            data["entities"].append(
-                {
-                    "kennitala": kennitala.replace("-", "").strip(),
-                    "name": name.strip(),
-                    "address": address.strip(),
-                }
-            )
-        data["case_serial"] = link.get("href").split("=")[-1:][0]
+        data["serial"] = link.previous_sibling["name"]
+        data["case_serial"] = link["href"].split("?nafn=")[1]
         data["case_address"] = link.text.lstrip('">').strip()
-        tegund = link.find_next("i")
-        data["headline"] = tegund.text.strip()
+        headline_el = link.parent.find_next("i")
+        data["headline"] = headline_el.text
         text = ""
-        for el in tegund.find_next_siblings():
+        for el in headline_el.find_next_siblings():
             if el.name == "i":
+                data["remarks"] = "\n".join(el.stripped_strings)
                 break
             if not el.name == "i":
                 try:
                     text = text + str(el.next_sibling)
                 except AttributeError:
                     pass
-        data["remarks"] = "\n".join(tegund.find_next("i").stripped_strings)
         data["inquiry"] = text.strip()
         yield data
 
 
-class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
+class ReykjavikSkipulagsfulltruiSpider(scrapy.Spider):
     municipality_slug = "reykjavik"
-    council_type_slug = "byggingarfulltrui"
+    council_type_slug = "skipulagsfulltrui"
 
     name = "{}_{}".format(municipality_slug, council_type_slug)
 
@@ -104,7 +88,7 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
         )
 
         match = re.search(
-            r"Árið (\d+), (\w+) (\d+)\. (\w+) kl\. (\d+):(\d+)", description
+            r"Ár(?:ið)? (\d+), (\w+) (\d+)\. (\w+) kl\. (\d+):(\d+)", description
         )
         if match is not None:
             year, _, day, month, hour, minute = match.groups()

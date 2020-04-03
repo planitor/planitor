@@ -1,3 +1,4 @@
+from collections import namedtuple
 import enum
 
 from sqlalchemy import (
@@ -7,46 +8,66 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    Date,
     DateTime,
     Numeric,
     Enum,
     func,
     UniqueConstraint,
 )
-from sqlalchemy.types import ARRAY
+from sqlalchemy.types import ARRAY, BIGINT
 from sqlalchemy.orm import relationship
 
 from .database import Base
 
 
+EnumValue = namedtuple("EnumValue", ("slug", "label"))
+
+
 class CouncilTypeEnum(enum.Enum):
-    byggingarfulltrui = {"short": "byggingarfulltrui", "long": "Byggingarfulltrúi"}
-    skipulagsrad = {"short": "skipulagsrad", "long": "Skipulagsráð"}
-    borgarrad = {"short": "borgarrad", "long": "Borgarráð"}
-    borgarstjorn = {"short": "borgarstjorn", "long": "Borgarstjórn"}
+    byggingarfulltrui = EnumValue("byggingarfulltrui", "Byggingarfulltrúi")
+    skipulagsfulltrui = EnumValue("skipulagsfulltrui", "Skipulagsfulltrúi")
+    skipulagsrad = EnumValue("skipulagsrad", "Skipulagsráð")
+    borgarrad = EnumValue("borgarrad", "Borgarráð")
+    borgarstjorn = EnumValue("borgarstjorn", "Borgarstjórn")
 
 
 class PlanTypeEnum(enum.Enum):
-    deiliskipulag = {"short": "deiliskipulag", "long": "Deiliskipulag"}
-    adalskipulag = {"short": "adalskipulag", "long": "Aðalskipulag"}
-    svaedisskipulag = {"short": "svaedisskipulag", "long": "Svæðisskipulag"}
+    deiliskipulag = EnumValue("deiliskipulag", "Deiliskipulag")
+    adalskipulag = EnumValue("adalskipulag", "Aðalskipulag")
+    svaedisskipulag = EnumValue("svaedisskipulag", "Svæðisskipulag")
 
 
 class EntityTypeEnum(enum.Enum):
-    person = {"short": "person", "long": "Persóna"}
-    company = {"short": "company", "long": "Fyrirtæki"}
+    person = EnumValue("persona", "Persóna")
+    company = EnumValue("fyrirtaeki", "Fyrirtæki")
 
 
 class CaseStatusEnum(enum.Enum):
-    delayed = {"short": "delayed", "long": "Frestað"}
-    approved = {"short": "approved", "long": "Samþykkt"}
-    answered_positive = {"short": "answered_positive", "long": "Jákvætt"}
-    answered_negative = {"short": "answered_negative", "long": "Neikvætt"}
+    delayed = EnumValue("frestad", "Frestað")
+    approved = EnumValue("samthykkt", "Samþykkt")
+    denied = EnumValue("neitad", "Synjað")
+    answered_positive = EnumValue("jakvaett", "Jákvætt")
+    answered_negative = EnumValue("neikvaett", "Neikvætt")
+    no_comment = EnumValue("engar-athugasemdir", "Engar athugasemdir")
+
+    notice = EnumValue("grenndarkynning", "Samþykkt að grenndarkynna")
+
+    directed_to_skipulagsrad = EnumValue(
+        "visad-til-skipulags", "Vísað til Skipulags- og samgönguráðs"
+    )
+    directed_to_adalskipulag = EnumValue(
+        "visad-til-deildarstjora-adalskipulags",
+        "Vísað til umsagnar deildarstjóra aðalskipulags",
+    )
+    assigned_project_manager = EnumValue(
+        "visad-til-verkefnastjora", "Vísað til verkefnastjóra"
+    )
 
 
 class Geoname(Base):
     __tablename__ = "geonames"
-    osm_id = Column(String, primary_key=True, index=True)
+    osm_id = Column(BIGINT, primary_key=True, index=True)
     name = Column(String)
     lon = Column(Numeric)
     lat = Column(Numeric)
@@ -57,13 +78,13 @@ class Geoname(Base):
 
 class Housenumber(Base):
     __tablename__ = "housenumbers"
-    osm_id = Column(String, primary_key=True, index=True)
+    osm_id = Column(BIGINT, primary_key=True, index=True)
     street_name = Column("street", String)
     lon = Column(Numeric)
     lat = Column(Numeric)
     housenumber = Column(String)
 
-    street_id = Column(String, ForeignKey(Geoname.osm_id))
+    street_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     street = relationship(Geoname)
 
 
@@ -74,12 +95,13 @@ class Entity(Base):
     kennitala = Column(String, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
     name = Column(String)
-    slug = Column(String, unique=True)
+    slug = Column(String)
     website_url = Column(String, nullable=True)
     entity_type = Column(Enum(EntityTypeEnum))
     address = Column(String, nullable=True)
+    birthday = Column(Date)
 
-    geoname_osm_id = Column(String, ForeignKey(Geoname.osm_id), nullable=True)
+    geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id), nullable=True)
     geoname = relationship(Geoname)
 
 
@@ -89,7 +111,7 @@ class Municipality(Base):
     created = Column(DateTime, server_default=func.now())
     name = Column(String)
 
-    geoname_osm_id = Column(String, ForeignKey(Geoname.osm_id))
+    geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
 
 
@@ -191,12 +213,15 @@ class Case(Base):
     serial = Column(String)
     created = Column(DateTime, server_default=func.now())
     address = Column(String)
-    status = Column(Enum(CaseStatusEnum), nullable=True)
 
-    geoname_osm_id = Column(String, ForeignKey(Geoname.osm_id))
+    # This field is denormalized, is derived from most recent minute
+    status = Column(Enum(CaseStatusEnum), nullable=True)
+    updated = Column(DateTime, nullable=True)
+
+    geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
 
-    housenumber_osm_id = Column(String, ForeignKey(Housenumber.osm_id))
+    housenumber_osm_id = Column(BIGINT, ForeignKey(Housenumber.osm_id))
     housenumber = relationship(Housenumber)
 
     council_id = Column(Integer, ForeignKey(Council.id))
@@ -220,6 +245,7 @@ class Minute(Base):
     serial = Column(String, index=True)
     case_id = Column(Integer, ForeignKey(Case.id), nullable=True)
     case = relationship(Case)
+    status = Column(Enum(CaseStatusEnum), nullable=True)
     meeting_id = Column(Integer, ForeignKey(Meeting.id), nullable=True)
     meeting = relationship(Meeting)
     headline = Column(String)

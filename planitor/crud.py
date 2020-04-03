@@ -1,4 +1,5 @@
 import re
+from typing import Tuple
 
 from .models import (
     Municipality,
@@ -6,6 +7,7 @@ from .models import (
     CouncilTypeEnum,
     Meeting,
     Entity,
+    EntityTypeEnum,
     Case,
     Minute,
     Housenumber,
@@ -14,6 +16,9 @@ from .models import (
     Tag,
 )
 
+from .cases import get_case_status_from_remarks
+
+from .utils.kennitala import Kennitala
 from .utils.text import fold
 
 
@@ -63,12 +68,22 @@ def get_or_create_meeting(db, council, name):
     return meeting, created
 
 
-def get_or_create_entity(db, kennitala, name, address):
-    entity = db.query(Entity).filter_by(kennitala=kennitala).first()
+def get_or_create_entity(
+    db, kennitala: Kennitala, name: str, address: str
+) -> Tuple[Entity, bool]:
+    entity = db.query(Entity).filter_by(kennitala=kennitala.kennitala).first()
     created = False
     if entity is None:
+        entity_type = (
+            EntityTypeEnum.person if kennitala.is_person() else EntityTypeEnum.company
+        )
         entity = Entity(
-            kennitala=kennitala, name=name, address=address, slug=fold(name)
+            kennitala=kennitala.only_digits(),
+            name=name,
+            address=address,
+            slug=fold(name),
+            entity_type=entity_type,
+            birthday=kennitala.get_birth_date(),
         )
         db.add(entity)
         created = True
@@ -86,16 +101,12 @@ def get_or_create_case(db, serial, council):
 
 
 """ The following regex matches street and house numbers like these:
-
 Síðumúli 24-26
 Prófgata 12b-14b
 Sæmundargata 21
 Tjarnargata 10D
-Hallgerðargata 19B
 Bauganes 3A
-Síðumúli 24 - 26
 Vesturás 10 - 16
-
 """
 
 ADDRESS_RE = re.compile(r"^([^\W\d]+) (\d+[A-Za-z]?(?: ?- ?)?(?:\d+[A-Za-z]?)?)?$")
@@ -131,25 +142,63 @@ def create_minute(db, meeting, **items):
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
 
-    case, created = get_or_create_case(db, case_serial, meeting.council)
+    case, case_created = get_or_create_case(db, case_serial, meeting.council)
     case.address = case_address
 
-    if created:
+    if case_created:
         (
             case.geoname,
             case.housenumber,
         ) = get_geoname_and_housenumber_from_address_and_municipality(
             db, address=case_address, municipality=meeting.council.municipality,
         )
+        case.updated = meeting.start
         db.add(case)
 
     minute = Minute(case=case, meeting=meeting, **items)
+
+    # The wording of the minute remarks tells us the case status
+    status = get_case_status_from_remarks(minute.remarks)
+    minute.status = status
+
+    # Also persist this status on the case unless a more recent meeting with the case
+    # has been held
+    if case_created or case.updated < meeting.start:
+        case.status = minute.status
+        case.updated = meeting.start
+
     db.add(minute)
     return minute
 
 
+def update_case_status(db, case):
+    """ Query minutes in chronological meeting order, the last minute status will
+    become the case status.
+
+    """
+    for minute in (
+        db.query(Minute)
+        .join(Meeting)
+        .join(Case)
+        .filter(Minute.case == case)
+        .order_by(Meeting.start)
+    ):
+        status = get_case_status_from_remarks(minute.remarks)
+        minute.status = status
+        db.add(minute)
+    case.status = status
+    db.add(case)
+
+
 def get_or_create_tag(db, name):
-    tag = db.query(Tag).filter_by(name=name).first()
+    for transient_tag in db.new:
+        if not isinstance(transient_tag, Tag):
+            continue
+        if name == transient_tag.name:
+            tag = transient_tag
+            break
+    else:
+        tag = db.query(Tag).get(name)
     created = False
     if tag is None:
         tag = Tag(name=name)
@@ -159,7 +208,17 @@ def get_or_create_tag(db, name):
 
 
 def get_or_create_case_tag(db, tag, case):
-    case_tag = db.query(CaseTag).filter_by(tag_id=tag.name, case_id=case.id).first()
+    for transient_case_tag in db.new:
+        if not isinstance(transient_case_tag, CaseTag):
+            continue
+        if (
+            tag.name == transient_case_tag.tag_id
+            and case.id == transient_case_tag.case_id
+        ):
+            case_tag = transient_case_tag
+            break
+    else:
+        case_tag = db.query(CaseTag).filter_by(tag_id=tag.name, case_id=case.id).first()
     created = False
     if case_tag is None:
         case_tag = CaseTag(case_id=case.id, tag_id=tag.name)
