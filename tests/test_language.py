@@ -4,6 +4,7 @@ from planitor.language import (
     lookup_icelandic_company_in_entities,
     find_nominative_icelandic_companies,
     apply_title_casing,
+    clean_company_name,
 )
 
 
@@ -55,13 +56,15 @@ def test_find_nominative_icelandic_companies_return_canonical():
 
 def test_find_nominative_icelandic_companies_veitur():
 
-    s = """Að lokinni auglýsingu er lögð fram að nýju tillaga umhverfis- og
-    skipulagssviðs dags í nóvember 2018, uppf. 13. desember 2018, að breytingu
-    á aðalskipulagi Reykjavíkur 2010-2030 fyrir Sundahöfn vegna landfyllingar
-    við Klettagarða ásamt umhverfisskýrsla VSÓ ráðgjafar dags. í september
-    2018, uppf. 14. desember 2018. Einnig er lögð fram greinargerð Veitna ohf.
-    dags. 4. desember 2018, bréf Faxaflóahafna sf. dags. 14. desember 2018 og
-    bréf Skipulagsstofnunar dags. 13. desember 2019. """
+    s = (
+        "Að lokinni auglýsingu er lögð fram að nýju tillaga umhverfis- og "
+        "skipulagssviðs dags í nóvember 2018, uppf. 13. desember 2018, að breytingu "
+        "á aðalskipulagi Reykjavíkur 2010-2030 fyrir Sundahöfn vegna landfyllingar "
+        "við Klettagarða ásamt umhverfisskýrsla VSÓ ráðgjafar dags. í september "
+        "2018, uppf. 14. desember 2018. Einnig er lögð fram greinargerð Veitna ohf. "
+        "dags. 4. desember 2018, bréf Faxaflóahafna sf. dags. 14. desember 2018 og "
+        "bréf Skipulagsstofnunar dags. 13. desember 2019. "
+    )
 
     assert find_nominative_icelandic_companies(s) == {
         # "Faxaflóahafnir sf.",  # The reason this doesn’t work is that
@@ -70,3 +73,26 @@ def test_find_nominative_icelandic_companies_veitur():
         "Faxaflóahafið sf.",
         "Veitur ohf.",
     }
+
+
+def test_find_nominative_icelandic_companies_fjogur():
+
+    s = (
+        "Á embættisafgreiðslufundi skipulagsfulltrúa 18. maí 2018 var lagt fram bréf "
+        "Orkustofnunar dags. 7. maí 2018 þar sem óskað er eftir umsögn á umsókn "
+        "Björgunar ehf. um leyfi til leitar og rannsókna á möl og sandi af hafsbotni í"
+        "Þerneyjarsundi í Kollafirði. Erindinu var vísað til umsagnar skrifstofu "
+        "umhverfisgæða og er nú lögð fram að nýju ásamt umsögn skrifstofu "
+        "umhverfisgæða dags. 24. maí 2018."
+    )
+
+    print(s)
+    assert find_nominative_icelandic_companies(s) == {
+        "Björgun ehf.",
+    }
+
+
+def test_clean_company_name():
+    assert clean_company_name("Co ehf") == "Co ehf."
+    assert clean_company_name("Co ehf.") == "Co ehf."
+    assert clean_company_name("Coehf") == "Coehf"

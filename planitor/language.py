@@ -26,6 +26,14 @@ ICELANDIC_COMPANY_RE = re.compile(
 )
 
 
+def clean_company_name(name):
+    # Ensure company suffixes are followed by the period character
+    for suff in COMPANY_SUFFIXES:
+        if name.endswith(" {}".format(suff.rstrip("."))):
+            return "{}.".format(name)
+    return name
+
+
 def parse_icelandic_companies(text) -> Set:
     """ This is only a regex so it does not tokenize. When company names are in
     different inflections, these are of course also not normalized to nefnifall. It
@@ -148,7 +156,7 @@ def find_nominative_icelandic_companies(text) -> Set:
     return found_company_names
 
 
-def lookup_icelandic_company_in_entities(
+def levenshtein_company_lookup(
     db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE
 ):
     """ As described above, we may encounter similar looking inflections of company
@@ -161,6 +169,6 @@ def lookup_icelandic_company_in_entities(
 
     """
 
-    folded = fold(name)
-    col = func.levenshtein(Entity.slug, folded)
+    folded = clean_company_name(fold(name))
+    col = func.levenshtein_less_equal(Entity.slug, folded, MAX_LEVENSHTEIN_DISTANCE)
     return db.query(Entity, col).filter(col <= MAX_LEVENSHTEIN_DISTANCE).order_by(col)

@@ -2,7 +2,6 @@ from collections import namedtuple
 import enum
 
 from sqlalchemy import (
-    Table,
     Boolean,
     Column,
     ForeignKey,
@@ -172,12 +171,11 @@ class Tag(Base):
     name = Column(String, primary_key=True, index=True)
 
 
-case_entity_table = Table(
-    "case_entities",
-    Base.metadata,
-    Column("entity_id", String, ForeignKey("entities.kennitala"), primary_key=True),
-    Column("case_id", Integer, ForeignKey("cases.id"), primary_key=True),
-)
+class CaseEntity(Base):
+    __tablename__ = "case_entities"
+    entity_id = Column(String, ForeignKey("entities.kennitala"), primary_key=True)
+    case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
+    applicant = Column(Boolean, default=True)
 
 
 class CaseAttachment(Base):
@@ -233,7 +231,7 @@ class Case(Base):
 
     attachments = relationship(CaseAttachment)
     tags = relationship(CaseTag)
-    entities = relationship(Entity, secondary=case_entity_table)
+    entities = relationship(CaseEntity)
 
     __table_args__ = (UniqueConstraint("serial", "council_id"),)
 

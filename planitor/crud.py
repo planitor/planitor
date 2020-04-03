@@ -9,6 +9,7 @@ from .models import (
     Entity,
     EntityTypeEnum,
     Case,
+    CaseEntity,
     Minute,
     Housenumber,
     Geoname,
@@ -18,6 +19,7 @@ from .models import (
 
 from .cases import get_case_status_from_remarks
 
+from .language import clean_company_name
 from .utils.kennitala import Kennitala
 from .utils.text import fold
 
@@ -77,6 +79,8 @@ def get_or_create_entity(
         entity_type = (
             EntityTypeEnum.person if kennitala.is_person() else EntityTypeEnum.company
         )
+        if entity_type == EntityTypeEnum.company:
+            name = clean_company_name(name)
         entity = Entity(
             kennitala=kennitala.only_digits(),
             name=name,
@@ -98,6 +102,24 @@ def get_or_create_case(db, serial, council):
         db.add(case)
         created = True
     return case, created
+
+
+def get_or_create_case_entity(db, case, entity, applicant):
+    case_entity = (
+        db.query(CaseEntity)
+        .filter_by(entity_id=entity.kennitala, case_id=case.id)
+        .first()
+    )
+    created = False
+    if case_entity is None:
+        case_entity = CaseEntity(case=case, entity=entity, applicant=applicant)
+        db.add(case_entity)
+        created = True
+    else:
+        if applicant:
+            case_entity.applicant = applicant
+            db.add(case_entity)
+    return case_entity, created
 
 
 """ The following regex matches street and house numbers like these:
@@ -225,3 +247,10 @@ def get_or_create_case_tag(db, tag, case):
         db.add(case_tag)
         created = True
     return case_tag, created
+
+
+def lookup_icelandic_company_in_entities(db, name):
+    name = clean_company_name(name)
+    return db.query(Entity).filter(
+        Entity.entity_type == EntityTypeEnum.company, Entity.name == name
+    )

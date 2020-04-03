@@ -11,6 +11,7 @@ from planitor.crud import (
     get_or_create_municipality,
     get_or_create_council,
     get_or_create_entity,
+    get_or_create_case_entity,
     get_or_create_meeting,
     create_minute,
 )
@@ -77,8 +78,11 @@ class DatabasePipeline(object):
                 if not kennitala.validate():
                     continue
                 entity, _ = get_or_create_entity(self.db, kennitala=kennitala, **items)
-                if entity not in case.entities:
-                    case.entities.append(entity)
+                case_entity, _ = get_or_create_case_entity(
+                    self.db, case, entity, applicant=True
+                )
+                if case_entity not in case.entities:
+                    case.entities.append(case_entity)
 
             self.db.add(case)
             self.db.commit()
