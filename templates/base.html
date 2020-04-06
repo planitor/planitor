@@ -7,15 +7,29 @@
       href="{{ url_for('static', path='/dist/styles.css') }}"
       rel="stylesheet"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:title" content="Planitor.is" />
-    <meta property="og:description" content="Gagnagrunnur með öllum rafhjól, hlaupahjólum og öðrum léttum rafknúnum farartækjum frá helstu söluaðilum." />
+    <meta
+      property="og:description"
+      content="Gagnagrunnur með öllum rafhjól, hlaupahjólum og öðrum léttum rafknúnum farartækjum frá helstu söluaðilum."
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.planitor.is/" />
     {#
-    <link rel="icon" href="{{ url_for('static', path='/favicon.png') }}" sizes="32x32">
-    <link rel="icon" href="{{ url_for('static', path='/favicon.png') }}" sizes="192x192">
-    <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
+    <link
+      rel="icon"
+      href="{{ url_for('static', path='/favicon.png') }}"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', path='/favicon.png') }}"
+      sizes="192x192"
+    />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', path='/opengraph.png') }}"
+    />
     #}
   </head>
 
@@ -46,10 +60,7 @@
           class="flex-grow bg-gray-100 shadow sm:shadow-none sm:bg-transparent w-full hidden sm:block sm:flex sm:items-center sm:w-auto p-6 sm:p-0"
         >
           <div class="text-sm sm:flex-grow">
-            <a
-              href="{{ url_for('get_index') }}"
-              class="nav-btn"
-            >
+            <a href="{{ url_for('get_index') }}" class="nav-btn">
               Forsíða
             </a>
           </div>
@@ -57,7 +68,7 @@
             <a
               href="#"
               target="_blank"
-              class="font-bold inline-block text-sm px-4 py-2 leading-none border rounded border-white hover:border-gray shadow bg-white mt-4 sm:mt-0"
+              class="font-bold inline-block text-sm px-4 py-2 leading-none mt-4 sm:mt-0"
               >Um Planitor</a
             >
           </div>
@@ -66,13 +77,17 @@
     </div>
     <div class="flex-grow w-full">
       <div class="max-w-6xl mx-auto">
-      {% block body %}{% endblock body %}
+        {% block body %}{% endblock body %}
       </div>
     </div>
-    <footer class="bg-gray-900 w-full mt-8">
+    <footer class="w-full mt-8">
       <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 text-xs sm:text-sm">
         <p class="my-1 text-gray-600">Planitor!</p>
-        <p class="my-1 text-gray-600"><a href="mailto:jokull@solberg.is" class="font-bold text-gray-500">jokull@solberg.is</a></p>
+        <p class="my-1 text-gray-600">
+          <a href="mailto:jokull@solberg.is" class="font-bold text-gray-500"
+            >jokull@solberg.is</a
+          >
+        </p>
       </div>
     </footer>
     <script src="{{ url_for('static', path='/dist/app.js') }}"></script>

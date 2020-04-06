@@ -1,33 +1,89 @@
-{% extends "base.html" %} {% block body %}
+{% extends "base.html" %}
+
+{% macro pagination() %}
+  <ul class="my-6 flex justify-between">
+  {% if paging.has_previous %}
+    <li>
+      <a class="btn bg-white shadow" href="{{ url_for('get_municipality', muni_id=h.encode(municipality.id)) }}?page={{ paging.bookmark_previous }}">
+        ← Fyrri síða
+      </a>
+    </li>
+  {% else %}
+    <li></li>
+  {% endif %}
+  {% if paging.has_next %}
+    <li>
+      <a class="btn bg-white shadow" href="{{ url_for('get_municipality', muni_id=h.encode(municipality.id)) }}?page={{ paging.bookmark_next }}">
+        Næsta síða →
+      </a>
+    </li>
+  {% endif %}
+  </ul>
+{% endmacro %}
+
+
+{% block body %}
 <div class="px-6">
-  <div class="my-6 mt-4 sm:mt-8">
-    <div class="text-xl font-bold">
-      {{ municipality.name }}
+  <div class="my-8 mt-4 sm:mt-8">
+    <div class="font-bold">
+      <a href="{{ url_for('get_municipality', muni_id=h.encode(municipality.id)) }}">Fundargerðir<br><span class="text-4xl font-thin">{{ municipality.name }}</a></a>
     </div>
   </div>
-  <div class="meetings grid grid-cols-1 gap-4">
-    {% for meeting, minute_count in meetings %}
-    <a
-      href="{{ url_for('get_meeting', muni_id=h.encode(municipality.id), council_slug=meeting.council.council_type.value.slug, meeting_id=h.encode(meeting.id)) }}"
-      class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
-    >
-      <div class="px-4 py-4">
-        <div class="flex justify-between items-center text-l mb-1">
-          <div class="name font-bold">
-            {{ meeting.council.name }} nr. {{ meeting.name }}
+  {{ pagination() }}
+  <div class="meetings">
+  {% for year, meetings in meetings|groupby('year')|sort(reverse=True) %}
+    <div class="my-8 mt-4 sm:mt-8">
+      <div class="font-bold">
+        <span class="text-4xl font-thin">{{ year }}</a>
+      </div>
+    </div>
+    <div class="mb-6">
+      {% for m in meetings -%}
+      <div
+        class="block bg-white rounded overflow-hidden shadow-lg mb-6"
+      >
+        <div class="px-4 py-4">
+          <div class="flex justify-between items-center mb-2">
+            <a
+              class="name font-bold mr-4 text-sm md:text-base"
+              style="flex: 2 1 0;"
+              href="{{
+                url_for('get_meeting',
+                  muni_id=h.encode(municipality.id),
+                  council_slug=m.council.council_type.value.slug,
+                  meeting_id=h.encode(m.id)) }}">
+              {{ m.council.name }} nr. {{ m.name }}
+            </a>
+            <div class="text-gray-700 mr-4 text-sm md:text-base" style="flex: 1 1 0;">{{ human_date(m.start) }}</div>
+            <div class="text-gray-700 mr-4 text-sm md:text-base hidden lg:block" style="flex: 1 1 0;">{{ timeago(m.start) }}</div>
+            <div class="text-gray-700 mr-4 text-sm md:text-base" style="flex: 1 1 0;">
+              {{ m.minute_count }}
+              {% if m.minute_count == 1 %}fundarliður{% else %}fundarliðir{% endif %}
+            </div>
+            <a
+                href="{{
+                  url_for('get_meeting',
+                    muni_id=h.encode(municipality.id),
+                    council_slug=m.council.council_type.value.slug,
+                    meeting_id=h.encode(m.id)) }}"
+                class="block rounded-md border-blue-800 border-2 px-4 py-1 text-sm font-bold text-blue-800"
+            >
+              Nánar
+            </a>
           </div>
-          <div>{{ minute_count }} {% if minute_count == 1 %}fundarliður{% else %}fundarliðir{% endif %}</div>
-        </div>
-        {% if meeting.attendant_names %}
-        <div class="pb-5 pt-2 text-sm">{{ ', '.join(meeting.attendant_names) }}</div>
-        {% endif %}
-        <div class="flex justify-between items-center">
-          <div class="text-xs">{{ meeting.start.strftime('%Y-%m-%d') }}</div>
-          <div class="text-xs text-gray-700">{{ timeago(meeting.start) }}</div>
+          <ul class="my-1">
+          {% for enum, count in m.counts.items() if count -%}
+            <li class="mr-1 mb-1 inline-block">
+              <span class="pill pill-{{ enum.value.color }}">{{ count }}</span> <span class="text-xs text-gray-800">{{ enum.value.label }}</span>
+            </li>
+          {% endfor -%}
+          </ul>
         </div>
       </div>
-    </a>
-    {% endfor %}
+      {% endfor %}
+    </div>
+  {% endfor %}
   </div>
+  {{ pagination() }}
 </div>
 {% endblock body %}

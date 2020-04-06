@@ -1,0 +1,1 @@
+poetry run ipython --config=".ipython.py" --pprint --no-simple-prompt

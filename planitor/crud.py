@@ -1,28 +1,25 @@
 import re
 from typing import Tuple
 
+from .cases import get_case_status_from_remarks
+from .language import clean_company_name
 from .models import (
-    Municipality,
-    Council,
-    CouncilTypeEnum,
-    Meeting,
-    Entity,
-    EntityTypeEnum,
     Case,
     CaseEntity,
-    Minute,
-    Housenumber,
-    Geoname,
     CaseTag,
+    Council,
+    CouncilTypeEnum,
+    Entity,
+    EntityTypeEnum,
+    Geoname,
+    Housenumber,
+    Meeting,
+    Minute,
+    Municipality,
     Tag,
 )
-
-from .cases import get_case_status_from_remarks
-
-from .language import clean_company_name
 from .utils.kennitala import Kennitala
 from .utils.text import fold
-
 
 MUNICIPALITIES_OSM_IDS = {
     # These are `name`, `osm_id` tuples

@@ -1,26 +1,27 @@
-from collections import namedtuple
 import enum
+from collections import namedtuple
 
 from sqlalchemy import (
     Boolean,
     Column,
-    ForeignKey,
-    Integer,
-    String,
     Date,
     DateTime,
-    Numeric,
     Enum,
-    func,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
     UniqueConstraint,
+    func,
 )
-from sqlalchemy.types import ARRAY, BIGINT
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
 
 from .database import Base
 
-
 EnumValue = namedtuple("EnumValue", ("slug", "label"))
+
+ColorEnumValue = namedtuple("ColorEnumValue", ("slug", "label", "color"))
 
 
 class CouncilTypeEnum(enum.Enum):
@@ -43,45 +44,64 @@ class EntityTypeEnum(enum.Enum):
 
 
 class CaseStatusEnum(enum.Enum):
-    delayed = EnumValue("frestad", "Frestað")
-    approved = EnumValue("samthykkt", "Samþykkt")
-    denied = EnumValue("neitad", "Synjað")
-    answered_positive = EnumValue("jakvaett", "Jákvætt")
-    answered_negative = EnumValue("neikvaett", "Neikvætt")
-    no_comment = EnumValue("engar-athugasemdir", "Engar athugasemdir")
+    approved = ColorEnumValue("samthykkt", "Samþykkt", "green")
+    answered_positive = ColorEnumValue("jakvaett", "Jákvætt", "green")
+    delayed = ColorEnumValue("frestad", "Frestað", "yellow")
 
-    notice = EnumValue("grenndarkynning", "Samþykkt að grenndarkynna")
+    notice = ColorEnumValue("grenndarkynning", "Samþykkt að grenndarkynna", "yellow")
 
-    directed_to_skipulagsrad = EnumValue(
-        "visad-til-skipulags", "Vísað til Skipulags- og samgönguráðs"
+    directed_to_skipulagsrad = ColorEnumValue(
+        "visad-til-skipulags", "Vísað til Skipulags- og samgönguráðs", "yellow"
     )
-    directed_to_adalskipulag = EnumValue(
+    directed_to_adalskipulag = ColorEnumValue(
         "visad-til-deildarstjora-adalskipulags",
         "Vísað til umsagnar deildarstjóra aðalskipulags",
+        "yellow",
     )
-    assigned_project_manager = EnumValue(
-        "visad-til-verkefnastjora", "Vísað til verkefnastjóra"
+    assigned_project_manager = ColorEnumValue(
+        "visad-til-verkefnastjora", "Vísað til verkefnisstjóra", "yellow"
     )
+    answered_negative = ColorEnumValue("neikvaett", "Neikvætt", "red")
+    denied = ColorEnumValue("neitad", "Synjað", "red")
+    no_comment = ColorEnumValue("engar-athugasemdir", "Engar athugasemdir", "blue")
 
 
 class Geoname(Base):
     __tablename__ = "geonames"
-    osm_id = Column(BIGINT, primary_key=True, index=True)
-    name = Column(String)
+    osm_id = Column(BIGINT, primary_key=True, index=True, autoincrement=False)
+    name = Column(TEXT)
     lon = Column(Numeric)
     lat = Column(Numeric)
     place_rank = Column(Integer)
-    city = Column(String)
-    importance = Column(Integer)
+    city = Column(TEXT)
+    importance = Column(NUMERIC)
+    alternative_names = Column(TEXT)
+    class_ = Column("class", TEXT)
+    country = Column(TEXT)
+    country_code = Column(TEXT)
+    county = Column(TEXT)
+    display_name = Column(TEXT)
+    housenumbers = Column(TEXT)
+    osm_type = Column(TEXT)
+    state = Column(TEXT)
+    street = Column(TEXT)
+    type_ = Column("type", TEXT)
+    wikidata = Column(TEXT)
+    wikipedia = Column(TEXT)
+
+    east = Column(NUMERIC)
+    north = Column(NUMERIC)
+    south = Column(NUMERIC)
+    west = Column(NUMERIC)
 
 
 class Housenumber(Base):
     __tablename__ = "housenumbers"
-    osm_id = Column(BIGINT, primary_key=True, index=True)
-    street_name = Column("street", String)
+    osm_id = Column(BIGINT, primary_key=True, index=True, autoincrement=False)
+    street_name = Column("street", TEXT)
     lon = Column(Numeric)
     lat = Column(Numeric)
-    housenumber = Column(String)
+    housenumber = Column(TEXT)
 
     street_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     street = relationship(Geoname)

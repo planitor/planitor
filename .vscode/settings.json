@@ -2,7 +2,6 @@
   "python.pythonPath": "/Users/jokull/Library/Caches/pypoetry/virtualenvs/planitor-3LJ6kOBz-py3.7/bin/python",
   "python.formatting.provider": "black",
   "editor.formatOnSave": true,
-  "files.trimTrailingWhitespace": true,
   "python.formatting.blackArgs": ["--line-length=88"],
   "prettier.proseWrap": "always",
   "[jinja-html]": {
@@ -10,6 +9,9 @@
   },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "*.html": "jinja-html"
   },
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": false,

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="px-6">
+  <div class="my-8 mt-4 sm:mt-8 flex justify-between">
+    <div class="font-bold">
+      <a href="{{ url_for('get_municipality', muni_id=h.encode(meeting.council.municipality.id)) }}">
+        ← Reykjavík
+      </a><br>
+      <span class="text-4xl font-thin">{{ meeting.council.name }} nr. {{ meeting.name }}</a>
+    </div>
+    <div>
+      <a class="btn bg-white shadow" href="{{ meeting.url }}">
+        Fundargerð →
+      </a>
+    </div>
+  </div>
+  <div class="minutes">
+  {% for m, case_count in minutes %}
+    <div
+      class="block bg-white rounded overflow-hidden shadow-lg mb-6"
+    >
+      <div class="px-4 py-4">
+        <div class="flex justify-between items-center mb-2">
+          <div
+            class="name mr-4 font-thin text-xs uppercase tracking-wide text-gray-700"
+            style="flex: 2 1 0;">
+            Umsókn nr. {{ m.serial }}
+          </div>
+          <div
+              class="pill pill-big pill-{{ m.status.value.color if m.status else 'none' }} font-bold"
+          >
+            {{ m.status.value.label if m.status else "Annað" }}
+          </div>
+        </div>
+        <div class="max-w-2xl">
+          <h4 class="text-xl font-bold tracking-tight">{{ m.case.address }}</h4>
+          <div class="text-xl mb-4 tracking-tight">{{ m.headline }}</div>
+          <div class="mb-4">
+            <h5 class="font-semibold text-xs uppercase tracking-wide text-gray-700">Fyrirspurn</h5>
+            <p>{{ m.inquiry }}</p>
+          </div>
+          <div class="mb-4">
+            <h5 class="font-semibold text-xs uppercase tracking-wide text-gray-700">Svar</h5>
+            <p>{{ m.remarks }}</p>
+          </div>
+          <hr class="border-1 mb-4">
+          <p class="text-xs text-gray-700">
+            Verknúmer
+            <a href="#" class="text-blue-700">{{ m.case.serial }} ({{ case_count }})</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock body %}

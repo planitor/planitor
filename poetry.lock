@@ -448,6 +448,22 @@ version = "0.6.1"
 
 [[package]]
 category = "dev"
+description = "Like `diff` but for PostgreSQL schemas"
+name = "migra"
+optional = false
+python-versions = "*"
+version = "1.0.1585875302"
+
+[package.dependencies]
+schemainspect = ">=0.1.1585871494"
+six = "*"
+sqlbag = "*"
+
+[package.extras]
+pg = ["psycopg2-binary"]
+
+[[package]]
+category = "dev"
 description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
@@ -493,6 +509,14 @@ version = "0.6.2"
 
 [package.extras]
 testing = ["docopt", "pytest (>=3.0.7)"]
+
+[[package]]
+category = "dev"
+description = "Object-oriented filesystem paths"
+name = "pathlib"
+optional = false
+python-versions = "*"
+version = "1.0.1"
 
 [[package]]
 category = "dev"
@@ -737,7 +761,7 @@ ipdb = "*"
 pytest = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Extensions to the standard Python datetime module"
 name = "python-dateutil"
 optional = false
@@ -806,6 +830,18 @@ dev = ["pytest"]
 
 [[package]]
 category = "dev"
+description = "Schema inspection for PostgreSQL (and possibly others)"
+name = "schemainspect"
+optional = false
+python-versions = "*"
+version = "0.1.1585871494"
+
+[package.dependencies]
+six = "*"
+sqlalchemy = "*"
+
+[[package]]
+category = "dev"
 description = "A high-level Web Crawling and Web Scraping framework"
 name = "scrapy"
 optional = false
@@ -848,7 +884,7 @@ idna = ["idna"]
 tests = ["coverage (>=4.2.0)", "pytest"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -862,6 +898,18 @@ name = "soupsieve"
 optional = false
 python-versions = ">=3.5"
 version = "2.0"
+
+[[package]]
+category = "main"
+description = "offset-free paging for sqlalchemy"
+name = "sqlakeyset"
+optional = false
+python-versions = "*"
+version = "0.1.1579837191"
+
+[package.dependencies]
+python-dateutil = "*"
+sqlalchemy = "*"
 
 [[package]]
 category = "main"
@@ -882,6 +930,24 @@ postgresql_pg8000 = ["pg8000"]
 postgresql_psycopg2binary = ["psycopg2-binary"]
 postgresql_psycopg2cffi = ["psycopg2cffi"]
 pymysql = ["pymysql"]
+
+[[package]]
+category = "dev"
+description = "various snippets of SQL-related boilerplate"
+name = "sqlbag"
+optional = false
+python-versions = "*"
+version = "0.1.1579049654"
+
+[package.dependencies]
+pathlib = "*"
+six = "*"
+sqlalchemy = "*"
+
+[package.extras]
+maria = ["pymysql"]
+pendulum = ["pendulum", "relativedelta"]
+pg = ["psycopg2"]
 
 [[package]]
 category = "main"
@@ -1065,7 +1131,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "266b23359b03359509d78242d596a720ee8809fe39b38990b794e8ac6ee0d7be"
+content-hash = "bff048fd964142214af7449b1ad4d62d18dc07871cd51117461bcee8ec85587b"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1332,6 +1398,10 @@ mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
+migra = [
+    {file = "migra-1.0.1585875302-py2.py3-none-any.whl", hash = "sha256:59d218e4410e5e1e02c7c24bf971d793c5f51fd3b8669f4cff70ead0683d2cfb"},
+    {file = "migra-1.0.1585875302.tar.gz", hash = "sha256:72baa8ff484c9968b8987ae77a1827fbb4457f53c0b28dcdd15126d7fe29ce8a"},
+]
 more-itertools = [
     {file = "more-itertools-8.2.0.tar.gz", hash = "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"},
     {file = "more_itertools-8.2.0-py3-none-any.whl", hash = "sha256:5dd8bcf33e5f9513ffa06d5ad33d78f31e1931ac9a18f33d37e77a180d393a7c"},
@@ -1347,6 +1417,9 @@ parsel = [
 parso = [
     {file = "parso-0.6.2-py2.py3-none-any.whl", hash = "sha256:8515fc12cfca6ee3aa59138741fc5624d62340c97e401c74875769948d4f2995"},
     {file = "parso-0.6.2.tar.gz", hash = "sha256:0c5659e0c6eba20636f99a04f469798dca8da279645ce5c387315b2c23912157"},
+]
+pathlib = [
+    {file = "pathlib-1.0.1.tar.gz", hash = "sha256:6940718dfc3eff4258203ad5021090933e5c04707d5ca8cc9e73c94a7894ea9f"},
 ]
 pathspec = [
     {file = "pathspec-0.7.0-py2.py3-none-any.whl", hash = "sha256:163b0632d4e31cef212976cf57b43d9fd6b0bac6e67c26015d611a647d5e7424"},
@@ -1530,6 +1603,10 @@ rope = [
     {file = "rope-0.16.0-py3-none-any.whl", hash = "sha256:52423a7eebb5306a6d63bdc91a7c657db51ac9babfb8341c9a1440831ecf3203"},
     {file = "rope-0.16.0.tar.gz", hash = "sha256:d2830142c2e046f5fc26a022fe680675b6f48f81c7fc1f03a950706e746e9dfe"},
 ]
+schemainspect = [
+    {file = "schemainspect-0.1.1585871494-py2.py3-none-any.whl", hash = "sha256:5d957f3049a741d5ff8f6a4f6cfe0fd18325ad53372d2de32551c8d1f009d788"},
+    {file = "schemainspect-0.1.1585871494.tar.gz", hash = "sha256:612616e6751c6f6d9cb9836820d8fc9290cbbbcfb240b21544828ced1b1483e1"},
+]
 scrapy = [
     {file = "Scrapy-2.0.1-py2.py3-none-any.whl", hash = "sha256:7b0e207eae772dca55a56cce5182680b5d66b69a8e733edc59eee11ffb99300e"},
     {file = "Scrapy-2.0.1.tar.gz", hash = "sha256:85581a01f4160a103ca9906ffa4e44474f4ecd1685f0934728892c58ebf111f6"},
@@ -1546,8 +1623,16 @@ soupsieve = [
     {file = "soupsieve-2.0-py2.py3-none-any.whl", hash = "sha256:fcd71e08c0aee99aca1b73f45478549ee7e7fc006d51b37bec9e9def7dc22b69"},
     {file = "soupsieve-2.0.tar.gz", hash = "sha256:e914534802d7ffd233242b785229d5ba0766a7f487385e3f714446a07bf540ae"},
 ]
+sqlakeyset = [
+    {file = "sqlakeyset-0.1.1579837191-py2.py3-none-any.whl", hash = "sha256:1aa250f0b124dd1a34e951542bcd6d1b858c4677846b3ca21aa1dabf54b8431f"},
+    {file = "sqlakeyset-0.1.1579837191.tar.gz", hash = "sha256:064355bfd30515012dea96dfec4e7fddab985ffd5bb57f517b60c47552a041ce"},
+]
 sqlalchemy = [
     {file = "SQLAlchemy-1.3.15.tar.gz", hash = "sha256:c4cca4aed606297afbe90d4306b49ad3a4cd36feb3f87e4bfd655c57fd9ef445"},
+]
+sqlbag = [
+    {file = "sqlbag-0.1.1579049654-py2.py3-none-any.whl", hash = "sha256:4beaffcd9335cb2f71c2f82a0e783da888f1a54c932b6e59d54f300cb062bc39"},
+    {file = "sqlbag-0.1.1579049654.tar.gz", hash = "sha256:bf1aba13a062b0ef61d37ab6f4aa8808bc4bd830e0c14178238ac8185d298f42"},
 ]
 starlette = [
     {file = "starlette-0.13.2-py3-none-any.whl", hash = "sha256:6169ee78ded501095d1dda7b141a1dc9f9934d37ad23196e180150ace2c6449b"},
