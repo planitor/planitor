@@ -32,7 +32,7 @@ def get_or_create_municipality(db, slug):
     muni = db.query(Municipality).filter_by(geoname_osm_id=osm_id).first()
     created = False
     if muni is None:
-        muni = Municipality(name=name, geoname_osm_id=osm_id)
+        muni = Municipality(name=name, geoname_osm_id=osm_id, slug=slug)
         db.add(muni)
         created = True
     return muni, created

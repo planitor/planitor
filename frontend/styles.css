@@ -8,7 +8,33 @@ body {
 }
 
 .btn {
-  @apply rounded-md border-blue-800 border-2 px-4 py-1 text-sm font-bold text-blue-800;
+  @apply rounded-md shadow-lg bg-blue-800 px-6 py-3 text-sm font-bold text-blue-100;
+}
+
+.btn-disabled {
+  @apply bg-gray-500;
+  opacity: 0.3;
+}
+
+.btn .sf-symbol {
+  position: relative;
+  top: -4px;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+.sf-symbol svg {
+  width: 18px;
+  height: 18px;
+  display: inline;
+}
+
+.sf-symbol svg .fill {
+  fill: #333;
+}
+
+.btn .sf-symbol svg .fill {
+  fill: #ebf8ff;
 }
 
 .pill {
@@ -57,6 +83,37 @@ body {
   background: #f7fafb;
 }
 
+.nav-wrapper {
+  background: #1561bd;
+}
+
+nav .logo {
+}
+
+nav .logo svg {
+  height: 43px;
+  width: 180px;
+  display: inline;
+}
+
+nav .search svg .fill {
+  fill: rgba(255, 255, 255, 0.6);
+}
+
+nav .search input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
 footer {
-  background: #1b6588;
+  background: #1561bd;
+}
+
+.entities svg {
+  position: relative;
+  top: -2px;
+  margin-right: 6px;
+}
+
+.entities svg .fill {
+  fill: #2b6cb0;
 }

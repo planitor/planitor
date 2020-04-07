@@ -123,12 +123,16 @@ class Entity(Base):
     geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id), nullable=True)
     geoname = relationship(Geoname)
 
+    def get_human_kennitala(self):
+        return "{}-{}".format(self.kennitala[:6], self.kennitala[7:])
+
 
 class Municipality(Base):
     __tablename__ = "municipalities"
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
     name = Column(String)
+    slug = Column(String, unique=True, nullable=False)
 
     geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
@@ -168,10 +172,10 @@ class Meeting(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     created = Column(DateTime, server_default=func.now())
-    start = Column(DateTime)
-    end = Column(DateTime, nullable=True)
-    description = Column(String, nullable=True)
-    attendant_names = Column(ARRAY(String), nullable=True)
+    start = Column(DateTime, nullable=False)
+    end = Column(DateTime)
+    description = Column(String)
+    attendant_names = Column(ARRAY(String))
     url = Column(String)
 
     council_id = Column(Integer, ForeignKey(Council.id))
@@ -197,6 +201,7 @@ class CaseEntity(Base):
     entity_id = Column(String, ForeignKey("entities.kennitala"), primary_key=True)
     case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
     applicant = Column(Boolean, default=True)
+    entity = relationship(Entity)
 
 
 class CaseAttachment(Base):
@@ -255,6 +260,12 @@ class Case(Base):
     entities = relationship(CaseEntity)
 
     __table_args__ = (UniqueConstraint("serial", "council_id"),)
+
+    def get_coordinates(self):
+        if self.housenumber_osm_id:
+            return self.housenumber.lat, self.housenumber.lon
+        if self.geoname_osm_id:
+            return self.geoname.lat, self.geoname.lon
 
 
 class Minute(Base):

@@ -31,48 +31,20 @@
       content="{{ url_for('static', path='/opengraph.png') }}"
     />
     #}
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
   </head>
 
   <body class="flex flex-col flex-wrap items-center min-h-screen">
-    <div class="w-full">
+    <div class="nav-wrapper w-full">
       <nav
         id="navigation"
-        class="flex items-center justify-between flex-wrap p-6 max-w-6xl mx-auto"
+        class="flex items-center justify-between flex-wrap p-6 max-w-6xl mx-auto "
       >
-        <a id="logo" href="/" class="mr-6 block" alt="Örflæði">Planitor</a>
-        <div class="block sm:hidden">
-          <button
-            id="hamburger"
-            class="flex items-center pl-3 py-2 rounded hover:text-gray-800 hover:border-gray-400"
-          >
-            <svg
-              class="fill-current h-4 w-4"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <title>Menu</title>
-              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-            </svg>
-          </button>
-        </div>
-        <div
-          id="hamburger-dropdown"
-          class="flex-grow bg-gray-100 shadow sm:shadow-none sm:bg-transparent w-full hidden sm:block sm:flex sm:items-center sm:w-auto p-6 sm:p-0"
-        >
-          <div class="text-sm sm:flex-grow">
-            <a href="{{ url_for('get_index') }}" class="nav-btn">
-              Forsíða
-            </a>
-          </div>
-          <div>
-            <a
-              href="#"
-              target="_blank"
-              class="font-bold inline-block text-sm px-4 py-2 leading-none mt-4 sm:mt-0"
-              >Um Planitor</a
-            >
-          </div>
-        </div>
+        <a href="/" class="mr-6 block logo" alt="Planitor">{% include "logo.svg" %}</a>
+        <form class="search rounded-md bg-blue-600 flex flex-grow items-center px-3 py-1">
+          <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
+          <input class="bg-transparent flex-grow py-1 px-2 text-white" placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'">
+        </form>
       </nav>
     </div>
     <div class="flex-grow w-full">
@@ -82,9 +54,9 @@
     </div>
     <footer class="w-full mt-8">
       <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 text-xs sm:text-sm">
-        <p class="my-1 text-gray-600">Planitor!</p>
-        <p class="my-1 text-gray-600">
-          <a href="mailto:jokull@solberg.is" class="font-bold text-gray-500"
+        <p class="my-1 text-white">Planitor!</p>
+        <p class="my-1 text-white">
+          <a href="mailto:jokull@solberg.is" class="font-bold text-blue-200"
             >jokull@solberg.is</a
           >
         </p>

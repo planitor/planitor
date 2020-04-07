@@ -6,20 +6,20 @@
     </div>
   </div>
   <div class="munis grid grid-cols-1 gap-4">
-    {% for muni in municipalities %}
+    {% for m in municipalities %}
     <a
-      href="{{ url_for('get_municipality', muni_id=h.encode(muni.id)) }}"
+      href="{{ url_for('get_municipality', muni_slug=m.slug) }}"
       class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
     >
       <div class="px-4 py-4">
         <div class="name font-bold text-xl mb-1">
-          {{ muni.name }}
+          {{ m.name }}
         </div>
       </div>
     </a>
     {% endfor %}
     <a
-      href="{{ url_for('get_municipality', muni_id=h.encode(2)) }}"
+      href="{{ url_for('get_municipality', muni_slug=h.encode(2)) }}"
       class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
     >
       <div class="px-4 py-4">

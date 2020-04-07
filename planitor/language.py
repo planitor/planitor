@@ -17,6 +17,7 @@ COMPANY_SUFFIXES = (
     "hses.",
     "hf.",
     "ohf.",
+    "bs.",
 )
 
 ICELANDIC_COMPANY_RE = re.compile(

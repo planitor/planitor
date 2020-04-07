@@ -28,20 +28,17 @@
       <li class="mr-4">
         /
       </li>
-      <li class="mr-4">Fundur nr. {{ meeting.name }}</li>
+      <li class="mr-4">Verk nr. {{ case.serial }}</li>
     </ul>
-    <div class="flex justify-between items-end">
-      <a class="text-4xl font-thin block">Fundur nr. {{ meeting.name }}, {{ human_date(meeting.start) }}</a>
-      <a class="btn block" href="{{ meeting.url }}">
-        Fundargerð <span class="sf-symbol">{% include "symbols/arrow.up.right.circle.fill.svg" %}</span>
-      </a>
+    <div>
+      <a class="text-4xl font-thin block">{{ case.address }}</a>
     </div>
   </div>
   <div class="minutes">
-  {% for m, case_count in minutes %}
+    {% for m in minutes %}
     <div class="flex">
       <div
-        class="block bg-white rounded-md shadow-lg mb-6"
+        class="block bg-white rounded overflow-hidden shadow-lg mb-6"
       >
         <div class="px-4 py-4">
           <div class="flex justify-between items-center mb-2">
@@ -69,47 +66,18 @@
             </div>
             <hr class="border-1 mb-4">
             <p class="text-xs text-gray-700">
-              Verknúmer
-              <a href="{{ url_for('get_case',
-              muni_slug=meeting.council.municipality.slug,
-              council_slug=m.case.council.council_type.value.slug,
-              case_id=h.encode(m.case.id)) }}" class="text-blue-700">{{ m.case.serial }} ({{ case_count }})</a>
+              Fundur
+              <a href="{{ url_for('get_meeting',
+              muni_slug=case.council.municipality.slug,
+              council_slug=case.council.council_type.value.slug,
+              meeting_id=h.encode(m.meeting_id)) }}" class="text-blue-700">
+                {{ m.meeting.name }}</a> — {{ human_date(m.meeting.start) }}
             </p>
           </div>
         </div>
       </div>
-      <div class="flex-grow w-1/4 ml-6">
-      {% if m.case.get_coordinates() %}
-        {% set lat, lon = m.case.get_coordinates() %}
-        <div
-          class="map h-64 w-full shadow-lg lazyload mb-6 rounded-md overflow-hidden"
-          id="map-{{ m.case.id }}"
-          data-lat="{{ lat }}"
-          data-lon="{{ lon }}"
-          data-address="{{ m.case.address }}"></div>
-      {% endif %}
-        <div class="entities">
-        {% for case_entity in m.case.entities %}
-          {% set e = case_entity.entity %}
-          <div class="mb-2">
-            <a href="{{
-              url_for('get_company', kennitala=e.kennitala, slug=e.slug) if e.entity_type.name == 'company' else
-              url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}"
-              class="text-blue-700 font-semibold font-sm">
-              <span class="sf-symbol">
-                {% if e.entity_type.name == "company" %}
-                {% include "symbols/briefcase.fill.svg" %}
-                {% else %}
-                {% include "symbols/person.fill.svg" %}
-                {% endif %}
-              </span> {{ e.name }}
-            </a>
-          </div>
-        {% endfor %}
-        </div>
-      </div>
     </div>
-  {% endfor %}
+    {% endfor %}
   </div>
 </div>
 {% endblock body %}

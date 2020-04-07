@@ -37,6 +37,7 @@ PATTERNS = {
     ),
     CaseStatusEnum.no_comment: (
         r"^ekki eru gerðar skipulagslegar athugasemdir við erindið",
+        r"^ekki er gerð athugasemd við erindið",
         r"^ekki gerð athugasemd við erindið",
     ),
     CaseStatusEnum.notice: (

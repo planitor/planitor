@@ -1,5 +1,6 @@
 import datetime as dt
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import PlainTextResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from starlette.requests import Request
@@ -8,9 +9,10 @@ from starlette.templating import Jinja2Templates
 
 from . import hashids as h
 from .meetings import MeetingView
-from .models import Municipality, Meeting, Minute, Case
+from .models import Municipality, Meeting, Minute, Case, Entity
 from .database import get_db
 from .utils.timeago import timeago
+from .mapkit import get_token as mapkit_get_token
 
 
 def human_date(date: dt.datetime) -> str:
@@ -47,11 +49,11 @@ async def get_index(
     )
 
 
-@app.get("/sveitarfelog/{muni_id}")
+@app.get("/s/{muni_slug}")
 async def get_municipality(
-    request: Request, muni_id: str, page: str = None, db: Session = Depends(get_db)
+    request: Request, muni_slug: str, page: str = None, db: Session = Depends(get_db)
 ):
-    muni = db.query(Municipality).get(h.decode(muni_id)[0])
+    muni = db.query(Municipality).filter_by(slug=muni_slug).first()
     if muni is None:
         raise HTTPException(status_code=404, detail="Sveitarfélag fannst ekki")
 
@@ -68,10 +70,10 @@ async def get_municipality(
     )
 
 
-@app.get("/sveitarfelog/{muni_id}/{council_slug}/{meeting_id}")
+@app.get("/s/{muni_slug}/{council_slug}/fundir/{meeting_id}")
 async def get_meeting(
     request: Request,
-    muni_id: str,
+    muni_slug: str,
     council_slug: str,
     meeting_id: str,
     db: Session = Depends(get_db),
@@ -80,7 +82,7 @@ async def get_meeting(
     if (
         meeting is None
         or meeting.council.council_type.value.slug != council_slug
-        or meeting.council.municipality_id != h.decode(muni_id)[0]
+        or meeting.council.municipality.slug != muni_slug
     ):
         raise HTTPException(status_code=404, detail="Fundargerð fannst ekki")
     sq_count = (
@@ -100,8 +102,84 @@ async def get_meeting(
         "meeting.html",
         {
             "municipality": meeting.council.municipality,
+            "council": meeting.council,
             "meeting": meeting,
             "minutes": minutes,
             "request": request,
         },
     )
+
+
+@app.get("/s/{muni_slug}/{council_slug}")
+async def get_council(
+    request: Request, muni_slug: str, council_slug: str, db: Session = Depends(get_db),
+):
+    return None
+
+
+@app.get("/s/{muni_slug}/{council_slug}/verk/{case_id}")
+async def get_case(
+    request: Request,
+    muni_slug: str,
+    council_slug: str,
+    case_id: str,
+    db: Session = Depends(get_db),
+):
+    case_id = h.decode(case_id)
+    if not case_id:
+        raise HTTPException(status_code=404, detail="Verk fannst ekki")
+    case = db.query(Case).get(case_id[0])
+    if (
+        case is None
+        or case.council.council_type.value.slug != council_slug
+        or case.council.municipality.slug != muni_slug
+    ):
+        raise HTTPException(status_code=404, detail="Verk fannst ekki")
+
+    minutes = (
+        db.query(Minute)
+        .join(Meeting)
+        .filter(Minute.case_id == case.id)
+        .order_by(Meeting.start)
+    )
+    return templates.TemplateResponse(
+        "case.html",
+        {
+            "municipality": case.council.municipality,
+            "case": case,
+            "council": case.council,
+            "minutes": minutes,
+            "request": request,
+        },
+    )
+
+
+@app.get("/f/{slug}-{kennitala}")
+async def get_company(
+    request: Request, kennitala: str, slug: str, db: Session = Depends(get_db),
+):
+    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
+    if entity is None or entity.slug != slug:
+        raise HTTPException(status_code=404, detail="Fyrirtæki fannst ekki")
+
+    return templates.TemplateResponse(
+        "company.html", {"entity": entity, "request": request}
+    )
+
+
+@app.get("/p/{slug}-{kennitala}")
+async def get_person(
+    request: Request, kennitala: str, slug: str, db: Session = Depends(get_db),
+):
+    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
+    if entity is None or entity.slug != slug:
+        raise HTTPException(status_code=404, detail="Fyrirtæki fannst ekki")
+
+    return templates.TemplateResponse(
+        "person.html", {"entity": entity, "request": request}
+    )
+
+
+@app.get("/mapkit-token")
+async def mapkit_token(request: Request):
+    return PlainTextResponse(mapkit_get_token())
