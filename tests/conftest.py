@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 import asyncio
 
@@ -47,3 +48,33 @@ def app_fixture(engine):
 def client_fixture(app):
     client = TestClient(app)
     return client
+
+
+def _c(db, obj):
+    db.add(obj)
+    db.commit()
+    return obj
+
+
+@pytest.fixture(scope="function", name="minute")
+def minute_fixture(db):
+    from planitor.models import Municipality, Council, Meeting, Minute, Case
+
+    muni = _c(db, Municipality(name="Acropolis", slug="acropolis"))
+    council = _c(db, Council(name="Building Office", municipality=muni))
+    meeting = _c(db, Meeting(council=council, name="1", start=dt.datetime(2000, 1, 1)))
+    case = _c(db, Case(council=council))
+    minute = _c(db, Minute(meeting=meeting, case=case))
+    return minute
+
+
+@pytest.fixture(scope="function", name="company")
+def company_fixture(db):
+    from planitor.crud import get_or_create_entity
+    from planitor.utils.kennitala import Kennitala
+
+    entity, created = get_or_create_entity(
+        db, kennitala=Kennitala("5012131870"), name="Veitur ohf.", address=None
+    )
+    db.commit()
+    return entity

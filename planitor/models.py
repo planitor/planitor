@@ -16,7 +16,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
+from sqlalchemy_utils import CompositeArray, CompositeType
 
+from .utils.kennitala import Kennitala
 from .database import Base
 
 EnumValue = namedtuple("EnumValue", ("slug", "label"))
@@ -124,7 +126,7 @@ class Entity(Base):
     geoname = relationship(Geoname)
 
     def get_human_kennitala(self):
-        return "{}-{}".format(self.kennitala[:6], self.kennitala[7:])
+        return "{}-{}".format(self.kennitala[:6], self.kennitala[6:])
 
 
 class Municipality(Base):
@@ -203,6 +205,11 @@ class CaseEntity(Base):
     applicant = Column(Boolean, default=True)
     entity = relationship(Entity)
 
+    # It’s a bit weird that minutes contribute entities to cases. If we update the
+    # inquiry field and re-assess the entities mentioned of a minute we cannot remove
+    # an entity no longer in the minute because another minute of the same case could
+    # have contributed it. This should be ok since inquiries never change.
+
 
 class CaseAttachment(Base):
     # We want to collate all attachments to cases, but they can be associated with a
@@ -268,6 +275,34 @@ class Case(Base):
             return self.geoname.lat, self.geoname.lon
 
 
+class EntityMention(object):
+    """ Used to mark parsed company names inside the inquiry text property. Very
+    expensive to calculate on the fly, so we store it here.
+
+    """
+
+    def __init__(self, entity, start, stop):
+        self.entity = entity
+        self.start = start
+        self.stop = stop
+
+    def __composite_values__(self):
+        return self.entity, self.start, self.stop
+
+    def __repr__(self):
+        return "EntityMention(entity={}, start={}, stop={})".format(
+            self.entity.id, self.start, self.stop
+        )
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, EntityMention)
+            and other.entity == self.entity
+            and other.start == self.start
+            and other.stop == self.stop
+        )
+
+
 class Minute(Base):
     __tablename__ = "minutes"
 
@@ -281,3 +316,40 @@ class Minute(Base):
     headline = Column(String)
     inquiry = Column(String)
     remarks = Column(String)
+    entity_mentions = Column(
+        CompositeArray(
+            CompositeType(
+                "entity_mention_type",
+                [
+                    Column("entity_id", String, ForeignKey(Entity.kennitala)),
+                    Column("start", Integer),
+                    Column("end_", Integer),
+                ],
+            )
+        )
+    )
+
+    def assign_entity_mentions(self, mentions):
+        self.entity_mentions = []
+        for kennitala, locations in mentions.items():
+            for location in locations:
+                start, end = location
+                self.entity_mentions.append((kennitala, start, end))
+
+    def get_inquiry_mention_tokens(self):
+        """ Use `entity_mentions` to mark linkable locations in the `inquiry` text
+        """
+        s = self.inquiry
+        mentions = sorted(self.entity_mentions, key=lambda i: i[1])
+        for i, (kennitala, start, end) in enumerate(mentions):
+            if i == 0 and start > 0:
+                yield (None, s[0:start])
+            elif i > 0:
+                last = mentions[i - 1]
+                yield (None, s[last[1] + 1 : start])
+            yield (Kennitala(kennitala), s[start:end])
+            last_index = len(mentions) - 1
+            if i == last_index and end != len(s):
+                yield (None, s[end:])
+        if not mentions:
+            yield (None, s)

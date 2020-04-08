@@ -1,4 +1,9 @@
-from planitor.postprocess import get_tag_suggestions_for_minute
+from planitor.models import Entity
+
+from planitor.postprocess import (
+    get_tag_suggestions_for_minute,
+    update_minute_with_entity_mentions,
+)
 
 
 def test_get_tag_suggestions_for_minute():
@@ -66,3 +71,37 @@ def test_get_tag_suggestions_for_minute():
         "viðauki",
         "vísa",
     }
+
+
+def test_update_minute_with_entity_mentions_creates_new_entity(db, minute):
+    # Tag
+    assert db.query(Entity).count() == 0
+    minute.inquiry = "Skjal barst frá Veitum ohf. í gær."
+    update_minute_with_entity_mentions(db, minute)
+    assert list(minute.get_inquiry_mention_tokens()) == [
+        (None, "Skjal barst frá "),
+        ("5012131870", "Veitum ohf."),
+        (None, " í gær."),
+    ]
+    assert len(minute.entity_mentions) == 1
+    assert len(minute.case.entities) == 1
+
+    # Update should remove case entities
+    minute.inquiry = ""
+    update_minute_with_entity_mentions(db, minute)
+    assert list(minute.get_inquiry_mention_tokens()) == []
+    assert len(minute.entity_mentions) == 0
+
+    # We don’t support chasing down and removing case entities
+    assert len(minute.case.entities) == 1
+
+
+def test_update_minute_with_entity_mentions_uses_existing_entity(db, minute, company):
+    # Tag
+    assert db.query(Entity).count() == 1
+    minute.inquiry = "Skjal barst frá Veitum ohf. í gær."
+    update_minute_with_entity_mentions(db, minute)
+    assert list(minute.get_inquiry_mention_tokens())
+    assert len(minute.entity_mentions) == 1
+    assert minute.case.entities[0].entity == company
+    assert db.query(Entity).count() == 1

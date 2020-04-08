@@ -7,38 +7,38 @@ from bs4 import BeautifulSoup as bs
 MEETING_URL = "http://gamli.rvk.is/vefur/owa/{}"
 YEAR_URL = "http://gamli.rvk.is/vefur/owa/edutils.parse_page?nafn=BN2MEN{}"
 YEARS = [
-    # "96",
-    # "97",
-    # "98",
-    # "99",
-    # "00",
-    # "01",
-    # "02",
-    # "03",
-    # "04",
-    # "05",
-    # "06",
-    # "07",
-    # "08",
-    # "09",
-    # "10",
-    # "11",
-    # "12",
-    # "13",
-    # "14",
-    # "15",
-    # "16",
-    # "17",
+    "96",
+    "97",
+    "98",
+    "99",
+    "00",
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
     "18",
     "19",
     "20",
 ]
 
 MONTHS = [
-    (u"Jan", u"janúar"),
-    (u"Feb", u"febrúar"),
-    (u"Mar", u"mars"),
-    (u"Apr", u"apríl"),
+    (u"jan", u"janúar"),
+    (u"feb", u"febrúar"),
+    (u"mar", u"mars"),
+    (u"apr", u"apríl"),
     (u"maí", u"maí"),
     (u"jún", u"júní"),
     (u"júl", u"júlí"),
@@ -95,10 +95,21 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
     start_urls = [YEAR_URL.format(year) for year in YEARS]
 
     def parse(self, response):
+        index_year = int(response.css("h2::text").re_first(r"\d+"))
         for i, link in enumerate(response.css("menu a")):
-            yield response.follow(link, self.parse_meeting)
+            # In some meeting reports the date is only available in the link index and
+            # not in the meeting report itself, so parse and pass it down in cb_kwargs
+            cb_kwargs = {}
+            match = re.search(r"(\d{2})\.(\d{2}).(\d{4})\)$", link.css("::text").get())
+            if match is not None:
+                day, month, year = [int(m) for m in match.groups()]
+                if year == index_year:
+                    # Sometimes there is a bullshit year (like 1899), don’t pass date
+                    # if that’s the case
+                    cb_kwargs = {"start": dt.datetime(year, month, day, 0, 0)}
+            yield response.follow(link, self.parse_meeting, cb_kwargs=cb_kwargs)
 
-    def parse_meeting(self, response):
+    def parse_meeting(self, response, start=None):
         description = (
             response.xpath("//center[1]/following-sibling::text()[2]").get().strip("\r")
         )
@@ -112,7 +123,12 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
                 if month.lower() == long_.lower():
                     month = i
                     break
-        start = dt.datetime(*(int(i) for i in (year, month, day, hour, minute)))
+            start = dt.datetime(*(int(i) for i in (year, month, day, hour, minute)))
+        else:
+            if start is None:
+                raise Exception(
+                    "Not date found for item"
+                )  # And not in referral page either
 
         name, _ = re.match(
             r"(\d+)\. fundur (\d+)",

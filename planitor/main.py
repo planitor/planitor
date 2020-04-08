@@ -1,6 +1,6 @@
 import datetime as dt
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from starlette.requests import Request
@@ -154,27 +154,34 @@ async def get_case(
     )
 
 
+def _get_entity(db, kennitala, slug) -> Entity:
+    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
+    if entity is None or (slug is not None and entity.slug != slug):
+        raise HTTPException(status_code=404, detail="Kennitala fannst ekki")
+    return entity
+
+
+@app.get("/f/{kennitala}")
 @app.get("/f/{slug}-{kennitala}")
 async def get_company(
-    request: Request, kennitala: str, slug: str, db: Session = Depends(get_db),
+    request: Request, kennitala: str, slug: str = None, db: Session = Depends(get_db),
 ):
-    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
-    if entity is None or entity.slug != slug:
-        raise HTTPException(status_code=404, detail="Fyrirtæki fannst ekki")
-
+    entity = _get_entity(db, kennitala, slug)
+    if slug is None:
+        return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
     return templates.TemplateResponse(
         "company.html", {"entity": entity, "request": request}
     )
 
 
+@app.get("/p/{kennitala}")
 @app.get("/p/{slug}-{kennitala}")
 async def get_person(
-    request: Request, kennitala: str, slug: str, db: Session = Depends(get_db),
+    request: Request, kennitala: str, slug: str = None, db: Session = Depends(get_db),
 ):
-    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
-    if entity is None or entity.slug != slug:
-        raise HTTPException(status_code=404, detail="Fyrirtæki fannst ekki")
-
+    entity = _get_entity(db, kennitala, slug)
+    if slug is None:
+        return RedirectResponse("/p/{}-{}".format(entity.slug, entity.kennitala))
     return templates.TemplateResponse(
         "person.html", {"entity": entity, "request": request}
     )

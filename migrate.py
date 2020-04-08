@@ -23,8 +23,15 @@ def sync():
         os.environ["DATABASE_URL"] = TEMP_DB_URL
         from planitor.models import Base
         from planitor.database import engine
+        from sqlalchemy_utils import register_composites
 
         engine.execute("create extension fuzzystrmatch;")
+        engine.execute(
+            "CREATE TYPE entity_mention_type AS "
+            "(entity_id VARCHAR, start INTEGER, end_ INTEGER);"
+        )
+        with engine.connect() as connection:
+            register_composites(connection)
         Base.metadata.create_all(engine)
 
         with S(DB_URL) as s_current, S(TEMP_DB_URL) as s_target:

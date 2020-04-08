@@ -1,14 +1,7 @@
 import re
-from typing import Set
-
-from sqlalchemy import func
+from typing import Dict
 
 from planitor import greynir
-from planitor.models import Entity
-from planitor.utils.text import fold
-
-
-MAX_LEVENSHTEIN_DISTANCE = 5
 
 COMPANY_SUFFIXES = (
     "ehf.",
@@ -35,12 +28,21 @@ def clean_company_name(name):
     return name
 
 
-def parse_icelandic_companies(text) -> Set:
+def parse_icelandic_companies(text) -> Dict:
     """ This is only a regex so it does not tokenize. When company names are in
     different inflections, these are of course also not normalized to nefnifall. It
-    does not pick company names with more than 4 word segments.
+    does not pick company names with more than 4 word segments (see regex).
+
     """
-    return set(re.findall(ICELANDIC_COMPANY_RE, text))
+    found = {}
+
+    for match in re.finditer(ICELANDIC_COMPANY_RE, text):
+        if match.group() not in found:
+            found[match.group()] = [match.span()]
+        else:
+            found[match.group()].append(match.span())
+
+    return found
 
 
 def apply_title_casing(left, right):
@@ -54,7 +56,7 @@ def apply_title_casing(left, right):
     return " ".join(parts)
 
 
-def extract_company_names(text) -> Set:
+def extract_company_names(text) -> Dict:
     """ Get company names with preserved plurality and in nominative form. The
     strategy is multipart:
 
@@ -76,7 +78,7 @@ def extract_company_names(text) -> Set:
 
     """
 
-    found_company_names = set()
+    found_company_names = {}
 
     if not parse_icelandic_companies(text):
         return found_company_names
@@ -86,10 +88,10 @@ def extract_company_names(text) -> Set:
         if not sentence.terminal_nodes:
             continue
 
+        parsed = parse_icelandic_companies(sentence.text)
+
         # Must reparse in lowercase to get inflection of names like Plúsarkitektar
-        inflected_company_names = (
-            parse_icelandic_companies(sentence.text) - found_company_names
-        )
+        inflected_company_names = set(parsed.keys()) - set(found_company_names.keys())
 
         if not inflected_company_names:
             continue
@@ -107,7 +109,7 @@ def extract_company_names(text) -> Set:
                     continue
                 inflected_company_names.remove(inflected_name)
                 name = node.canonical + " {}".format(next_node.text)
-                found_company_names.add(name)
+                found_company_names[name] = parsed[inflected_name]
 
         if not inflected_company_names:
             continue
@@ -146,28 +148,13 @@ def extract_company_names(text) -> Set:
                         nominative_name = " ".join(
                             node.indefinite for node in name_part_nodes
                         )
-                        found_company_names.add(
-                            apply_title_casing(inflected_name, nominative_name)
+                        nominative_name = apply_title_casing(
+                            inflected_name, nominative_name
                         )
+                        found_company_names[nominative_name] = parsed[inflected_name]
                         break
                     steps += 1
                     if steps > 4:  # Limit leftward matching to 4 extra words
                         break
 
     return found_company_names
-
-
-def levenshtein_company_lookup(db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE):
-    """ As described above, we may encounter similar looking inflections of company
-    names. Instead of tokenizing and lemming words (which we could ...) we just use a
-    simple Levenshtein distance calculation. This will also be useful for search.
-
-    Here we use ascii folding and rely on the slug column which is also ascii folded.
-    This is also useful for quick ranking of results for typing inputs that doesn’t
-    require capital letters or accented characters.
-
-    """
-
-    folded = clean_company_name(fold(name))
-    col = func.levenshtein_less_equal(Entity.slug, folded, MAX_LEVENSHTEIN_DISTANCE)
-    return db.query(Entity, col).filter(col <= MAX_LEVENSHTEIN_DISTANCE).order_by(col)

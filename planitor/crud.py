@@ -1,6 +1,9 @@
 import re
 from typing import Tuple
 
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
 from .cases import get_case_status_from_remarks
 from .language import clean_company_name
 from .models import (
@@ -101,7 +104,7 @@ def get_or_create_case(db, serial, council):
     return case, created
 
 
-def get_or_create_case_entity(db, case, entity, applicant):
+def get_or_create_case_entity(db: Session, case: Case, entity: Entity, applicant: bool):
     case_entity = (
         db.query(CaseEntity)
         .filter_by(entity_id=entity.kennitala, case_id=case.id)
@@ -109,7 +112,7 @@ def get_or_create_case_entity(db, case, entity, applicant):
     )
     created = False
     if case_entity is None:
-        case_entity = CaseEntity(case=case, entity=entity, applicant=applicant)
+        case_entity = CaseEntity(case_id=case.id, entity=entity, applicant=applicant)
         db.add(case_entity)
         created = True
     else:
@@ -247,7 +250,26 @@ def get_or_create_case_tag(db, tag, case):
 
 
 def lookup_icelandic_company_in_entities(db, name):
-    name = clean_company_name(name)
+    name = clean_company_name(name).lower()
     return db.query(Entity).filter(
-        Entity.entity_type == EntityTypeEnum.company, Entity.name == name
+        Entity.entity_type == EntityTypeEnum.company, func.lower(Entity.name) == name,
     )
+
+
+MAX_LEVENSHTEIN_DISTANCE = 5
+
+
+def levenshtein_company_lookup(db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE):
+    """ As described above, we may encounter similar looking inflections of company
+    names. Instead of tokenizing and lemming words (which we could ...) we just use a
+    simple Levenshtein distance calculation. This will also be useful for search.
+
+    Here we use ascii folding and rely on the slug column which is also ascii folded.
+    This is also useful for quick ranking of results for typing inputs that doesn’t
+    require capital letters or accented characters.
+
+    """
+
+    folded = clean_company_name(fold(name))
+    col = func.levenshtein_less_equal(Entity.slug, folded, max_distance)
+    return db.query(Entity, col).filter(col <= max_distance).order_by(col)
