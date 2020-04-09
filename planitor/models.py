@@ -341,15 +341,29 @@ class Minute(Base):
         """
         s = self.inquiry
         mentions = sorted(self.entity_mentions, key=lambda i: i[1])
-        for i, (kennitala, start, end) in enumerate(mentions):
-            if i == 0 and start > 0:
-                yield (None, s[0:start])
-            elif i > 0:
-                last = mentions[i - 1]
-                yield (None, s[last[1] + 1 : start])
-            yield (Kennitala(kennitala), s[start:end])
-            last_index = len(mentions) - 1
-            if i == last_index and end != len(s):
-                yield (None, s[end:])
+
         if not mentions:
             yield (None, s)
+
+        def tokens():
+
+            for i, (kennitala, start, end) in enumerate(mentions):
+                if i == 0:
+                    # Before first token
+                    yield (None, s[0:start])
+
+                # Token
+                yield (Kennitala(kennitala), s[start:end])
+
+                if len(mentions) != i + 1:
+                    # Up to next token
+                    next_start = mentions[i + 1][1]
+                    yield (None, s[end:next_start])
+                else:
+                    # Or to end if this is last iteration
+                    yield (None, s[end:])
+
+        for category, text in tokens():
+            if not text:
+                continue
+            yield (category, text)

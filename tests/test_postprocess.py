@@ -78,22 +78,21 @@ def test_update_minute_with_entity_mentions_creates_new_entity(db, minute):
     assert db.query(Entity).count() == 0
     minute.inquiry = "Skjal barst frá Veitum ohf. í gær."
     update_minute_with_entity_mentions(db, minute)
-    assert list(minute.get_inquiry_mention_tokens()) == [
-        (None, "Skjal barst frá "),
-        ("5012131870", "Veitum ohf."),
-        (None, " í gær."),
-    ]
     assert len(minute.entity_mentions) == 1
     assert len(minute.case.entities) == 1
 
     # Update should remove case entities
     minute.inquiry = ""
     update_minute_with_entity_mentions(db, minute)
-    assert list(minute.get_inquiry_mention_tokens()) == []
+    assert list(minute.get_inquiry_mention_tokens()) == [(None, "")]
     assert len(minute.entity_mentions) == 0
 
     # We don’t support chasing down and removing case entities
     assert len(minute.case.entities) == 1
+
+    entity = minute.case.entities[0].entity
+    assert entity.slug == "veitur-ohf"
+    assert entity.kennitala == "5012131870"
 
 
 def test_update_minute_with_entity_mentions_uses_existing_entity(db, minute, company):

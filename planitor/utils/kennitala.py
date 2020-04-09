@@ -19,6 +19,9 @@ class Kennitala:
             return "Invalid kennitala"
         return self.kennitala
 
+    def __eq__(self, other):
+        return other.only_digits() == self.only_digits()
+
     class Invalid(Exception):
         """Kennitala is not valid"""
 

@@ -50,8 +50,11 @@ def apply_title_casing(left, right):
     parts = []
     for left_word, right_word in zip(left.split(), right.split()):
         is_title = left_word[0] == left_word[0].upper()
+        is_upper = left_word == left_word.upper()
         if is_title:
             right_word = right_word.title()
+        if is_upper:
+            right_word = right_word.upper()
         parts.append(right_word)
     return " ".join(parts)
 
@@ -78,83 +81,84 @@ def extract_company_names(text) -> Dict:
 
     """
 
-    found_company_names = {}
+    matched_names = {}
+    name_positions = parse_icelandic_companies(text)
 
     if not parse_icelandic_companies(text):
-        return found_company_names
+        return matched_names
 
     for sentence in greynir.parse(text)["sentences"]:
 
         if not sentence.terminal_nodes:
             continue
 
-        parsed = parse_icelandic_companies(sentence.text)
-
         # Must reparse in lowercase to get inflection of names like Plúsarkitektar
-        inflected_company_names = set(parsed.keys()) - set(found_company_names.keys())
+        original_names = set(name_positions.keys()) - set(matched_names.keys())
 
-        if not inflected_company_names:
+        if not original_names:
             continue
 
         # For companies named after persons we can just use node.canonical
-        for node in sentence.terminal_nodes:
-            if node.index == len(sentence.terminal_nodes) - 1:
+        for i, node in enumerate(sentence.terminal_nodes):
+            if i == len(sentence.terminal_nodes) - 1:
                 break
-            next_node = sentence.terminal_nodes[node.index + 1]
+            next_node = sentence.terminal_nodes[i + 1]
             if node.kind == "PERSON" and next_node.text in COMPANY_SUFFIXES:
-                inflected_name = node.text + " {}".format(next_node.text)
-                if inflected_name not in inflected_company_names:
+                original_name = node.text + " {}".format(next_node.text)
+                if original_name not in original_names:
                     # Skip if we caught "Sigurjóns ehf." in "Hjólbarðaverkstæði
                     # Sigurjóns ehf."
                     continue
-                inflected_company_names.remove(inflected_name)
+                original_names.remove(original_name)
                 name = node.canonical + " {}".format(next_node.text)
-                found_company_names[name] = parsed[inflected_name]
+                matched_names[name] = name_positions[original_name]
 
-        if not inflected_company_names:
+        if not original_names:
             continue
 
         def _(matchobj):
             return matchobj.group(0).lower()
 
-        sentence_text_with_lowercase_company_names = re.sub(
-            ICELANDIC_COMPANY_RE, _, sentence.text
-        )
-
         nodes = greynir.parse_single(
-            sentence_text_with_lowercase_company_names
+            re.sub(ICELANDIC_COMPANY_RE, _, sentence.text)
         ).terminal_nodes
 
         if not nodes:
             continue
 
-        for inflected_name in inflected_company_names:
-            for node in nodes:
+        for original_name in original_names:
+            for i, node in enumerate(nodes):
                 if node.text not in COMPANY_SUFFIXES:
                     continue
                 name_part_nodes = [node]
                 steps = 1
                 while True:
-                    previous_index = node.index - steps
+                    previous_index = i - steps
                     if previous_index <= 0:
                         break
                     name_part_nodes.insert(0, nodes[previous_index])
-                    lowercase_inflected = " ".join(
-                        node.text for node in name_part_nodes
-                    )
-                    if not inflected_name.lower().endswith(lowercase_inflected):
+
+                    untokenized = " ".join(node.text for node in name_part_nodes)
+
+                    _original_name = original_name.lower()
+
+                    # # Greynir seems to convert to em-dash
+                    _untokenized = untokenized.replace("—", "-").replace("–", "-")
+
+                    if not _original_name.endswith(_untokenized):
                         break
-                    if lowercase_inflected == inflected_name.lower():
+
+                    if _untokenized == _original_name:
                         nominative_name = " ".join(
                             node.indefinite for node in name_part_nodes
                         )
                         nominative_name = apply_title_casing(
-                            inflected_name, nominative_name
+                            original_name, nominative_name
                         )
-                        found_company_names[nominative_name] = parsed[inflected_name]
+                        matched_names[nominative_name] = name_positions[original_name]
                         break
                     steps += 1
                     if steps > 4:  # Limit leftward matching to 4 extra words
                         break
 
-    return found_company_names
+    return matched_names

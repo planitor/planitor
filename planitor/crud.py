@@ -22,7 +22,7 @@ from .models import (
     Tag,
 )
 from .utils.kennitala import Kennitala
-from .utils.text import fold
+from .utils.text import slugify, fold
 
 MUNICIPALITIES_OSM_IDS = {
     # These are `name`, `osm_id` tuples
@@ -85,7 +85,7 @@ def get_or_create_entity(
             kennitala=kennitala.only_digits(),
             name=name,
             address=address,
-            slug=fold(name),
+            slug=slugify(name),
             entity_type=entity_type,
             birthday=kennitala.get_birth_date(),
         )

@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 from scrapy.utils.project import get_project_settings
 
 from planitor import greynir
-from planitor.language import extract_company_names
 from planitor.utils.kennitala import Kennitala
 from planitor.crud import (
     get_or_create_municipality,
@@ -15,8 +14,8 @@ from planitor.crud import (
     get_or_create_case_entity,
     get_or_create_meeting,
     create_minute,
-    lookup_icelandic_company_in_entities,
 )
+from planitor.postprocess import update_minute_with_entity_mentions
 
 
 def get_connection_string():
@@ -92,11 +91,7 @@ class DatabasePipeline(object):
                 apply_entity(case, entity, applicant=True)
 
             # Also associate companies mentioned in the inquiry, such as architects
-            for co_name in extract_company_names(minute.inquiry):
-                for entity in list(
-                    lookup_icelandic_company_in_entities(self.db, co_name)
-                ):
-                    apply_entity(case, entity, applicant=False)
+            update_minute_with_entity_mentions(minute)
 
             self.db.add(case)
             self.db.commit()
