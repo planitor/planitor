@@ -87,7 +87,8 @@ def test_update_minute_with_entity_mentions_creates_new_entity(db, minute):
     assert list(minute.get_inquiry_mention_tokens()) == [(None, "")]
     assert len(minute.entity_mentions) == 0
 
-    # We don’t support chasing down and removing case entities
+    # We don’t support chasing down and removing case entities, otherwise this
+    # would be zero again.
     assert len(minute.case.entities) == 1
 
     entity = minute.case.entities[0].entity

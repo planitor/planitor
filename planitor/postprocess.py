@@ -62,6 +62,7 @@ def _get_entity(db: Session, name: str):
         return None
     if len(_all) == 1:
         return _all[0]
+    # Try doing a lookup in the RSK.is fyrirtækjaskrá
     kennitala = get_kennitala_from_rsk_search(name)
     if kennitala is not None:
         kennitala = Kennitala(kennitala)
@@ -77,15 +78,15 @@ def update_minute_with_entity_mentions(db: Session, minute: Minute):
 
     mentions = extract_company_names(minute.inquiry)
 
-    # We only want to persist mentions that have matching local entities, this is to
-    # track those
-    _matched_mentions = {}
-
     if not mentions:
         minute.assign_entity_mentions({})
         db.add(minute)
         db.commit()
         return
+
+    # We only want to persist mentions that have matching local entities, this is to
+    # track those
+    _matched_mentions = {}
 
     for co_name, locations in mentions.items():
         entity = _get_entity(db, co_name)
