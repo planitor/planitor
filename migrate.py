@@ -21,8 +21,8 @@ def sync():
 
     with temporary_db() as TEMP_DB_URL:
         os.environ["DATABASE_URL"] = TEMP_DB_URL
-        from planitor.models import Base
-        from planitor.database import engine
+        from planitor.database import engine, Base
+        from planitor.models import _all  # noqa, needed to register models
         from sqlalchemy_utils import register_composites
 
         engine.execute("create extension fuzzystrmatch;")

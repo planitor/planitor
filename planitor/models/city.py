@@ -18,8 +18,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
 from sqlalchemy_utils import CompositeArray, CompositeType
 
-from .utils.kennitala import Kennitala
-from .database import Base
+from ..utils.kennitala import Kennitala
+from ..database import Base
 
 EnumValue = namedtuple("EnumValue", ("slug", "label"))
 

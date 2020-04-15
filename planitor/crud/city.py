@@ -4,9 +4,9 @@ from typing import Tuple
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from .cases import get_case_status_from_remarks
-from .language import clean_company_name
-from .models import (
+from planitor.cases import get_case_status_from_remarks
+from planitor.language import clean_company_name
+from planitor.models import (
     Case,
     CaseEntity,
     CaseTag,
@@ -21,8 +21,8 @@ from .models import (
     Municipality,
     Tag,
 )
-from .utils.kennitala import Kennitala
-from .utils.text import slugify, fold
+from planitor.utils.kennitala import Kennitala
+from planitor.utils.text import slugify, fold
 
 MUNICIPALITIES_OSM_IDS = {
     # These are `name`, `osm_id` tuples

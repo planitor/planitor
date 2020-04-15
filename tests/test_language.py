@@ -84,3 +84,22 @@ def test_clean_company_name():
     assert clean_company_name("Co ehf") == "Co ehf."
     assert clean_company_name("Co ehf.") == "Co ehf."
     assert clean_company_name("Coehf") == "Coehf"
+
+
+def test_recognize_entities():
+
+    s = (
+        "Á embættisafgreiðslufundi skipulagsfulltrúa 18. maí 2018 var lagt fram bréf "
+        "Orkustofnunar dags. 7. maí 2018 þar sem óskað er eftir umsögn á umsókn "
+        "Björgunar ehf. um leyfi til leitar og rannsókna á möl og sandi af hafsbotni í"
+        "Þerneyjarsundi í Kollafirði. Erindinu var vísað til umsagnar skrifstofu "
+        "umhverfisgæða og er nú lögð fram að nýju ásamt umsögn skrifstofu "
+        "umhverfisgæða dags. 24. maí 2018."
+    )
+
+    from planitor.utils.nertokenizer import recognize_entities
+    from reynir import mark_paragraphs, tokenize
+
+    text = mark_paragraphs(s)
+    token_stream = tokenize(text)
+    print(list(recognize_entities(token_stream)))

@@ -91,8 +91,6 @@ def extract_company_names(text) -> Dict:
 
         if not sentence.terminal_nodes:
             continue
-
-        # Must reparse in lowercase to get inflection of names like Plúsarkitektar
         original_names = set(name_positions.keys()) - set(matched_names.keys())
 
         if not original_names:
@@ -116,6 +114,7 @@ def extract_company_names(text) -> Dict:
         if not original_names:
             continue
 
+        # Must reparse in lowercase to get inflection of names like Plúsarkitektar
         def _(matchobj):
             return matchobj.group(0).lower()
 
