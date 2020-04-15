@@ -2,7 +2,7 @@ import datetime as dt
 
 from starlette.templating import Jinja2Templates
 
-from planitor import hashids
+from planitor import hashids, env
 from planitor.utils.timeago import timeago
 
 
@@ -26,5 +26,10 @@ def human_date(date: dt.datetime) -> str:
 
 templates = Jinja2Templates(directory="templates")
 templates.env.globals.update(
-    {"h": hashids, "timeago": timeago, "human_date": human_date}
+    {
+        "h": hashids,
+        "timeago": timeago,
+        "human_date": human_date,
+        "DEBUG": env.bool("DEBUG"),
+    }
 )

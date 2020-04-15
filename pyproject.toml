@@ -39,6 +39,7 @@ pytest-ipdb = "^0.1-prerelease2"
 rope = "^0.16.0"
 migra = "^1.0.1585875302"
 httpie = "^2.0.0"
+arel = "^0.1.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

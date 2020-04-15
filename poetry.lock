@@ -25,6 +25,18 @@ version = "0.1.0"
 
 [[package]]
 category = "dev"
+description = "Browser hot reload for Python ASGI web apps"
+name = "arel"
+optional = false
+python-versions = ">=3.7"
+version = "0.1.0"
+
+[package.dependencies]
+starlette = "<1.0.0"
+watchgod = ">=0.6.0,<0.7.0"
+
+[[package]]
+category = "dev"
 description = "Atomic file writes."
 marker = "sys_platform == \"win32\""
 name = "atomicwrites"
@@ -1312,6 +1324,14 @@ six = ">=1.4.1"
 
 [[package]]
 category = "dev"
+description = "Simple, modern file watching and code reload in python."
+name = "watchgod"
+optional = false
+python-versions = ">=3.5"
+version = "0.6"
+
+[[package]]
+category = "dev"
 description = "Measures number of Terminal column cells of wide-character codes"
 name = "wcwidth"
 optional = false
@@ -1364,7 +1384,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "6b2ab89a5a3e0ff81051ff3121c577ebd1550d8f87e027b15e257c9913122c36"
+content-hash = "a8453de22ff0610b05b4c3f4830c33bb3858007e0902511563625a27788ffb4a"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1379,6 +1399,10 @@ appdirs = [
 appnope = [
     {file = "appnope-0.1.0-py2.py3-none-any.whl", hash = "sha256:5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0"},
     {file = "appnope-0.1.0.tar.gz", hash = "sha256:8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"},
+]
+arel = [
+    {file = "arel-0.1.0-py3-none-any.whl", hash = "sha256:46843ece267450e8d018485cb5f73c4be3d6d9e58cf5058b6ea01d70f1c777a6"},
+    {file = "arel-0.1.0.tar.gz", hash = "sha256:11fa0dbdd0a3f8af5b350b43768e8c215b9a428103af663f1c2808c1d81fccce"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.3.0-py2.py3-none-any.whl", hash = "sha256:03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4"},
@@ -2026,6 +2050,10 @@ uvloop = [
 w3lib = [
     {file = "w3lib-1.21.0-py2.py3-none-any.whl", hash = "sha256:847704b837b2b973cddef6938325d466628e6078266bc2e1f7ac49ba85c34823"},
     {file = "w3lib-1.21.0.tar.gz", hash = "sha256:8b1854fef570b5a5fc84d960e025debd110485d73fd283580376104762774315"},
+]
+watchgod = [
+    {file = "watchgod-0.6-py35.py36.py37-none-any.whl", hash = "sha256:59700dab7445aa8e6067a5b94f37bae90fc367554549b1ed2e9d0f4f38a90d2a"},
+    {file = "watchgod-0.6.tar.gz", hash = "sha256:e9cca0ab9c63f17fc85df9fd8bd18156ff00aff04ebe5976cee473f4968c6858"},
 ]
 wcwidth = [
     {file = "wcwidth-0.1.9-py2.py3-none-any.whl", hash = "sha256:cafe2186b3c009a04067022ce1dcd79cb38d8d65ee4f4791b8888d6599d1bbe1"},

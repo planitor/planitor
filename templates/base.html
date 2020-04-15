@@ -60,8 +60,13 @@
             >jokull@solberg.is</a
           >
         </p>
+        <div id="root"></div>
       </div>
     </footer>
     <script src="{{ url_for('static', path='/dist/app.js') }}"></script>
+    <!-- Hot reload script -->
+    {% if DEBUG %}
+      {{ hotreload.script(url_for('hot-reload')) | safe }}
+    {% endif %}
   </body>
 </html>

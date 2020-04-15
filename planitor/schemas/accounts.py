@@ -36,3 +36,16 @@ class User(UserBaseInDB):
 # Additional properties stored in DB
 class UserInDB(UserBaseInDB):
     hashed_password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenPayload(BaseModel):
+    user_id: int = None
+
+
+class Msg(BaseModel):
+    msg: str
