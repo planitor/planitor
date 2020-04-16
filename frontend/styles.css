@@ -8,12 +8,24 @@ body {
 }
 
 .btn {
-  @apply rounded-md shadow-lg bg-blue-800 px-6 py-3 text-sm font-bold text-blue-100;
+  @apply rounded-md shadow-lg bg-blue-800 px-6 py-3 font-bold font-bold text-blue-100;
+}
+
+nav .btn {
+  @apply py-2;
 }
 
 .btn-disabled {
   @apply bg-gray-500;
   opacity: 0.3;
+}
+
+.btn-primary {
+  @apply btn bg-green-600 text-white;
+}
+
+.btn-primary:hover {
+  @apply bg-green-500;
 }
 
 .btn .sf-symbol {
@@ -116,4 +128,8 @@ footer {
 
 .entities svg .fill {
   fill: #2b6cb0;
+}
+
+form input.error {
+  @apply border-red-700;
 }

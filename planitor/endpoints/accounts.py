@@ -1,6 +1,6 @@
 import datetime as dt
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.encoders import jsonable_encoder
 from pydantic import EmailStr
@@ -9,17 +9,16 @@ from sqlalchemy.orm import Session
 from planitor import env
 from planitor.database import get_db
 from planitor.security import (
+    cookie_auth,
     get_current_user,
     get_current_active_superuser,
     get_current_active_user,
-)
-from planitor.models import User as DBUser
-from planitor.schemas import User, UserUpdate, UserCreate, Token, Msg
-from planitor.security import (
     create_access_token,
     generate_password_reset_token,
     verify_password_reset_token,
 )
+from planitor.models import User as DBUser
+from planitor.schemas import User, UserUpdate, UserCreate, Token, Msg
 from planitor.utils.passwords import get_password_hash
 from planitor import crud
 
@@ -138,7 +137,9 @@ def update_user(
 
 @router.post("/login/access-token", response_model=Token, tags=["login"])
 def login_access_token(
-    db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
+    response: Response,
+    db: Session = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends(),
 ):
     user = crud.user.authenticate(
         db, email=form_data.username, password=form_data.password
@@ -148,6 +149,7 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = dt.timedelta(minutes=env("ACCESS_TOKEN_EXPIRE_MINUTES", 20))
+    cookie_auth.get_login_response(user, response)  # set cookie for the browser
     return {
         "access_token": create_access_token(
             data={"user_id": user.id}, expires_delta=access_token_expires

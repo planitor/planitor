@@ -1,3 +1,10 @@
+"""
+Planitor uses OAuth2PasswordBearer as the primary authentication method. But to allow
+non-XHR browser requests to be authenticated too we actually return a token AND use the
+set-cookie header upon login. See OAuth2PasswordOrSessionCookie.
+
+"""
+
 import datetime as dt
 from typing import Optional
 
@@ -7,9 +14,11 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_403_FORBIDDEN
+from starlette.requests import Request
 
 from planitor.database import get_db
 from planitor.models.accounts import User
+from planitor.session import CookieAuthentication
 from planitor import env
 from planitor import crud
 
@@ -29,12 +38,21 @@ def create_access_token(*, data: dict, expires_delta: dt.timedelta = None):
     return encoded_jwt
 
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/login/access-token")
+cookie_auth = CookieAuthentication()
 
 
-def get_current_user(
-    db: Session = Depends(get_db), token: str = Security(reusable_oauth2)
-):
+class OAuth2PasswordOrSessionCookie(OAuth2PasswordBearer):
+    async def __call__(self, request: Request) -> Optional[str]:
+        payload = cookie_auth(request)
+        if payload is not None:
+            return payload
+        return await super().__call__(request)
+
+
+auth = OAuth2PasswordBearer(tokenUrl="/notendur/login/access-token")
+
+
+def get_current_user(db: Session = Depends(get_db), token: str = Security(auth)):
     try:
         payload = jwt.decode(token, env.str("SECRET_KEY"), algorithms=[ALGORITHM])
     except PyJWTError:

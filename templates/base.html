@@ -45,6 +45,8 @@
           <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
           <input class="bg-transparent flex-grow py-1 px-2 text-white" placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'">
         </form>
+        <button id="login" class="btn btn-primary ml-4">Innskrá</button>
+        <button id="signup" class="btn ml-2 font-regular">Nýskrá</button>
       </nav>
     </div>
     <div class="flex-grow w-full">
@@ -63,6 +65,7 @@
         <div id="root"></div>
       </div>
     </footer>
+    {% include "modal.html" %}
     <script src="{{ url_for('static', path='/dist/app.js') }}"></script>
     <!-- Hot reload script -->
     {% if DEBUG %}
