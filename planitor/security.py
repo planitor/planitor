@@ -19,12 +19,12 @@ from starlette.requests import Request
 from planitor.database import get_db
 from planitor.models.accounts import User
 from planitor.session import CookieAuthentication
-from planitor import env
-from planitor import crud
+from planitor import env, crud
 
 
 ALGORITHM = "HS256"
 access_token_jwt_subject = "access"
+EMAIL_RESET_TOKEN_EXPIRE_HOURS = env.int("EMAIL_RESET_TOKEN_EXPIRE_HOURS", 2)
 
 
 def create_access_token(*, data: dict, expires_delta: dt.timedelta = None):
@@ -43,9 +43,12 @@ cookie_auth = CookieAuthentication()
 
 class OAuth2PasswordOrSessionCookie(OAuth2PasswordBearer):
     async def __call__(self, request: Request) -> Optional[str]:
-        payload = cookie_auth(request)
-        if payload is not None:
-            return payload
+        if request.method == "GET":
+            print("GET")
+            payload = cookie_auth(request)
+            print("GET", payload)
+            if payload is not None:
+                return payload
         return await super().__call__(request)
 
 
@@ -83,7 +86,7 @@ password_reset_jwt_subject = "preset"
 
 
 def generate_password_reset_token(email):
-    delta = dt.timedelta(hours=env.int("EMAIL_RESET_TOKEN_EXPIRE_HOURS"))
+    delta = dt.timedelta(hours=EMAIL_RESET_TOKEN_EXPIRE_HOURS)
     now = dt.datetime.utcnow()
     expires = now + delta
     exp = expires.timestamp()
