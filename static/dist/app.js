@@ -3258,7 +3258,6 @@ var api = {
   }
 };
 exports.api = api;
-console.log(api.getMe());
 },{"axios":"../node_modules/axios/index.js"}],"forms/login.js":[function(require,module,exports) {
 "use strict";
 
@@ -3310,9 +3309,9 @@ var classNames = function classNames(classArr) {
 }; // filter falsy values
 
 
-var LoginForm = function LoginForm(_ref) {
-  var setScreen = _ref.setScreen,
-      success = _ref.success;
+var LoginForm = function LoginForm(props) {
+  var success = props.success,
+      setScreen = props.setScreen;
 
   var _useState = (0, _hooks.useState)({
     value: "",
@@ -3348,7 +3347,6 @@ var LoginForm = function LoginForm(_ref) {
     });
 
     _api.api.logInGetToken(username.value, password.value).then(function (response) {
-      console.log("success", response.data);
       saveLocalToken(response.data.access_token);
       success();
     }).catch(function (error) {
@@ -3538,7 +3536,6 @@ var NewPasswordForm = function NewPasswordForm(_ref) {
     });
 
     _api.api.resetPassword(password, token).then(function (response) {
-      console.log("success", response.data);
       saveLocalToken(response.data.access_token);
       setForm({
         isLoading: false,
@@ -3654,7 +3651,6 @@ var PasswordRecoveryForm = function PasswordRecoveryForm(_ref) {
     });
 
     _api.api.passwordRecovery(email.value).then(function (response) {
-      console.log("success", response.data);
       setForm({
         isLoading: false,
         error: null,
@@ -3757,7 +3753,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var NewPassword = _newPassword.NewPasswordForm;
 exports.NewPassword = NewPassword;
 
-var Login = function Login(success) {
+var Login = function Login(props) {
+  var success = props.success;
+
   var _useState = (0, _hooks.useState)(["login", ""]),
       _useState2 = _slicedToArray(_useState, 2),
       _useState2$ = _slicedToArray(_useState2[0], 2),
@@ -3769,7 +3767,6 @@ var Login = function Login(success) {
     login: _login.LoginForm,
     "password-recovery": _passwordRecovery.PasswordRecoveryForm
   }[screen];
-  console.log(Form, emailDefaultValue);
   return (0, _preact.h)("div", null, (0, _preact.h)(Form, {
     setScreen: setScreen,
     emailDefaultValue: emailDefaultValue,

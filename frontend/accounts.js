@@ -6,12 +6,12 @@ import { PasswordRecoveryForm } from "./forms/password-recovery";
 
 export const NewPassword = NewPasswordForm;
 
-export const Login = (success) => {
+export const Login = (props) => {
+  const { success } = props;
   const [[screen, emailDefaultValue], setScreen] = useState(["login", ""]);
   const Form = { login: LoginForm, "password-recovery": PasswordRecoveryForm }[
     screen
   ];
-  console.log(Form, emailDefaultValue);
   return (
     <div>
       <Form

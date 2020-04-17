@@ -45,7 +45,7 @@ def get_login_response(user: User, response: Response):
     }
 
 
-def create_access_token(*, data: dict, expires_delta: dt.timedelta = None):
+def create_access_token(data: dict, expires_delta: dt.timedelta = None):
     to_encode = data.copy()
     if expires_delta:
         expire = dt.datetime.utcnow() + expires_delta

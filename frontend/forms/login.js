@@ -8,7 +8,8 @@ const removeLocalToken = () => localStorage.removeItem("token");
 
 const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
-export const LoginForm = ({ setScreen, success }) => {
+export const LoginForm = (props) => {
+  const { success, setScreen } = props;
   const [username, setUsername] = useState({
     value: "",
     isDirty: false,
@@ -27,7 +28,6 @@ export const LoginForm = ({ setScreen, success }) => {
     api
       .logInGetToken(username.value, password.value)
       .then((response) => {
-        console.log("success", response.data);
         saveLocalToken(response.data.access_token);
         success();
       })

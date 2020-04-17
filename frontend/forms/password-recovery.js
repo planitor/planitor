@@ -22,7 +22,6 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
     api
       .passwordRecovery(email.value)
       .then((response) => {
-        console.log("success", response.data);
         setForm({ isLoading: false, error: null, isSuccess: true });
       })
       .catch(function (error) {

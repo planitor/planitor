@@ -22,7 +22,6 @@ export const NewPasswordForm = ({ token }) => {
     api
       .resetPassword(password, token)
       .then((response) => {
-        console.log("success", response.data);
         saveLocalToken(response.data.access_token);
         setForm({ isLoading: false, error: null, isSuccess: true });
       })
