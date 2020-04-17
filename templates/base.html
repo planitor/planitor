@@ -43,10 +43,12 @@
         <a href="/" class="mr-6 block logo" alt="Planitor">{% include "logo.svg" %}</a>
         <form class="search rounded-md bg-blue-600 flex flex-grow items-center px-3 py-1">
           <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
-          <input class="bg-transparent flex-grow py-1 px-2 text-white" placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'">
+          <input
+            class="bg-transparent flex-grow py-1 px-2 text-white"
+            placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
+          >
         </form>
-        <button id="login" class="btn btn-primary ml-4">Innskrá</button>
-        <button id="signup" class="btn ml-2 font-regular">Nýskrá</button>
+        <button id="login-button" class="btn btn-primary ml-4">Innskrá</button>
       </nav>
     </div>
     <div class="flex-grow w-full">
@@ -58,11 +60,10 @@
       <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 text-xs sm:text-sm">
         <p class="my-1 text-white">Planitor!</p>
         <p class="my-1 text-white">
-          <a href="mailto:jokull@solberg.is" class="font-bold text-blue-200"
-            >jokull@solberg.is</a
-          >
+          <a href="mailto:jokull@solberg.is" class="font-bold text-blue-200">
+            jokull@solberg.is
+          </a>
         </p>
-        <div id="root"></div>
       </div>
     </footer>
     {% include "modal.html" %}

@@ -48,9 +48,7 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
 
   return (
     <div>
-      <h1 class="text-center text-2xl text-green-dark">
-        Sækja um nýtt lykilorð
-      </h1>
+      <h1 class="text-center text-2xl">Sækja um nýtt lykilorð</h1>
       <div class="pt-6 pb-2 my-2">
         <form onSubmit={onSubmit}>
           {form.error && (
@@ -66,7 +64,7 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
               Netfang
             </label>
             <input
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+              class="shadow appearance-none border rounded w-full py-2 px-3"
               name="email"
               type="text"
               disabled={form.isLoading || form.isSuccess}

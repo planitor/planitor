@@ -8,7 +8,7 @@ const removeLocalToken = () => localStorage.removeItem("token");
 
 const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
-export const LoginForm = ({ setScreen }) => {
+export const LoginForm = ({ setScreen, success }) => {
   const [username, setUsername] = useState({
     value: "",
     isDirty: false,
@@ -29,6 +29,7 @@ export const LoginForm = ({ setScreen }) => {
       .then((response) => {
         console.log("success", response.data);
         saveLocalToken(response.data.access_token);
+        success();
       })
       .catch(function (error) {
         // handle error
@@ -93,7 +94,7 @@ export const LoginForm = ({ setScreen }) => {
 
   return (
     <div>
-      <h1 class="text-center text-2xl text-green-dark">Innskráning</h1>
+      <h1 class="text-center text-2xl">Innskráning</h1>
       <div class="pt-6 pb-2 my-2">
         <form onSubmit={onSubmit}>
           {form.error && (
@@ -105,7 +106,7 @@ export const LoginForm = ({ setScreen }) => {
             </label>
             <input
               class={classNames([
-                "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker",
+                "shadow appearance-none border rounded w-full py-2 px-3",
                 (!username.isDirty && !!username.errors.length && "error") ||
                   "",
               ])}
@@ -125,7 +126,7 @@ export const LoginForm = ({ setScreen }) => {
             </label>
             <input
               class={classNames([
-                "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3",
+                "shadow appearance-none border rounded w-full py-2 px-3 mb-3",
                 (!password.isDirty && !!password.errors.length && "error") ||
                   "",
               ])}

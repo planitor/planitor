@@ -3227,7 +3227,8 @@ var _axios = _interopRequireDefault(require("axios"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function authHeaders(token) {
+function authHeaders() {
+  var token = localStorage.getItem("token");
   return {
     headers: {
       Authorization: "Bearer ".concat(token)
@@ -3243,32 +3244,21 @@ var api = {
     params.append("password", password);
     return _axios.default.post("/notendur/login/access-token", params);
   },
-  getMe: function getMe(token) {
-    return _axios.default.get("/notendur/users/me", authHeaders(token));
-  },
-  updateMe: function updateMe(token, data) {
-    return _axios.default.put("/notendur/users/me", data, authHeaders(token));
-  },
-  getUsers: function getUsers(token) {
-    return _axios.default.get("/notendur/users/", authHeaders(token));
-  },
-  updateUser: function updateUser(token, userId, data) {
-    return _axios.default.put("/notendur/users/".concat(userId), data, authHeaders(token));
-  },
-  createUser: function createUser(token, data) {
-    return _axios.default.post("/notendur/users/", data, authHeaders(token));
+  getMe: function getMe() {
+    return _axios.default.get("/notendur/me", authHeaders());
   },
   passwordRecovery: function passwordRecovery(email) {
     return _axios.default.post("/notendur/password-recovery/".concat(email));
   },
   resetPassword: function resetPassword(password, token) {
-    return _axios.default.post("/notendur/reset-password/", {
+    return _axios.default.post("/notendur/reset-password", {
       new_password: password,
       token: token
     });
   }
 };
 exports.api = api;
+console.log(api.getMe());
 },{"axios":"../node_modules/axios/index.js"}],"forms/login.js":[function(require,module,exports) {
 "use strict";
 
@@ -3321,7 +3311,8 @@ var classNames = function classNames(classArr) {
 
 
 var LoginForm = function LoginForm(_ref) {
-  var setScreen = _ref.setScreen;
+  var setScreen = _ref.setScreen,
+      success = _ref.success;
 
   var _useState = (0, _hooks.useState)({
     value: "",
@@ -3359,6 +3350,7 @@ var LoginForm = function LoginForm(_ref) {
     _api.api.logInGetToken(username.value, password.value).then(function (response) {
       console.log("success", response.data);
       saveLocalToken(response.data.access_token);
+      success();
     }).catch(function (error) {
       // handle error
       // remove dirty from fields, meant for highlighting invalid fields until user edits
@@ -3429,7 +3421,7 @@ var LoginForm = function LoginForm(_ref) {
   };
 
   return (0, _preact.h)("div", null, (0, _preact.h)("h1", {
-    class: "text-center text-2xl text-green-dark"
+    class: "text-center text-2xl"
   }, "Innskr\xE1ning"), (0, _preact.h)("div", {
     class: "pt-6 pb-2 my-2"
   }, (0, _preact.h)("form", {
@@ -3442,7 +3434,7 @@ var LoginForm = function LoginForm(_ref) {
     class: "block text-sm font-bold mb-2",
     for: "username"
   }, "Netfang"), (0, _preact.h)("input", {
-    class: classNames(["shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker", !username.isDirty && !!username.errors.length && "error" || ""]),
+    class: classNames(["shadow appearance-none border rounded w-full py-2 px-3", !username.isDirty && !!username.errors.length && "error" || ""]),
     name: "username",
     type: "text",
     disabled: form.isLoading,
@@ -3458,7 +3450,7 @@ var LoginForm = function LoginForm(_ref) {
     class: "block text-sm font-bold mb-2",
     for: "password"
   }, "Lykilor\xF0"), (0, _preact.h)("input", {
-    class: classNames(["shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3", !password.isDirty && !!password.errors.length && "error" || ""]),
+    class: classNames(["shadow appearance-none border rounded w-full py-2 px-3 mb-3", !password.isDirty && !!password.errors.length && "error" || ""]),
     name: "password",
     type: "password",
     disabled: form.isLoading,
@@ -3486,6 +3478,113 @@ var LoginForm = function LoginForm(_ref) {
 };
 
 exports.LoginForm = LoginForm;
+},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","../api":"api.js"}],"forms/new-password.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.NewPasswordForm = void 0;
+
+var _preact = require("preact");
+
+var _hooks = require("preact/hooks");
+
+var _api = require("../api");
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var saveLocalToken = function saveLocalToken(token) {
+  return localStorage.setItem("token", token);
+};
+
+var NewPasswordForm = function NewPasswordForm(_ref) {
+  var token = _ref.token;
+
+  var _useState = (0, _hooks.useState)({
+    isSuccess: false,
+    isLoading: false,
+    error: null
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      form = _useState2[0],
+      setForm = _useState2[1];
+
+  var _useState3 = (0, _hooks.useState)(""),
+      _useState4 = _slicedToArray(_useState3, 2),
+      password = _useState4[0],
+      setPassword = _useState4[1];
+
+  var onChange = function onChange(event) {
+    setPassword(event.target.value);
+  };
+
+  var onSubmit = function onSubmit(event) {
+    event.preventDefault();
+    setForm({
+      isLoading: true,
+      isSuccess: false,
+      error: null
+    });
+
+    _api.api.resetPassword(password, token).then(function (response) {
+      console.log("success", response.data);
+      saveLocalToken(response.data.access_token);
+      setForm({
+        isLoading: false,
+        error: null,
+        isSuccess: true
+      });
+    }).catch(function (error) {
+      // remove dirty, meant for highlighting invalid fields until user edits
+      var errorMessage = error.response.data.detail || "Óþekkt villa á vefþjóni";
+      setForm({
+        isLoading: false,
+        isSuccess: false,
+        error: errorMessage
+      });
+    });
+  };
+
+  return (0, _preact.h)("div", null, (0, _preact.h)("h1", {
+    class: "text-center text-2xl"
+  }, "N\xFDtt lykilor\xF0"), (0, _preact.h)("div", {
+    class: "py-2 my-2"
+  }), (0, _preact.h)("form", {
+    onSubmit: onSubmit
+  }, form.error && (0, _preact.h)("div", {
+    class: "mb-4 text-red-700 font-bold"
+  }, form.error), form.isSuccess && (0, _preact.h)("div", {
+    class: "mb-4 text-green-600 font-bold"
+  }, "Lykilor\xF0i\xF0 hefur veri\xF0 uppf\xE6rt."), (0, _preact.h)("div", {
+    class: "mb-4"
+  }, (0, _preact.h)("input", {
+    class: "shadow appearance-none border rounded w-full py-2 px-3",
+    name: "password",
+    type: "password",
+    disabled: form.isLoading || form.isSuccess,
+    value: password.value,
+    onInput: onChange
+  })), (0, _preact.h)("div", {
+    class: "block md:flex items-center justify-between"
+  }, (0, _preact.h)("div", null, (0, _preact.h)("button", {
+    class: "btn-primary",
+    type: "submit",
+    disabled: form.isLoading || form.isSuccess
+  }, "Vista")))));
+};
+
+exports.NewPasswordForm = NewPasswordForm;
 },{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","../api":"api.js"}],"forms/password-recovery.js":[function(require,module,exports) {
 "use strict";
 
@@ -3586,7 +3685,7 @@ var PasswordRecoveryForm = function PasswordRecoveryForm(_ref) {
   };
 
   return (0, _preact.h)("div", null, (0, _preact.h)("h1", {
-    class: "text-center text-2xl text-green-dark"
+    class: "text-center text-2xl"
   }, "S\xE6kja um n\xFDtt lykilor\xF0"), (0, _preact.h)("div", {
     class: "pt-6 pb-2 my-2"
   }, (0, _preact.h)("form", {
@@ -3601,7 +3700,7 @@ var PasswordRecoveryForm = function PasswordRecoveryForm(_ref) {
     class: "block text-sm font-bold mb-2",
     for: "email"
   }, "Netfang"), (0, _preact.h)("input", {
-    class: "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker",
+    class: "shadow appearance-none border rounded w-full py-2 px-3",
     name: "email",
     type: "text",
     disabled: form.isLoading || form.isSuccess,
@@ -3631,13 +3730,15 @@ exports.PasswordRecoveryForm = PasswordRecoveryForm;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Login = void 0;
+exports.Login = exports.NewPassword = void 0;
 
 var _preact = require("preact");
 
 var _hooks = require("preact/hooks");
 
 var _login = require("./forms/login");
+
+var _newPassword = require("./forms/new-password");
 
 var _passwordRecovery = require("./forms/password-recovery");
 
@@ -3653,7 +3754,10 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-var Login = function Login() {
+var NewPassword = _newPassword.NewPasswordForm;
+exports.NewPassword = NewPassword;
+
+var Login = function Login(success) {
   var _useState = (0, _hooks.useState)(["login", ""]),
       _useState2 = _slicedToArray(_useState, 2),
       _useState2$ = _slicedToArray(_useState2[0], 2),
@@ -3668,12 +3772,13 @@ var Login = function Login() {
   console.log(Form, emailDefaultValue);
   return (0, _preact.h)("div", null, (0, _preact.h)(Form, {
     setScreen: setScreen,
-    emailDefaultValue: emailDefaultValue
+    emailDefaultValue: emailDefaultValue,
+    success: success
   }));
 };
 
 exports.Login = Login;
-},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","./forms/login":"forms/login.js","./forms/password-recovery":"forms/password-recovery.js"}],"modals.js":[function(require,module,exports) {
+},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","./forms/login":"forms/login.js","./forms/new-password":"forms/new-password.js","./forms/password-recovery":"forms/password-recovery.js"}],"modals.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3688,7 +3793,7 @@ var openModal = function openModal() {
   var modalEl = document.getElementById("modal");
   modalEl.classList.remove("hidden");
 
-  var close = function close() {
+  var cleanup = function cleanup() {
     modalEl.classList.add("hidden");
   };
 
@@ -3696,14 +3801,14 @@ var openModal = function openModal() {
     // `Element.closest` traverses parents to find matching selector
     // if we did not find #modal in ancestors we must have clicked somewhere outside
     var clickedOutsideModalEl = !event.target.closest("#modal .inner");
-    if (clickedOutsideModalEl) close();
+    if (clickedOutsideModalEl) cleanup();
   });
   modalEl.querySelectorAll(".close").forEach(function (el) {
     el.addEventListener("click", function (event) {
-      close();
+      cleanup();
     });
   });
-  return modalEl.querySelector(".form"); // the section that can be taken over by Preact
+  return [modalEl.querySelector(".form"), cleanup]; // the section that can be taken over by Preact
 };
 
 exports.openModal = openModal;
@@ -3718,11 +3823,55 @@ var _accounts = require("./accounts");
 
 var _modals = require("./modals");
 
-document.getElementById("login").addEventListener("click", function (event) {
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+document.getElementById("login-button").addEventListener("click", function (event) {
   event.stopPropagation();
-  var el = (0, _modals.openModal)();
-  (0, _preact.render)((0, _preact.h)(_accounts.Login, null), el);
+
+  var _openModal = (0, _modals.openModal)(),
+      _openModal2 = _slicedToArray(_openModal, 2),
+      el = _openModal2[0],
+      cleanup = _openModal2[1];
+
+  (0, _preact.render)((0, _preact.h)(_accounts.Login, {
+    success: cleanup
+  }), el);
 });
+var passwordRecoveryEl = document.getElementById("password-recovery");
+
+if (passwordRecoveryEl) {
+  var el = (0, _modals.openModal)();
+  (0, _preact.render)((0, _preact.h)(_accounts.NewPassword, {
+    token: passwordRecoveryEl.dataset.token
+  }), el);
+}
+
+var loginEl = document.getElementById("login");
+
+if (loginEl) {
+  var _openModal3 = (0, _modals.openModal)(),
+      _openModal4 = _slicedToArray(_openModal3, 2),
+      _el = _openModal4[0],
+      close = _openModal4[1];
+
+  var cleanup = function cleanup() {
+    window.location.pathname = loginEl.dataset.redirectTo;
+  };
+
+  (0, _preact.render)((0, _preact.h)(_accounts.Login, {
+    success: cleanup
+  }), _el);
+}
 },{"preact":"../node_modules/preact/dist/preact.module.js","./maps":"maps.js","./accounts":"accounts.js","./modals":"modals.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';

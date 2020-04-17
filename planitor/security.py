@@ -1,7 +1,7 @@
 """
 Planitor uses OAuth2PasswordBearer as the primary authentication method. But to allow
 non-XHR browser requests to be authenticated too we actually return a token AND use the
-set-cookie header upon login. See OAuth2PasswordOrSessionCookie.
+set-cookie header upon login.
 
 """
 
@@ -10,21 +10,39 @@ from typing import Optional
 
 import jwt
 from jwt.exceptions import InvalidTokenError, PyJWTError
-from fastapi import Depends, HTTPException, Security
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Security, Response
+from fastapi.security import OAuth2PasswordBearer, APIKeyCookie
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
 
 from planitor.database import get_db
 from planitor.models.accounts import User
-from planitor.session import CookieAuthentication
 from planitor import env, crud
 
-
-ALGORITHM = "HS256"
-access_token_jwt_subject = "access"
 EMAIL_RESET_TOKEN_EXPIRE_HOURS = env.int("EMAIL_RESET_TOKEN_EXPIRE_HOURS", 2)
+ALGORITHM = "HS256"
+COOKIE_NAME = "_planitor_auth"
+access_token_jwt_subject = "access"
+
+cookie_auth = APIKeyCookie(name=COOKIE_NAME, auto_error=False)
+oauth2_auth = OAuth2PasswordBearer(
+    tokenUrl="/notendur/login/access-token", auto_error=False
+)
+
+
+async def auth(request: Request) -> Optional[str]:
+    for backend in [cookie_auth, oauth2_auth]:
+        return await backend(request)
+
+
+def get_login_response(user: User, response: Response):
+    token = create_access_token({"user_id": user.id})
+    response.set_cookie(COOKIE_NAME, token, path="/", secure=True, httponly=True)
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+    }
 
 
 def create_access_token(*, data: dict, expires_delta: dt.timedelta = None):
@@ -32,27 +50,10 @@ def create_access_token(*, data: dict, expires_delta: dt.timedelta = None):
     if expires_delta:
         expire = dt.datetime.utcnow() + expires_delta
     else:
-        expire = dt.datetime.utcnow() + dt.timedelta(minutes=15)
+        expire = dt.datetime.utcnow() + dt.timedelta(hours=24)
     to_encode.update({"exp": expire, "sub": access_token_jwt_subject})
     encoded_jwt = jwt.encode(to_encode, env.str("SECRET_KEY"), algorithm=ALGORITHM)
-    return encoded_jwt
-
-
-cookie_auth = CookieAuthentication()
-
-
-class OAuth2PasswordOrSessionCookie(OAuth2PasswordBearer):
-    async def __call__(self, request: Request) -> Optional[str]:
-        if request.method == "GET":
-            print("GET")
-            payload = cookie_auth(request)
-            print("GET", payload)
-            if payload is not None:
-                return payload
-        return await super().__call__(request)
-
-
-auth = OAuth2PasswordBearer(tokenUrl="/notendur/login/access-token")
+    return encoded_jwt.decode("utf-8")
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Security(auth)):
@@ -93,14 +94,14 @@ def generate_password_reset_token(email):
     encoded_jwt = jwt.encode(
         {"exp": exp, "nbf": now, "sub": password_reset_jwt_subject, "email": email},
         env.str("SECRET_KEY"),
-        algorithm="HS256",
+        algorithm=ALGORITHM,
     )
     return encoded_jwt
 
 
 def verify_password_reset_token(token) -> Optional[str]:
     try:
-        decoded_token = jwt.decode(token, env.str("SECRET_KEY"), algorithms=["HS256"])
+        decoded_token = jwt.decode(token, env.str("SECRET_KEY"), algorithms=[ALGORITHM])
         assert decoded_token["sub"] == password_reset_jwt_subject
         return decoded_token["email"]
     except InvalidTokenError:
