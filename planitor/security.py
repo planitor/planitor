@@ -32,11 +32,20 @@ oauth2_auth = OAuth2PasswordBearer(
 
 
 async def auth(request: Request) -> Optional[str]:
+    """ On POST/PUT/DELETE do not use the cookie backend. We don’t have any XSS or CSRF
+    protection. For endpoints that modify state we want tokens that are stored by the
+    planitor client itself.
+
+    """
+
+    if request.method != "GET":
+        return await oauth2_auth(request)
     for backend in [cookie_auth, oauth2_auth]:
         return await backend(request)
 
 
 def get_login_response(user: User, response: Response):
+    """ set-cookie but also return oauth2 compatible login response """
     token = create_access_token({"user_id": user.id})
     response.set_cookie(COOKIE_NAME, token, path="/", secure=True, httponly=True)
     return {
