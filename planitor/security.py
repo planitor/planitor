@@ -15,12 +15,15 @@ from fastapi.security import OAuth2PasswordBearer, APIKeyCookie
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.requests import Request
+from starlette.datastructures import Secret
 
 from planitor.database import get_db
 from planitor.models.accounts import User
-from planitor import env, crud
+from planitor import config, crud
 
-EMAIL_RESET_TOKEN_EXPIRE_HOURS = env.int("EMAIL_RESET_TOKEN_EXPIRE_HOURS", 2)
+EMAIL_RESET_TOKEN_EXPIRE_HOURS = config(
+    "EMAIL_RESET_TOKEN_EXPIRE_HOURS", cast=int, default=2
+)
 ALGORITHM = "HS256"
 COOKIE_NAME = "_planitor_auth"
 access_token_jwt_subject = "access"
@@ -61,13 +64,17 @@ def create_access_token(data: dict, expires_delta: dt.timedelta = None):
     else:
         expire = dt.datetime.utcnow() + dt.timedelta(hours=24)
     to_encode.update({"exp": expire, "sub": access_token_jwt_subject})
-    encoded_jwt = jwt.encode(to_encode, env.str("SECRET_KEY"), algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, config("SECRET_KEY", cast=Secret), algorithm=ALGORITHM
+    )
     return encoded_jwt.decode("utf-8")
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Security(auth)):
     try:
-        payload = jwt.decode(token, env.str("SECRET_KEY"), algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, config("SECRET_KEY", cast=Secret), algorithms=[ALGORITHM]
+        )
     except PyJWTError:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
@@ -102,7 +109,7 @@ def generate_password_reset_token(email):
     exp = expires.timestamp()
     encoded_jwt = jwt.encode(
         {"exp": exp, "nbf": now, "sub": password_reset_jwt_subject, "email": email},
-        env.str("SECRET_KEY"),
+        config("SECRET_KEY", cast=Secret),
         algorithm=ALGORITHM,
     )
     return encoded_jwt
@@ -110,7 +117,9 @@ def generate_password_reset_token(email):
 
 def verify_password_reset_token(token) -> Optional[str]:
     try:
-        decoded_token = jwt.decode(token, env.str("SECRET_KEY"), algorithms=[ALGORITHM])
+        decoded_token = jwt.decode(
+            token, config("SECRET_KEY", cast=Secret), algorithms=[ALGORITHM]
+        )
         assert decoded_token["sub"] == password_reset_jwt_subject
         return decoded_token["email"]
     except InvalidTokenError:

@@ -17,13 +17,13 @@ aiofiles = "^0.4.0"
 hashids = "^1.2.0"
 sqlakeyset = "^0.1.1579837191"
 pyjwt = "^1.7.1"
-environs = "^7.3.1"
 sqlalchemy_utils = "^0.36.3"
 passlib = {extras = ["bcrypt"], version = "^1.7.2"}
 email-validator = "^1.0.5"
 emails = "^0.5.15"
 sentry-sdk = "^0.14.3"
 python-multipart = "^0.0.5"
+gino = {version = "^1.0rc4", extras = ["starlette"], allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"

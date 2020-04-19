@@ -3,11 +3,11 @@ from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 from starlette.routing import WebSocketRoute
 
-from . import env
+from . import config
 from .endpoints import router
 from .endpoints.templates import templates
 
-if env.bool("DEBUG", False):
+if config("DEBUG", cast=bool, default=False):
     import arel
 
     hotreload = arel.HotReload("templates")

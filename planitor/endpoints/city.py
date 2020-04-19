@@ -3,8 +3,9 @@ from fastapi.responses import PlainTextResponse, RedirectResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from starlette.requests import Request
+from starlette.datastructures import Secret
 
-from planitor import hashids
+from planitor import hashids, config
 from planitor.meetings import MeetingView
 from planitor.models import Municipality, Meeting, Minute, Case, Entity
 from planitor.database import get_db
@@ -166,4 +167,6 @@ async def get_person(
 
 @router.get("/mapkit-token")
 async def mapkit_token(request: Request):
-    return PlainTextResponse(mapkit_get_token())
+    return PlainTextResponse(
+        mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret))
+    )

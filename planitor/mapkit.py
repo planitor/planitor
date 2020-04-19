@@ -1,10 +1,9 @@
-import os
 import datetime as dt
 
 import jwt
 
 
-def get_token():
+def get_token(private_key):
 
     epoch = dt.datetime.utcfromtimestamp(0)
     time_iat = (dt.datetime.utcnow() - epoch).total_seconds()
@@ -14,7 +13,7 @@ def get_token():
     team_id = "RDC8539AWM"
 
     private_key = ("-----BEGIN PRIVATE KEY-----\n{}\n-----END PRIVATE KEY-----").format(
-        os.environ["MAPKIT_PRIVATE_KEY"]
+        private_key
     )
 
     return jwt.encode(
