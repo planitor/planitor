@@ -8,13 +8,13 @@
       rel="stylesheet"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta property="og:title" content="Planitor.is" />
+    <meta property="og:title" content="Planitor" />
     <meta
       property="og:description"
-      content="Gagnagrunnur með öllum rafhjól, hlaupahjólum og öðrum léttum rafknúnum farartækjum frá helstu söluaðilum."
+      content="Skipulagsmál."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.planitor.is/" />
+    <meta property="og:url" content="https://www.planitor.io/" />
     {#
     <link
       rel="icon"
@@ -38,17 +38,26 @@
     <div class="nav-wrapper w-full">
       <nav
         id="navigation"
-        class="flex items-center justify-between flex-wrap p-6 max-w-6xl mx-auto "
+        class="flex items-center justify-between flex-wrap px-6 py-2 max-w-6xl mx-auto "
       >
-        <a href="/" class="mr-6 block logo" alt="Planitor">{% include "logo.svg" %}</a>
-        <form class="search rounded-md bg-blue-600 flex flex-grow items-center px-3 py-1">
+        <a href="/" class="mr-6 block logo" alt="Planitor">{% include "badge.svg" %}</a>
+        <div class="flex-grow"></div>
+        <form class="search rounded-md flex items-center px-3 w-1/2">
           <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
           <input
-            class="bg-transparent flex-grow py-1 px-2 text-white"
+            class="bg-transparent flex-grow py-2 px-2 text-white text-sm font-thin"
             placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
           >
         </form>
+        <div class="flex-grow"></div>
+        {% if user %}
+        <div class="user text-white">
+          <span class="name font-thin" style="color:rgba(255,255,255,.6);">{{ user.full_name }}</span>
+          <button id="logout-button" class="ml-4 font-bold text-white">Útskrá</button>
+        </div>
+        {% else %}
         <button id="login-button" class="btn btn-primary ml-4">Innskrá</button>
+        {% endif %}
       </nav>
     </div>
     <div class="flex-grow w-full">

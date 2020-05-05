@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 build/
-project.egg-info/
+planitor.egg-info/
 
 # VSCode
 .vscode
@@ -18,3 +18,4 @@ poetry.lock
 # Project
 .cache
 .env
+.pytest_cache

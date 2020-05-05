@@ -1,25 +1,26 @@
 """
 Planitor uses OAuth2PasswordBearer as the primary authentication method. But to allow
 non-XHR browser requests to be authenticated too we actually return a token AND use the
-set-cookie header upon login.
+set-cookie header upon login. However, only on GET request do we also consider session
+cookies as valid credentials.
 
 """
 
 import datetime as dt
 from typing import Optional
 
+from fastapi import Depends, HTTPException, Response, Security
+from fastapi.security import APIKeyCookie, OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import InvalidTokenError, PyJWTError
-from fastapi import Depends, HTTPException, Security, Response
-from fastapi.security import OAuth2PasswordBearer, APIKeyCookie
 from sqlalchemy.orm import Session
-from starlette.status import HTTP_403_FORBIDDEN
-from starlette.requests import Request
 from starlette.datastructures import Secret
+from starlette.requests import Request
+from starlette.status import HTTP_403_FORBIDDEN
 
+from planitor import config, crud
 from planitor.database import get_db
 from planitor.models.accounts import User
-from planitor import config, crud
 
 EMAIL_RESET_TOKEN_EXPIRE_HOURS = config(
     "EMAIL_RESET_TOKEN_EXPIRE_HOURS", cast=int, default=2
@@ -35,9 +36,9 @@ oauth2_auth = OAuth2PasswordBearer(
 
 
 async def auth(request: Request) -> Optional[str]:
-    """ On POST/PUT/DELETE do not use the cookie backend. We don’t have any XSS or CSRF
-    protection. For endpoints that modify state we want tokens that are stored by the
-    planitor client itself.
+    """ On POST/PUT/DELETE do not use the cookie backend since we don’t have any XSS or
+    CSRF protection. For endpoints that modify state we want tokens that are stored by
+    the planitor client itself.
 
     """
 
@@ -47,7 +48,7 @@ async def auth(request: Request) -> Optional[str]:
         return await backend(request)
 
 
-def get_login_response(user: User, response: Response):
+def get_login_response(user: User, response: Response) -> dict:
     """ set-cookie but also return oauth2 compatible login response """
     token = create_access_token({"user_id": user.id})
     response.set_cookie(COOKIE_NAME, token, path="/", secure=True, httponly=True)
@@ -57,24 +58,20 @@ def get_login_response(user: User, response: Response):
     }
 
 
-def create_access_token(data: dict, expires_delta: dt.timedelta = None):
+def create_access_token(data: dict, expires_delta: dt.timedelta = None) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = dt.datetime.utcnow() + expires_delta
     else:
         expire = dt.datetime.utcnow() + dt.timedelta(hours=24)
     to_encode.update({"exp": expire, "sub": access_token_jwt_subject})
-    encoded_jwt = jwt.encode(
-        to_encode, config("SECRET_KEY", cast=Secret), algorithm=ALGORITHM
-    )
+    encoded_jwt = jwt.encode(to_encode, config("SECRET_KEY"), algorithm=ALGORITHM)
     return encoded_jwt.decode("utf-8")
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Security(auth)):
     try:
-        payload = jwt.decode(
-            token, config("SECRET_KEY", cast=Secret), algorithms=[ALGORITHM]
-        )
+        payload = jwt.decode(token, config("SECRET_KEY"), algorithms=[ALGORITHM])
     except PyJWTError:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
@@ -91,7 +88,9 @@ def get_current_active_user(current_user: User = Security(get_current_user)):
     return current_user
 
 
-def get_current_active_superuser(current_user: User = Security(get_current_user)):
+def get_current_active_superuser(
+    current_user: User = Security(get_current_user),
+) -> User:
     if not crud.user.is_superuser(current_user):
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"

@@ -7,7 +7,8 @@ from starlette.datastructures import Secret
 
 from planitor import hashids, config
 from planitor.meetings import MeetingView
-from planitor.models import Municipality, Meeting, Minute, Case, Entity
+from planitor.models import User, Municipality, Meeting, Minute, Case, Entity
+from planitor.security import get_current_active_user
 from planitor.database import get_db
 from planitor.mapkit import get_token as mapkit_get_token
 
@@ -19,17 +20,24 @@ router = APIRouter()
 
 @router.get("/")
 async def get_index(
-    request: Request, db: Session = Depends(get_db),
-):
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> templates.TemplateResponse:
     municipalities = db.query(Municipality)
     return templates.TemplateResponse(
-        "index.html", {"municipalities": municipalities, "request": request}
+        "index.html",
+        {"municipalities": municipalities, "request": request, "user": current_user},
     )
 
 
 @router.get("/s/{muni_slug}")
 async def get_municipality(
-    request: Request, muni_slug: str, page: str = None, db: Session = Depends(get_db)
+    request: Request,
+    muni_slug: str,
+    page: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     muni = db.query(Municipality).filter_by(slug=muni_slug).first()
     if muni is None:
@@ -44,6 +52,7 @@ async def get_municipality(
             "meetings": meetings,
             "paging": meetings.paging,
             "request": request,
+            "user": current_user,
         },
     )
 
@@ -55,6 +64,7 @@ async def get_meeting(
     council_slug: str,
     meeting_id: str,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     meeting = db.query(Meeting).get(hashids.decode(meeting_id)[0])
     if (
@@ -84,6 +94,7 @@ async def get_meeting(
             "meeting": meeting,
             "minutes": minutes,
             "request": request,
+            "user": current_user,
         },
     )
 
@@ -102,6 +113,7 @@ async def get_case(
     council_slug: str,
     case_id: str,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     case_id = hashids.decode(case_id)
     if not case_id:
@@ -128,6 +140,7 @@ async def get_case(
             "council": case.council,
             "minutes": minutes,
             "request": request,
+            "user": current_user,
         },
     )
 
@@ -142,26 +155,34 @@ def _get_entity(db, kennitala, slug) -> Entity:
 @router.get("/f/{kennitala}")
 @router.get("/f/{slug}-{kennitala}")
 async def get_company(
-    request: Request, kennitala: str, slug: str = None, db: Session = Depends(get_db),
+    request: Request,
+    kennitala: str,
+    slug: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     entity = _get_entity(db, kennitala, slug)
     if slug is None:
         return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
     return templates.TemplateResponse(
-        "company.html", {"entity": entity, "request": request}
+        "company.html", {"entity": entity, "request": request, "user": current_user}
     )
 
 
 @router.get("/p/{kennitala}")
 @router.get("/p/{slug}-{kennitala}")
 async def get_person(
-    request: Request, kennitala: str, slug: str = None, db: Session = Depends(get_db),
+    request: Request,
+    kennitala: str,
+    slug: str = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     entity = _get_entity(db, kennitala, slug)
     if slug is None:
         return RedirectResponse("/p/{}-{}".format(entity.slug, entity.kennitala))
     return templates.TemplateResponse(
-        "person.html", {"entity": entity, "request": request}
+        "person.html", {"entity": entity, "request": request, "user": current_user}
     )
 
 
