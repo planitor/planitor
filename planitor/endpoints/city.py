@@ -1,28 +1,27 @@
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from starlette.requests import Request
 from starlette.datastructures import Secret
+from starlette.requests import Request
 
-from planitor import hashids, config
-from planitor.meetings import MeetingView
-from planitor.models import User, Municipality, Meeting, Minute, Case, Entity
-from planitor.security import get_current_active_user
+from planitor import config, hashids
 from planitor.database import get_db
 from planitor.mapkit import get_token as mapkit_get_token
+from planitor.meetings import MeetingView
+from planitor.models import Case, Entity, Meeting, Minute, Municipality, User
+from planitor.security import get_current_active_user_or_none
 
 from .templates import templates
-
 
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/s")
 async def get_index(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user_or_none),
 ) -> templates.TemplateResponse:
     municipalities = db.query(Municipality)
     return templates.TemplateResponse(
@@ -37,7 +36,7 @@ async def get_municipality(
     muni_slug: str,
     page: str = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user_or_none),
 ):
     muni = db.query(Municipality).filter_by(slug=muni_slug).first()
     if muni is None:
@@ -64,7 +63,7 @@ async def get_meeting(
     council_slug: str,
     meeting_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user_or_none),
 ):
     meeting = db.query(Meeting).get(hashids.decode(meeting_id)[0])
     if (
@@ -113,7 +112,7 @@ async def get_case(
     council_slug: str,
     case_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user_or_none),
 ):
     case_id = hashids.decode(case_id)
     if not case_id:
@@ -159,7 +158,7 @@ async def get_company(
     kennitala: str,
     slug: str = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user_or_none),
 ):
     entity = _get_entity(db, kennitala, slug)
     if slug is None:
@@ -176,7 +175,7 @@ async def get_person(
     kennitala: str,
     slug: str = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(get_current_active_user_or_none),
 ):
     entity = _get_entity(db, kennitala, slug)
     if slug is None:

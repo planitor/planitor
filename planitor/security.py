@@ -98,6 +98,21 @@ def get_current_active_superuser(
     return current_user
 
 
+def get_current_active_user_or_none(
+    db: Session = Depends(get_db), token: str = Security(auth)
+):
+    """ HTML GET endpoints need this to render user/no-user versions of the same view.
+    """
+    try:
+        payload = jwt.decode(token, config("SECRET_KEY"), algorithms=[ALGORITHM])
+    except PyJWTError:
+        return None
+    user = crud.user.get(db, id=payload["user_id"])
+    if not user or not crud.user.is_active(user):
+        return None
+    return user
+
+
 password_reset_jwt_subject = "preset"
 
 
