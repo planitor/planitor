@@ -1,33 +1,113 @@
-{% extends "base.html" %} {% block body %}
-<div class="px-6">
-  <div class="my-6 px-4 sm:px-0 mt-4 sm:mt-8">
-    <div class="text-xs text-right text-gray-500">
-      Sveitarfélög
+<!DOCTYPE html>
+<html lang="is">
+  <head>
+    <meta charset="utf-8" />
+    <title>Planitor</title>
+    <link href="{{ url_for('static', path='/dist/styles.css') }}" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="Planitor" />
+    <meta property="og:description" content="Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.planitor.io/" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192" />
+    <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+  </head>
+  <body id="teaser" class="flex flex-col flex-wrap items-center min-h-screen bg-white">
+    <div class="w-full absolute bg-powder z-0" style="height: 33%;"></div>
+    <div
+      style="box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.5);"
+      class="z-1 absolute w-full sm:px-10 md:max-w-screen-md m-auto bg-midnight min-h-screen text-white"
+    >
+      <header class="p-4 my-2">
+        <div class="flex items-center">
+          <div class="logo h-12 w-12 mr-3">{% include "emblem.svg" %}</div>
+          <div class="font-semibold text-5xl">Planitor</div>
+        </div>
+        <p class="pl-16 mb-2 font-light">
+          Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi*
+        </p>
+      </header>
+      <section class="p-4 text-sm md:text-lg">
+        <ul>
+          <li class="flex items-start mb-4">
+            <div style="flex: 0 0 3.5rem;" class="text-right mr-2">{% include "teaser/hexagon.svg" %}</div>
+            <p class="mt-2">
+              <strong class="font-semibold">Leit</strong> — Skipulags- og mannvirkjatengdar fundargerðir
+              sveitarfélaga á Íslandi flokkaðar eftir hagsmunaaðilum, málsnúmerum, staðsetningu,
+              stjórnsýslustigi, kennitölum o.fl. Í fyrsta skipti verður hægt að nálgast allar þessar
+              upplýsingar á einum og sama staðnum í gegnum notendavænt viðmót.
+            </p>
+          </li>
+          <li class="flex items-start mb-4">
+            <div style="flex: 0 0 3.5rem;" class="text-right mr-2">{% include "teaser/triangle.svg" %}</div>
+            <p class="mt-2">
+              <strong class="font-semibold">Vaktari</strong> — Fáðu tilkynningar í tölvupósti þegar mál,
+              skipulagsáætlanir, málsnúmer, kennitölur, stikkorð ofl. birtast í fundargerðum, um leið og þær
+              verða opinberar.
+            </p>
+          </li>
+          <li class="flex items-start mb-4">
+            <div style="flex: 0 0 3.5rem;" class="text-right mr-2">{% include "teaser/circle.svg" %}</div>
+            <p class="mt-2">
+              <strong class="font-semibold">Byggingarpúls</strong> — Greiningar eftir svæðum og fyrirtækjum
+              sem byggja á samþættum grunni þvert á öll sveitarfélög á Íslandi.
+            </p>
+          </li>
+        </ul>
+      </section>
+      <section class="p-4 my-8">
+        <h4 class="font-bold text-xl">Fréttabréf Planitor</h4>
+        <p class="text-sm md:text-base mb-4">
+          Fáðu fréttabréf Planitor um skipulagsmál á Íslandi sent vikulega. Allt það helsta, áhugaverðasta og
+          skemmtilegasta rakleitt í pósthólfið þitt.
+        </p>
+        <a
+          class="inline-block rounded-full bg-powder text-midnight text-xl font-bold py-3 my-3 w-full md:w-2/3 flex items-center justify-center"
+          href="https://planitor.substack.com/"
+        >
+          <span class="icon mr-2">{% include "teaser/mail.svg" %}</span>
+          <span>planitor.substack.com</span>
+        </a>
+      </section>
+      <section class="p-4">
+        <div class="flex items-center mb-4">
+          <img
+            class="w-16 mr-2"
+            src="{{ url_for('static', path='/teaser/gummi.png') }}"
+            alt="Mynd af Gumma"
+          />
+          <div class="text-lg leading-tight">
+            <div class="font-medium">Guðmundur Kristján Jónsson</div>
+            <a class="underline text-powder font-light" href="mailto:gudmundur@planitor.io"
+              >gudmundur@planitor.io</a
+            >
+          </div>
+        </div>
+        <div class="flex items-center">
+          <img
+            class="w-16 mr-2"
+            src="{{ url_for('static', path='/teaser/jokull.png') }}"
+            alt="Mynd af Jökli"
+          />
+          <div class="text-lg leading-tight">
+            <div class="font-medium">Jökull Sólberg</div>
+            <a class="underline text-powder font-light" href="mailto:jokull@planitor.io"
+              >jokull@planitor.io</a
+            >
+          </div>
+        </div>
+      </section>
+      <section class="py-12 px-4 font-light">
+        <p class="text-xs">
+          *Planitor þjónustan er opin fyrir takmarkaðan hóp sem stendur. Hafðu samband ef þú hefur áhuga á að
+          kynna þér kerfið.
+        </p>
+      </section>
     </div>
-  </div>
-  <div class="munis grid grid-cols-1 gap-4">
-    {% for m in municipalities %}
-    <a
-      href="{{ url_for('get_municipality', muni_slug=m.slug) }}"
-      class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
-    >
-      <div class="px-4 py-4">
-        <div class="name font-bold text-xl mb-1">
-          {{ m.name }}
-        </div>
-      </div>
-    </a>
-    {% endfor %}
-    <a
-      href="{{ url_for('get_municipality', muni_slug=h.encode(2)) }}"
-      class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
-    >
-      <div class="px-4 py-4">
-        <div class="name font-bold text-xl mb-1">
-          Kópavogur
-        </div>
-      </div>
-    </a>
-  </div>
-</div>
-{% endblock body %}
+    <!-- Hot reload script -->
+    {% if DEBUG %} {{ hotreload.script(url_for('hot-reload')) | safe }} {% endif %}
+  </body>
+</html>

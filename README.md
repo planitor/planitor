@@ -2,13 +2,12 @@
 
 Planning + Monitoring = Planitor
 
-A business intelligence service for people in the planning, property, transport
-and construction sector in Iceland.
+A business intelligence service for people in the planning, property, transport and construction sector in
+Iceland.
 
 # High level
 
-There are two development servers, for bundling frontend and the backend
-respectively.
+There are two development servers, for bundling frontend and the backend respectively.
 
 # Development
 
@@ -56,4 +55,10 @@ Run frontend
 
 ```bash
 yarn run watch
+```
+
+Build frontend for production
+
+```bash
+NODE_ENV=production yarn run build
 ```

@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block body %}
+<div class="px-6">
+  <div class="my-6 px-4 sm:px-0 mt-4 sm:mt-8">
+    <div class="text-xs text-right text-gray-500">
+      Sveitarfélög
+    </div>
+  </div>
+  <div class="munis grid grid-cols-1 gap-4">
+    {% for m in municipalities %}
+    <a
+      href="{{ url_for('get_municipality', muni_slug=m.slug) }}"
+      class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
+    >
+      <div class="px-4 py-4">
+        <div class="name font-bold text-xl mb-1">
+          {{ m.name }}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+    <a
+      href="{{ url_for('get_municipality', muni_slug=h.encode(2)) }}"
+      class="model bg-white rounded overflow-hidden shadow-lg sm:mb-1"
+    >
+      <div class="px-4 py-4">
+        <div class="name font-bold text-xl mb-1">
+          Kópavogur
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock body %}

@@ -25,7 +25,7 @@ async def get_index(
 ) -> templates.TemplateResponse:
     municipalities = db.query(Municipality)
     return templates.TemplateResponse(
-        "index.html",
+        "municipalities.html",
         {"municipalities": municipalities, "request": request, "user": current_user},
     )
 

@@ -23,7 +23,7 @@ else:
     app.add_middleware(SentryAsgiMiddleware)
 
 
-@app.router("/")
+@app.router.get("/")
 async def get_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 

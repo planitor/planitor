@@ -4,6 +4,7 @@
   "editor.formatOnSave": true,
   "python.formatting.blackArgs": ["--line-length=88"],
   "prettier.proseWrap": "always",
+  "prettier.printWidth": 110,
   "[jinja-html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
