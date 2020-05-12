@@ -12,11 +12,15 @@
     <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="32x32" />
     <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="32x32" />
     <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
     <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
     <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
   </head>
   <body id="teaser" class="flex flex-col flex-wrap items-center min-h-screen bg-white">
-    <div class="w-full absolute bg-powder z-0" style="height: 33%;"></div>
+    <div class="w-full fixed bg-powder z-0" style="height: 33%;"></div>
     <div
       style="box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.5);"
       class="z-1 absolute w-full sm:px-10 md:max-w-screen-md m-auto bg-midnight min-h-screen text-white"
