@@ -9,32 +9,35 @@
     <meta property="og:description" content="Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.planitor.io/" />
-    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="32x32" />
-    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="16x16" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-32.png') }}" sizes="32x32" />
     <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
       rel="stylesheet"
     />
     <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
     <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
   </head>
-  <body id="teaser" class="flex flex-col flex-wrap items-center min-h-screen bg-white">
-    <div class="w-full fixed bg-powder z-0" style="height: 33%;"></div>
+  <body id="teaser" class="flex flex-col flex-wrap items-center min-h-screen">
+    <div
+      class="w-full fixed bg-powder z-0 h-screen"
+      style="background-image: linear-gradient(180deg, #c0dfe1 0%, #8dbcbf 100%);"
+    ></div>
     <div
       style="box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.5);"
-      class="z-1 absolute w-full sm:px-10 md:max-w-screen-md m-auto bg-midnight min-h-screen text-white"
+      class="z-1 relative w-full sm:px-10 md:max-w-screen-md md:my-8 md:py-6 md:rounded-lg m-auto bg-midnight min-h-screen text-white"
     >
       <header class="p-4 my-2">
         <div class="flex items-center">
           <div class="logo h-12 w-12 mr-3">{% include "emblem.svg" %}</div>
           <div class="font-semibold text-5xl">Planitor</div>
         </div>
-        <p class="pl-16 mb-2 font-light">
+        <p class="pl-16 mb-2 font-light font-medium">
           Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi*
         </p>
       </header>
-      <section class="p-4 text-sm md:text-lg">
+      <section class="p-4 md:py-12 text-sm md:text-lg">
         <ul>
           <li class="flex items-start mb-4">
             <div style="flex: 0 0 3rem;" class="text-right mr-3">{% include "teaser/hexagon.svg" %}</div>
@@ -62,7 +65,7 @@
           </li>
         </ul>
       </section>
-      <section class="p-4 my-8">
+      <section class="p-4 md:py-8">
         <h4 class="font-bold text-xl">Fréttabréf Planitor</h4>
         <p class="text-sm md:text-base mb-4">
           Fáðu fréttabréf Planitor um skipulagsmál á Íslandi sent vikulega. Allt það helsta, áhugaverðasta og
@@ -76,7 +79,7 @@
           <span>planitor.substack.com</span>
         </a>
       </section>
-      <section class="p-4">
+      <section class="p-4 md:py-8">
         <div class="flex items-center mb-4">
           <img
             class="w-16 mr-2"

@@ -290,6 +290,31 @@ DNSSEC = ["pycryptodome", "ecdsa (>=0.13)"]
 IDNA = ["idna (>=2.1)"]
 
 [[package]]
+category = "dev"
+description = "Python client for Docker."
+name = "docker-py"
+optional = false
+python-versions = "*"
+version = "1.10.6"
+
+[package.dependencies]
+docker-pycreds = ">=0.2.1"
+requests = ">=2.5.2,<2.11.0 || >2.11.0"
+six = ">=1.4.0"
+websocket-client = ">=0.32.0"
+
+[[package]]
+category = "dev"
+description = "Python bindings for the docker credentials store API"
+name = "docker-pycreds"
+optional = false
+python-versions = "*"
+version = "0.4.0"
+
+[package.dependencies]
+six = ">=1.4.0"
+
+[[package]]
 category = "main"
 description = "A robust email syntax and deliverability validation library for Python 2.x/3.x."
 name = "email-validator"
@@ -356,14 +381,6 @@ entrypoints = ">=0.3.0,<0.4.0"
 mccabe = ">=0.6.0,<0.7.0"
 pycodestyle = ">=2.5.0,<2.6.0"
 pyflakes = ">=2.1.0,<2.2.0"
-
-[[package]]
-category = "dev"
-description = "A Python port of the Apache Lucene ASCII Folding Filter that converts alphabetic, numeric, and symbolic Unicode characters which are not in the first 127 ASCII characters (the ‘Basic Latin’ Unicode block) into ASCII equivalents, if they exist."
-name = "fold-to-ascii"
-optional = false
-python-versions = "*"
-version = "1.0.1"
 
 [[package]]
 category = "dev"
@@ -993,6 +1010,14 @@ six = ">=1.4.0"
 
 [[package]]
 category = "dev"
+description = "YAML parser and emitter for Python"
+name = "pyyaml"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "5.3.1"
+
+[[package]]
+category = "dev"
 description = "Collection of persistent (disk-based) queues"
 name = "queuelib"
 optional = false
@@ -1024,6 +1049,17 @@ urllib3 = ">=1.21.1,<1.25.0 || >1.25.0,<1.25.1 || >1.25.1,<1.26"
 [package.extras]
 security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7)", "win-inet-pton"]
+
+[[package]]
+category = "dev"
+description = "Retrying"
+name = "retrying"
+optional = false
+python-versions = "*"
+version = "1.3.3"
+
+[package.dependencies]
+six = ">=1.7.0"
 
 [[package]]
 category = "main"
@@ -1059,6 +1095,22 @@ version = "0.1.1585871494"
 [package.dependencies]
 six = "*"
 sqlalchemy = "*"
+
+[[package]]
+category = "dev"
+description = "Client interface for Scrapinghub API"
+name = "scrapinghub"
+optional = false
+python-versions = "*"
+version = "2.3.1"
+
+[package.dependencies]
+requests = ">=1.0"
+retrying = ">=1.3.3"
+six = ">=1.10.0"
+
+[package.extras]
+msgpack = ["msgpack (>=1.0.0)"]
 
 [[package]]
 category = "dev"
@@ -1128,6 +1180,26 @@ dev = ["coverage (>=4.2.0)", "pytest", "sphinx", "idna", "pyopenssl"]
 docs = ["sphinx"]
 idna = ["idna"]
 tests = ["coverage (>=4.2.0)", "pytest"]
+
+[[package]]
+category = "dev"
+description = "Scrapinghub Command Line Client"
+name = "shub"
+optional = false
+python-versions = "*"
+version = "2.10.0"
+
+[package.dependencies]
+PyYAML = "*"
+click = "*"
+docker-py = "*"
+pip = "*"
+requests = "*"
+retrying = "*"
+scrapinghub = ">=2.0.3"
+six = ">=1.7.0"
+toml = "*"
+tqdm = "*"
 
 [[package]]
 category = "main"
@@ -1248,6 +1320,17 @@ name = "toml"
 optional = false
 python-versions = "*"
 version = "0.10.0"
+
+[[package]]
+category = "dev"
+description = "Fast, Extensible Progress Meter"
+name = "tqdm"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*"
+version = "4.46.0"
+
+[package.extras]
+dev = ["py-make (>=0.1.0)", "twine", "argopt", "pydoc-markdown"]
 
 [[package]]
 category = "dev"
@@ -1375,6 +1458,17 @@ python-versions = "*"
 version = "0.5.1"
 
 [[package]]
+category = "dev"
+description = "WebSocket client for Python. hybi13 is supported."
+name = "websocket-client"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "0.57.0"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 category = "main"
 description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 name = "websockets"
@@ -1412,7 +1506,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "9ddde3722704652dbbc4ef09e4703c607b169072298332657ceae539bd2bc846"
+content-hash = "5b7d8758e39650b44581d3c00a113db60c81c34e649f1795e2a5220fc89867e1"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1581,6 +1675,14 @@ dnspython = [
     {file = "dnspython-1.16.0-py2.py3-none-any.whl", hash = "sha256:f69c21288a962f4da86e56c4905b49d11aba7938d3d740e80d9e366ee4f1632d"},
     {file = "dnspython-1.16.0.zip", hash = "sha256:36c5e8e38d4369a08b6780b7f27d790a292b2b08eea01607865bf0936c558e01"},
 ]
+docker-py = [
+    {file = "docker-py-1.10.6.tar.gz", hash = "sha256:4c2a75875764d38d67f87bc7d03f7443a3895704efc57962bdf6500b8d4bc415"},
+    {file = "docker_py-1.10.6-py2.py3-none-any.whl", hash = "sha256:35b506e95861914fa5ad57a6707e3217b4082843b883be246190f57013948aba"},
+]
+docker-pycreds = [
+    {file = "docker-pycreds-0.4.0.tar.gz", hash = "sha256:6ce3270bcaf404cc4c3e27e4b6c70d3521deae82fb508767870fdbf772d584d4"},
+    {file = "docker_pycreds-0.4.0-py2.py3-none-any.whl", hash = "sha256:7266112468627868005106ec19cd0d722702d2b7d5912a28e19b826c3d37af49"},
+]
 email-validator = [
     {file = "email_validator-1.1.0-py2.py3-none-any.whl", hash = "sha256:de2aad89b13574a73fd26c04a5200389b293bd9578602fc3b51537ada47af153"},
     {file = "email_validator-1.1.0.tar.gz", hash = "sha256:2d515ed56eca41a2c91bbe1e0b1054d604a2502417487b553d3d26962945eda2"},
@@ -1600,12 +1702,6 @@ fastapi = [
 flake8 = [
     {file = "flake8-3.7.9-py2.py3-none-any.whl", hash = "sha256:49356e766643ad15072a789a20915d3c91dc89fd313ccd71802303fd67e4deca"},
     {file = "flake8-3.7.9.tar.gz", hash = "sha256:45681a117ecc81e870cbf1262835ae4af5e7a8b08e40b944a8a6e6b895914cfb"},
-]
-fold-to-ascii = [
-    {file = "fold_to_ascii-1.0.1-py2-none-any.whl", hash = "sha256:34761ad4984250e927f2e6e7ad5389c2df0acac45c67a84a784c56f73d90461c"},
-    {file = "fold_to_ascii-1.0.1-py2.7.egg", hash = "sha256:e0e7b62240e704c072262eb14f23f096bf187fd9dc66cb03dfa7754307577798"},
-    {file = "fold_to_ascii-1.0.1-py3-none-any.whl", hash = "sha256:5e248095c21e1b866f857c369e4ccc9ef4908087556c409499dd4be677f1a6e2"},
-    {file = "fold_to_ascii-1.0.1.tar.gz", hash = "sha256:ba94fcfe21df535754b8e61495888001cb25e3623ea877f485ea4147fb936fab"},
 ]
 greenlet = [
     {file = "greenlet-0.4.15-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:99a26afdb82ea83a265137a398f570402aa1f2b5dfb4ac3300c026931817b163"},
@@ -1975,6 +2071,19 @@ python-dateutil = [
 python-multipart = [
     {file = "python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"},
 ]
+pyyaml = [
+    {file = "PyYAML-5.3.1-cp27-cp27m-win32.whl", hash = "sha256:74809a57b329d6cc0fdccee6318f44b9b8649961fa73144a98735b0aaf029f1f"},
+    {file = "PyYAML-5.3.1-cp27-cp27m-win_amd64.whl", hash = "sha256:240097ff019d7c70a4922b6869d8a86407758333f02203e0fc6ff79c5dcede76"},
+    {file = "PyYAML-5.3.1-cp35-cp35m-win32.whl", hash = "sha256:4f4b913ca1a7319b33cfb1369e91e50354d6f07a135f3b901aca02aa95940bd2"},
+    {file = "PyYAML-5.3.1-cp35-cp35m-win_amd64.whl", hash = "sha256:cc8955cfbfc7a115fa81d85284ee61147059a753344bc51098f3ccd69b0d7e0c"},
+    {file = "PyYAML-5.3.1-cp36-cp36m-win32.whl", hash = "sha256:7739fc0fa8205b3ee8808aea45e968bc90082c10aef6ea95e855e10abf4a37b2"},
+    {file = "PyYAML-5.3.1-cp36-cp36m-win_amd64.whl", hash = "sha256:69f00dca373f240f842b2931fb2c7e14ddbacd1397d57157a9b005a6a9942648"},
+    {file = "PyYAML-5.3.1-cp37-cp37m-win32.whl", hash = "sha256:d13155f591e6fcc1ec3b30685d50bf0711574e2c0dfffd7644babf8b5102ca1a"},
+    {file = "PyYAML-5.3.1-cp37-cp37m-win_amd64.whl", hash = "sha256:73f099454b799e05e5ab51423c7bcf361c58d3206fa7b0d555426b1f4d9a3eaf"},
+    {file = "PyYAML-5.3.1-cp38-cp38-win32.whl", hash = "sha256:06a0d7ba600ce0b2d2fe2e78453a470b5a6e000a985dd4a4e54e436cc36b0e97"},
+    {file = "PyYAML-5.3.1-cp38-cp38-win_amd64.whl", hash = "sha256:95f71d2af0ff4227885f7a6605c37fd53d3a106fcab511b8860ecca9fcf400ee"},
+    {file = "PyYAML-5.3.1.tar.gz", hash = "sha256:b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"},
+]
 queuelib = [
     {file = "queuelib-1.5.0-py2.py3-none-any.whl", hash = "sha256:ff43b5b74b9266f8df4232a8f768dc4d67281a271905e2ed4a3689d4d304cd02"},
     {file = "queuelib-1.5.0.tar.gz", hash = "sha256:42b413295551bdc24ed9376c1a2cd7d0b1b0fa4746b77b27ca2b797a276a1a17"},
@@ -2006,6 +2115,9 @@ requests = [
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
 ]
+retrying = [
+    {file = "retrying-1.3.3.tar.gz", hash = "sha256:08c039560a6da2fe4f2c426d0766e284d3b736e355f8dd24b37367b0bb41973b"},
+]
 reynir = [
     {file = "reynir-2.2.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:73f136d17f95344cd96a8433bf1539cc9a891ba500a4c73b7cd23cbbcfb0dbbe"},
     {file = "reynir-2.2.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:0acea3874ce08fc578a7bcbbd0a8b158d45420378d4f490b3b24dace1155416a"},
@@ -2022,6 +2134,10 @@ schemainspect = [
     {file = "schemainspect-0.1.1585871494-py2.py3-none-any.whl", hash = "sha256:5d957f3049a741d5ff8f6a4f6cfe0fd18325ad53372d2de32551c8d1f009d788"},
     {file = "schemainspect-0.1.1585871494.tar.gz", hash = "sha256:612616e6751c6f6d9cb9836820d8fc9290cbbbcfb240b21544828ced1b1483e1"},
 ]
+scrapinghub = [
+    {file = "scrapinghub-2.3.1-py2.py3-none-any.whl", hash = "sha256:9dbe4ebac719cf4ec065a4748cc513a6f9cc4190ef31b98ea24deb63992a9eff"},
+    {file = "scrapinghub-2.3.1.tar.gz", hash = "sha256:cffdfdb233af30f1e5e45d9c3e5e52b1e5d88e13c6c76c66ccf2f5231b601dbf"},
+]
 scrapy = [
     {file = "Scrapy-2.0.1-py2.py3-none-any.whl", hash = "sha256:7b0e207eae772dca55a56cce5182680b5d66b69a8e733edc59eee11ffb99300e"},
     {file = "Scrapy-2.0.1.tar.gz", hash = "sha256:85581a01f4160a103ca9906ffa4e44474f4ecd1685f0934728892c58ebf111f6"},
@@ -2033,6 +2149,10 @@ sentry-sdk = [
 service-identity = [
     {file = "service_identity-18.1.0-py2.py3-none-any.whl", hash = "sha256:001c0707759cb3de7e49c078a7c0c9cd12594161d3bf06b9c254fdcb1a60dc36"},
     {file = "service_identity-18.1.0.tar.gz", hash = "sha256:0858a54aabc5b459d1aafa8a518ed2081a285087f349fe3e55197989232e2e2d"},
+]
+shub = [
+    {file = "shub-2.10.0-py2.py3-none-any.whl", hash = "sha256:b4f5a6d0a082b7988de01f34bbe406c4c7b35675240ada4ba4152d49601b7fd7"},
+    {file = "shub-2.10.0.tar.gz", hash = "sha256:5df6ec1a5613c9248c8a44b3547deae49d2d8743a5c8710a79b9b32fcbec06a0"},
 ]
 six = [
     {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
@@ -2086,6 +2206,10 @@ toml = [
     {file = "toml-0.10.0-py2.7.egg", hash = "sha256:f1db651f9657708513243e61e6cc67d101a39bad662eaa9b5546f789338e07a3"},
     {file = "toml-0.10.0-py2.py3-none-any.whl", hash = "sha256:235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e"},
     {file = "toml-0.10.0.tar.gz", hash = "sha256:229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c"},
+]
+tqdm = [
+    {file = "tqdm-4.46.0-py2.py3-none-any.whl", hash = "sha256:acdafb20f51637ca3954150d0405ff1a7edde0ff19e38fb99a80a66210d2a28f"},
+    {file = "tqdm-4.46.0.tar.gz", hash = "sha256:4733c4a10d0f2a4d098d801464bdaf5240c7dadd2a7fde4ee93b0a0efd9fb25e"},
 ]
 traitlets = [
     {file = "traitlets-4.3.3-py2.py3-none-any.whl", hash = "sha256:70b4c6a1d9019d7b4f6846832288f86998aa3b9207c6821f3578a6a6a467fe44"},
@@ -2173,6 +2297,10 @@ wcwidth = [
 webencodings = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
+]
+websocket-client = [
+    {file = "websocket_client-0.57.0-py2.py3-none-any.whl", hash = "sha256:0fc45c961324d79c781bab301359d5a1b00b13ad1b10415a4780229ef71a5549"},
+    {file = "websocket_client-0.57.0.tar.gz", hash = "sha256:d735b91d6d1692a6a181f2a8c9e0238e5f6373356f561bb9dc4c7af36f452010"},
 ]
 websockets = [
     {file = "websockets-8.1-cp36-cp36m-macosx_10_6_intel.whl", hash = "sha256:3762791ab8b38948f0c4d281c8b2ddfa99b7e510e46bd8dfa942a5fff621068c"},

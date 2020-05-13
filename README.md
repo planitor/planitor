@@ -57,8 +57,19 @@ Run frontend
 yarn run watch
 ```
 
-Build frontend for production
+Preparing deployment
 
 ```bash
-NODE_ENV=production yarn run build
+NODE_ENV=production yarn run build  # frontend build
+poetry export -f requirements.txt > requirements.txt
+```
+
+Then commit this to repo and push to GitHub. Render takes over from there.
+
+Deploy scrapers — beautifulsoup4 needs to be added manually
+
+```bash
+poetry export -f requirements.txt --without-hashes > scrapy-requirements.txt
+echo "beautifulsoup4==4.8.2\nhtml5lib==1.0.1" >> scrapy-requirements.txt
+poetry run shub deploy
 ```

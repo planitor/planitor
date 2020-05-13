@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 build/
-planitor.egg-info/
+*.egg-info/
 
 # VSCode
 .vscode

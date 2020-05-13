@@ -1,80 +1,4081 @@
-parcelRequire=function(e,r,t,n){var i,o="function"==typeof parcelRequire&&parcelRequire,u="function"==typeof require&&require;function f(t,n){if(!r[t]){if(!e[t]){var i="function"==typeof parcelRequire&&parcelRequire;if(!n&&i)return i(t,!0);if(o)return o(t,!0);if(u&&"string"==typeof t)return u(t);var c=new Error("Cannot find module '"+t+"'");throw c.code="MODULE_NOT_FOUND",c}p.resolve=function(r){return e[t][1][r]||r},p.cache={};var l=r[t]=new f.Module(t);e[t][0].call(l.exports,p,l,l.exports,this)}return r[t].exports;function p(e){return f(p.resolve(e))}}f.isParcelRequire=!0,f.Module=function(e){this.id=e,this.bundle=f,this.exports={}},f.modules=e,f.cache=r,f.parent=o,f.register=function(r,t){e[r]=[function(e,r){r.exports=t},{}]};for(var c=0;c<t.length;c++)try{f(t[c])}catch(e){i||(i=e)}if(t.length){var l=f(t[t.length-1]);"object"==typeof exports&&"undefined"!=typeof module?module.exports=l:"function"==typeof define&&define.amd?define(function(){return l}):n&&(this[n]=l)}if(parcelRequire=f,i)throw i;return f}({"aSor":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.render=L,exports.hydrate=M,exports.h=exports.createElement=a,exports.Fragment=v,exports.createRef=h,exports.Component=y,exports.cloneElement=F,exports.createContext=R,exports.toChildArray=C,exports._unmount=W,exports.options=exports.isValidElement=void 0;var e,t,n,o,_,l,r,i,u={},s=[],c=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;function p(e,t){for(var n in t)e[n]=t[n];return e}function f(e){var t=e.parentNode;t&&t.removeChild(e)}function a(e,t,n){var o,_=arguments,l={};for(o in t)"key"!==o&&"ref"!==o&&(l[o]=t[o]);if(arguments.length>3)for(n=[n],o=3;o<arguments.length;o++)n.push(_[o]);if(null!=n&&(l.children=n),"function"==typeof e&&null!=e.defaultProps)for(o in e.defaultProps)void 0===l[o]&&(l[o]=e.defaultProps[o]);return d(e,l,t&&t.key,t&&t.ref,null)}function d(t,n,o,_,l){var r={type:t,props:n,key:o,ref:_,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,constructor:void 0,__v:l};return null==l&&(r.__v=r),e.vnode&&e.vnode(r),r}function h(){return{}}function v(e){return e.children}function y(e,t){this.props=e,this.context=t}function m(e,t){if(null==t)return e.__?m(e.__,e.__.__k.indexOf(e)+1):null;for(var n;t<e.__k.length;t++)if(null!=(n=e.__k[t])&&null!=n.__e)return n.__e;return"function"==typeof e.type?m(e):null}function k(e){var t,n;if(null!=(e=e.__)&&null!=e.__c){for(e.__e=e.__c.base=null,t=0;t<e.__k.length;t++)if(null!=(n=e.__k[t])&&null!=n.__e){e.__e=e.__c.base=n.__e;break}return k(e)}}function g(t){(!t.__d&&(t.__d=!0)&&n.push(t)&&!o++||l!==e.debounceRendering)&&((l=e.debounceRendering)||_)(x)}function x(){for(var e;o=n.length;)e=n.sort(function(e,t){return e.__v.__b-t.__v.__b}),n=[],e.some(function(e){var t,n,o,_,l,r,i;e.__d&&(r=(l=(t=e).__v).__e,(i=t.__P)&&(n=[],(o=p({},l)).__v=o,_=N(i,l,o,t.__n,void 0!==i.ownerSVGElement,null,n,null==r?m(l):r),U(n,l),_!=r&&k(l)))})}function b(e,t,n,o,_,l,r,i,c){var p,a,d,h,v,y,k,g=n&&n.__k||s,x=g.length;if(i==u&&(i=null!=l?l[0]:x?m(n,0):null),p=0,t.__k=C(t.__k,function(n){if(null!=n){if(n.__=t,n.__b=t.__b+1,null===(d=g[p])||d&&n.key==d.key&&n.type===d.type)g[p]=void 0;else for(a=0;a<x;a++){if((d=g[a])&&n.key==d.key&&n.type===d.type){g[a]=void 0;break}d=null}if(h=N(e,n,d=d||u,o,_,l,r,i,c),(a=n.ref)&&d.ref!=a&&(k||(k=[]),d.ref&&k.push(d.ref,null,n),k.push(a,n.__c||h,n)),null!=h){var s;if(null==y&&(y=h),void 0!==n.__d)s=n.__d,n.__d=void 0;else if(l==d||h!=i||null==h.parentNode){e:if(null==i||i.parentNode!==e)e.appendChild(h),s=null;else{for(v=i,a=0;(v=v.nextSibling)&&a<x;a+=2)if(v==h)break e;e.insertBefore(h,i),s=i}"option"==t.type&&(e.value="")}i=void 0!==s?s:h.nextSibling,"function"==typeof t.type&&(t.__d=i)}else i&&d.__e==i&&i.parentNode!=e&&(i=m(d))}return p++,n}),t.__e=y,null!=l&&"function"!=typeof t.type)for(p=l.length;p--;)null!=l[p]&&f(l[p]);for(p=x;p--;)null!=g[p]&&W(g[p],g[p]);if(k)for(p=0;p<k.length;p++)T(k[p],k[++p],k[++p])}function C(e,t,n){if(null==n&&(n=[]),null==e||"boolean"==typeof e)t&&n.push(t(null));else if(Array.isArray(e))for(var o=0;o<e.length;o++)C(e[o],t,n);else n.push(t?t("string"==typeof e||"number"==typeof e?d(null,e,null,null,e):null!=e.__e||null!=e.__c?d(e.type,e.props,e.key,null,e.__v):e):e);return n}function w(e,t,n,o,_){var l;for(l in n)"children"===l||"key"===l||l in t||P(e,l,null,n[l],o);for(l in t)_&&"function"!=typeof t[l]||"children"===l||"key"===l||"value"===l||"checked"===l||n[l]===t[l]||P(e,l,t[l],n[l],o)}function S(e,t,n){"-"===t[0]?e.setProperty(t,n):e[t]="number"==typeof n&&!1===c.test(t)?n+"px":null==n?"":n}function P(e,t,n,o,_){var l,r,i,u,s;if(_?"className"===t&&(t="class"):"class"===t&&(t="className"),"style"===t)if(l=e.style,"string"==typeof n)l.cssText=n;else{if("string"==typeof o&&(l.cssText="",o=null),o)for(u in o)n&&u in n||S(l,u,"");if(n)for(s in n)o&&n[s]===o[s]||S(l,s,n[s])}else"o"===t[0]&&"n"===t[1]?(r=t!==(t=t.replace(/Capture$/,"")),i=t.toLowerCase(),t=(i in e?i:t).slice(2),n?(o||e.addEventListener(t,E,r),(e.l||(e.l={}))[t]=n):e.removeEventListener(t,E,r)):"list"!==t&&"tagName"!==t&&"form"!==t&&"type"!==t&&"size"!==t&&!_&&t in e?e[t]=null==n?"":n:"function"!=typeof n&&"dangerouslySetInnerHTML"!==t&&(t!==(t=t.replace(/^xlink:?/,""))?null==n||!1===n?e.removeAttributeNS("http://www.w3.org/1999/xlink",t.toLowerCase()):e.setAttributeNS("http://www.w3.org/1999/xlink",t.toLowerCase(),n):null==n||!1===n&&!/^ar/.test(t)?e.removeAttribute(t):e.setAttribute(t,n))}function E(t){this.l[t.type](e.event?e.event(t):t)}function N(t,n,o,_,l,r,i,u,s){var c,f,a,d,h,m,k,g,x,C,w=n.type;if(void 0!==n.constructor)return null;(c=e.__b)&&c(n);try{e:if("function"==typeof w){if(g=n.props,x=(c=w.contextType)&&_[c.__c],C=c?x?x.props.value:c.__:_,o.__c?k=(f=n.__c=o.__c).__=f.__E:("prototype"in w&&w.prototype.render?n.__c=f=new w(g,C):(n.__c=f=new y(g,C),f.constructor=w,f.render=A),x&&x.sub(f),f.props=g,f.state||(f.state={}),f.context=C,f.__n=_,a=f.__d=!0,f.__h=[]),null==f.__s&&(f.__s=f.state),null!=w.getDerivedStateFromProps&&(f.__s==f.state&&(f.__s=p({},f.__s)),p(f.__s,w.getDerivedStateFromProps(g,f.__s))),d=f.props,h=f.state,a)null==w.getDerivedStateFromProps&&null!=f.componentWillMount&&f.componentWillMount(),null!=f.componentDidMount&&f.__h.push(f.componentDidMount);else{if(null==w.getDerivedStateFromProps&&g!==d&&null!=f.componentWillReceiveProps&&f.componentWillReceiveProps(g,C),!f.__e&&null!=f.shouldComponentUpdate&&!1===f.shouldComponentUpdate(g,f.__s,C)||n.__v===o.__v&&!f.__){for(f.props=g,f.state=f.__s,n.__v!==o.__v&&(f.__d=!1),f.__v=n,n.__e=o.__e,n.__k=o.__k,f.__h.length&&i.push(f),c=0;c<n.__k.length;c++)n.__k[c]&&(n.__k[c].__=n);break e}null!=f.componentWillUpdate&&f.componentWillUpdate(g,f.__s,C),null!=f.componentDidUpdate&&f.__h.push(function(){f.componentDidUpdate(d,h,m)})}f.context=C,f.props=g,f.state=f.__s,(c=e.__r)&&c(n),f.__d=!1,f.__v=n,f.__P=t,c=f.render(f.props,f.state,f.context),n.__k=null!=c&&c.type==v&&null==c.key?c.props.children:Array.isArray(c)?c:[c],null!=f.getChildContext&&(_=p(p({},_),f.getChildContext())),a||null==f.getSnapshotBeforeUpdate||(m=f.getSnapshotBeforeUpdate(d,h)),b(t,n,o,_,l,r,i,u,s),f.base=n.__e,f.__h.length&&i.push(f),k&&(f.__E=f.__=null),f.__e=!1}else null==r&&n.__v===o.__v?(n.__k=o.__k,n.__e=o.__e):n.__e=D(o.__e,n,o,_,l,r,i,s);(c=e.diffed)&&c(n)}catch(t){n.__v=null,e.__e(t,n,o)}return n.__e}function U(t,n){e.__c&&e.__c(n,t),t.some(function(n){try{t=n.__h,n.__h=[],t.some(function(e){e.call(n)})}catch(t){e.__e(t,n.__v)}})}function D(e,t,n,o,_,l,r,i){var c,p,f,a,d,h=n.props,v=t.props;if(_="svg"===t.type||_,null!=l)for(c=0;c<l.length;c++)if(null!=(p=l[c])&&((null===t.type?3===p.nodeType:p.localName===t.type)||e==p)){e=p,l[c]=null;break}if(null==e){if(null===t.type)return document.createTextNode(v);e=_?document.createElementNS("http://www.w3.org/2000/svg",t.type):document.createElement(t.type,v.is&&{is:v.is}),l=null,i=!1}if(null===t.type)h!==v&&e.data!=v&&(e.data=v);else{if(null!=l&&(l=s.slice.call(e.childNodes)),f=(h=n.props||u).dangerouslySetInnerHTML,a=v.dangerouslySetInnerHTML,!i){if(h===u)for(h={},d=0;d<e.attributes.length;d++)h[e.attributes[d].name]=e.attributes[d].value;(a||f)&&(a&&f&&a.__html==f.__html||(e.innerHTML=a&&a.__html||""))}w(e,v,h,_,i),a?t.__k=[]:(t.__k=t.props.children,b(e,t,n,o,"foreignObject"!==t.type&&_,l,r,u,i)),i||("value"in v&&void 0!==(c=v.value)&&c!==e.value&&P(e,"value",c,h.value,!1),"checked"in v&&void 0!==(c=v.checked)&&c!==e.checked&&P(e,"checked",c,h.checked,!1))}return e}function T(t,n,o){try{"function"==typeof t?t(n):t.current=n}catch(t){e.__e(t,o)}}function W(t,n,o){var _,l,r;if(e.unmount&&e.unmount(t),(_=t.ref)&&(_.current&&_.current!==t.__e||T(_,null,n)),o||"function"==typeof t.type||(o=null!=(l=t.__e)),t.__e=t.__d=void 0,null!=(_=t.__c)){if(_.componentWillUnmount)try{_.componentWillUnmount()}catch(t){e.__e(t,n)}_.base=_.__P=null}if(_=t.__k)for(r=0;r<_.length;r++)_[r]&&W(_[r],n,o);null!=l&&f(l)}function A(e,t,n){return this.constructor(e,n)}function L(t,n,o){var _,l,i;e.__&&e.__(t,n),l=(_=o===r)?null:o&&o.__k||n.__k,t=a(v,null,[t]),i=[],N(n,(_?n:o||n).__k=t,l||u,u,void 0!==n.ownerSVGElement,o&&!_?[o]:l?null:s.slice.call(n.childNodes),i,o||u,_),U(i,t)}function M(e,t){L(e,t,r)}function F(e,t){var n,o;for(o in t=p(p({},e.props),t),arguments.length>2&&(t.children=s.slice.call(arguments,2)),n={},t)"key"!==o&&"ref"!==o&&(n[o]=t[o]);return d(e.type,n,t.key||e.key,t.ref||e.ref,null)}function R(e){var t={},n={__c:"__cC"+i++,__:e,Consumer:function(e,t){return e.children(t)},Provider:function(e){var o,_=this;return this.getChildContext||(o=[],this.getChildContext=function(){return t[n.__c]=_,t},this.shouldComponentUpdate=function(e){_.props.value!==e.value&&o.some(function(t){t.context=e.value,g(t)})},this.sub=function(e){o.push(e);var t=e.componentWillUnmount;e.componentWillUnmount=function(){o.splice(o.indexOf(e),1),t&&t.call(e)}}),e.children}};return n.Consumer.contextType=n,n.Provider.__=n,n}exports.isValidElement=t,exports.options=e,exports.options=e={__e:function(e,t){for(var n,o;t=t.__;)if((n=t.__c)&&!n.__)try{if(n.constructor&&null!=n.constructor.getDerivedStateFromError&&(o=!0,n.setState(n.constructor.getDerivedStateFromError(e))),null!=n.componentDidCatch&&(o=!0,n.componentDidCatch(e)),o)return g(n.__E=n)}catch(t){e=t}throw e}},exports.isValidElement=t=function(e){return null!=e&&void 0===e.constructor},y.prototype.setState=function(e,t){var n;n=this.__s!==this.state?this.__s:this.__s=p({},this.state),"function"==typeof e&&(e=e(n,this.props)),e&&p(n,e),null!=e&&this.__v&&(t&&this.__h.push(t),g(this))},y.prototype.forceUpdate=function(e){this.__v&&(this.__e=!0,e&&this.__h.push(e),g(this))},y.prototype.render=v,n=[],o=0,_="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,r=u,i=0;
-},{}],"c8dR":[function(require,module,exports) {
-!function(e,t){var n=function(e,t,n){"use strict";var i,a;if(function(){var t,n={lazyClass:"lazyload",loadedClass:"lazyloaded",loadingClass:"lazyloading",preloadClass:"lazypreload",errorClass:"lazyerror",autosizesClass:"lazyautosizes",srcAttr:"data-src",srcsetAttr:"data-srcset",sizesAttr:"data-sizes",minSize:40,customMedia:{},init:!0,expFactor:1.5,hFac:.8,loadMode:2,loadHidden:!0,ricTimeout:0,throttleDelay:125};for(t in a=e.lazySizesConfig||e.lazysizesConfig||{},n)t in a||(a[t]=n[t])}(),!t||!t.getElementsByClassName)return{init:function(){},cfg:a,noSupport:!0};var r=t.documentElement,s=e.HTMLPictureElement,o=e.addEventListener.bind(e),l=e.setTimeout,c=e.requestAnimationFrame||l,d=e.requestIdleCallback,u=/^picture$/i,f=["load","error","lazyincluded","_lazyloaded"],g={},m=Array.prototype.forEach,y=function(e,t){return g[t]||(g[t]=new RegExp("(\\s|^)"+t+"(\\s|$)")),g[t].test(e.getAttribute("class")||"")&&g[t]},h=function(e,t){y(e,t)||e.setAttribute("class",(e.getAttribute("class")||"").trim()+" "+t)},v=function(e,t){var n;(n=y(e,t))&&e.setAttribute("class",(e.getAttribute("class")||"").replace(n," "))},z=function(e,t,n){var i=n?"addEventListener":"removeEventListener";n&&z(e,t),f.forEach(function(n){e[i](n,t)})},p=function(e,n,a,r,s){var o=t.createEvent("Event");return a||(a={}),a.instance=i,o.initEvent(n,!r,!s),o.detail=a,e.dispatchEvent(o),o},b=function(t,n){var i;!s&&(i=e.picturefill||a.pf)?(n&&n.src&&!t.getAttribute("srcset")&&t.setAttribute("srcset",n.src),i({reevaluate:!0,elements:[t]})):n&&n.src&&(t.src=n.src)},A=function(e,t){return(getComputedStyle(e,null)||{})[t]},C=function(e,t,n){for(n=n||e.offsetWidth;n<a.minSize&&t&&!e._lazysizesWidth;)n=t.offsetWidth,t=t.parentNode;return n},E=(R=[],D=[],k=R,H=function(){var e=k;for(k=R.length?D:R,T=!0,F=!1;e.length;)e.shift()();T=!1},O=function(e,n){T&&!n?e.apply(this,arguments):(k.push(e),F||(F=!0,(t.hidden?l:c)(H)))},O._lsFlush=H,O),_=function(e,t){return t?function(){E(e)}:function(){var t=this,n=arguments;E(function(){e.apply(t,n)})}},w=function(e){var t,i,a=function(){t=null,e()},r=function(){var e=n.now()-i;e<99?l(r,99-e):(d||a)(a)};return function(){i=n.now(),t||(t=l(r,99))}},N=function(){var s,f,g,C,N,L,x,W,S,B,T,F,R,D,k,H,O,P,$,q=/^img$/i,I=/^iframe$/i,U="onscroll"in e&&!/(gle|ing)bot/.test(navigator.userAgent),j=0,G=0,J=-1,K=function(e){G--,(!e||G<0||!e.target)&&(G=0)},Q=function(e){return null==F&&(F="hidden"==A(t.body,"visibility")),F||!("hidden"==A(e.parentNode,"visibility")&&"hidden"==A(e,"visibility"))},V=function(e,n){var i,a=e,s=Q(e);for(W-=n,T+=n,S-=n,B+=n;s&&(a=a.offsetParent)&&a!=t.body&&a!=r;)(s=(A(a,"opacity")||1)>0)&&"visible"!=A(a,"overflow")&&(i=a.getBoundingClientRect(),s=B>i.left&&S<i.right&&T>i.top-1&&W<i.bottom+1);return s},X=function(){var e,n,o,l,c,d,u,g,m,y,h,v,z=i.elements;if((C=a.loadMode)&&G<8&&(e=z.length)){for(n=0,J++;n<e;n++)if(z[n]&&!z[n]._lazyRace)if(!U||i.prematureUnveil&&i.prematureUnveil(z[n]))ae(z[n]);else if((g=z[n].getAttribute("data-expand"))&&(d=1*g)||(d=j),y||(y=!a.expand||a.expand<1?r.clientHeight>500&&r.clientWidth>500?500:370:a.expand,i._defEx=y,h=y*a.expFactor,v=a.hFac,F=null,j<h&&G<1&&J>2&&C>2&&!t.hidden?(j=h,J=0):j=C>1&&J>1&&G<6?y:0),m!==d&&(L=innerWidth+d*v,x=innerHeight+d,u=-1*d,m=d),o=z[n].getBoundingClientRect(),(T=o.bottom)>=u&&(W=o.top)<=x&&(B=o.right)>=u*v&&(S=o.left)<=L&&(T||B||S||W)&&(a.loadHidden||Q(z[n]))&&(f&&G<3&&!g&&(C<3||J<4)||V(z[n],d))){if(ae(z[n]),c=!0,G>9)break}else!c&&f&&!l&&G<4&&J<4&&C>2&&(s[0]||a.preloadAfterLoad)&&(s[0]||!g&&(T||B||S||W||"auto"!=z[n].getAttribute(a.sizesAttr)))&&(l=s[0]||z[n]);l&&!c&&ae(l)}},Y=(R=X,k=0,H=a.throttleDelay,O=a.ricTimeout,P=function(){D=!1,k=n.now(),R()},$=d&&O>49?function(){d(P,{timeout:O}),O!==a.ricTimeout&&(O=a.ricTimeout)}:_(function(){l(P)},!0),function(e){var t;(e=!0===e)&&(O=33),D||(D=!0,(t=H-(n.now()-k))<0&&(t=0),e||t<9?$():l($,t))}),Z=function(e){var t=e.target;t._lazyCache?delete t._lazyCache:(K(e),h(t,a.loadedClass),v(t,a.loadingClass),z(t,te),p(t,"lazyloaded"))},ee=_(Z),te=function(e){ee({target:e.target})},ne=function(e){var t,n=e.getAttribute(a.srcsetAttr);(t=a.customMedia[e.getAttribute("data-media")||e.getAttribute("media")])&&e.setAttribute("media",t),n&&e.setAttribute("srcset",n)},ie=_(function(e,t,n,i,r){var s,o,c,d,f,y;(f=p(e,"lazybeforeunveil",t)).defaultPrevented||(i&&(n?h(e,a.autosizesClass):e.setAttribute("sizes",i)),o=e.getAttribute(a.srcsetAttr),s=e.getAttribute(a.srcAttr),r&&(c=e.parentNode,d=c&&u.test(c.nodeName||"")),y=t.firesLoad||"src"in e&&(o||s||d),f={target:e},h(e,a.loadingClass),y&&(clearTimeout(g),g=l(K,2500),z(e,te,!0)),d&&m.call(c.getElementsByTagName("source"),ne),o?e.setAttribute("srcset",o):s&&!d&&(I.test(e.nodeName)?function(e,t){try{e.contentWindow.location.replace(t)}catch(n){e.src=t}}(e,s):e.src=s),r&&(o||d)&&b(e,{src:s})),e._lazyRace&&delete e._lazyRace,v(e,a.lazyClass),E(function(){var t=e.complete&&e.naturalWidth>1;y&&!t||(t&&h(e,"ls-is-cached"),Z(f),e._lazyCache=!0,l(function(){"_lazyCache"in e&&delete e._lazyCache},9)),"lazy"==e.loading&&G--},!0)}),ae=function(e){if(!e._lazyRace){var t,n=q.test(e.nodeName),i=n&&(e.getAttribute(a.sizesAttr)||e.getAttribute("sizes")),r="auto"==i;(!r&&f||!n||!e.getAttribute("src")&&!e.srcset||e.complete||y(e,a.errorClass)||!y(e,a.lazyClass))&&(t=p(e,"lazyunveilread").detail,r&&M.updateElem(e,!0,e.offsetWidth),e._lazyRace=!0,G++,ie(e,t,r,i,n))}},re=w(function(){a.loadMode=3,Y()}),se=function(){3==a.loadMode&&(a.loadMode=2),re()},oe=function(){f||(n.now()-N<999?l(oe,999):(f=!0,a.loadMode=3,Y(),o("scroll",se,!0)))};return{_:function(){N=n.now(),i.elements=t.getElementsByClassName(a.lazyClass),s=t.getElementsByClassName(a.lazyClass+" "+a.preloadClass),o("scroll",Y,!0),o("resize",Y,!0),o("pageshow",function(e){if(e.persisted){var n=t.querySelectorAll("."+a.loadingClass);n.length&&n.forEach&&c(function(){n.forEach(function(e){e.complete&&ae(e)})})}}),e.MutationObserver?new MutationObserver(Y).observe(r,{childList:!0,subtree:!0,attributes:!0}):(r.addEventListener("DOMNodeInserted",Y,!0),r.addEventListener("DOMAttrModified",Y,!0),setInterval(Y,999)),o("hashchange",Y,!0),["focus","mouseover","click","load","transitionend","animationend"].forEach(function(e){t.addEventListener(e,Y,!0)}),/d$|^c/.test(t.readyState)?oe():(o("load",oe),t.addEventListener("DOMContentLoaded",Y),l(oe,2e4)),i.elements.length?(X(),E._lsFlush()):Y()},checkElems:Y,unveil:ae,_aLSL:se}}(),M=(W=_(function(e,t,n,i){var a,r,s;if(e._lazysizesWidth=i,i+="px",e.setAttribute("sizes",i),u.test(t.nodeName||""))for(a=t.getElementsByTagName("source"),r=0,s=a.length;r<s;r++)a[r].setAttribute("sizes",i);n.detail.dataAttr||b(e,n.detail)}),S=function(e,t,n){var i,a=e.parentNode;a&&(n=C(e,a,n),(i=p(e,"lazybeforesizes",{width:n,dataAttr:!!t})).defaultPrevented||(n=i.detail.width)&&n!==e._lazysizesWidth&&W(e,a,i,n))},B=w(function(){var e,t=x.length;if(t)for(e=0;e<t;e++)S(x[e])}),{_:function(){x=t.getElementsByClassName(a.autosizesClass),o("resize",B)},checkElems:B,updateElem:S}),L=function(){!L.i&&t.getElementsByClassName&&(L.i=!0,M._(),N._())};var x,W,S,B;var T,F,R,D,k,H,O;return l(function(){a.init&&L()}),i={cfg:a,autoSizer:M,loader:N,init:L,uP:b,aC:h,rC:v,hC:y,fire:p,gW:C,rAF:E}}(e,e.document,Date);e.lazySizes=n,"object"==typeof module&&module.exports&&(module.exports=n)}("undefined"!=typeof window?window:{});
-},{}],"zB7T":[function(require,module,exports) {
-"use strict";require("lazysizes");var t=window.mapkit;document.addEventListener("lazybeforeunveil",function(e){var n=e.target;if(n.classList.contains("map")){var a=new t.Coordinate(parseFloat(n.dataset.lat),parseFloat(n.dataset.lon)),o=new t.CoordinateRegion(a,new t.CoordinateSpan(.03,.04)),i=new t.Map(n),r=new t.MarkerAnnotation(a,{color:"#f4a56d",title:n.dataset.address});i.showItems([r]),i.region=o}}),t.init({authorizationCallback:function(t){fetch("/mapkit-token").then(function(t){return t.text()}).then(function(e){return t(e)}).catch(function(t){console.error(t)})}});
-},{"lazysizes":"c8dR"}],"MwGB":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.useState=a,exports.useReducer=p,exports.useEffect=h,exports.useLayoutEffect=v,exports.useRef=m,exports.useImperativeHandle=H,exports.useMemo=l,exports.useCallback=d,exports.useContext=x,exports.useDebugValue=y,exports.useErrorBoundary=E;var _,n,t,o=require("preact"),e=0,u=[],r=o.options.__r,i=o.options.diffed,c=o.options.__c,s=o.options.unmount;function f(_,t){o.options.__h&&o.options.__h(n,_,e||t),e=0;var u=n.__H||(n.__H={__:[],__h:[]});return _>=u.__.length&&u.__.push({}),u.__[_]}function a(_){return e=1,p(A,_)}function p(t,o,e){var u=f(_++,2);return u.__c||(u.__c=n,u.__=[e?e(o):A(void 0,o),function(_){var n=t(u.__[0],_);u.__[0]!==n&&(u.__[0]=n,u.__c.setState({}))}]),u.__}function h(t,e){var u=f(_++,3);!o.options.__s&&q(u.__H,e)&&(u.__=t,u.__H=e,n.__H.__h.push(u))}function v(t,e){var u=f(_++,4);!o.options.__s&&q(u.__H,e)&&(u.__=t,u.__H=e,n.__h.push(u))}function m(_){return e=5,l(function(){return{current:_}},[])}function H(_,n,t){e=6,v(function(){"function"==typeof _?_(n()):_&&(_.current=n())},null==t?t:t.concat(_))}function l(n,t){var o=f(_++,7);return q(o.__H,t)?(o.__H=t,o.__h=n,o.__=n()):o.__}function d(_,n){return e=8,l(function(){return _},n)}function x(t){var o=n.context[t.__c],e=f(_++,9);return e.__c=t,o?(null==e.__&&(e.__=!0,o.sub(n)),o.props.value):t.__}function y(_,n){o.options.useDebugValue&&o.options.useDebugValue(n?n(_):_)}function E(t){var o=f(_++,10),e=a();return o.__=t,n.componentDidCatch||(n.componentDidCatch=function(_){o.__&&o.__(_),e[1](_)}),[e[0],function(){e[1](void 0)}]}function b(){u.some(function(_){if(_.__P)try{_.__H.__h.forEach(g),_.__H.__h.forEach(D),_.__H.__h=[]}catch(n){return _.__H.__h=[],o.options.__e(n,_.__v),!0}}),u=[]}function g(_){_.t&&_.t()}function D(_){var n=_.__();"function"==typeof n&&(_.t=n)}function q(_,n){return!_||n.some(function(n,t){return n!==_[t]})}function A(_,n){return"function"==typeof n?n(_):n}o.options.__r=function(t){r&&r(t),_=0,(n=t.__c).__H&&(n.__H.__h.forEach(g),n.__H.__h.forEach(D),n.__H.__h=[])},o.options.diffed=function(_){i&&i(_);var n=_.__c;if(n){var e=n.__H;e&&e.__h.length&&(1!==u.push(n)&&t===o.options.requestAnimationFrame||((t=o.options.requestAnimationFrame)||function(_){var n,t=function(){clearTimeout(o),cancelAnimationFrame(n),setTimeout(_)},o=setTimeout(t,100);"undefined"!=typeof window&&(n=requestAnimationFrame(t))})(b))}},o.options.__c=function(_,n){n.some(function(_){try{_.__h.forEach(g),_.__h=_.__h.filter(function(_){return!_.__||D(_)})}catch(t){n.some(function(_){_.__h&&(_.__h=[])}),n=[],o.options.__e(t,_.__v)}}),c&&c(_,n)},o.options.unmount=function(_){s&&s(_);var n=_.__c;if(n){var t=n.__H;if(t)try{t.__.forEach(function(_){return _.t&&_.t()})}catch(_){o.options.__e(_,n.__v)}}};
-},{"preact":"aSor"}],"EDTP":[function(require,module,exports) {
-"use strict";module.exports=function(r,n){return function(){for(var t=new Array(arguments.length),e=0;e<t.length;e++)t[e]=arguments[e];return r.apply(n,t)}};
-},{}],"S1cf":[function(require,module,exports) {
-"use strict";var r=require("./helpers/bind"),e=Object.prototype.toString;function t(r){return"[object Array]"===e.call(r)}function n(r){return void 0===r}function o(r){return null!==r&&!n(r)&&null!==r.constructor&&!n(r.constructor)&&"function"==typeof r.constructor.isBuffer&&r.constructor.isBuffer(r)}function u(r){return"[object ArrayBuffer]"===e.call(r)}function f(r){return"undefined"!=typeof FormData&&r instanceof FormData}function i(r){return"undefined"!=typeof ArrayBuffer&&ArrayBuffer.isView?ArrayBuffer.isView(r):r&&r.buffer&&r.buffer instanceof ArrayBuffer}function c(r){return"string"==typeof r}function a(r){return"number"==typeof r}function l(r){return null!==r&&"object"==typeof r}function s(r){return"[object Date]"===e.call(r)}function p(r){return"[object File]"===e.call(r)}function y(r){return"[object Blob]"===e.call(r)}function d(r){return"[object Function]"===e.call(r)}function b(r){return l(r)&&d(r.pipe)}function j(r){return"undefined"!=typeof URLSearchParams&&r instanceof URLSearchParams}function v(r){return r.replace(/^\s*/,"").replace(/\s*$/,"")}function m(){return("undefined"==typeof navigator||"ReactNative"!==navigator.product&&"NativeScript"!==navigator.product&&"NS"!==navigator.product)&&("undefined"!=typeof window&&"undefined"!=typeof document)}function B(r,e){if(null!=r)if("object"!=typeof r&&(r=[r]),t(r))for(var n=0,o=r.length;n<o;n++)e.call(null,r[n],n,r);else for(var u in r)Object.prototype.hasOwnProperty.call(r,u)&&e.call(null,r[u],u,r)}function g(){var r={};function e(e,t){"object"==typeof r[t]&&"object"==typeof e?r[t]=g(r[t],e):r[t]=e}for(var t=0,n=arguments.length;t<n;t++)B(arguments[t],e);return r}function h(){var r={};function e(e,t){"object"==typeof r[t]&&"object"==typeof e?r[t]=h(r[t],e):r[t]="object"==typeof e?h({},e):e}for(var t=0,n=arguments.length;t<n;t++)B(arguments[t],e);return r}function A(e,t,n){return B(t,function(t,o){e[o]=n&&"function"==typeof t?r(t,n):t}),e}module.exports={isArray:t,isArrayBuffer:u,isBuffer:o,isFormData:f,isArrayBufferView:i,isString:c,isNumber:a,isObject:l,isUndefined:n,isDate:s,isFile:p,isBlob:y,isFunction:d,isStream:b,isURLSearchParams:j,isStandardBrowserEnv:m,forEach:B,merge:g,deepMerge:h,extend:A,trim:v};
-},{"./helpers/bind":"EDTP"}],"H6Qo":[function(require,module,exports) {
-"use strict";var e=require("./../utils");function r(e){return encodeURIComponent(e).replace(/%40/gi,"@").replace(/%3A/gi,":").replace(/%24/g,"$").replace(/%2C/gi,",").replace(/%20/g,"+").replace(/%5B/gi,"[").replace(/%5D/gi,"]")}module.exports=function(i,n,t){if(!n)return i;var a;if(t)a=t(n);else if(e.isURLSearchParams(n))a=n.toString();else{var c=[];e.forEach(n,function(i,n){null!=i&&(e.isArray(i)?n+="[]":i=[i],e.forEach(i,function(i){e.isDate(i)?i=i.toISOString():e.isObject(i)&&(i=JSON.stringify(i)),c.push(r(n)+"="+r(i))}))}),a=c.join("&")}if(a){var l=i.indexOf("#");-1!==l&&(i=i.slice(0,l)),i+=(-1===i.indexOf("?")?"?":"&")+a}return i};
-},{"./../utils":"S1cf"}],"rj2i":[function(require,module,exports) {
-"use strict";var t=require("./../utils");function e(){this.handlers=[]}e.prototype.use=function(t,e){return this.handlers.push({fulfilled:t,rejected:e}),this.handlers.length-1},e.prototype.eject=function(t){this.handlers[t]&&(this.handlers[t]=null)},e.prototype.forEach=function(e){t.forEach(this.handlers,function(t){null!==t&&e(t)})},module.exports=e;
-},{"./../utils":"S1cf"}],"woEt":[function(require,module,exports) {
-"use strict";var r=require("./../utils");module.exports=function(t,u,e){return r.forEach(e,function(r){t=r(t,u)}),t};
-},{"./../utils":"S1cf"}],"V30M":[function(require,module,exports) {
-"use strict";module.exports=function(t){return!(!t||!t.__CANCEL__)};
-},{}],"M8l6":[function(require,module,exports) {
-"use strict";var e=require("../utils");module.exports=function(t,r){e.forEach(t,function(e,o){o!==r&&o.toUpperCase()===r.toUpperCase()&&(t[r]=e,delete t[o])})};
-},{"../utils":"S1cf"}],"YdsM":[function(require,module,exports) {
-"use strict";module.exports=function(e,i,s,t,n){return e.config=i,s&&(e.code=s),e.request=t,e.response=n,e.isAxiosError=!0,e.toJSON=function(){return{message:this.message,name:this.name,description:this.description,number:this.number,fileName:this.fileName,lineNumber:this.lineNumber,columnNumber:this.columnNumber,stack:this.stack,config:this.config,code:this.code}},e};
-},{}],"bIiH":[function(require,module,exports) {
-"use strict";var r=require("./enhanceError");module.exports=function(e,n,o,t,u){var a=new Error(e);return r(a,n,o,t,u)};
-},{"./enhanceError":"YdsM"}],"aS8y":[function(require,module,exports) {
-"use strict";var t=require("./createError");module.exports=function(e,s,r){var u=r.config.validateStatus;!u||u(r.status)?e(r):s(t("Request failed with status code "+r.status,r.config,null,r.request,r))};
-},{"./createError":"bIiH"}],"YZjV":[function(require,module,exports) {
-"use strict";module.exports=function(t){return/^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(t)};
-},{}],"a2Uu":[function(require,module,exports) {
-"use strict";module.exports=function(e,r){return r?e.replace(/\/+$/,"")+"/"+r.replace(/^\/+/,""):e};
-},{}],"KxkP":[function(require,module,exports) {
-"use strict";var e=require("../helpers/isAbsoluteURL"),r=require("../helpers/combineURLs");module.exports=function(s,u){return s&&!e(u)?r(s,u):u};
-},{"../helpers/isAbsoluteURL":"YZjV","../helpers/combineURLs":"a2Uu"}],"ZeD7":[function(require,module,exports) {
-"use strict";var e=require("./../utils"),t=["age","authorization","content-length","content-type","etag","expires","from","host","if-modified-since","if-unmodified-since","last-modified","location","max-forwards","proxy-authorization","referer","retry-after","user-agent"];module.exports=function(r){var i,o,n,s={};return r?(e.forEach(r.split("\n"),function(r){if(n=r.indexOf(":"),i=e.trim(r.substr(0,n)).toLowerCase(),o=e.trim(r.substr(n+1)),i){if(s[i]&&t.indexOf(i)>=0)return;s[i]="set-cookie"===i?(s[i]?s[i]:[]).concat([o]):s[i]?s[i]+", "+o:o}}),s):s};
-},{"./../utils":"S1cf"}],"w7LF":[function(require,module,exports) {
-"use strict";var t=require("./../utils");module.exports=t.isStandardBrowserEnv()?function(){var r,e=/(msie|trident)/i.test(navigator.userAgent),o=document.createElement("a");function a(t){var r=t;return e&&(o.setAttribute("href",r),r=o.href),o.setAttribute("href",r),{href:o.href,protocol:o.protocol?o.protocol.replace(/:$/,""):"",host:o.host,search:o.search?o.search.replace(/^\?/,""):"",hash:o.hash?o.hash.replace(/^#/,""):"",hostname:o.hostname,port:o.port,pathname:"/"===o.pathname.charAt(0)?o.pathname:"/"+o.pathname}}return r=a(window.location.href),function(e){var o=t.isString(e)?a(e):e;return o.protocol===r.protocol&&o.host===r.host}}():function(){return!0};
-},{"./../utils":"S1cf"}],"dn2M":[function(require,module,exports) {
-"use strict";var e=require("./../utils");module.exports=e.isStandardBrowserEnv()?{write:function(n,t,o,r,i,u){var s=[];s.push(n+"="+encodeURIComponent(t)),e.isNumber(o)&&s.push("expires="+new Date(o).toGMTString()),e.isString(r)&&s.push("path="+r),e.isString(i)&&s.push("domain="+i),!0===u&&s.push("secure"),document.cookie=s.join("; ")},read:function(e){var n=document.cookie.match(new RegExp("(^|;\\s*)("+e+")=([^;]*)"));return n?decodeURIComponent(n[3]):null},remove:function(e){this.write(e,"",Date.now()-864e5)}}:{write:function(){},read:function(){return null},remove:function(){}};
-},{"./../utils":"S1cf"}],"KRuG":[function(require,module,exports) {
-"use strict";var e=require("./../utils"),r=require("./../core/settle"),t=require("./../helpers/buildURL"),s=require("../core/buildFullPath"),o=require("./../helpers/parseHeaders"),n=require("./../helpers/isURLSameOrigin"),a=require("../core/createError");module.exports=function(i){return new Promise(function(u,l){var d=i.data,p=i.headers;e.isFormData(d)&&delete p["Content-Type"];var c=new XMLHttpRequest;if(i.auth){var f=i.auth.username||"",h=i.auth.password||"";p.Authorization="Basic "+btoa(f+":"+h)}var m=s(i.baseURL,i.url);if(c.open(i.method.toUpperCase(),t(m,i.params,i.paramsSerializer),!0),c.timeout=i.timeout,c.onreadystatechange=function(){if(c&&4===c.readyState&&(0!==c.status||c.responseURL&&0===c.responseURL.indexOf("file:"))){var e="getAllResponseHeaders"in c?o(c.getAllResponseHeaders()):null,t={data:i.responseType&&"text"!==i.responseType?c.response:c.responseText,status:c.status,statusText:c.statusText,headers:e,config:i,request:c};r(u,l,t),c=null}},c.onabort=function(){c&&(l(a("Request aborted",i,"ECONNABORTED",c)),c=null)},c.onerror=function(){l(a("Network Error",i,null,c)),c=null},c.ontimeout=function(){var e="timeout of "+i.timeout+"ms exceeded";i.timeoutErrorMessage&&(e=i.timeoutErrorMessage),l(a(e,i,"ECONNABORTED",c)),c=null},e.isStandardBrowserEnv()){var v=require("./../helpers/cookies"),T=(i.withCredentials||n(m))&&i.xsrfCookieName?v.read(i.xsrfCookieName):void 0;T&&(p[i.xsrfHeaderName]=T)}if("setRequestHeader"in c&&e.forEach(p,function(e,r){void 0===d&&"content-type"===r.toLowerCase()?delete p[r]:c.setRequestHeader(r,e)}),e.isUndefined(i.withCredentials)||(c.withCredentials=!!i.withCredentials),i.responseType)try{c.responseType=i.responseType}catch(g){if("json"!==i.responseType)throw g}"function"==typeof i.onDownloadProgress&&c.addEventListener("progress",i.onDownloadProgress),"function"==typeof i.onUploadProgress&&c.upload&&c.upload.addEventListener("progress",i.onUploadProgress),i.cancelToken&&i.cancelToken.promise.then(function(e){c&&(c.abort(),l(e),c=null)}),void 0===d&&(d=null),c.send(d)})};
-},{"./../utils":"S1cf","./../core/settle":"aS8y","./../helpers/buildURL":"H6Qo","../core/buildFullPath":"KxkP","./../helpers/parseHeaders":"ZeD7","./../helpers/isURLSameOrigin":"w7LF","../core/createError":"bIiH","./../helpers/cookies":"dn2M"}],"pBGv":[function(require,module,exports) {
+// modules are defined as an array
+// [ module function, map of requires ]
+//
+// map of requires is short require name -> numeric require
+//
+// anything defined in a previous bundle is accessed via the
+// orig method which is the require for previous bundles
+parcelRequire = (function (modules, cache, entry, globalName) {
+  // Save the require from previous bundle to this closure if any
+  var previousRequire = typeof parcelRequire === 'function' && parcelRequire;
+  var nodeRequire = typeof require === 'function' && require;
 
-var t,e,n=module.exports={};function r(){throw new Error("setTimeout has not been defined")}function o(){throw new Error("clearTimeout has not been defined")}function i(e){if(t===setTimeout)return setTimeout(e,0);if((t===r||!t)&&setTimeout)return t=setTimeout,setTimeout(e,0);try{return t(e,0)}catch(n){try{return t.call(null,e,0)}catch(n){return t.call(this,e,0)}}}function u(t){if(e===clearTimeout)return clearTimeout(t);if((e===o||!e)&&clearTimeout)return e=clearTimeout,clearTimeout(t);try{return e(t)}catch(n){try{return e.call(null,t)}catch(n){return e.call(this,t)}}}!function(){try{t="function"==typeof setTimeout?setTimeout:r}catch(n){t=r}try{e="function"==typeof clearTimeout?clearTimeout:o}catch(n){e=o}}();var c,s=[],l=!1,a=-1;function f(){l&&c&&(l=!1,c.length?s=c.concat(s):a=-1,s.length&&h())}function h(){if(!l){var t=i(f);l=!0;for(var e=s.length;e;){for(c=s,s=[];++a<e;)c&&c[a].run();a=-1,e=s.length}c=null,l=!1,u(t)}}function m(t,e){this.fun=t,this.array=e}function p(){}n.nextTick=function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)e[n-1]=arguments[n];s.push(new m(t,e)),1!==s.length||l||i(h)},m.prototype.run=function(){this.fun.apply(null,this.array)},n.title="browser",n.env={},n.argv=[],n.version="",n.versions={},n.on=p,n.addListener=p,n.once=p,n.off=p,n.removeListener=p,n.removeAllListeners=p,n.emit=p,n.prependListener=p,n.prependOnceListener=p,n.listeners=function(t){return[]},n.binding=function(t){throw new Error("process.binding is not supported")},n.cwd=function(){return"/"},n.chdir=function(t){throw new Error("process.chdir is not supported")},n.umask=function(){return 0};
-},{}],"BXyq":[function(require,module,exports) {
+  function newRequire(name, jumped) {
+    if (!cache[name]) {
+      if (!modules[name]) {
+        // if we cannot find the module within our internal map or
+        // cache jump to the current global require ie. the last bundle
+        // that was added to the page.
+        var currentRequire = typeof parcelRequire === 'function' && parcelRequire;
+        if (!jumped && currentRequire) {
+          return currentRequire(name, true);
+        }
+
+        // If there are other bundles on this page the require from the
+        // previous one is saved to 'previousRequire'. Repeat this as
+        // many times as there are bundles until the module is found or
+        // we exhaust the require chain.
+        if (previousRequire) {
+          return previousRequire(name, true);
+        }
+
+        // Try the node require function if it exists.
+        if (nodeRequire && typeof name === 'string') {
+          return nodeRequire(name);
+        }
+
+        var err = new Error('Cannot find module \'' + name + '\'');
+        err.code = 'MODULE_NOT_FOUND';
+        throw err;
+      }
+
+      localRequire.resolve = resolve;
+      localRequire.cache = {};
+
+      var module = cache[name] = new newRequire.Module(name);
+
+      modules[name][0].call(module.exports, localRequire, module, module.exports, this);
+    }
+
+    return cache[name].exports;
+
+    function localRequire(x){
+      return newRequire(localRequire.resolve(x));
+    }
+
+    function resolve(x){
+      return modules[name][1][x] || x;
+    }
+  }
+
+  function Module(moduleName) {
+    this.id = moduleName;
+    this.bundle = newRequire;
+    this.exports = {};
+  }
+
+  newRequire.isParcelRequire = true;
+  newRequire.Module = Module;
+  newRequire.modules = modules;
+  newRequire.cache = cache;
+  newRequire.parent = previousRequire;
+  newRequire.register = function (id, exports) {
+    modules[id] = [function (require, module) {
+      module.exports = exports;
+    }, {}];
+  };
+
+  var error;
+  for (var i = 0; i < entry.length; i++) {
+    try {
+      newRequire(entry[i]);
+    } catch (e) {
+      // Save first error but execute all entries
+      if (!error) {
+        error = e;
+      }
+    }
+  }
+
+  if (entry.length) {
+    // Expose entry point to Node, AMD or browser globals
+    // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
+    var mainExports = newRequire(entry[entry.length - 1]);
+
+    // CommonJS
+    if (typeof exports === "object" && typeof module !== "undefined") {
+      module.exports = mainExports;
+
+    // RequireJS
+    } else if (typeof define === "function" && define.amd) {
+     define(function () {
+       return mainExports;
+     });
+
+    // <script>
+    } else if (globalName) {
+      this[globalName] = mainExports;
+    }
+  }
+
+  // Override the current require with this new one
+  parcelRequire = newRequire;
+
+  if (error) {
+    // throw error from earlier, _after updating parcelRequire_
+    throw error;
+  }
+
+  return newRequire;
+})({"../node_modules/preact/dist/preact.module.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.render = H;
+exports.hydrate = I;
+exports.h = exports.createElement = h;
+exports.Fragment = d;
+exports.createRef = y;
+exports.Component = m;
+exports.cloneElement = L;
+exports.createContext = M;
+exports.toChildArray = x;
+exports._unmount = D;
+exports.options = exports.isValidElement = void 0;
+var n,
+    l,
+    u,
+    i,
+    t,
+    r,
+    o,
+    f,
+    e = {},
+    c = [],
+    s = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+exports.isValidElement = l;
+exports.options = n;
+
+function a(n, l) {
+  for (var u in l) n[u] = l[u];
+
+  return n;
+}
+
+function v(n) {
+  var l = n.parentNode;
+  l && l.removeChild(n);
+}
+
+function h(n, l, u) {
+  var i,
+      t = arguments,
+      r = {};
+
+  for (i in l) "key" !== i && "ref" !== i && (r[i] = l[i]);
+
+  if (arguments.length > 3) for (u = [u], i = 3; i < arguments.length; i++) u.push(t[i]);
+  if (null != u && (r.children = u), "function" == typeof n && null != n.defaultProps) for (i in n.defaultProps) void 0 === r[i] && (r[i] = n.defaultProps[i]);
+  return p(n, r, l && l.key, l && l.ref, null);
+}
+
+function p(l, u, i, t, r) {
+  var o = {
+    type: l,
+    props: u,
+    key: i,
+    ref: t,
+    __k: null,
+    __: null,
+    __b: 0,
+    __e: null,
+    __d: void 0,
+    __c: null,
+    constructor: void 0,
+    __v: r
+  };
+  return null == r && (o.__v = o), n.vnode && n.vnode(o), o;
+}
+
+function y() {
+  return {};
+}
+
+function d(n) {
+  return n.children;
+}
+
+function m(n, l) {
+  this.props = n, this.context = l;
+}
+
+function w(n, l) {
+  if (null == l) return n.__ ? w(n.__, n.__.__k.indexOf(n) + 1) : null;
+
+  for (var u; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) return u.__e;
+
+  return "function" == typeof n.type ? w(n) : null;
+}
+
+function k(n) {
+  var l, u;
+
+  if (null != (n = n.__) && null != n.__c) {
+    for (n.__e = n.__c.base = null, l = 0; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) {
+      n.__e = n.__c.base = u.__e;
+      break;
+    }
+
+    return k(n);
+  }
+}
+
+function g(l) {
+  (!l.__d && (l.__d = !0) && u.push(l) && !i++ || r !== n.debounceRendering) && ((r = n.debounceRendering) || t)(_);
+}
+
+function _() {
+  for (var n; i = u.length;) n = u.sort(function (n, l) {
+    return n.__v.__b - l.__v.__b;
+  }), u = [], n.some(function (n) {
+    var l, u, i, t, r, o, f;
+    n.__d && (o = (r = (l = n).__v).__e, (f = l.__P) && (u = [], (i = a({}, r)).__v = i, t = A(f, r, i, l.__n, void 0 !== f.ownerSVGElement, null, u, null == o ? w(r) : o), T(u, r), t != o && k(r)));
+  });
+}
+
+function b(n, l, u, i, t, r, o, f, s) {
+  var a,
+      h,
+      p,
+      y,
+      d,
+      m,
+      k,
+      g = u && u.__k || c,
+      _ = g.length;
+  if (f == e && (f = null != r ? r[0] : _ ? w(u, 0) : null), a = 0, l.__k = x(l.__k, function (u) {
+    if (null != u) {
+      if (u.__ = l, u.__b = l.__b + 1, null === (p = g[a]) || p && u.key == p.key && u.type === p.type) g[a] = void 0;else for (h = 0; h < _; h++) {
+        if ((p = g[h]) && u.key == p.key && u.type === p.type) {
+          g[h] = void 0;
+          break;
+        }
+
+        p = null;
+      }
+
+      if (y = A(n, u, p = p || e, i, t, r, o, f, s), (h = u.ref) && p.ref != h && (k || (k = []), p.ref && k.push(p.ref, null, u), k.push(h, u.__c || y, u)), null != y) {
+        var c;
+        if (null == m && (m = y), void 0 !== u.__d) c = u.__d, u.__d = void 0;else if (r == p || y != f || null == y.parentNode) {
+          n: if (null == f || f.parentNode !== n) n.appendChild(y), c = null;else {
+            for (d = f, h = 0; (d = d.nextSibling) && h < _; h += 2) if (d == y) break n;
+
+            n.insertBefore(y, f), c = f;
+          }
+
+          "option" == l.type && (n.value = "");
+        }
+        f = void 0 !== c ? c : y.nextSibling, "function" == typeof l.type && (l.__d = f);
+      } else f && p.__e == f && f.parentNode != n && (f = w(p));
+    }
+
+    return a++, u;
+  }), l.__e = m, null != r && "function" != typeof l.type) for (a = r.length; a--;) null != r[a] && v(r[a]);
+
+  for (a = _; a--;) null != g[a] && D(g[a], g[a]);
+
+  if (k) for (a = 0; a < k.length; a++) j(k[a], k[++a], k[++a]);
+}
+
+function x(n, l, u) {
+  if (null == u && (u = []), null == n || "boolean" == typeof n) l && u.push(l(null));else if (Array.isArray(n)) for (var i = 0; i < n.length; i++) x(n[i], l, u);else u.push(l ? l("string" == typeof n || "number" == typeof n ? p(null, n, null, null, n) : null != n.__e || null != n.__c ? p(n.type, n.props, n.key, null, n.__v) : n) : n);
+  return u;
+}
+
+function P(n, l, u, i, t) {
+  var r;
+
+  for (r in u) "children" === r || "key" === r || r in l || N(n, r, null, u[r], i);
+
+  for (r in l) t && "function" != typeof l[r] || "children" === r || "key" === r || "value" === r || "checked" === r || u[r] === l[r] || N(n, r, l[r], u[r], i);
+}
+
+function C(n, l, u) {
+  "-" === l[0] ? n.setProperty(l, u) : n[l] = "number" == typeof u && !1 === s.test(l) ? u + "px" : null == u ? "" : u;
+}
+
+function N(n, l, u, i, t) {
+  var r, o, f, e, c;
+  if (t ? "className" === l && (l = "class") : "class" === l && (l = "className"), "style" === l) {
+    if (r = n.style, "string" == typeof u) r.cssText = u;else {
+      if ("string" == typeof i && (r.cssText = "", i = null), i) for (e in i) u && e in u || C(r, e, "");
+      if (u) for (c in u) i && u[c] === i[c] || C(r, c, u[c]);
+    }
+  } else "o" === l[0] && "n" === l[1] ? (o = l !== (l = l.replace(/Capture$/, "")), f = l.toLowerCase(), l = (f in n ? f : l).slice(2), u ? (i || n.addEventListener(l, z, o), (n.l || (n.l = {}))[l] = u) : n.removeEventListener(l, z, o)) : "list" !== l && "tagName" !== l && "form" !== l && "type" !== l && "size" !== l && !t && l in n ? n[l] = null == u ? "" : u : "function" != typeof u && "dangerouslySetInnerHTML" !== l && (l !== (l = l.replace(/^xlink:?/, "")) ? null == u || !1 === u ? n.removeAttributeNS("http://www.w3.org/1999/xlink", l.toLowerCase()) : n.setAttributeNS("http://www.w3.org/1999/xlink", l.toLowerCase(), u) : null == u || !1 === u && !/^ar/.test(l) ? n.removeAttribute(l) : n.setAttribute(l, u));
+}
+
+function z(l) {
+  this.l[l.type](n.event ? n.event(l) : l);
+}
+
+function A(l, u, i, t, r, o, f, e, c) {
+  var s,
+      v,
+      h,
+      p,
+      y,
+      w,
+      k,
+      g,
+      _,
+      x,
+      P = u.type;
+
+  if (void 0 !== u.constructor) return null;
+  (s = n.__b) && s(u);
+
+  try {
+    n: if ("function" == typeof P) {
+      if (g = u.props, _ = (s = P.contextType) && t[s.__c], x = s ? _ ? _.props.value : s.__ : t, i.__c ? k = (v = u.__c = i.__c).__ = v.__E : ("prototype" in P && P.prototype.render ? u.__c = v = new P(g, x) : (u.__c = v = new m(g, x), v.constructor = P, v.render = E), _ && _.sub(v), v.props = g, v.state || (v.state = {}), v.context = x, v.__n = t, h = v.__d = !0, v.__h = []), null == v.__s && (v.__s = v.state), null != P.getDerivedStateFromProps && (v.__s == v.state && (v.__s = a({}, v.__s)), a(v.__s, P.getDerivedStateFromProps(g, v.__s))), p = v.props, y = v.state, h) null == P.getDerivedStateFromProps && null != v.componentWillMount && v.componentWillMount(), null != v.componentDidMount && v.__h.push(v.componentDidMount);else {
+        if (null == P.getDerivedStateFromProps && g !== p && null != v.componentWillReceiveProps && v.componentWillReceiveProps(g, x), !v.__e && null != v.shouldComponentUpdate && !1 === v.shouldComponentUpdate(g, v.__s, x) || u.__v === i.__v && !v.__) {
+          for (v.props = g, v.state = v.__s, u.__v !== i.__v && (v.__d = !1), v.__v = u, u.__e = i.__e, u.__k = i.__k, v.__h.length && f.push(v), s = 0; s < u.__k.length; s++) u.__k[s] && (u.__k[s].__ = u);
+
+          break n;
+        }
+
+        null != v.componentWillUpdate && v.componentWillUpdate(g, v.__s, x), null != v.componentDidUpdate && v.__h.push(function () {
+          v.componentDidUpdate(p, y, w);
+        });
+      }
+      v.context = x, v.props = g, v.state = v.__s, (s = n.__r) && s(u), v.__d = !1, v.__v = u, v.__P = l, s = v.render(v.props, v.state, v.context), u.__k = null != s && s.type == d && null == s.key ? s.props.children : Array.isArray(s) ? s : [s], null != v.getChildContext && (t = a(a({}, t), v.getChildContext())), h || null == v.getSnapshotBeforeUpdate || (w = v.getSnapshotBeforeUpdate(p, y)), b(l, u, i, t, r, o, f, e, c), v.base = u.__e, v.__h.length && f.push(v), k && (v.__E = v.__ = null), v.__e = !1;
+    } else null == o && u.__v === i.__v ? (u.__k = i.__k, u.__e = i.__e) : u.__e = $(i.__e, u, i, t, r, o, f, c);
+
+    (s = n.diffed) && s(u);
+  } catch (l) {
+    u.__v = null, n.__e(l, u, i);
+  }
+
+  return u.__e;
+}
+
+function T(l, u) {
+  n.__c && n.__c(u, l), l.some(function (u) {
+    try {
+      l = u.__h, u.__h = [], l.some(function (n) {
+        n.call(u);
+      });
+    } catch (l) {
+      n.__e(l, u.__v);
+    }
+  });
+}
+
+function $(n, l, u, i, t, r, o, f) {
+  var s,
+      a,
+      v,
+      h,
+      p,
+      y = u.props,
+      d = l.props;
+  if (t = "svg" === l.type || t, null != r) for (s = 0; s < r.length; s++) if (null != (a = r[s]) && ((null === l.type ? 3 === a.nodeType : a.localName === l.type) || n == a)) {
+    n = a, r[s] = null;
+    break;
+  }
+
+  if (null == n) {
+    if (null === l.type) return document.createTextNode(d);
+    n = t ? document.createElementNS("http://www.w3.org/2000/svg", l.type) : document.createElement(l.type, d.is && {
+      is: d.is
+    }), r = null, f = !1;
+  }
+
+  if (null === l.type) y !== d && n.data != d && (n.data = d);else {
+    if (null != r && (r = c.slice.call(n.childNodes)), v = (y = u.props || e).dangerouslySetInnerHTML, h = d.dangerouslySetInnerHTML, !f) {
+      if (y === e) for (y = {}, p = 0; p < n.attributes.length; p++) y[n.attributes[p].name] = n.attributes[p].value;
+      (h || v) && (h && v && h.__html == v.__html || (n.innerHTML = h && h.__html || ""));
+    }
+
+    P(n, d, y, t, f), h ? l.__k = [] : (l.__k = l.props.children, b(n, l, u, i, "foreignObject" !== l.type && t, r, o, e, f)), f || ("value" in d && void 0 !== (s = d.value) && s !== n.value && N(n, "value", s, y.value, !1), "checked" in d && void 0 !== (s = d.checked) && s !== n.checked && N(n, "checked", s, y.checked, !1));
+  }
+  return n;
+}
+
+function j(l, u, i) {
+  try {
+    "function" == typeof l ? l(u) : l.current = u;
+  } catch (l) {
+    n.__e(l, i);
+  }
+}
+
+function D(l, u, i) {
+  var t, r, o;
+
+  if (n.unmount && n.unmount(l), (t = l.ref) && (t.current && t.current !== l.__e || j(t, null, u)), i || "function" == typeof l.type || (i = null != (r = l.__e)), l.__e = l.__d = void 0, null != (t = l.__c)) {
+    if (t.componentWillUnmount) try {
+      t.componentWillUnmount();
+    } catch (l) {
+      n.__e(l, u);
+    }
+    t.base = t.__P = null;
+  }
+
+  if (t = l.__k) for (o = 0; o < t.length; o++) t[o] && D(t[o], u, i);
+  null != r && v(r);
+}
+
+function E(n, l, u) {
+  return this.constructor(n, u);
+}
+
+function H(l, u, i) {
+  var t, r, f;
+  n.__ && n.__(l, u), r = (t = i === o) ? null : i && i.__k || u.__k, l = h(d, null, [l]), f = [], A(u, (t ? u : i || u).__k = l, r || e, e, void 0 !== u.ownerSVGElement, i && !t ? [i] : r ? null : c.slice.call(u.childNodes), f, i || e, t), T(f, l);
+}
+
+function I(n, l) {
+  H(n, l, o);
+}
+
+function L(n, l) {
+  var u, i;
+
+  for (i in l = a(a({}, n.props), l), arguments.length > 2 && (l.children = c.slice.call(arguments, 2)), u = {}, l) "key" !== i && "ref" !== i && (u[i] = l[i]);
+
+  return p(n.type, u, l.key || n.key, l.ref || n.ref, null);
+}
+
+function M(n) {
+  var l = {},
+      u = {
+    __c: "__cC" + f++,
+    __: n,
+    Consumer: function (n, l) {
+      return n.children(l);
+    },
+    Provider: function (n) {
+      var i,
+          t = this;
+      return this.getChildContext || (i = [], this.getChildContext = function () {
+        return l[u.__c] = t, l;
+      }, this.shouldComponentUpdate = function (n) {
+        t.props.value !== n.value && i.some(function (l) {
+          l.context = n.value, g(l);
+        });
+      }, this.sub = function (n) {
+        i.push(n);
+        var l = n.componentWillUnmount;
+
+        n.componentWillUnmount = function () {
+          i.splice(i.indexOf(n), 1), l && l.call(n);
+        };
+      }), n.children;
+    }
+  };
+  return u.Consumer.contextType = u, u.Provider.__ = u, u;
+}
+
+exports.options = n = {
+  __e: function (n, l) {
+    for (var u, i; l = l.__;) if ((u = l.__c) && !u.__) try {
+      if (u.constructor && null != u.constructor.getDerivedStateFromError && (i = !0, u.setState(u.constructor.getDerivedStateFromError(n))), null != u.componentDidCatch && (i = !0, u.componentDidCatch(n)), i) return g(u.__E = u);
+    } catch (l) {
+      n = l;
+    }
+
+    throw n;
+  }
+}, exports.isValidElement = l = function (n) {
+  return null != n && void 0 === n.constructor;
+}, m.prototype.setState = function (n, l) {
+  var u;
+  u = this.__s !== this.state ? this.__s : this.__s = a({}, this.state), "function" == typeof n && (n = n(u, this.props)), n && a(u, n), null != n && this.__v && (l && this.__h.push(l), g(this));
+}, m.prototype.forceUpdate = function (n) {
+  this.__v && (this.__e = !0, n && this.__h.push(n), g(this));
+}, m.prototype.render = d, u = [], i = 0, t = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, o = e, f = 0;
+},{}],"../node_modules/lazysizes/lazysizes.js":[function(require,module,exports) {
+(function(window, factory) {
+	var lazySizes = factory(window, window.document, Date);
+	window.lazySizes = lazySizes;
+	if(typeof module == 'object' && module.exports){
+		module.exports = lazySizes;
+	}
+}(typeof window != 'undefined' ?
+      window : {}, function l(window, document, Date) { // Pass in the windoe Date function also for SSR because the Date class can be lost
+	'use strict';
+	/*jshint eqnull:true */
+
+	var lazysizes, lazySizesCfg;
+
+	(function(){
+		var prop;
+
+		var lazySizesDefaults = {
+			lazyClass: 'lazyload',
+			loadedClass: 'lazyloaded',
+			loadingClass: 'lazyloading',
+			preloadClass: 'lazypreload',
+			errorClass: 'lazyerror',
+			//strictClass: 'lazystrict',
+			autosizesClass: 'lazyautosizes',
+			srcAttr: 'data-src',
+			srcsetAttr: 'data-srcset',
+			sizesAttr: 'data-sizes',
+			//preloadAfterLoad: false,
+			minSize: 40,
+			customMedia: {},
+			init: true,
+			expFactor: 1.5,
+			hFac: 0.8,
+			loadMode: 2,
+			loadHidden: true,
+			ricTimeout: 0,
+			throttleDelay: 125,
+		};
+
+		lazySizesCfg = window.lazySizesConfig || window.lazysizesConfig || {};
+
+		for(prop in lazySizesDefaults){
+			if(!(prop in lazySizesCfg)){
+				lazySizesCfg[prop] = lazySizesDefaults[prop];
+			}
+		}
+	})();
+
+	if (!document || !document.getElementsByClassName) {
+		return {
+			init: function () {},
+			cfg: lazySizesCfg,
+			noSupport: true,
+		};
+	}
+
+	var docElem = document.documentElement;
+
+	var supportPicture = window.HTMLPictureElement;
+
+	var _addEventListener = 'addEventListener';
+
+	var _getAttribute = 'getAttribute';
+
+	/**
+	 * Update to bind to window because 'this' becomes null during SSR
+	 * builds.
+	 */
+	var addEventListener = window[_addEventListener].bind(window);
+
+	var setTimeout = window.setTimeout;
+
+	var requestAnimationFrame = window.requestAnimationFrame || setTimeout;
+
+	var requestIdleCallback = window.requestIdleCallback;
+
+	var regPicture = /^picture$/i;
+
+	var loadEvents = ['load', 'error', 'lazyincluded', '_lazyloaded'];
+
+	var regClassCache = {};
+
+	var forEach = Array.prototype.forEach;
+
+	var hasClass = function(ele, cls) {
+		if(!regClassCache[cls]){
+			regClassCache[cls] = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+		}
+		return regClassCache[cls].test(ele[_getAttribute]('class') || '') && regClassCache[cls];
+	};
+
+	var addClass = function(ele, cls) {
+		if (!hasClass(ele, cls)){
+			ele.setAttribute('class', (ele[_getAttribute]('class') || '').trim() + ' ' + cls);
+		}
+	};
+
+	var removeClass = function(ele, cls) {
+		var reg;
+		if ((reg = hasClass(ele,cls))) {
+			ele.setAttribute('class', (ele[_getAttribute]('class') || '').replace(reg, ' '));
+		}
+	};
+
+	var addRemoveLoadEvents = function(dom, fn, add){
+		var action = add ? _addEventListener : 'removeEventListener';
+		if(add){
+			addRemoveLoadEvents(dom, fn);
+		}
+		loadEvents.forEach(function(evt){
+			dom[action](evt, fn);
+		});
+	};
+
+	var triggerEvent = function(elem, name, detail, noBubbles, noCancelable){
+		var event = document.createEvent('Event');
+
+		if(!detail){
+			detail = {};
+		}
+
+		detail.instance = lazysizes;
+
+		event.initEvent(name, !noBubbles, !noCancelable);
+
+		event.detail = detail;
+
+		elem.dispatchEvent(event);
+		return event;
+	};
+
+	var updatePolyfill = function (el, full){
+		var polyfill;
+		if( !supportPicture && ( polyfill = (window.picturefill || lazySizesCfg.pf) ) ){
+			if(full && full.src && !el[_getAttribute]('srcset')){
+				el.setAttribute('srcset', full.src);
+			}
+			polyfill({reevaluate: true, elements: [el]});
+		} else if(full && full.src){
+			el.src = full.src;
+		}
+	};
+
+	var getCSS = function (elem, style){
+		return (getComputedStyle(elem, null) || {})[style];
+	};
+
+	var getWidth = function(elem, parent, width){
+		width = width || elem.offsetWidth;
+
+		while(width < lazySizesCfg.minSize && parent && !elem._lazysizesWidth){
+			width =  parent.offsetWidth;
+			parent = parent.parentNode;
+		}
+
+		return width;
+	};
+
+	var rAF = (function(){
+		var running, waiting;
+		var firstFns = [];
+		var secondFns = [];
+		var fns = firstFns;
+
+		var run = function(){
+			var runFns = fns;
+
+			fns = firstFns.length ? secondFns : firstFns;
+
+			running = true;
+			waiting = false;
+
+			while(runFns.length){
+				runFns.shift()();
+			}
+
+			running = false;
+		};
+
+		var rafBatch = function(fn, queue){
+			if(running && !queue){
+				fn.apply(this, arguments);
+			} else {
+				fns.push(fn);
+
+				if(!waiting){
+					waiting = true;
+					(document.hidden ? setTimeout : requestAnimationFrame)(run);
+				}
+			}
+		};
+
+		rafBatch._lsFlush = run;
+
+		return rafBatch;
+	})();
+
+	var rAFIt = function(fn, simple){
+		return simple ?
+			function() {
+				rAF(fn);
+			} :
+			function(){
+				var that = this;
+				var args = arguments;
+				rAF(function(){
+					fn.apply(that, args);
+				});
+			}
+		;
+	};
+
+	var throttle = function(fn){
+		var running;
+		var lastTime = 0;
+		var gDelay = lazySizesCfg.throttleDelay;
+		var rICTimeout = lazySizesCfg.ricTimeout;
+		var run = function(){
+			running = false;
+			lastTime = Date.now();
+			fn();
+		};
+		var idleCallback = requestIdleCallback && rICTimeout > 49 ?
+			function(){
+				requestIdleCallback(run, {timeout: rICTimeout});
+
+				if(rICTimeout !== lazySizesCfg.ricTimeout){
+					rICTimeout = lazySizesCfg.ricTimeout;
+				}
+			} :
+			rAFIt(function(){
+				setTimeout(run);
+			}, true)
+		;
+
+		return function(isPriority){
+			var delay;
+
+			if((isPriority = isPriority === true)){
+				rICTimeout = 33;
+			}
+
+			if(running){
+				return;
+			}
+
+			running =  true;
+
+			delay = gDelay - (Date.now() - lastTime);
+
+			if(delay < 0){
+				delay = 0;
+			}
+
+			if(isPriority || delay < 9){
+				idleCallback();
+			} else {
+				setTimeout(idleCallback, delay);
+			}
+		};
+	};
+
+	//based on http://modernjavascript.blogspot.de/2013/08/building-better-debounce.html
+	var debounce = function(func) {
+		var timeout, timestamp;
+		var wait = 99;
+		var run = function(){
+			timeout = null;
+			func();
+		};
+		var later = function() {
+			var last = Date.now() - timestamp;
+
+			if (last < wait) {
+				setTimeout(later, wait - last);
+			} else {
+				(requestIdleCallback || run)(run);
+			}
+		};
+
+		return function() {
+			timestamp = Date.now();
+
+			if (!timeout) {
+				timeout = setTimeout(later, wait);
+			}
+		};
+	};
+
+	var loader = (function(){
+		var preloadElems, isCompleted, resetPreloadingTimer, loadMode, started;
+
+		var eLvW, elvH, eLtop, eLleft, eLright, eLbottom, isBodyHidden;
+
+		var regImg = /^img$/i;
+		var regIframe = /^iframe$/i;
+
+		var supportScroll = ('onscroll' in window) && !(/(gle|ing)bot/.test(navigator.userAgent));
+
+		var shrinkExpand = 0;
+		var currentExpand = 0;
+
+		var isLoading = 0;
+		var lowRuns = -1;
+
+		var resetPreloading = function(e){
+			isLoading--;
+			if(!e || isLoading < 0 || !e.target){
+				isLoading = 0;
+			}
+		};
+
+		var isVisible = function (elem) {
+			if (isBodyHidden == null) {
+				isBodyHidden = getCSS(document.body, 'visibility') == 'hidden';
+			}
+
+			return isBodyHidden || !(getCSS(elem.parentNode, 'visibility') == 'hidden' && getCSS(elem, 'visibility') == 'hidden');
+		};
+
+		var isNestedVisible = function(elem, elemExpand){
+			var outerRect;
+			var parent = elem;
+			var visible = isVisible(elem);
+
+			eLtop -= elemExpand;
+			eLbottom += elemExpand;
+			eLleft -= elemExpand;
+			eLright += elemExpand;
+
+			while(visible && (parent = parent.offsetParent) && parent != document.body && parent != docElem){
+				visible = ((getCSS(parent, 'opacity') || 1) > 0);
+
+				if(visible && getCSS(parent, 'overflow') != 'visible'){
+					outerRect = parent.getBoundingClientRect();
+					visible = eLright > outerRect.left &&
+						eLleft < outerRect.right &&
+						eLbottom > outerRect.top - 1 &&
+						eLtop < outerRect.bottom + 1
+					;
+				}
+			}
+
+			return visible;
+		};
+
+		var checkElements = function() {
+			var eLlen, i, rect, autoLoadElem, loadedSomething, elemExpand, elemNegativeExpand, elemExpandVal,
+				beforeExpandVal, defaultExpand, preloadExpand, hFac;
+			var lazyloadElems = lazysizes.elements;
+
+			if((loadMode = lazySizesCfg.loadMode) && isLoading < 8 && (eLlen = lazyloadElems.length)){
+
+				i = 0;
+
+				lowRuns++;
+
+				for(; i < eLlen; i++){
+
+					if(!lazyloadElems[i] || lazyloadElems[i]._lazyRace){continue;}
+
+					if(!supportScroll || (lazysizes.prematureUnveil && lazysizes.prematureUnveil(lazyloadElems[i]))){unveilElement(lazyloadElems[i]);continue;}
+
+					if(!(elemExpandVal = lazyloadElems[i][_getAttribute]('data-expand')) || !(elemExpand = elemExpandVal * 1)){
+						elemExpand = currentExpand;
+					}
+
+					if (!defaultExpand) {
+						defaultExpand = (!lazySizesCfg.expand || lazySizesCfg.expand < 1) ?
+							docElem.clientHeight > 500 && docElem.clientWidth > 500 ? 500 : 370 :
+							lazySizesCfg.expand;
+
+						lazysizes._defEx = defaultExpand;
+
+						preloadExpand = defaultExpand * lazySizesCfg.expFactor;
+						hFac = lazySizesCfg.hFac;
+						isBodyHidden = null;
+
+						if(currentExpand < preloadExpand && isLoading < 1 && lowRuns > 2 && loadMode > 2 && !document.hidden){
+							currentExpand = preloadExpand;
+							lowRuns = 0;
+						} else if(loadMode > 1 && lowRuns > 1 && isLoading < 6){
+							currentExpand = defaultExpand;
+						} else {
+							currentExpand = shrinkExpand;
+						}
+					}
+
+					if(beforeExpandVal !== elemExpand){
+						eLvW = innerWidth + (elemExpand * hFac);
+						elvH = innerHeight + elemExpand;
+						elemNegativeExpand = elemExpand * -1;
+						beforeExpandVal = elemExpand;
+					}
+
+					rect = lazyloadElems[i].getBoundingClientRect();
+
+					if ((eLbottom = rect.bottom) >= elemNegativeExpand &&
+						(eLtop = rect.top) <= elvH &&
+						(eLright = rect.right) >= elemNegativeExpand * hFac &&
+						(eLleft = rect.left) <= eLvW &&
+						(eLbottom || eLright || eLleft || eLtop) &&
+						(lazySizesCfg.loadHidden || isVisible(lazyloadElems[i])) &&
+						((isCompleted && isLoading < 3 && !elemExpandVal && (loadMode < 3 || lowRuns < 4)) || isNestedVisible(lazyloadElems[i], elemExpand))){
+						unveilElement(lazyloadElems[i]);
+						loadedSomething = true;
+						if(isLoading > 9){break;}
+					} else if(!loadedSomething && isCompleted && !autoLoadElem &&
+						isLoading < 4 && lowRuns < 4 && loadMode > 2 &&
+						(preloadElems[0] || lazySizesCfg.preloadAfterLoad) &&
+						(preloadElems[0] || (!elemExpandVal && ((eLbottom || eLright || eLleft || eLtop) || lazyloadElems[i][_getAttribute](lazySizesCfg.sizesAttr) != 'auto')))){
+						autoLoadElem = preloadElems[0] || lazyloadElems[i];
+					}
+				}
+
+				if(autoLoadElem && !loadedSomething){
+					unveilElement(autoLoadElem);
+				}
+			}
+		};
+
+		var throttledCheckElements = throttle(checkElements);
+
+		var switchLoadingClass = function(e){
+			var elem = e.target;
+
+			if (elem._lazyCache) {
+				delete elem._lazyCache;
+				return;
+			}
+
+			resetPreloading(e);
+			addClass(elem, lazySizesCfg.loadedClass);
+			removeClass(elem, lazySizesCfg.loadingClass);
+			addRemoveLoadEvents(elem, rafSwitchLoadingClass);
+			triggerEvent(elem, 'lazyloaded');
+		};
+		var rafedSwitchLoadingClass = rAFIt(switchLoadingClass);
+		var rafSwitchLoadingClass = function(e){
+			rafedSwitchLoadingClass({target: e.target});
+		};
+
+		var changeIframeSrc = function(elem, src){
+			try {
+				elem.contentWindow.location.replace(src);
+			} catch(e){
+				elem.src = src;
+			}
+		};
+
+		var handleSources = function(source){
+			var customMedia;
+
+			var sourceSrcset = source[_getAttribute](lazySizesCfg.srcsetAttr);
+
+			if( (customMedia = lazySizesCfg.customMedia[source[_getAttribute]('data-media') || source[_getAttribute]('media')]) ){
+				source.setAttribute('media', customMedia);
+			}
+
+			if(sourceSrcset){
+				source.setAttribute('srcset', sourceSrcset);
+			}
+		};
+
+		var lazyUnveil = rAFIt(function (elem, detail, isAuto, sizes, isImg){
+			var src, srcset, parent, isPicture, event, firesLoad;
+
+			if(!(event = triggerEvent(elem, 'lazybeforeunveil', detail)).defaultPrevented){
+
+				if(sizes){
+					if(isAuto){
+						addClass(elem, lazySizesCfg.autosizesClass);
+					} else {
+						elem.setAttribute('sizes', sizes);
+					}
+				}
+
+				srcset = elem[_getAttribute](lazySizesCfg.srcsetAttr);
+				src = elem[_getAttribute](lazySizesCfg.srcAttr);
+
+				if(isImg) {
+					parent = elem.parentNode;
+					isPicture = parent && regPicture.test(parent.nodeName || '');
+				}
+
+				firesLoad = detail.firesLoad || (('src' in elem) && (srcset || src || isPicture));
+
+				event = {target: elem};
+
+				addClass(elem, lazySizesCfg.loadingClass);
+
+				if(firesLoad){
+					clearTimeout(resetPreloadingTimer);
+					resetPreloadingTimer = setTimeout(resetPreloading, 2500);
+					addRemoveLoadEvents(elem, rafSwitchLoadingClass, true);
+				}
+
+				if(isPicture){
+					forEach.call(parent.getElementsByTagName('source'), handleSources);
+				}
+
+				if(srcset){
+					elem.setAttribute('srcset', srcset);
+				} else if(src && !isPicture){
+					if(regIframe.test(elem.nodeName)){
+						changeIframeSrc(elem, src);
+					} else {
+						elem.src = src;
+					}
+				}
+
+				if(isImg && (srcset || isPicture)){
+					updatePolyfill(elem, {src: src});
+				}
+			}
+
+			if(elem._lazyRace){
+				delete elem._lazyRace;
+			}
+			removeClass(elem, lazySizesCfg.lazyClass);
+
+			rAF(function(){
+				// Part of this can be removed as soon as this fix is older: https://bugs.chromium.org/p/chromium/issues/detail?id=7731 (2015)
+				var isLoaded = elem.complete && elem.naturalWidth > 1;
+
+				if( !firesLoad || isLoaded){
+					if (isLoaded) {
+						addClass(elem, 'ls-is-cached');
+					}
+					switchLoadingClass(event);
+					elem._lazyCache = true;
+					setTimeout(function(){
+						if ('_lazyCache' in elem) {
+							delete elem._lazyCache;
+						}
+					}, 9);
+				}
+				if (elem.loading == 'lazy') {
+					isLoading--;
+				}
+			}, true);
+		});
+
+		var unveilElement = function (elem){
+			if (elem._lazyRace) {return;}
+			var detail;
+
+			var isImg = regImg.test(elem.nodeName);
+
+			//allow using sizes="auto", but don't use. it's invalid. Use data-sizes="auto" or a valid value for sizes instead (i.e.: sizes="80vw")
+			var sizes = isImg && (elem[_getAttribute](lazySizesCfg.sizesAttr) || elem[_getAttribute]('sizes'));
+			var isAuto = sizes == 'auto';
+
+			if( (isAuto || !isCompleted) && isImg && (elem[_getAttribute]('src') || elem.srcset) && !elem.complete && !hasClass(elem, lazySizesCfg.errorClass) && hasClass(elem, lazySizesCfg.lazyClass)){return;}
+
+			detail = triggerEvent(elem, 'lazyunveilread').detail;
+
+			if(isAuto){
+				 autoSizer.updateElem(elem, true, elem.offsetWidth);
+			}
+
+			elem._lazyRace = true;
+			isLoading++;
+
+			lazyUnveil(elem, detail, isAuto, sizes, isImg);
+		};
+
+		var afterScroll = debounce(function(){
+			lazySizesCfg.loadMode = 3;
+			throttledCheckElements();
+		});
+
+		var altLoadmodeScrollListner = function(){
+			if(lazySizesCfg.loadMode == 3){
+				lazySizesCfg.loadMode = 2;
+			}
+			afterScroll();
+		};
+
+		var onload = function(){
+			if(isCompleted){return;}
+			if(Date.now() - started < 999){
+				setTimeout(onload, 999);
+				return;
+			}
+
+
+			isCompleted = true;
+
+			lazySizesCfg.loadMode = 3;
+
+			throttledCheckElements();
+
+			addEventListener('scroll', altLoadmodeScrollListner, true);
+		};
+
+		return {
+			_: function(){
+				started = Date.now();
+
+				lazysizes.elements = document.getElementsByClassName(lazySizesCfg.lazyClass);
+				preloadElems = document.getElementsByClassName(lazySizesCfg.lazyClass + ' ' + lazySizesCfg.preloadClass);
+
+				addEventListener('scroll', throttledCheckElements, true);
+
+				addEventListener('resize', throttledCheckElements, true);
+
+				addEventListener('pageshow', function (e) {
+					if (e.persisted) {
+						var loadingElements = document.querySelectorAll('.' + lazySizesCfg.loadingClass);
+
+						if (loadingElements.length && loadingElements.forEach) {
+							requestAnimationFrame(function () {
+								loadingElements.forEach( function (img) {
+									if (img.complete) {
+										unveilElement(img);
+									}
+								});
+							});
+						}
+					}
+				});
+
+				if(window.MutationObserver){
+					new MutationObserver( throttledCheckElements ).observe( docElem, {childList: true, subtree: true, attributes: true} );
+				} else {
+					docElem[_addEventListener]('DOMNodeInserted', throttledCheckElements, true);
+					docElem[_addEventListener]('DOMAttrModified', throttledCheckElements, true);
+					setInterval(throttledCheckElements, 999);
+				}
+
+				addEventListener('hashchange', throttledCheckElements, true);
+
+				//, 'fullscreenchange'
+				['focus', 'mouseover', 'click', 'load', 'transitionend', 'animationend'].forEach(function(name){
+					document[_addEventListener](name, throttledCheckElements, true);
+				});
+
+				if((/d$|^c/.test(document.readyState))){
+					onload();
+				} else {
+					addEventListener('load', onload);
+					document[_addEventListener]('DOMContentLoaded', throttledCheckElements);
+					setTimeout(onload, 20000);
+				}
+
+				if(lazysizes.elements.length){
+					checkElements();
+					rAF._lsFlush();
+				} else {
+					throttledCheckElements();
+				}
+			},
+			checkElems: throttledCheckElements,
+			unveil: unveilElement,
+			_aLSL: altLoadmodeScrollListner,
+		};
+	})();
+
+
+	var autoSizer = (function(){
+		var autosizesElems;
+
+		var sizeElement = rAFIt(function(elem, parent, event, width){
+			var sources, i, len;
+			elem._lazysizesWidth = width;
+			width += 'px';
+
+			elem.setAttribute('sizes', width);
+
+			if(regPicture.test(parent.nodeName || '')){
+				sources = parent.getElementsByTagName('source');
+				for(i = 0, len = sources.length; i < len; i++){
+					sources[i].setAttribute('sizes', width);
+				}
+			}
+
+			if(!event.detail.dataAttr){
+				updatePolyfill(elem, event.detail);
+			}
+		});
+		var getSizeElement = function (elem, dataAttr, width){
+			var event;
+			var parent = elem.parentNode;
+
+			if(parent){
+				width = getWidth(elem, parent, width);
+				event = triggerEvent(elem, 'lazybeforesizes', {width: width, dataAttr: !!dataAttr});
+
+				if(!event.defaultPrevented){
+					width = event.detail.width;
+
+					if(width && width !== elem._lazysizesWidth){
+						sizeElement(elem, parent, event, width);
+					}
+				}
+			}
+		};
+
+		var updateElementsSizes = function(){
+			var i;
+			var len = autosizesElems.length;
+			if(len){
+				i = 0;
+
+				for(; i < len; i++){
+					getSizeElement(autosizesElems[i]);
+				}
+			}
+		};
+
+		var debouncedUpdateElementsSizes = debounce(updateElementsSizes);
+
+		return {
+			_: function(){
+				autosizesElems = document.getElementsByClassName(lazySizesCfg.autosizesClass);
+				addEventListener('resize', debouncedUpdateElementsSizes);
+			},
+			checkElems: debouncedUpdateElementsSizes,
+			updateElem: getSizeElement
+		};
+	})();
+
+	var init = function(){
+		if(!init.i && document.getElementsByClassName){
+			init.i = true;
+			autoSizer._();
+			loader._();
+		}
+	};
+
+	setTimeout(function(){
+		if(lazySizesCfg.init){
+			init();
+		}
+	});
+
+	lazysizes = {
+		cfg: lazySizesCfg,
+		autoSizer: autoSizer,
+		loader: loader,
+		init: init,
+		uP: updatePolyfill,
+		aC: addClass,
+		rC: removeClass,
+		hC: hasClass,
+		fire: triggerEvent,
+		gW: getWidth,
+		rAF: rAF,
+	};
+
+	return lazysizes;
+}
+));
+
+},{}],"maps.js":[function(require,module,exports) {
+"use strict";
+
+require("lazysizes");
+
+var mapkit = window["mapkit"]; // Render map only when it is in the viewport
+
+document.addEventListener("lazybeforeunveil", function (e) {
+  var el = e.target;
+
+  if (el.classList.contains("map")) {
+    var address = new mapkit.Coordinate(parseFloat(el.dataset.lat), parseFloat(el.dataset.lon));
+    var region = new mapkit.CoordinateRegion(address, new mapkit.CoordinateSpan(0.03, 0.04));
+    var map = new mapkit.Map(el);
+    var addressAnnotation = new mapkit.MarkerAnnotation(address, {
+      color: "#f4a56d",
+      title: el.dataset.address
+    });
+    map.showItems([addressAnnotation]);
+    map.region = region;
+  }
+});
+mapkit.init({
+  authorizationCallback: function authorizationCallback(done) {
+    fetch("/mapkit-token").then(function (res) {
+      return res.text();
+    }).then(function (token) {
+      return done(token);
+    }).catch(function (error) {
+      console.error(error);
+    });
+  }
+});
+},{"lazysizes":"../node_modules/lazysizes/lazysizes.js"}],"../node_modules/preact/hooks/dist/hooks.module.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.useState = m;
+exports.useReducer = p;
+exports.useEffect = l;
+exports.useLayoutEffect = y;
+exports.useRef = d;
+exports.useImperativeHandle = s;
+exports.useMemo = h;
+exports.useCallback = T;
+exports.useContext = w;
+exports.useDebugValue = A;
+exports.useErrorBoundary = F;
+
+var _preact = require("preact");
+
+var t,
+    u,
+    r,
+    i = 0,
+    o = [],
+    c = _preact.options.__r,
+    f = _preact.options.diffed,
+    e = _preact.options.__c,
+    a = _preact.options.unmount;
+
+function v(t, r) {
+  _preact.options.__h && _preact.options.__h(u, t, i || r), i = 0;
+  var o = u.__H || (u.__H = {
+    __: [],
+    __h: []
+  });
+  return t >= o.__.length && o.__.push({}), o.__[t];
+}
+
+function m(n) {
+  return i = 1, p(E, n);
+}
+
+function p(n, r, i) {
+  var o = v(t++, 2);
+  return o.__c || (o.__c = u, o.__ = [i ? i(r) : E(void 0, r), function (t) {
+    var u = n(o.__[0], t);
+    o.__[0] !== u && (o.__[0] = u, o.__c.setState({}));
+  }]), o.__;
+}
+
+function l(r, i) {
+  var o = v(t++, 3);
+  !_preact.options.__s && x(o.__H, i) && (o.__ = r, o.__H = i, u.__H.__h.push(o));
+}
+
+function y(r, i) {
+  var o = v(t++, 4);
+  !_preact.options.__s && x(o.__H, i) && (o.__ = r, o.__H = i, u.__h.push(o));
+}
+
+function d(n) {
+  return i = 5, h(function () {
+    return {
+      current: n
+    };
+  }, []);
+}
+
+function s(n, t, u) {
+  i = 6, y(function () {
+    "function" == typeof n ? n(t()) : n && (n.current = t());
+  }, null == u ? u : u.concat(n));
+}
+
+function h(n, u) {
+  var r = v(t++, 7);
+  return x(r.__H, u) ? (r.__H = u, r.__h = n, r.__ = n()) : r.__;
+}
+
+function T(n, t) {
+  return i = 8, h(function () {
+    return n;
+  }, t);
+}
+
+function w(n) {
+  var r = u.context[n.__c],
+      i = v(t++, 9);
+  return i.__c = n, r ? (null == i.__ && (i.__ = !0, r.sub(u)), r.props.value) : n.__;
+}
+
+function A(t, u) {
+  _preact.options.useDebugValue && _preact.options.useDebugValue(u ? u(t) : t);
+}
+
+function F(n) {
+  var r = v(t++, 10),
+      i = m();
+  return r.__ = n, u.componentDidCatch || (u.componentDidCatch = function (n) {
+    r.__ && r.__(n), i[1](n);
+  }), [i[0], function () {
+    i[1](void 0);
+  }];
+}
+
+function _() {
+  o.some(function (t) {
+    if (t.__P) try {
+      t.__H.__h.forEach(g), t.__H.__h.forEach(q), t.__H.__h = [];
+    } catch (u) {
+      return t.__H.__h = [], _preact.options.__e(u, t.__v), !0;
+    }
+  }), o = [];
+}
+
+function g(n) {
+  n.t && n.t();
+}
+
+function q(n) {
+  var t = n.__();
+
+  "function" == typeof t && (n.t = t);
+}
+
+function x(n, t) {
+  return !n || t.some(function (t, u) {
+    return t !== n[u];
+  });
+}
+
+function E(n, t) {
+  return "function" == typeof t ? t(n) : t;
+}
+
+_preact.options.__r = function (n) {
+  c && c(n), t = 0, (u = n.__c).__H && (u.__H.__h.forEach(g), u.__H.__h.forEach(q), u.__H.__h = []);
+}, _preact.options.diffed = function (t) {
+  f && f(t);
+  var u = t.__c;
+
+  if (u) {
+    var i = u.__H;
+    i && i.__h.length && (1 !== o.push(u) && r === _preact.options.requestAnimationFrame || ((r = _preact.options.requestAnimationFrame) || function (n) {
+      var t,
+          u = function () {
+        clearTimeout(r), cancelAnimationFrame(t), setTimeout(n);
+      },
+          r = setTimeout(u, 100);
+
+      "undefined" != typeof window && (t = requestAnimationFrame(u));
+    })(_));
+  }
+}, _preact.options.__c = function (t, u) {
+  u.some(function (t) {
+    try {
+      t.__h.forEach(g), t.__h = t.__h.filter(function (n) {
+        return !n.__ || q(n);
+      });
+    } catch (r) {
+      u.some(function (n) {
+        n.__h && (n.__h = []);
+      }), u = [], _preact.options.__e(r, t.__v);
+    }
+  }), e && e(t, u);
+}, _preact.options.unmount = function (t) {
+  a && a(t);
+  var u = t.__c;
+
+  if (u) {
+    var r = u.__H;
+    if (r) try {
+      r.__.forEach(function (n) {
+        return n.t && n.t();
+      });
+    } catch (t) {
+      _preact.options.__e(t, u.__v);
+    }
+  }
+};
+},{"preact":"../node_modules/preact/dist/preact.module.js"}],"../node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+'use strict';
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+},{}],"../node_modules/axios/lib/utils.js":[function(require,module,exports) {
+'use strict';
+
+var bind = require('./helpers/bind');
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is a Buffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Buffer, otherwise false
+ */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = merge(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Function equal to merge with the difference being that no reference
+ * to original objects is kept.
+ *
+ * @see merge
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function deepMerge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = deepMerge(result[key], val);
+    } else if (typeof val === 'object') {
+      result[key] = deepMerge({}, val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  deepMerge: deepMerge,
+  extend: extend,
+  trim: trim
+};
+
+},{"./helpers/bind":"../node_modules/axios/lib/helpers/bind.js"}],"../node_modules/axios/lib/helpers/buildURL.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/InterceptorManager.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/transformData.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/cancel/isCancel.js":[function(require,module,exports) {
+'use strict';
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+},{}],"../node_modules/axios/lib/helpers/normalizeHeaderName.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('../utils');
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+},{"../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/enhanceError.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+module.exports = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+
+  error.request = request;
+  error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code
+    };
+  };
+  return error;
+};
+
+},{}],"../node_modules/axios/lib/core/createError.js":[function(require,module,exports) {
+'use strict';
+
+var enhanceError = require('./enhanceError');
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+},{"./enhanceError":"../node_modules/axios/lib/core/enhanceError.js"}],"../node_modules/axios/lib/core/settle.js":[function(require,module,exports) {
+'use strict';
+
+var createError = require('./createError');
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  if (!validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
+};
+
+},{"./createError":"../node_modules/axios/lib/core/createError.js"}],"../node_modules/axios/lib/helpers/isAbsoluteURL.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+},{}],"../node_modules/axios/lib/helpers/combineURLs.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+},{}],"../node_modules/axios/lib/core/buildFullPath.js":[function(require,module,exports) {
+'use strict';
+
+var isAbsoluteURL = require('../helpers/isAbsoluteURL');
+var combineURLs = require('../helpers/combineURLs');
+
+/**
+ * Creates a new URL by combining the baseURL with the requestedURL,
+ * only when the requestedURL is not already an absolute URL.
+ * If the requestURL is absolute, this function returns the requestedURL untouched.
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} requestedURL Absolute or relative URL to combine
+ * @returns {string} The combined full path
+ */
+module.exports = function buildFullPath(baseURL, requestedURL) {
+  if (baseURL && !isAbsoluteURL(requestedURL)) {
+    return combineURLs(baseURL, requestedURL);
+  }
+  return requestedURL;
+};
+
+},{"../helpers/isAbsoluteURL":"../node_modules/axios/lib/helpers/isAbsoluteURL.js","../helpers/combineURLs":"../node_modules/axios/lib/helpers/combineURLs.js"}],"../node_modules/axios/lib/helpers/parseHeaders.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/helpers/isURLSameOrigin.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
+
+      /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+      function resolveURL(url) {
+        var href = url;
+
+        if (msie) {
+        // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
+        urlParsingNode.setAttribute('href', href);
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
+      }
+
+      originURL = resolveURL(window.location.href);
+
+      /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+      };
+    })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
+);
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/helpers/cookies.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
+
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
+        }
+      };
+    })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
+);
+
+},{"./../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/adapters/xhr.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var settle = require('./../core/settle');
+var buildURL = require('./../helpers/buildURL');
+var buildFullPath = require('../core/buildFullPath');
+var parseHeaders = require('./../helpers/parseHeaders');
+var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
+var createError = require('../core/createError');
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    var fullPath = buildFullPath(config.baseURL, config.url);
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request.onreadystatechange = function handleLoad() {
+      if (!request || request.readyState !== 4) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        status: request.status,
+        statusText: request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies = require('./../helpers/cookies');
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
+        cookies.read(config.xsrfCookieName) :
+        undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js","./../core/settle":"../node_modules/axios/lib/core/settle.js","./../helpers/buildURL":"../node_modules/axios/lib/helpers/buildURL.js","../core/buildFullPath":"../node_modules/axios/lib/core/buildFullPath.js","./../helpers/parseHeaders":"../node_modules/axios/lib/helpers/parseHeaders.js","./../helpers/isURLSameOrigin":"../node_modules/axios/lib/helpers/isURLSameOrigin.js","../core/createError":"../node_modules/axios/lib/core/createError.js","./../helpers/cookies":"../node_modules/axios/lib/helpers/cookies.js"}],"../node_modules/process/browser.js":[function(require,module,exports) {
+
+// shim for using process in browser
+var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+  throw new Error('setTimeout has not been defined');
+}
+
+function defaultClearTimeout() {
+  throw new Error('clearTimeout has not been defined');
+}
+
+(function () {
+  try {
+    if (typeof setTimeout === 'function') {
+      cachedSetTimeout = setTimeout;
+    } else {
+      cachedSetTimeout = defaultSetTimout;
+    }
+  } catch (e) {
+    cachedSetTimeout = defaultSetTimout;
+  }
+
+  try {
+    if (typeof clearTimeout === 'function') {
+      cachedClearTimeout = clearTimeout;
+    } else {
+      cachedClearTimeout = defaultClearTimeout;
+    }
+  } catch (e) {
+    cachedClearTimeout = defaultClearTimeout;
+  }
+})();
+
+function runTimeout(fun) {
+  if (cachedSetTimeout === setTimeout) {
+    //normal enviroments in sane situations
+    return setTimeout(fun, 0);
+  } // if setTimeout wasn't available but was latter defined
+
+
+  if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+    cachedSetTimeout = setTimeout;
+    return setTimeout(fun, 0);
+  }
+
+  try {
+    // when when somebody has screwed with setTimeout but no I.E. maddness
+    return cachedSetTimeout(fun, 0);
+  } catch (e) {
+    try {
+      // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+      return cachedSetTimeout.call(null, fun, 0);
+    } catch (e) {
+      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+      return cachedSetTimeout.call(this, fun, 0);
+    }
+  }
+}
+
+function runClearTimeout(marker) {
+  if (cachedClearTimeout === clearTimeout) {
+    //normal enviroments in sane situations
+    return clearTimeout(marker);
+  } // if clearTimeout wasn't available but was latter defined
+
+
+  if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+    cachedClearTimeout = clearTimeout;
+    return clearTimeout(marker);
+  }
+
+  try {
+    // when when somebody has screwed with setTimeout but no I.E. maddness
+    return cachedClearTimeout(marker);
+  } catch (e) {
+    try {
+      // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+      return cachedClearTimeout.call(null, marker);
+    } catch (e) {
+      // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+      // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+      return cachedClearTimeout.call(this, marker);
+    }
+  }
+}
+
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+  if (!draining || !currentQueue) {
+    return;
+  }
+
+  draining = false;
+
+  if (currentQueue.length) {
+    queue = currentQueue.concat(queue);
+  } else {
+    queueIndex = -1;
+  }
+
+  if (queue.length) {
+    drainQueue();
+  }
+}
+
+function drainQueue() {
+  if (draining) {
+    return;
+  }
+
+  var timeout = runTimeout(cleanUpNextTick);
+  draining = true;
+  var len = queue.length;
+
+  while (len) {
+    currentQueue = queue;
+    queue = [];
+
+    while (++queueIndex < len) {
+      if (currentQueue) {
+        currentQueue[queueIndex].run();
+      }
+    }
+
+    queueIndex = -1;
+    len = queue.length;
+  }
+
+  currentQueue = null;
+  draining = false;
+  runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+  var args = new Array(arguments.length - 1);
+
+  if (arguments.length > 1) {
+    for (var i = 1; i < arguments.length; i++) {
+      args[i - 1] = arguments[i];
+    }
+  }
+
+  queue.push(new Item(fun, args));
+
+  if (queue.length === 1 && !draining) {
+    runTimeout(drainQueue);
+  }
+}; // v8 likes predictible objects
+
+
+function Item(fun, array) {
+  this.fun = fun;
+  this.array = array;
+}
+
+Item.prototype.run = function () {
+  this.fun.apply(null, this.array);
+};
+
+process.title = 'browser';
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) {
+  return [];
+};
+
+process.binding = function (name) {
+  throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () {
+  return '/';
+};
+
+process.chdir = function (dir) {
+  throw new Error('process.chdir is not supported');
+};
+
+process.umask = function () {
+  return 0;
+};
+},{}],"../node_modules/axios/lib/defaults.js":[function(require,module,exports) {
 var process = require("process");
-var e=require("process"),t=require("./utils"),r=require("./helpers/normalizeHeaderName"),n={"Content-Type":"application/x-www-form-urlencoded"};function a(e,r){!t.isUndefined(e)&&t.isUndefined(e["Content-Type"])&&(e["Content-Type"]=r)}function i(){var t;return"undefined"!=typeof XMLHttpRequest?t=require("./adapters/xhr"):void 0!==e&&"[object process]"===Object.prototype.toString.call(e)&&(t=require("./adapters/http")),t}var o={adapter:i(),transformRequest:[function(e,n){return r(n,"Accept"),r(n,"Content-Type"),t.isFormData(e)||t.isArrayBuffer(e)||t.isBuffer(e)||t.isStream(e)||t.isFile(e)||t.isBlob(e)?e:t.isArrayBufferView(e)?e.buffer:t.isURLSearchParams(e)?(a(n,"application/x-www-form-urlencoded;charset=utf-8"),e.toString()):t.isObject(e)?(a(n,"application/json;charset=utf-8"),JSON.stringify(e)):e}],transformResponse:[function(e){if("string"==typeof e)try{e=JSON.parse(e)}catch(t){}return e}],timeout:0,xsrfCookieName:"XSRF-TOKEN",xsrfHeaderName:"X-XSRF-TOKEN",maxContentLength:-1,validateStatus:function(e){return e>=200&&e<300},headers:{common:{Accept:"application/json, text/plain, */*"}}};t.forEach(["delete","get","head"],function(e){o.headers[e]={}}),t.forEach(["post","put","patch"],function(e){o.headers[e]=t.merge(n)}),module.exports=o;
-},{"./utils":"S1cf","./helpers/normalizeHeaderName":"M8l6","./adapters/xhr":"KRuG","./adapters/http":"KRuG","process":"pBGv"}],"uz6X":[function(require,module,exports) {
-"use strict";var e=require("./../utils"),r=require("./transformData"),a=require("../cancel/isCancel"),t=require("../defaults");function s(e){e.cancelToken&&e.cancelToken.throwIfRequested()}module.exports=function(n){return s(n),n.headers=n.headers||{},n.data=r(n.data,n.headers,n.transformRequest),n.headers=e.merge(n.headers.common||{},n.headers[n.method]||{},n.headers),e.forEach(["delete","get","head","post","put","patch","common"],function(e){delete n.headers[e]}),(n.adapter||t.adapter)(n).then(function(e){return s(n),e.data=r(e.data,e.headers,n.transformResponse),e},function(e){return a(e)||(s(n),e&&e.response&&(e.response.data=r(e.response.data,e.response.headers,n.transformResponse))),Promise.reject(e)})};
-},{"./../utils":"S1cf","./transformData":"woEt","../cancel/isCancel":"V30M","../defaults":"BXyq"}],"OHvn":[function(require,module,exports) {
-"use strict";var e=require("../utils");module.exports=function(t,r){r=r||{};var o={},a=["url","method","params","data"],n=["headers","auth","proxy"],s=["baseURL","url","transformRequest","transformResponse","paramsSerializer","timeout","withCredentials","adapter","responseType","xsrfCookieName","xsrfHeaderName","onUploadProgress","onDownloadProgress","maxContentLength","validateStatus","maxRedirects","httpAgent","httpsAgent","cancelToken","socketPath"];e.forEach(a,function(e){void 0!==r[e]&&(o[e]=r[e])}),e.forEach(n,function(a){e.isObject(r[a])?o[a]=e.deepMerge(t[a],r[a]):void 0!==r[a]?o[a]=r[a]:e.isObject(t[a])?o[a]=e.deepMerge(t[a]):void 0!==t[a]&&(o[a]=t[a])}),e.forEach(s,function(e){void 0!==r[e]?o[e]=r[e]:void 0!==t[e]&&(o[e]=t[e])});var i=a.concat(n).concat(s),c=Object.keys(r).filter(function(e){return-1===i.indexOf(e)});return e.forEach(c,function(e){void 0!==r[e]?o[e]=r[e]:void 0!==t[e]&&(o[e]=t[e])}),o};
-},{"../utils":"S1cf"}],"OvAf":[function(require,module,exports) {
-"use strict";var e=require("./../utils"),t=require("../helpers/buildURL"),r=require("./InterceptorManager"),o=require("./dispatchRequest"),s=require("./mergeConfig");function i(e){this.defaults=e,this.interceptors={request:new r,response:new r}}i.prototype.request=function(e){"string"==typeof e?(e=arguments[1]||{}).url=arguments[0]:e=e||{},(e=s(this.defaults,e)).method?e.method=e.method.toLowerCase():this.defaults.method?e.method=this.defaults.method.toLowerCase():e.method="get";var t=[o,void 0],r=Promise.resolve(e);for(this.interceptors.request.forEach(function(e){t.unshift(e.fulfilled,e.rejected)}),this.interceptors.response.forEach(function(e){t.push(e.fulfilled,e.rejected)});t.length;)r=r.then(t.shift(),t.shift());return r},i.prototype.getUri=function(e){return e=s(this.defaults,e),t(e.url,e.params,e.paramsSerializer).replace(/^\?/,"")},e.forEach(["delete","get","head","options"],function(t){i.prototype[t]=function(r,o){return this.request(e.merge(o||{},{method:t,url:r}))}}),e.forEach(["post","put","patch"],function(t){i.prototype[t]=function(r,o,s){return this.request(e.merge(s||{},{method:t,url:r,data:o}))}}),module.exports=i;
-},{"./../utils":"S1cf","../helpers/buildURL":"H6Qo","./InterceptorManager":"rj2i","./dispatchRequest":"uz6X","./mergeConfig":"OHvn"}],"mIKj":[function(require,module,exports) {
-"use strict";function t(t){this.message=t}t.prototype.toString=function(){return"Cancel"+(this.message?": "+this.message:"")},t.prototype.__CANCEL__=!0,module.exports=t;
-},{}],"tsWd":[function(require,module,exports) {
-"use strict";var e=require("./Cancel");function n(n){if("function"!=typeof n)throw new TypeError("executor must be a function.");var o;this.promise=new Promise(function(e){o=e});var r=this;n(function(n){r.reason||(r.reason=new e(n),o(r.reason))})}n.prototype.throwIfRequested=function(){if(this.reason)throw this.reason},n.source=function(){var e;return{token:new n(function(n){e=n}),cancel:e}},module.exports=n;
-},{"./Cancel":"mIKj"}],"X8jb":[function(require,module,exports) {
-"use strict";module.exports=function(n){return function(t){return n.apply(null,t)}};
-},{}],"nUiQ":[function(require,module,exports) {
-"use strict";var e=require("./utils"),r=require("./helpers/bind"),n=require("./core/Axios"),u=require("./core/mergeConfig"),t=require("./defaults");function i(u){var t=new n(u),i=r(n.prototype.request,t);return e.extend(i,n.prototype,t),e.extend(i,t),i}var l=i(t);l.Axios=n,l.create=function(e){return i(u(l.defaults,e))},l.Cancel=require("./cancel/Cancel"),l.CancelToken=require("./cancel/CancelToken"),l.isCancel=require("./cancel/isCancel"),l.all=function(e){return Promise.all(e)},l.spread=require("./helpers/spread"),module.exports=l,module.exports.default=l;
-},{"./utils":"S1cf","./helpers/bind":"EDTP","./core/Axios":"OvAf","./core/mergeConfig":"OHvn","./defaults":"BXyq","./cancel/Cancel":"mIKj","./cancel/CancelToken":"tsWd","./cancel/isCancel":"V30M","./helpers/spread":"X8jb"}],"dZBD":[function(require,module,exports) {
-module.exports=require("./lib/axios");
-},{"./lib/axios":"nUiQ"}],"LVu9":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.api=void 0;var e=r(require("axios"));function r(e){return e&&e.__esModule?e:{default:e}}function t(){var e=localStorage.getItem("token");return{headers:{Authorization:"Bearer ".concat(e)}}}var n={logInGetToken:function(r,t){var n=new URLSearchParams;return n.append("username",r),n.append("password",t),e.default.post("/notendur/login/access-token",n)},getMe:function(){return e.default.get("/notendur/me",t())},passwordRecovery:function(r){return e.default.post("/notendur/password-recovery/".concat(r))},resetPassword:function(r,t){return e.default.post("/notendur/reset-password",{new_password:r,token:t})}};exports.api=n;
-},{"axios":"dZBD"}],"PGtr":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.LoginForm=void 0;var r=require("preact"),e=require("preact/hooks"),t=require("../api");function n(r,e){var t=Object.keys(r);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(r);e&&(n=n.filter(function(e){return Object.getOwnPropertyDescriptor(r,e).enumerable})),t.push.apply(t,n)}return t}function o(r){for(var e=1;e<arguments.length;e++){var t=null!=arguments[e]?arguments[e]:{};e%2?n(Object(t),!0).forEach(function(e){a(r,e,t[e])}):Object.getOwnPropertyDescriptors?Object.defineProperties(r,Object.getOwnPropertyDescriptors(t)):n(Object(t)).forEach(function(e){Object.defineProperty(r,e,Object.getOwnPropertyDescriptor(t,e))})}return r}function a(r,e,t){return e in r?Object.defineProperty(r,e,{value:t,enumerable:!0,configurable:!0,writable:!0}):r[e]=t,r}function i(r,e){return f(r)||c(r,e)||u(r,e)||s()}function s(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function u(r,e){if(r){if("string"==typeof r)return l(r,e);var t=Object.prototype.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?l(r,e):void 0}}function l(r,e){(null==e||e>r.length)&&(e=r.length);for(var t=0,n=new Array(e);t<e;t++)n[t]=r[t];return n}function c(r,e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(r)){var t=[],n=!0,o=!1,a=void 0;try{for(var i,s=r[Symbol.iterator]();!(n=(i=s.next()).done)&&(t.push(i.value),!e||t.length!==e);n=!0);}catch(u){o=!0,a=u}finally{try{n||null==s.return||s.return()}finally{if(o)throw a}}return t}}function f(r){if(Array.isArray(r))return r}var p=function(){return localStorage.getItem("token")},d=function(r){return localStorage.setItem("token",r)},b=function(){return localStorage.removeItem("token")},y=function(r){return r.filter(function(r){return r}).join(" ")},m=function(n){var a=n.success,s=n.setScreen,u=i((0,e.useState)({value:"",isDirty:!1,errors:[]}),2),l=u[0],c=u[1],f=i((0,e.useState)({value:"",isDirty:!1,errors:[]}),2),p=f[0],b=f[1],m=i((0,e.useState)({isLoading:!1,error:null}),2),v=m[0],h=m[1];return(0,r.h)("div",null,(0,r.h)("h1",{class:"text-center text-2xl"},"Innskráning"),(0,r.h)("div",{class:"pt-6 pb-2 my-2"},(0,r.h)("form",{onSubmit:function(r){r.preventDefault(),h({isLoading:!0,error:null}),t.api.logInGetToken(l.value,p.value).then(function(r){d(r.data.access_token),a()}).catch(function(r){[c,b].forEach(function(r){r(function(r){return o(o({},r),{},{errors:[],isDirty:!1})})});var e=r.response.data.detail,t=null;"string"==typeof e&&(t=e),Array.isArray(e)&&e.forEach(function(r){var e=r.loc,t=(r.msg,{"value_error.missing":!0}[r.type]);if(void 0!==t){var n=e[e.length-1],a={username:c,password:b}[n];void 0!==a&&a(function(r){return o(o({},r),{},{errors:[t]})})}}),h({isLoading:!1,error:t})})}},v.error&&(0,r.h)("div",{class:"mb-4 text-red-700 font-bold"},v.error),(0,r.h)("div",{class:"mb-4"},(0,r.h)("label",{class:"block text-sm font-bold mb-2",for:"username"},"Netfang"),(0,r.h)("input",{class:y(["shadow appearance-none border rounded w-full py-2 px-3",l.isDirty||!l.errors.length?"":"error"]),name:"username",type:"text",disabled:v.isLoading,value:l.value,onInput:function(r){var e=r.target.value;c(function(r){return o(o({},r),{},{value:e,isDirty:!0})})}}),l.errors.map(function(e){return(0,r.h)("div",{class:"text-red-700 text-sm my-2"},e)})),(0,r.h)("div",{class:"mb-6"},(0,r.h)("label",{class:"block text-sm font-bold mb-2",for:"password"},"Lykilorð"),(0,r.h)("input",{class:y(["shadow appearance-none border rounded w-full py-2 px-3 mb-3",p.isDirty||!p.errors.length?"":"error"]),name:"password",type:"password",disabled:v.isLoading,value:p.value,onInput:function(r){var e=r.target.value;b(function(r){return o(o({},r),{},{value:e,isDirty:!0})})}}),p.errors.map(function(e){return(0,r.h)("div",{class:"text-red-700 text-sm my-2"},e)})),(0,r.h)("div",{class:"block sm:flex items-center justify-between"},(0,r.h)("div",null,(0,r.h)("button",{class:"btn-primary",type:"submit",disabled:v.isLoading},"Innskrá")),(0,r.h)("div",{class:"mt-4 sm:mt-0"},(0,r.h)("button",{onClick:function(r){r.stopPropagation(),s(["password-recovery",l.value])},class:"no-underline"},"Gleymt lykilorð?"))))))};exports.LoginForm=m;
-},{"preact":"aSor","preact/hooks":"MwGB","../api":"LVu9"}],"E3M1":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.NewPasswordForm=void 0;var e=require("preact"),r=require("preact/hooks"),t=require("../api");function n(e,r){return u(e)||a(e,r)||s(e,r)||o()}function o(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function s(e,r){if(e){if("string"==typeof e)return i(e,r);var t=Object.prototype.toString.call(e).slice(8,-1);return"Object"===t&&e.constructor&&(t=e.constructor.name),"Map"===t||"Set"===t?Array.from(e):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?i(e,r):void 0}}function i(e,r){(null==r||r>e.length)&&(r=e.length);for(var t=0,n=new Array(r);t<r;t++)n[t]=e[t];return n}function a(e,r){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e)){var t=[],n=!0,o=!1,s=void 0;try{for(var i,a=e[Symbol.iterator]();!(n=(i=a.next()).done)&&(t.push(i.value),!r||t.length!==r);n=!0);}catch(u){o=!0,s=u}finally{try{n||null==a.return||a.return()}finally{if(o)throw s}}return t}}function u(e){if(Array.isArray(e))return e}var l=function(e){return localStorage.setItem("token",e)},c=function(o){var s=o.token,i=n((0,r.useState)({isSuccess:!1,isLoading:!1,error:null}),2),a=i[0],u=i[1],c=n((0,r.useState)(""),2),d=c[0],f=c[1];return(0,e.h)("div",null,(0,e.h)("h1",{class:"text-center text-2xl"},"Nýtt lykilorð"),(0,e.h)("div",{class:"py-2 my-2"}),(0,e.h)("form",{onSubmit:function(e){e.preventDefault(),u({isLoading:!0,isSuccess:!1,error:null}),t.api.resetPassword(d,s).then(function(e){l(e.data.access_token),u({isLoading:!1,error:null,isSuccess:!0})}).catch(function(e){var r=e.response.data.detail||"Óþekkt villa á vefþjóni";u({isLoading:!1,isSuccess:!1,error:r})})}},a.error&&(0,e.h)("div",{class:"mb-4 text-red-700 font-bold"},a.error),a.isSuccess&&(0,e.h)("div",{class:"mb-4 text-green-600 font-bold"},"Lykilorðið hefur verið uppfært."),(0,e.h)("div",{class:"mb-4"},(0,e.h)("input",{class:"shadow appearance-none border rounded w-full py-2 px-3",name:"password",type:"password",disabled:a.isLoading||a.isSuccess,value:d.value,onInput:function(e){f(e.target.value)}})),(0,e.h)("div",{class:"block md:flex items-center justify-between"},(0,e.h)("div",null,(0,e.h)("button",{class:"btn-primary",type:"submit",disabled:a.isLoading||a.isSuccess},"Vista")))))};exports.NewPasswordForm=c;
-},{"preact":"aSor","preact/hooks":"MwGB","../api":"LVu9"}],"FT94":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.PasswordRecoveryForm=void 0;var e=require("preact"),r=require("preact/hooks"),t=require("../api");function n(e,r){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);r&&(n=n.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),t.push.apply(t,n)}return t}function o(e){for(var r=1;r<arguments.length;r++){var t=null!=arguments[r]?arguments[r]:{};r%2?n(Object(t),!0).forEach(function(r){i(e,r,t[r])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(t)):n(Object(t)).forEach(function(r){Object.defineProperty(e,r,Object.getOwnPropertyDescriptor(t,r))})}return e}function i(e,r,t){return r in e?Object.defineProperty(e,r,{value:t,enumerable:!0,configurable:!0,writable:!0}):e[r]=t,e}function a(e,r){return f(e)||c(e,r)||u(e,r)||s()}function s(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function u(e,r){if(e){if("string"==typeof e)return l(e,r);var t=Object.prototype.toString.call(e).slice(8,-1);return"Object"===t&&e.constructor&&(t=e.constructor.name),"Map"===t||"Set"===t?Array.from(e):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?l(e,r):void 0}}function l(e,r){(null==r||r>e.length)&&(r=e.length);for(var t=0,n=new Array(r);t<r;t++)n[t]=e[t];return n}function c(e,r){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e)){var t=[],n=!0,o=!1,i=void 0;try{for(var a,s=e[Symbol.iterator]();!(n=(a=s.next()).done)&&(t.push(a.value),!r||t.length!==r);n=!0);}catch(u){o=!0,i=u}finally{try{n||null==s.return||s.return()}finally{if(o)throw i}}return t}}function f(e){if(Array.isArray(e))return e}var b=function(e){return e.filter(function(e){return e}).join(" ")},d=function(n){var i=n.setScreen,s=n.emailDefaultValue,u=a((0,r.useState)({isLoading:!1,isSuccess:!1,error:null}),2),l=u[0],c=u[1],f=a((0,r.useState)({value:s,isDirty:!1}),2),b=f[0],d=f[1];return(0,e.h)("div",null,(0,e.h)("h1",{class:"text-center text-2xl"},"Sækja um nýtt lykilorð"),(0,e.h)("div",{class:"pt-6 pb-2 my-2"},(0,e.h)("form",{onSubmit:function(e){e.preventDefault(),c({isLoading:!0,isSuccess:!1,error:null}),t.api.passwordRecovery(b.value).then(function(e){c({isLoading:!1,error:null,isSuccess:!0})}).catch(function(e){d(function(e){return o(o({},e),{},{isDirty:!1})});var r=e.response.data.detail||"Óþekkt villa á vefþjóni";c({isLoading:!1,isSuccess:!1,error:r})})}},l.error&&(0,e.h)("div",{class:"mb-4 text-red-700 font-bold"},l.error),l.isSuccess&&(0,e.h)("div",{class:"mb-4 text-green-600 font-bold"},"Tölvupóstur með leiðbeiningum var sendur á ",b.value),(0,e.h)("div",{class:"mb-4"},(0,e.h)("label",{class:"block text-sm font-bold mb-2",for:"email"},"Netfang"),(0,e.h)("input",{class:"shadow appearance-none border rounded w-full py-2 px-3",name:"email",type:"text",disabled:l.isLoading||l.isSuccess,value:b.value,onInput:function(e){var r=e.target.value;d({value:r,isDirty:!0})}})),(0,e.h)("div",{class:"block md:flex items-center justify-between"},(0,e.h)("div",null,(0,e.h)("button",{class:"btn-primary",type:"submit",disabled:l.isLoading||l.isSuccess},"Senda")),(0,e.h)("div",{class:"mt-4 md:mt-0"},(0,e.h)("button",{onClick:function(e){e.stopPropagation(),i(["login",b.value])},class:"no-underline"},"Til baka"))))))};exports.PasswordRecoveryForm=d;
-},{"preact":"aSor","preact/hooks":"MwGB","../api":"LVu9"}],"twly":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.Login=exports.NewPassword=void 0;var r=require("preact"),e=require("preact/hooks"),t=require("./forms/login"),o=require("./forms/new-password"),n=require("./forms/password-recovery");function a(r,e){return l(r)||c(r,e)||s(r,e)||i()}function i(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function s(r,e){if(r){if("string"==typeof r)return u(r,e);var t=Object.prototype.toString.call(r).slice(8,-1);return"Object"===t&&r.constructor&&(t=r.constructor.name),"Map"===t||"Set"===t?Array.from(r):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?u(r,e):void 0}}function u(r,e){(null==e||e>r.length)&&(e=r.length);for(var t=0,o=new Array(e);t<e;t++)o[t]=r[t];return o}function c(r,e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(r)){var t=[],o=!0,n=!1,a=void 0;try{for(var i,s=r[Symbol.iterator]();!(o=(i=s.next()).done)&&(t.push(i.value),!e||t.length!==e);o=!0);}catch(u){n=!0,a=u}finally{try{o||null==s.return||s.return()}finally{if(n)throw a}}return t}}function l(r){if(Array.isArray(r))return r}var f=o.NewPasswordForm;exports.NewPassword=f;var y=function(o){var i=o.success,s=a((0,e.useState)(["login",""]),2),u=a(s[0],2),c=u[0],l=u[1],f=s[1],y={login:t.LoginForm,"password-recovery":n.PasswordRecoveryForm}[c];return(0,r.h)("div",null,(0,r.h)(y,{setScreen:f,emailDefaultValue:l,success:i}))};exports.Login=y;
-},{"preact":"aSor","preact/hooks":"MwGB","./forms/login":"PGtr","./forms/new-password":"E3M1","./forms/password-recovery":"FT94"}],"MiHU":[function(require,module,exports) {
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.openModal=void 0;var e=function(){var e=document.getElementById("modal");e.classList.remove("hidden");var t=function(){e.classList.add("hidden")};return window.addEventListener("click",function(e){!e.target.closest("#modal .inner")&&t()}),e.querySelectorAll(".close").forEach(function(e){e.addEventListener("click",function(e){t()})}),[e.querySelector(".form"),t]};exports.openModal=e;
-},{}],"A2T1":[function(require,module,exports) {
-"use strict";var e=require("preact");require("./maps");var r=require("./accounts"),t=require("./modals");function n(e,r){return c(e)||u(e,r)||a(e,r)||o()}function o(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function a(e,r){if(e){if("string"==typeof e)return i(e,r);var t=Object.prototype.toString.call(e).slice(8,-1);return"Object"===t&&e.constructor&&(t=e.constructor.name),"Map"===t||"Set"===t?Array.from(e):"Arguments"===t||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?i(e,r):void 0}}function i(e,r){(null==r||r>e.length)&&(r=e.length);for(var t=0,n=new Array(r);t<r;t++)n[t]=e[t];return n}function u(e,r){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e)){var t=[],n=!0,o=!1,a=void 0;try{for(var i,u=e[Symbol.iterator]();!(n=(i=u.next()).done)&&(t.push(i.value),!r||t.length!==r);n=!0);}catch(c){o=!0,a=c}finally{try{n||null==u.return||u.return()}finally{if(o)throw a}}return t}}function c(e){if(Array.isArray(e))return e}document.getElementById("login-button").addEventListener("click",function(o){o.stopPropagation();var a=n((0,t.openModal)(),2),i=a[0],u=a[1];(0,e.render)((0,e.h)(r.Login,{success:u}),i)});var l=document.getElementById("password-recovery");if(l){var d=(0,t.openModal)();(0,e.render)((0,e.h)(r.NewPassword,{token:l.dataset.token}),d)}var s=document.getElementById("login");if(s){var f=(0,t.openModal)(),y=n(f,2),m=y[0],p=y[1],v=function(){window.location.pathname=s.dataset.redirectTo};(0,e.render)((0,e.h)(r.Login,{success:v}),m)}
-},{"preact":"aSor","./maps":"zB7T","./accounts":"twly","./modals":"MiHU"}]},{},["A2T1"], null)
+'use strict';
+
+var utils = require('./utils');
+var normalizeHeaderName = require('./helpers/normalizeHeaderName');
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = require('./adapters/xhr');
+  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = require('./adapters/http');
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+},{"./utils":"../node_modules/axios/lib/utils.js","./helpers/normalizeHeaderName":"../node_modules/axios/lib/helpers/normalizeHeaderName.js","./adapters/xhr":"../node_modules/axios/lib/adapters/xhr.js","./adapters/http":"../node_modules/axios/lib/adapters/xhr.js","process":"../node_modules/process/browser.js"}],"../node_modules/axios/lib/core/dispatchRequest.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var transformData = require('./transformData');
+var isCancel = require('../cancel/isCancel');
+var defaults = require('../defaults');
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+},{"./../utils":"../node_modules/axios/lib/utils.js","./transformData":"../node_modules/axios/lib/core/transformData.js","../cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","../defaults":"../node_modules/axios/lib/defaults.js"}],"../node_modules/axios/lib/core/mergeConfig.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('../utils');
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  var valueFromConfig2Keys = ['url', 'method', 'params', 'data'];
+  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy'];
+  var defaultToConfig2Keys = [
+    'baseURL', 'url', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress',
+    'maxContentLength', 'validateStatus', 'maxRedirects', 'httpAgent',
+    'httpsAgent', 'cancelToken', 'socketPath'
+  ];
+
+  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    }
+  });
+
+  utils.forEach(mergeDeepPropertiesKeys, function mergeDeepProperties(prop) {
+    if (utils.isObject(config2[prop])) {
+      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
+    } else if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (utils.isObject(config1[prop])) {
+      config[prop] = utils.deepMerge(config1[prop]);
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  var axiosKeys = valueFromConfig2Keys
+    .concat(mergeDeepPropertiesKeys)
+    .concat(defaultToConfig2Keys);
+
+  var otherKeys = Object
+    .keys(config2)
+    .filter(function filterAxiosKeys(key) {
+      return axiosKeys.indexOf(key) === -1;
+    });
+
+  utils.forEach(otherKeys, function otherKeysDefaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  return config;
+};
+
+},{"../utils":"../node_modules/axios/lib/utils.js"}],"../node_modules/axios/lib/core/Axios.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./../utils');
+var buildURL = require('../helpers/buildURL');
+var InterceptorManager = require('./InterceptorManager');
+var dispatchRequest = require('./dispatchRequest');
+var mergeConfig = require('./mergeConfig');
+
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof config === 'string') {
+    config = arguments[1] || {};
+    config.url = arguments[0];
+  } else {
+    config = config || {};
+  }
+
+  config = mergeConfig(this.defaults, config);
+
+  // Set config.method
+  if (config.method) {
+    config.method = config.method.toLowerCase();
+  } else if (this.defaults.method) {
+    config.method = this.defaults.method.toLowerCase();
+  } else {
+    config.method = 'get';
+  }
+
+  // Hook up interceptors middleware
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+
+  return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+module.exports = Axios;
+
+},{"./../utils":"../node_modules/axios/lib/utils.js","../helpers/buildURL":"../node_modules/axios/lib/helpers/buildURL.js","./InterceptorManager":"../node_modules/axios/lib/core/InterceptorManager.js","./dispatchRequest":"../node_modules/axios/lib/core/dispatchRequest.js","./mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js"}],"../node_modules/axios/lib/cancel/Cancel.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
+
+},{}],"../node_modules/axios/lib/cancel/CancelToken.js":[function(require,module,exports) {
+'use strict';
+
+var Cancel = require('./Cancel');
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+},{"./Cancel":"../node_modules/axios/lib/cancel/Cancel.js"}],"../node_modules/axios/lib/helpers/spread.js":[function(require,module,exports) {
+'use strict';
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+},{}],"../node_modules/axios/lib/axios.js":[function(require,module,exports) {
+'use strict';
+
+var utils = require('./utils');
+var bind = require('./helpers/bind');
+var Axios = require('./core/Axios');
+var mergeConfig = require('./core/mergeConfig');
+var defaults = require('./defaults');
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = require('./cancel/Cancel');
+axios.CancelToken = require('./cancel/CancelToken');
+axios.isCancel = require('./cancel/isCancel');
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = require('./helpers/spread');
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+},{"./utils":"../node_modules/axios/lib/utils.js","./helpers/bind":"../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"../node_modules/axios/lib/core/mergeConfig.js","./defaults":"../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../node_modules/axios/lib/helpers/spread.js"}],"../node_modules/axios/index.js":[function(require,module,exports) {
+module.exports = require('./lib/axios');
+},{"./lib/axios":"../node_modules/axios/lib/axios.js"}],"api.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.api = void 0;
+
+var _axios = _interopRequireDefault(require("axios"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function authHeaders() {
+  var token = localStorage.getItem("token");
+  return {
+    headers: {
+      Authorization: "Bearer ".concat(token)
+    }
+  };
+}
+
+var api = {
+  logInGetToken: function logInGetToken(email, password) {
+    var params = new URLSearchParams(); // Using FastAPI OAuth2PasswordRequestForm which requires `username` not email
+
+    params.append("username", email);
+    params.append("password", password);
+    return _axios.default.post("/notendur/login/access-token", params);
+  },
+  getMe: function getMe() {
+    return _axios.default.get("/notendur/me", authHeaders());
+  },
+  passwordRecovery: function passwordRecovery(email) {
+    return _axios.default.post("/notendur/password-recovery/".concat(email));
+  },
+  resetPassword: function resetPassword(password, token) {
+    return _axios.default.post("/notendur/reset-password", {
+      new_password: password,
+      token: token
+    });
+  }
+};
+exports.api = api;
+},{"axios":"../node_modules/axios/index.js"}],"forms/login.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.LoginForm = void 0;
+
+var _preact = require("preact");
+
+var _hooks = require("preact/hooks");
+
+var _api = require("../api");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var getLocalToken = function getLocalToken() {
+  return localStorage.getItem("token");
+};
+
+var saveLocalToken = function saveLocalToken(token) {
+  return localStorage.setItem("token", token);
+};
+
+var removeLocalToken = function removeLocalToken() {
+  return localStorage.removeItem("token");
+};
+
+var classNames = function classNames(classArr) {
+  return classArr.filter(function (el) {
+    return el;
+  }).join(" ");
+}; // filter falsy values
+
+
+var LoginForm = function LoginForm(props) {
+  var success = props.success,
+      setScreen = props.setScreen;
+
+  var _useState = (0, _hooks.useState)({
+    value: "",
+    isDirty: false,
+    errors: []
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      username = _useState2[0],
+      setUsername = _useState2[1];
+
+  var _useState3 = (0, _hooks.useState)({
+    value: "",
+    isDirty: false,
+    errors: []
+  }),
+      _useState4 = _slicedToArray(_useState3, 2),
+      password = _useState4[0],
+      setPassword = _useState4[1];
+
+  var _useState5 = (0, _hooks.useState)({
+    isLoading: false,
+    error: null
+  }),
+      _useState6 = _slicedToArray(_useState5, 2),
+      form = _useState6[0],
+      setForm = _useState6[1];
+
+  var onSubmit = function onSubmit(event) {
+    event.preventDefault();
+    setForm({
+      isLoading: true,
+      error: null
+    });
+
+    _api.api.logInGetToken(username.value, password.value).then(function (response) {
+      saveLocalToken(response.data.access_token);
+      success();
+    }).catch(function (error) {
+      // handle error
+      // remove dirty from fields, meant for highlighting invalid fields until user edits
+      [setUsername, setPassword].forEach(function (setState) {
+        setState(function (prevState) {
+          return _objectSpread(_objectSpread({}, prevState), {}, {
+            errors: [],
+            isDirty: false
+          });
+        });
+      });
+      var errors = error.response.data.detail;
+      var formError = null;
+
+      if (typeof errors == "string") {
+        formError = errors;
+      }
+
+      if (Array.isArray(errors)) {
+        errors.forEach(function (error) {
+          var loc = error.loc,
+              msg = error.msg,
+              type = error.type; // The API has types of errors (from Pydantic: https://pydantic-docs.helpmanual.io/usage/models/#error-handling)
+
+          var msgTranslation = {
+            "value_error.missing": true
+          }[type];
+          if (msgTranslation === undefined) return;
+          var fieldName = loc[loc.length - 1];
+          var setState = {
+            username: setUsername,
+            password: setPassword
+          }[fieldName];
+          if (setState === undefined) return;
+          setState(function (prevState) {
+            return _objectSpread(_objectSpread({}, prevState), {}, {
+              errors: [msgTranslation]
+            });
+          });
+        });
+      }
+
+      setForm({
+        isLoading: false,
+        error: formError
+      });
+    });
+  };
+
+  var onUsernameChange = function onUsernameChange(event) {
+    var value = event.target.value;
+    setUsername(function (prevState) {
+      return _objectSpread(_objectSpread({}, prevState), {}, {
+        value: value,
+        isDirty: true
+      });
+    });
+  };
+
+  var onPasswordChange = function onPasswordChange(event) {
+    var value = event.target.value;
+    setPassword(function (prevState) {
+      return _objectSpread(_objectSpread({}, prevState), {}, {
+        value: value,
+        isDirty: true
+      });
+    });
+  };
+
+  return (0, _preact.h)("div", null, (0, _preact.h)("h1", {
+    class: "text-center text-2xl"
+  }, "Innskr\xE1ning"), (0, _preact.h)("div", {
+    class: "pt-6 pb-2 my-2"
+  }, (0, _preact.h)("form", {
+    onSubmit: onSubmit
+  }, form.error && (0, _preact.h)("div", {
+    class: "mb-4 text-red-700 font-bold"
+  }, form.error), (0, _preact.h)("div", {
+    class: "mb-4"
+  }, (0, _preact.h)("label", {
+    class: "block text-sm font-bold mb-2",
+    for: "username"
+  }, "Netfang"), (0, _preact.h)("input", {
+    class: classNames(["shadow appearance-none border rounded w-full py-2 px-3", !username.isDirty && !!username.errors.length && "error" || ""]),
+    name: "username",
+    type: "text",
+    disabled: form.isLoading,
+    value: username.value,
+    onInput: onUsernameChange
+  }), username.errors.map(function (error) {
+    return (0, _preact.h)("div", {
+      class: "text-red-700 text-sm my-2"
+    }, error);
+  })), (0, _preact.h)("div", {
+    class: "mb-6"
+  }, (0, _preact.h)("label", {
+    class: "block text-sm font-bold mb-2",
+    for: "password"
+  }, "Lykilor\xF0"), (0, _preact.h)("input", {
+    class: classNames(["shadow appearance-none border rounded w-full py-2 px-3 mb-3", !password.isDirty && !!password.errors.length && "error" || ""]),
+    name: "password",
+    type: "password",
+    disabled: form.isLoading,
+    value: password.value,
+    onInput: onPasswordChange
+  }), password.errors.map(function (error) {
+    return (0, _preact.h)("div", {
+      class: "text-red-700 text-sm my-2"
+    }, error);
+  })), (0, _preact.h)("div", {
+    class: "block sm:flex items-center justify-between"
+  }, (0, _preact.h)("div", null, (0, _preact.h)("button", {
+    class: "btn-primary",
+    type: "submit",
+    disabled: form.isLoading
+  }, "Innskr\xE1")), (0, _preact.h)("div", {
+    class: "mt-4 sm:mt-0"
+  }, (0, _preact.h)("button", {
+    onClick: function onClick(event) {
+      event.stopPropagation();
+      setScreen(["password-recovery", username.value]);
+    },
+    class: "no-underline"
+  }, "Gleymt lykilor\xF0?"))))));
+};
+
+exports.LoginForm = LoginForm;
+},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","../api":"api.js"}],"forms/new-password.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.NewPasswordForm = void 0;
+
+var _preact = require("preact");
+
+var _hooks = require("preact/hooks");
+
+var _api = require("../api");
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var saveLocalToken = function saveLocalToken(token) {
+  return localStorage.setItem("token", token);
+};
+
+var NewPasswordForm = function NewPasswordForm(_ref) {
+  var token = _ref.token;
+
+  var _useState = (0, _hooks.useState)({
+    isSuccess: false,
+    isLoading: false,
+    error: null
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      form = _useState2[0],
+      setForm = _useState2[1];
+
+  var _useState3 = (0, _hooks.useState)(""),
+      _useState4 = _slicedToArray(_useState3, 2),
+      password = _useState4[0],
+      setPassword = _useState4[1];
+
+  var onChange = function onChange(event) {
+    setPassword(event.target.value);
+  };
+
+  var onSubmit = function onSubmit(event) {
+    event.preventDefault();
+    setForm({
+      isLoading: true,
+      isSuccess: false,
+      error: null
+    });
+
+    _api.api.resetPassword(password, token).then(function (response) {
+      saveLocalToken(response.data.access_token);
+      setForm({
+        isLoading: false,
+        error: null,
+        isSuccess: true
+      });
+    }).catch(function (error) {
+      // remove dirty, meant for highlighting invalid fields until user edits
+      var errorMessage = error.response.data.detail || "Óþekkt villa á vefþjóni";
+      setForm({
+        isLoading: false,
+        isSuccess: false,
+        error: errorMessage
+      });
+    });
+  };
+
+  return (0, _preact.h)("div", null, (0, _preact.h)("h1", {
+    class: "text-center text-2xl"
+  }, "N\xFDtt lykilor\xF0"), (0, _preact.h)("div", {
+    class: "py-2 my-2"
+  }), (0, _preact.h)("form", {
+    onSubmit: onSubmit
+  }, form.error && (0, _preact.h)("div", {
+    class: "mb-4 text-red-700 font-bold"
+  }, form.error), form.isSuccess && (0, _preact.h)("div", {
+    class: "mb-4 text-green-600 font-bold"
+  }, "Lykilor\xF0i\xF0 hefur veri\xF0 uppf\xE6rt."), (0, _preact.h)("div", {
+    class: "mb-4"
+  }, (0, _preact.h)("input", {
+    class: "shadow appearance-none border rounded w-full py-2 px-3",
+    name: "password",
+    type: "password",
+    disabled: form.isLoading || form.isSuccess,
+    value: password.value,
+    onInput: onChange
+  })), (0, _preact.h)("div", {
+    class: "block md:flex items-center justify-between"
+  }, (0, _preact.h)("div", null, (0, _preact.h)("button", {
+    class: "btn-primary",
+    type: "submit",
+    disabled: form.isLoading || form.isSuccess
+  }, "Vista")))));
+};
+
+exports.NewPasswordForm = NewPasswordForm;
+},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","../api":"api.js"}],"forms/password-recovery.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PasswordRecoveryForm = void 0;
+
+var _preact = require("preact");
+
+var _hooks = require("preact/hooks");
+
+var _api = require("../api");
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var classNames = function classNames(classArr) {
+  return classArr.filter(function (el) {
+    return el;
+  }).join(" ");
+}; // filter falsy values
+
+
+var PasswordRecoveryForm = function PasswordRecoveryForm(_ref) {
+  var setScreen = _ref.setScreen,
+      emailDefaultValue = _ref.emailDefaultValue;
+
+  var _useState = (0, _hooks.useState)({
+    isLoading: false,
+    isSuccess: false,
+    error: null
+  }),
+      _useState2 = _slicedToArray(_useState, 2),
+      form = _useState2[0],
+      setForm = _useState2[1];
+
+  var _useState3 = (0, _hooks.useState)({
+    value: emailDefaultValue,
+    isDirty: false
+  }),
+      _useState4 = _slicedToArray(_useState3, 2),
+      email = _useState4[0],
+      setEmail = _useState4[1];
+
+  var onSubmit = function onSubmit(event) {
+    event.preventDefault();
+    setForm({
+      isLoading: true,
+      isSuccess: false,
+      error: null
+    });
+
+    _api.api.passwordRecovery(email.value).then(function (response) {
+      setForm({
+        isLoading: false,
+        error: null,
+        isSuccess: true
+      });
+    }).catch(function (error) {
+      // remove dirty from email, meant for highlighting invalid fields until user edits
+      setEmail(function (prevState) {
+        return _objectSpread(_objectSpread({}, prevState), {}, {
+          isDirty: false
+        });
+      });
+      var errorMessage = error.response.data.detail || "Óþekkt villa á vefþjóni";
+      setForm({
+        isLoading: false,
+        isSuccess: false,
+        error: errorMessage
+      });
+    });
+  };
+
+  var onEmailChange = function onEmailChange(event) {
+    var value = event.target.value;
+    setEmail({
+      value: value,
+      isDirty: true
+    });
+  };
+
+  return (0, _preact.h)("div", null, (0, _preact.h)("h1", {
+    class: "text-center text-2xl"
+  }, "S\xE6kja um n\xFDtt lykilor\xF0"), (0, _preact.h)("div", {
+    class: "pt-6 pb-2 my-2"
+  }, (0, _preact.h)("form", {
+    onSubmit: onSubmit
+  }, form.error && (0, _preact.h)("div", {
+    class: "mb-4 text-red-700 font-bold"
+  }, form.error), form.isSuccess && (0, _preact.h)("div", {
+    class: "mb-4 text-green-600 font-bold"
+  }, "T\xF6lvup\xF3stur me\xF0 lei\xF0beiningum var sendur \xE1 ", email.value), (0, _preact.h)("div", {
+    class: "mb-4"
+  }, (0, _preact.h)("label", {
+    class: "block text-sm font-bold mb-2",
+    for: "email"
+  }, "Netfang"), (0, _preact.h)("input", {
+    class: "shadow appearance-none border rounded w-full py-2 px-3",
+    name: "email",
+    type: "text",
+    disabled: form.isLoading || form.isSuccess,
+    value: email.value,
+    onInput: onEmailChange
+  })), (0, _preact.h)("div", {
+    class: "block md:flex items-center justify-between"
+  }, (0, _preact.h)("div", null, (0, _preact.h)("button", {
+    class: "btn-primary",
+    type: "submit",
+    disabled: form.isLoading || form.isSuccess
+  }, "Senda")), (0, _preact.h)("div", {
+    class: "mt-4 md:mt-0"
+  }, (0, _preact.h)("button", {
+    onClick: function onClick(event) {
+      event.stopPropagation();
+      setScreen(["login", email.value]);
+    },
+    class: "no-underline"
+  }, "Til baka"))))));
+};
+
+exports.PasswordRecoveryForm = PasswordRecoveryForm;
+},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","../api":"api.js"}],"accounts.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Login = exports.NewPassword = void 0;
+
+var _preact = require("preact");
+
+var _hooks = require("preact/hooks");
+
+var _login = require("./forms/login");
+
+var _newPassword = require("./forms/new-password");
+
+var _passwordRecovery = require("./forms/password-recovery");
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var NewPassword = _newPassword.NewPasswordForm;
+exports.NewPassword = NewPassword;
+
+var Login = function Login(props) {
+  var success = props.success;
+
+  var _useState = (0, _hooks.useState)(["login", ""]),
+      _useState2 = _slicedToArray(_useState, 2),
+      _useState2$ = _slicedToArray(_useState2[0], 2),
+      screen = _useState2$[0],
+      emailDefaultValue = _useState2$[1],
+      setScreen = _useState2[1];
+
+  var Form = {
+    login: _login.LoginForm,
+    "password-recovery": _passwordRecovery.PasswordRecoveryForm
+  }[screen];
+  return (0, _preact.h)("div", null, (0, _preact.h)(Form, {
+    setScreen: setScreen,
+    emailDefaultValue: emailDefaultValue,
+    success: success
+  }));
+};
+
+exports.Login = Login;
+},{"preact":"../node_modules/preact/dist/preact.module.js","preact/hooks":"../node_modules/preact/hooks/dist/hooks.module.js","./forms/login":"forms/login.js","./forms/new-password":"forms/new-password.js","./forms/password-recovery":"forms/password-recovery.js"}],"modals.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.openModal = void 0;
+
+var openModal = function openModal() {
+  /* Handle opening and closing the modal window, return the el where Preact
+  can inject a login form or whatever.
+    */
+  var modalEl = document.getElementById("modal");
+  modalEl.classList.remove("hidden");
+
+  var cleanup = function cleanup() {
+    modalEl.classList.add("hidden");
+  };
+
+  window.addEventListener("click", function (event) {
+    // `Element.closest` traverses parents to find matching selector
+    // if we did not find #modal in ancestors we must have clicked somewhere outside
+    var clickedOutsideModalEl = !event.target.closest("#modal .inner");
+    if (clickedOutsideModalEl) cleanup();
+  });
+  modalEl.querySelectorAll(".close").forEach(function (el) {
+    el.addEventListener("click", function (event) {
+      cleanup();
+    });
+  });
+  return [modalEl.querySelector(".form"), cleanup]; // the section that can be taken over by Preact
+};
+
+exports.openModal = openModal;
+},{}],"app.js":[function(require,module,exports) {
+"use strict";
+
+var _preact = require("preact");
+
+require("./maps");
+
+var _accounts = require("./accounts");
+
+var _modals = require("./modals");
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+document.getElementById("login-button").addEventListener("click", function (event) {
+  event.stopPropagation();
+
+  var _openModal = (0, _modals.openModal)(),
+      _openModal2 = _slicedToArray(_openModal, 2),
+      el = _openModal2[0],
+      cleanup = _openModal2[1];
+
+  (0, _preact.render)((0, _preact.h)(_accounts.Login, {
+    success: cleanup
+  }), el);
+});
+var passwordRecoveryEl = document.getElementById("password-recovery");
+
+if (passwordRecoveryEl) {
+  var el = (0, _modals.openModal)();
+  (0, _preact.render)((0, _preact.h)(_accounts.NewPassword, {
+    token: passwordRecoveryEl.dataset.token
+  }), el);
+}
+
+var loginEl = document.getElementById("login");
+
+if (loginEl) {
+  var _openModal3 = (0, _modals.openModal)(),
+      _openModal4 = _slicedToArray(_openModal3, 2),
+      _el = _openModal4[0],
+      close = _openModal4[1];
+
+  var cleanup = function cleanup() {
+    window.location.pathname = loginEl.dataset.redirectTo;
+  };
+
+  (0, _preact.render)((0, _preact.h)(_accounts.Login, {
+    success: cleanup
+  }), _el);
+}
+},{"preact":"../node_modules/preact/dist/preact.module.js","./maps":"maps.js","./accounts":"accounts.js","./modals":"modals.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var global = arguments[3];
+var OVERLAY_ID = '__parcel__error__overlay__';
+var OldModule = module.bundle.Module;
+
+function Module(moduleName) {
+  OldModule.call(this, moduleName);
+  this.hot = {
+    data: module.bundle.hotData,
+    _acceptCallbacks: [],
+    _disposeCallbacks: [],
+    accept: function (fn) {
+      this._acceptCallbacks.push(fn || function () {});
+    },
+    dispose: function (fn) {
+      this._disposeCallbacks.push(fn);
+    }
+  };
+  module.bundle.hotData = null;
+}
+
+module.bundle.Module = Module;
+var checkedAssets, assetsToAccept;
+var parent = module.bundle.parent;
+
+if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
+  var hostname = "" || location.hostname;
+  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53224" + '/');
+
+  ws.onmessage = function (event) {
+    checkedAssets = {};
+    assetsToAccept = [];
+    var data = JSON.parse(event.data);
+
+    if (data.type === 'update') {
+      var handled = false;
+      data.assets.forEach(function (asset) {
+        if (!asset.isNew) {
+          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
+
+          if (didAccept) {
+            handled = true;
+          }
+        }
+      }); // Enable HMR for CSS by default.
+
+      handled = handled || data.assets.every(function (asset) {
+        return asset.type === 'css' && asset.generated.js;
+      });
+
+      if (handled) {
+        console.clear();
+        data.assets.forEach(function (asset) {
+          hmrApply(global.parcelRequire, asset);
+        });
+        assetsToAccept.forEach(function (v) {
+          hmrAcceptRun(v[0], v[1]);
+        });
+      } else if (location.reload) {
+        // `location` global exists in a web worker context but lacks `.reload()` function.
+        location.reload();
+      }
+    }
+
+    if (data.type === 'reload') {
+      ws.close();
+
+      ws.onclose = function () {
+        location.reload();
+      };
+    }
+
+    if (data.type === 'error-resolved') {
+      console.log('[parcel] ✨ Error resolved');
+      removeErrorOverlay();
+    }
+
+    if (data.type === 'error') {
+      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
+      removeErrorOverlay();
+      var overlay = createErrorOverlay(data);
+      document.body.appendChild(overlay);
+    }
+  };
+}
+
+function removeErrorOverlay() {
+  var overlay = document.getElementById(OVERLAY_ID);
+
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function createErrorOverlay(data) {
+  var overlay = document.createElement('div');
+  overlay.id = OVERLAY_ID; // html encode message and stack trace
+
+  var message = document.createElement('div');
+  var stackTrace = document.createElement('pre');
+  message.innerText = data.error.message;
+  stackTrace.innerText = data.error.stack;
+  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
+  return overlay;
+}
+
+function getParents(bundle, id) {
+  var modules = bundle.modules;
+
+  if (!modules) {
+    return [];
+  }
+
+  var parents = [];
+  var k, d, dep;
+
+  for (k in modules) {
+    for (d in modules[k][1]) {
+      dep = modules[k][1][d];
+
+      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
+        parents.push(k);
+      }
+    }
+  }
+
+  if (bundle.parent) {
+    parents = parents.concat(getParents(bundle.parent, id));
+  }
+
+  return parents;
+}
+
+function hmrApply(bundle, asset) {
+  var modules = bundle.modules;
+
+  if (!modules) {
+    return;
+  }
+
+  if (modules[asset.id] || !bundle.parent) {
+    var fn = new Function('require', 'module', 'exports', asset.generated.js);
+    asset.isNew = !modules[asset.id];
+    modules[asset.id] = [fn, asset.deps];
+  } else if (bundle.parent) {
+    hmrApply(bundle.parent, asset);
+  }
+}
+
+function hmrAcceptCheck(bundle, id) {
+  var modules = bundle.modules;
+
+  if (!modules) {
+    return;
+  }
+
+  if (!modules[id] && bundle.parent) {
+    return hmrAcceptCheck(bundle.parent, id);
+  }
+
+  if (checkedAssets[id]) {
+    return;
+  }
+
+  checkedAssets[id] = true;
+  var cached = bundle.cache[id];
+  assetsToAccept.push([bundle, id]);
+
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    return true;
+  }
+
+  return getParents(global.parcelRequire, id).some(function (id) {
+    return hmrAcceptCheck(global.parcelRequire, id);
+  });
+}
+
+function hmrAcceptRun(bundle, id) {
+  var cached = bundle.cache[id];
+  bundle.hotData = {};
+
+  if (cached) {
+    cached.hot.data = bundle.hotData;
+  }
+
+  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
+    cached.hot._disposeCallbacks.forEach(function (cb) {
+      cb(bundle.hotData);
+    });
+  }
+
+  delete bundle.cache[id];
+  bundle(id);
+  cached = bundle.cache[id];
+
+  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
+    cached.hot._acceptCallbacks.forEach(function (cb) {
+      cb();
+    });
+
+    return true;
+  }
+}
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","app.js"], null)
 //# sourceMappingURL=/static/dist/app.js.map
