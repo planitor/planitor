@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
+    Index,
     Integer,
     Numeric,
     String,
@@ -174,7 +175,7 @@ class Meeting(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     created = Column(DateTime, server_default=func.now())
-    start = Column(DateTime, nullable=False)
+    start = Column(DateTime, nullable=False, index=True)
     end = Column(DateTime)
     description = Column(String)
     attendant_names = Column(ARRAY(String))
@@ -191,11 +192,6 @@ class Attachment(Base):
     file_url = Column(String)
     file_type = Column(String, nullable=True)
     name = Column(String)
-
-
-class Tag(Base):
-    __tablename__ = "tags"
-    name = Column(String, primary_key=True, index=True)
 
 
 class CaseEntity(Base):
@@ -218,20 +214,6 @@ class CaseAttachment(Base):
     attachment_id = Column(Integer, ForeignKey("attachments.id"), primary_key=True)
     case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
     created = Column(DateTime, server_default=func.now())
-
-    minute_id = Column(Integer, ForeignKey("minutes.id"))
-    minute = relationship("Minute")
-
-
-class CaseTag(Base):
-    # We want to collate all tags to cases, but they can be associated with a
-    # meeting minute about a case where they first appeared
-    __tablename__ = "case_tags"
-    tag_id = Column(String, ForeignKey("tags.name"), primary_key=True)
-    case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
-    approved = Column(
-        Boolean, default=False
-    )  # We want to process suggested tags approved by an admin
 
     minute_id = Column(Integer, ForeignKey("minutes.id"))
     minute = relationship("Minute")
@@ -263,7 +245,6 @@ class Case(Base):
     plan = relationship(Plan)
 
     attachments = relationship(CaseAttachment)
-    tags = relationship(CaseTag)
     entities = relationship(CaseEntity)
 
     __table_args__ = (UniqueConstraint("serial", "council_id"),)
@@ -308,14 +289,15 @@ class Minute(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     serial = Column(String, index=True)
-    case_id = Column(Integer, ForeignKey(Case.id), nullable=True)
+    case_id = Column(Integer, ForeignKey(Case.id), nullable=True, index=True)
     case = relationship(Case)
     status = Column(Enum(CaseStatusEnum), nullable=True)
-    meeting_id = Column(Integer, ForeignKey(Meeting.id), nullable=True)
+    meeting_id = Column(Integer, ForeignKey(Meeting.id), nullable=True, index=True)
     meeting = relationship(Meeting)
     headline = Column(String)
     inquiry = Column(String)
     remarks = Column(String)
+    lemmas = Column(String)
     entity_mentions = Column(
         CompositeArray(
             CompositeType(
@@ -327,6 +309,12 @@ class Minute(Base):
                 ],
             )
         )
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_lemmas_tsv", func.to_tsvector("simple", lemmas), postgresql_using="gin"
+        ),
     )
 
     def assign_entity_mentions(self, mentions):

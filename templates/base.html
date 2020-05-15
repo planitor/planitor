@@ -25,9 +25,15 @@
       <nav id="navigation" class="flex items-center justify-between flex-wrap px-6 py-2 max-w-6xl mx-auto">
         <a href="/" class="mr-6 block logo" alt="Planitor">{% include "emblem.svg" %}</a>
         <div class="flex-grow"></div>
-        <form class="search rounded-md flex items-center px-3 w-1/2">
+        <form
+          class="search rounded-md flex items-center px-3 w-1/2"
+          method="GET"
+          action="{{ url_for('get_search') }}"
+        >
           <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
           <input
+            value="{{ q or '' }}"
+            name="q"
             class="bg-transparent flex-grow py-2 px-2 text-white text-sm font-thin"
             placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
           />

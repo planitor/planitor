@@ -1,58 +1,16 @@
-from tokenizer import TOK
-from reynir.bintokenizer import _GENDER_SET
 from sqlalchemy.orm import Session
 
-from . import greynir
-from .models import Minute
 from .crud import (
-    get_or_create_tag,
-    get_or_create_case_tag,
-    get_or_create_entity,
+    create_minute,
     get_or_create_case_entity,
+    get_or_create_entity,
     lookup_icelandic_company_in_entities,
 )
-from .language import extract_company_names
-from .utils.stopwords import stopwords
-from .utils.rsk import get_kennitala_from_rsk_search
+from .language.companies import extract_company_names
+from .minutes import get_minute_lemmas
+from .models import Meeting, Minute
 from .utils.kennitala import Kennitala
-
-
-INTERESTING_TOKENS = (TOK.WORD, TOK.ENTITY)
-
-
-def yield_noun_stems(text: str):
-    for token in greynir.tokenize(text):
-
-        if token.kind not in INTERESTING_TOKENS or not token.val:
-            continue
-
-        # Skip non-nouns
-        for meaning in token.val:
-            if meaning.ordfl in _GENDER_SET:
-                if meaning.stofn.lower() not in stopwords:
-                    break
-        else:
-            continue
-
-        yield meaning.stofn
-
-
-def get_tag_suggestions_for_minute(minute: Minute):
-    tags = set()
-    text = "\n".join((minute.inquiry, minute.remarks, minute.headline))
-    for tag in yield_noun_stems(text):
-        tags.add(tag)
-    return tags
-
-
-def tag_minute(db, minute):
-    case = minute.case
-    for tag in get_tag_suggestions_for_minute(minute):
-        tag, _ = get_or_create_tag(db, tag)
-        case_tag, _ = get_or_create_case_tag(db, tag, case)
-        case_tag.minute = minute
-        if case_tag not in case.tags:
-            case.tags.append(case_tag)
+from .utils.rsk import get_kennitala_from_rsk_search
 
 
 def _get_entity(db: Session, name: str):
@@ -70,6 +28,31 @@ def _get_entity(db: Session, name: str):
         if created:
             db.commit()
         return entity
+
+
+def update_minute_with_entity_relations(
+    db: Session, minute: Minute, entity_items: list
+):
+    """Here we have kennitala and name, whereas in `update_minute_with_entity_mentions`
+    we only have the names. """
+
+    case = minute.case
+
+    # Squash duplicates
+    entity_items = ({e["kennitala"]: e for e in entity_items}).values()
+
+    # Create and add applicant companies or persons
+    for items in entity_items:  # persons or companies inquiring
+        kennitala = Kennitala(items.pop("kennitala"))
+        if not kennitala.validate():
+            continue
+        entity, _ = get_or_create_entity(db, kennitala=kennitala, **items)
+
+        case_entity, _ = get_or_create_case_entity(db, case, entity, applicant=True)
+        if case_entity not in case.entities:
+            case.entities.append(case_entity)
+
+    db.commit()
 
 
 def update_minute_with_entity_mentions(db: Session, minute: Minute):
@@ -101,4 +84,31 @@ def update_minute_with_entity_mentions(db: Session, minute: Minute):
 
     minute.assign_entity_mentions(_matched_mentions)
     db.add(minute)
+    db.commit()
+
+
+def update_minute_with_lemmas(db: Session, minute: Minute):
+    minute.lemmas = get_minute_lemmas(minute)
+    db.add(minute)
+    db.commit()
+
+
+def process_minute(db: Session, items, meeting: Meeting):
+
+    minute = create_minute(db, meeting, **items)
+    db.commit()
+    case = minute.case
+
+    # Update minute with the entities of record
+    update_minute_with_entity_relations(
+        db, minute, entity_items=items.pop("entities", [])
+    )
+
+    # Also associate companies mentioned in the inquiry, such as architects
+    update_minute_with_entity_mentions(db, minute)
+
+    # Populate the lemma column with lemmas from Greynir and/or tokenizer
+    update_minute_with_lemmas(db, minute)
+
+    db.add(case)
     db.commit()

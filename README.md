@@ -66,10 +66,12 @@ poetry export -f requirements.txt > requirements.txt
 
 Then commit this to repo and push to GitHub. Render takes over from there.
 
-Deploy scrapers — beautifulsoup4 needs to be added manually
+DB Migrations
 
 ```bash
-poetry export -f requirements.txt --without-hashes > scrapy-requirements.txt
-echo "beautifulsoup4==4.8.2\nhtml5lib==1.0.1" >> scrapy-requirements.txt
-poetry run shub deploy
+poetry run python migrate.py
 ```
+
+This will create a test database based upon the declarative SQLAlchemy schema, then use migra to detect the
+diff, suggest to run a migration to sync the databases. It shows the SQL migration code which you can
+copy-paste to tweak.

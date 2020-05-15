@@ -1,4 +1,4 @@
-from .city import (
+from .city import (  # noqa
     CouncilTypeEnum,
     PlanTypeEnum,
     EntityTypeEnum,
@@ -11,13 +11,13 @@ from .city import (
     Council,
     Meeting,
     Attachment,
-    Tag,
     CaseEntity,
     CaseAttachment,
-    CaseTag,
     Case,
     EntityMention,
     Minute,
 )
 
-from .accounts import User
+from .accounts import User  # noqa
+
+_all = locals().values()

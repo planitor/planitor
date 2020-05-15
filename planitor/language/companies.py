@@ -31,7 +31,7 @@ def clean_company_name(name):
 def parse_icelandic_companies(text) -> Dict:
     """ This is only a regex so it does not tokenize. When company names are in
     different inflections, these are of course also not normalized to nefnifall. It
-    does not pick company names with more than 4 word segments (see regex).
+    does not pick company names with more than 3 word segments (see regex).
 
     """
     found = {}
@@ -45,16 +45,16 @@ def parse_icelandic_companies(text) -> Dict:
     return found
 
 
-def apply_title_casing(left, right):
+def titleize(left, right):
     # Apply title casing of each word on the left to the right
     parts = []
     for left_word, right_word in zip(left.split(), right.split()):
-        is_title = left_word[0] == left_word[0].upper()
         is_upper = left_word == left_word.upper()
-        if is_title:
-            right_word = right_word.title()
+        is_title = left_word[0] == left_word[0].upper()
         if is_upper:
             right_word = right_word.upper()
+        elif is_title:
+            right_word = right_word.title()
         parts.append(right_word)
     return " ".join(parts)
 
@@ -78,6 +78,8 @@ def extract_company_names(text) -> Dict:
         "Vektor, hönnun og ráðgjöf ehf.").
     2.  I’m still not sure if `node.indefinite` always gets us to the word form used in
         RSK fyrirtækjaskrá.
+    3.  If Greynir fails to parse a sentence (which is common for planning meeting
+        notes) there is no fallback and we give up trying to match the company name.
 
     """
 
@@ -151,9 +153,7 @@ def extract_company_names(text) -> Dict:
                         nominative_name = " ".join(
                             node.indefinite for node in name_part_nodes
                         )
-                        nominative_name = apply_title_casing(
-                            original_name, nominative_name
-                        )
+                        nominative_name = titleize(original_name, nominative_name)
                         matched_names[nominative_name] = name_positions[original_name]
                         break
                     steps += 1

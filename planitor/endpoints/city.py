@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from sqlalchemy import func
@@ -6,7 +8,9 @@ from starlette.datastructures import Secret
 from starlette.requests import Request
 
 from planitor import config, hashids
+from planitor.crud.city import get_search_results
 from planitor.database import get_db
+from planitor.language.search import parse_lemmas
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import Case, Entity, Meeting, Minute, Municipality, User
@@ -15,6 +19,32 @@ from planitor.security import get_current_active_user_or_none
 from .templates import templates
 
 router = APIRouter()
+
+
+@router.get("/leit")
+async def get_search(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user_or_none),
+    q: str = "",
+) -> templates.TemplateResponse:
+    if q:
+        # People frequently compose search queries with plural form, for example
+        # "bílakjallarar". It’s important to depluralize this. The `parse_lemmas`
+        # achieves this for us.
+
+        def repl(matchobj):
+            lemmas = list(parse_lemmas(matchobj.group(0)))
+            return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
+
+        lemma_q = re.sub(r"\w+", repl, q)
+        minutes = get_search_results(db, lemma_q)
+    else:
+        minutes = []
+    return templates.TemplateResponse(
+        "search_results.html",
+        {"request": request, "q": q, "user": current_user, "minutes": minutes},
+    )
 
 
 @router.get("/s")
@@ -105,7 +135,7 @@ async def get_council(
     return None
 
 
-@router.get("/s/{muni_slug}/{council_slug}/verk/{case_id}")
+@router.get("/s/{muni_slug}/{council_slug}/nr/{case_id}")
 async def get_case(
     request: Request,
     muni_slug: str,
@@ -114,10 +144,7 @@ async def get_case(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
-    case_id = hashids.decode(case_id)
-    if not case_id:
-        raise HTTPException(status_code=404, detail="Verk fannst ekki")
-    case = db.query(Case).get(case_id[0])
+    case = db.query(Case).filter(Case.serial == case_id).first()
     if (
         case is None
         or case.council.council_type.value.slug != council_slug
@@ -138,6 +165,50 @@ async def get_case(
             "case": case,
             "council": case.council,
             "minutes": minutes,
+            "request": request,
+            "user": current_user,
+        },
+    )
+
+
+@router.get("/s/{muni_slug}/{council_slug}/nr/{case_id}/{minute_id}")
+def get_minute(
+    request: Request,
+    muni_slug: str,
+    council_slug: str,
+    case_id: str,
+    minute_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user_or_none),
+):
+    # Minutes are available on both case and meeting pages but it’s nice to have
+    # permalinks for each minute as well, for links.
+    minute = db.query(Minute).get(hashids.decode(minute_id)[0])
+    if (
+        minute is None
+        or minute.case.serial != case_id
+        or minute.case.council.council_type.value.slug != council_slug
+        or minute.case.council.municipality.slug != muni_slug
+    ):
+        raise HTTPException(status_code=404, detail="Bókun fannst ekki")
+    sq_count = (
+        db.query(func.count(Case.id).label("case_count"))
+        .filter(Case.id == minute.case_id)
+        .subquery()
+    )
+    minute = (
+        db.query(Minute, sq_count.c.case_count)
+        .select_from(Minute)
+        .filter(Minute.id == minute.id)
+        .first()
+    )
+    return templates.TemplateResponse(
+        "meeting.html",
+        {
+            "municipality": minute.meeting.council.municipality,
+            "council": minute.meeting.council,
+            "meeting": minute.meeting,
+            "minute": minute,
             "request": request,
             "user": current_user,
         },

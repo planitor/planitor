@@ -5,11 +5,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from planitor.cases import get_case_status_from_remarks
-from planitor.language import clean_company_name
+from planitor.language.companies import clean_company_name
 from planitor.models import (
     Case,
     CaseEntity,
-    CaseTag,
     Council,
     CouncilTypeEnum,
     Entity,
@@ -19,7 +18,6 @@ from planitor.models import (
     Meeting,
     Minute,
     Municipality,
-    Tag,
 )
 from planitor.utils.kennitala import Kennitala
 from planitor.utils.text import slugify, fold
@@ -193,6 +191,17 @@ def create_minute(db, meeting, **items):
     return minute
 
 
+def get_search_results(db: Session, search_query: str):
+    tsvector = func.to_tsvector("simple", Minute.lemmas)
+    tsquery = func.websearch_to_tsquery("simple", search_query)
+    sa_query = (
+        db.query(Minute)
+        .filter(tsvector.op("@@")(tsquery))
+        .order_by(func.ts_rank(tsvector, tsquery))
+    )
+    return sa_query
+
+
 def update_case_status(db, case):
     """ Query minutes in chronological meeting order, the last minute status will
     become the case status.
@@ -210,43 +219,6 @@ def update_case_status(db, case):
         db.add(minute)
     case.status = status
     db.add(case)
-
-
-def get_or_create_tag(db, name):
-    for transient_tag in db.new:
-        if not isinstance(transient_tag, Tag):
-            continue
-        if name == transient_tag.name:
-            tag = transient_tag
-            break
-    else:
-        tag = db.query(Tag).get(name)
-    created = False
-    if tag is None:
-        tag = Tag(name=name)
-        db.add(tag)
-        created = True
-    return tag, created
-
-
-def get_or_create_case_tag(db, tag, case):
-    for transient_case_tag in db.new:
-        if not isinstance(transient_case_tag, CaseTag):
-            continue
-        if (
-            tag.name == transient_case_tag.tag_id
-            and case.id == transient_case_tag.case_id
-        ):
-            case_tag = transient_case_tag
-            break
-    else:
-        case_tag = db.query(CaseTag).filter_by(tag_id=tag.name, case_id=case.id).first()
-    created = False
-    if case_tag is None:
-        case_tag = CaseTag(case_id=case.id, tag_id=tag.name)
-        db.add(case_tag)
-        created = True
-    return case_tag, created
 
 
 def lookup_icelandic_company_in_entities(db, name):

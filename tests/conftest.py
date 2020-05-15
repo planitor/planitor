@@ -26,10 +26,8 @@ def engine_fixture() -> sqlalchemy.engine.Engine:
 @pytest.fixture(scope="function", name="db")
 def db_fixture(engine):
 
-    from planitor.database import SessionLocal, engine
-    from planitor.models import (
-        Base,
-    )  # Base is also in `database` but this import attaches models
+    from planitor.database import SessionLocal, engine, Base
+    from planitor import models  # noqa
 
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(engine)

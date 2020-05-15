@@ -9,16 +9,12 @@ from scrapy.utils.project import get_project_settings
 
 from planitor import greynir
 from planitor.models import Minute
-from planitor.utils.kennitala import Kennitala
 from planitor.crud import (
     get_or_create_municipality,
     get_or_create_council,
-    get_or_create_entity,
-    get_or_create_case_entity,
     get_or_create_meeting,
-    create_minute,
 )
-from planitor.postprocess import update_minute_with_entity_mentions
+from planitor.postprocess import process_minute
 
 
 def get_connection_string():
@@ -36,37 +32,6 @@ def get_names(text):
         if sentence.tree:
             names.update(sentence.tree.persons)
     return names
-
-
-def process_minute(db, items, meeting):
-
-    entity_items = items.pop("entities", [])
-
-    minute = create_minute(db, meeting, **items)
-    db.commit()
-    case = minute.case
-
-    # Squash duplicates
-    entity_items = ({e["kennitala"]: e for e in entity_items}).values()
-
-    # Create and add applicant companies or persons
-    for items in entity_items:  # persons or companies inquiring
-        kennitala = Kennitala(items.pop("kennitala"))
-        if not kennitala.validate():
-            continue
-        entity, _ = get_or_create_entity(db, kennitala=kennitala, **items)
-
-        case_entity, _ = get_or_create_case_entity(db, case, entity, applicant=True)
-        if case_entity not in case.entities:
-            case.entities.append(case_entity)
-
-    db.commit()
-
-    # Also associate companies mentioned in the inquiry, such as architects
-    update_minute_with_entity_mentions(db, minute)
-
-    db.add(case)
-    db.commit()
 
 
 class DatabasePipeline(object):
