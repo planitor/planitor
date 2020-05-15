@@ -1,4 +1,8 @@
-from planitor.language.search import get_lemmas, get_wordbase, parse_lemmas
+from planitor.language.search import (
+    get_lemmas,
+    get_wordbase,
+    lemmatize_query,
+)
 
 
 def test_get_wordbase():
@@ -16,14 +20,18 @@ def test_get_lemmas_singularizes_plural_words():
     assert list(get_lemmas("Sömu gömlu þorpararnir.")) == ["þorpari"]
 
 
-def test_parse_lemmas_for_webquery():
-    assert list(parse_lemmas("veitingastaðir")) == ["veitingastaður"]
-    assert list(parse_lemmas("skemmdir")) == ["skemmd"]
+def test_lemmatize_query_for_webquery():
+    assert lemmatize_query("veitingastaðir") == "veitingastaður"
+    assert lemmatize_query("skemmdir") == "skemmd"
 
 
-def test_parse_unknown_lemma():
-    assert list(parse_lemmas("unknown")) == ["unknown"]
-    assert list(parse_lemmas("svalir")) == ["svalir"]
+def test_lemmatize_query_capitalize():
+    assert lemmatize_query("brautarholti") == "brautarholt"
+
+
+def test_lemmatize_query_unknown_lemma():
+    assert lemmatize_query("unknown") == "unknown"
+    assert lemmatize_query("svalir") == "svalir"
 
 
 def test_get_lemmas_large_sentence():

@@ -23,6 +23,15 @@ from planitor import greynir
 from planitor.utils.stopwords import stopwords
 
 
+def lemmatize_query(query):
+    def repl(matchobj):
+        lemmas = list(parse_lemmas(matchobj.group(0).title()))
+        return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
+
+    lemma_q = re.sub(r"\w+", repl, query)
+    return lemma_q.lower()
+
+
 def get_token_meanings(token, ignore=None) -> Optional[list]:
     if ignore is None:
         ignore = []
@@ -68,6 +77,7 @@ def parse_lemmas(text, ignore=None) -> Generator[str, None, None]:
         ignore = []
     for sentence in greynir.parse(text)["sentences"]:
         terminals = sentence.terminals
+        print(terminals)
         if terminals is None:
             for token in tokenize(sentence.tidy_text):
                 for lemma in set(get_token_lemmas(token, ignore)):

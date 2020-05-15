@@ -1,5 +1,3 @@
-import re
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from sqlalchemy import func
@@ -10,7 +8,7 @@ from starlette.requests import Request
 from planitor import config, hashids
 from planitor.crud.city import get_search_results
 from planitor.database import get_db
-from planitor.language.search import parse_lemmas
+from planitor.language.search import lemmatize_query
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import Case, Entity, Meeting, Minute, Municipality, User
@@ -32,12 +30,7 @@ async def get_search(
         # People frequently compose search queries with plural form, for example
         # "bílakjallarar". It’s important to depluralize this. The `parse_lemmas`
         # achieves this for us.
-
-        def repl(matchobj):
-            lemmas = list(parse_lemmas(matchobj.group(0)))
-            return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
-
-        lemma_q = re.sub(r"\w+", repl, q)
+        lemma_q = lemmatize_query(q)
         minutes = get_search_results(db, lemma_q)
     else:
         minutes = []
