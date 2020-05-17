@@ -2,6 +2,7 @@ from planitor.language.search import (
     get_lemmas,
     get_wordbase,
     lemmatize_query,
+    get_terms_from_query,
 )
 
 
@@ -55,4 +56,13 @@ def test_get_lemmas_large_sentence():
         "hús",
         "nr.",
         "Austurstræti",
+    ]
+
+
+def test_get_terms_from_query():
+    assert get_terms_from_query("'cheese' <-> 'monger' | 'foo' & 'bár'") == [
+        "cheese",
+        "monger",
+        "foo",
+        "bár",
     ]

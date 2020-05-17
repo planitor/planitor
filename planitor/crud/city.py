@@ -191,17 +191,6 @@ def create_minute(db, meeting, **items):
     return minute
 
 
-def get_search_results(db: Session, search_query: str):
-    tsvector = func.to_tsvector("simple", Minute.lemmas)
-    tsquery = func.websearch_to_tsquery("simple", search_query)
-    sa_query = (
-        db.query(Minute)
-        .filter(tsvector.op("@@")(tsquery))
-        .order_by(func.ts_rank(tsvector, tsquery))
-    )
-    return sa_query
-
-
 def update_case_status(db, case):
     """ Query minutes in chronological meeting order, the last minute status will
     become the case status.

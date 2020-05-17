@@ -23,15 +23,6 @@ from planitor import greynir
 from planitor.utils.stopwords import stopwords
 
 
-def lemmatize_query(query):
-    def repl(matchobj):
-        lemmas = list(parse_lemmas(matchobj.group(0).title()))
-        return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
-
-    lemma_q = re.sub(r"\w+", repl, query)
-    return lemma_q.lower()
-
-
 def get_token_meanings(token, ignore=None) -> Optional[list]:
     if ignore is None:
         ignore = []
@@ -77,7 +68,6 @@ def parse_lemmas(text, ignore=None) -> Generator[str, None, None]:
         ignore = []
     for sentence in greynir.parse(text)["sentences"]:
         terminals = sentence.terminals
-        print(terminals)
         if terminals is None:
             for token in tokenize(sentence.tidy_text):
                 for lemma in set(get_token_lemmas(token, ignore)):
@@ -111,3 +101,33 @@ def get_lemmas(text, ignore=None) -> Generator[str, None, None]:
     if ignore is None:
         ignore = []
     yield from with_wordbases(parse_lemmas(text, ignore))
+
+
+def get_terms_from_query(tsquerytree):
+    """ querytree in Postgres takes a tsquery and strips negated terms and stopwords.
+    This returns the terms considered, stripped of the boolean logic tokens. """
+
+    # split on <->, | and & characters
+    quoted_terms = re.split(r" <-> | \| | & ", tsquerytree)
+
+    # remove single quotes around terms
+    terms = [t[1:-1] for t in quoted_terms]
+    return terms
+
+
+def get_wordforms(bindb, term):
+
+    # Create big string with both inquiry and remarks
+    matches = set()
+
+    _, meanings = bindb.lookup_word(term, auto_uppercase=True)
+    for meaning in meanings:
+        for f in (
+            bindb.lookup_nominative,
+            bindb.lookup_accusative,
+            bindb.lookup_dative,
+            bindb.lookup_genitive,
+        ):
+            matches.update(tuple(m.ordmynd.lower() for m in (f(meaning.stofn) or [])))
+
+    return matches

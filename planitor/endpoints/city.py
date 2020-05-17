@@ -6,13 +6,12 @@ from starlette.datastructures import Secret
 from starlette.requests import Request
 
 from planitor import config, hashids
-from planitor.crud.city import get_search_results
 from planitor.database import get_db
-from planitor.language.search import lemmatize_query
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import Case, Entity, Meeting, Minute, Municipality, User
 from planitor.security import get_current_active_user_or_none
+from planitor.search import MinuteResults
 
 from .templates import templates
 
@@ -25,18 +24,16 @@ async def get_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
     q: str = "",
+    page: str = None,
 ) -> templates.TemplateResponse:
     if q:
-        # People frequently compose search queries with plural form, for example
-        # "bílakjallarar". It’s important to depluralize this. The `parse_lemmas`
-        # achieves this for us.
-        lemma_q = lemmatize_query(q)
-        minutes = get_search_results(db, lemma_q)
+        results = MinuteResults(q, page)
     else:
-        minutes = []
+        results = None
+
     return templates.TemplateResponse(
         "search_results.html",
-        {"request": request, "q": q, "user": current_user, "minutes": minutes},
+        {"request": request, "q": q, "user": current_user, "results": results},
     )
 
 
