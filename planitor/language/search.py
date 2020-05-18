@@ -103,18 +103,6 @@ def get_lemmas(text, ignore=None) -> Generator[str, None, None]:
     yield from with_wordbases(parse_lemmas(text, ignore))
 
 
-def get_terms_from_query(tsquerytree):
-    """ querytree in Postgres takes a tsquery and strips negated terms and stopwords.
-    This returns the terms considered, stripped of the boolean logic tokens. """
-
-    # split on <->, | and & characters
-    quoted_terms = re.split(r" <-> | \| | & ", tsquerytree)
-
-    # remove single quotes around terms
-    terms = [t[1:-1] for t in quoted_terms]
-    return terms
-
-
 def get_wordforms(bindb, term):
 
     # Create big string with both inquiry and remarks

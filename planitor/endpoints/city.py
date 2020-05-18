@@ -24,10 +24,10 @@ async def get_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
     q: str = "",
-    page: str = None,
+    page: int = None,
 ) -> templates.TemplateResponse:
     if q:
-        results = MinuteResults(q, page)
+        results = MinuteResults(db, q, page)
     else:
         results = None
 

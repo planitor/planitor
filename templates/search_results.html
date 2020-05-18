@@ -18,17 +18,76 @@
       <li class="mr-4">
         /
       </li>
-      <li class="mr-4">„{{ q }}“</li>
+      <li class="mr-4">{{ q }}</li>
     </ul>
     <div class="flex justify-between items-end">
-      Leitarniðurstöður
+      <span class="font-bold">{{ results.count }} leitarniðurstöður</span>
     </div>
   </div>
   <div class="results">
-    {% for minute in minutes %}
-    <h4 class="font-bold">{{ minute.headline }} at {{ minute.case.address }}</h4>
-    <p class="mb-4">{{ minute.inquiry }}</p>
+    {% for minute, previews in results %}
+    <a
+      href="{{ url_for('get_minute',
+        muni_slug=minute.case.council.municipality.slug,
+        council_slug=minute.case.council.council_type.value.slug,
+        case_id=minute.case.serial,
+        minute_id=h.encode(minute.id)) }}"
+      class="mb-6 block"
+    >
+      <h5 class="font-medium text-xs text-gray-700">
+        {{ minute.meeting.council.municipality.name }} - {{ minute.meeting.council.name }}
+      </h5>
+      <h4 class="text-lg font-semibold text-midnight">
+        {{ minute.case.address }}
+      </h4>
+      <p class="mb-1" style="max-width: 660px;">
+        {{ (" "|safe).join(previews).replace("… …", " … ") }}
+      </p>
+      <p class="text-xs text-gray-500">{{ human_date(minute.meeting.start) }}</p>
+    </a>
     {% endfor %}
+  </div>
+
+  <!-- prettier-ignore -->
+  {% macro page(number) %}
+  <div class="mr-3">
+    {% if number == results.page.number %}
+    <span class="font-bold text-midnight">{{ number }}</span>
+    {% else %}
+    <a class="text-gray-600 hover:underline" href="{{ url_for('get_search') }}?q={{ q }}&page={{ number }}">
+      {{ number }}
+    </a>
+    {% endif %}
+  </div>
+  {% endmacro %}
+
+  <!-- prettier-ignore -->
+  {% macro ellipsis() %}
+  <div class="mr-3 text-gray-600">…</div>
+  {% endmacro %}
+
+  <div class="my-8 flex justify-between text-lg">
+    <div class="flex">
+      <!-- prettier-ignore -->
+      {% set head, current, tail = results.page.get_page_segments() %}
+      {% if head %}
+        {% for number in head %} {{ page(number) }} {% endfor %} {{ ellipsis() }}
+      {% endif %}
+      {% for number in current %} {{ page(number) }} {% endfor %}
+      {% if tail %}
+        {{ ellipsis() }} {% for number in tail %} {{ page(number) }} {% endfor %}
+      {% endif %}
+    </div>
+    <div>
+      {% if results.page.has_next %}
+      <a
+        class="text-midnight font-semibold"
+        href="{{ url_for('get_search') }}?q={{ q }}&page={{ results.page.number + 1 }}"
+      >
+        Næsta síða →
+      </a>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock body %}
