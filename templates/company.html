@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="px-6">
+  <div class="my-8 mt-4 sm:mt-8">
+    <ul class="breadcrumbs flex items-center text-lg  mb-8">
+      <li class="mr-4">
+        <a class="text-blue-700" href="{{ url_for('get_index') }}">
+          <span class="sf-symbol">{% include "symbols/house.fill.svg" %}</span>
+        </a>
+      </li>
+      <li class="mr-4">
+        /
+      </li>
+      <li class="mr-4">
+        Fyrirtæki
+      </li>
+      <li class="mr-4">
+        /
+      </li>
+      <li class="mr-4">{{ entity.name }}</li>
+    </ul>
+    <div class="flex justify-between items-end">
+      <a class="text-4xl font-thin block">{{ entity.name }} kt. {{ entity.get_human_kennitala() }}</a>
+      <a class="btn block" href="https://www.rsk.is/fyrirtaekjaskra/leit/kennitala/{{ entity.kennitala }}">
+        RSK.is <span class="sf-symbol">{% include "symbols/arrow.up.right.circle.fill.svg" %}</span>
+      </a>
+    </div>
+  </div>
+  <div class="px-4">
+    <div class="text-4xl">
+
+    </div>
+  </div>
+  <div class="">
+    << Hér koma svo allskonar mál tengd fyrirtækinu >>
+  </div>
+</div>
+{% endblock body %}

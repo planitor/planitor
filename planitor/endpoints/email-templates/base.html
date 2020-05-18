@@ -1,0 +1,152 @@
+{# See https://github.com/timothylong/email-starter-kit/blob/master/templates/transactional.html -#}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" initial-scale="1">
+  <!-- Disables auto-scaling in iOS Mail 10. (https://litmus.com/blog/9-things-you-need-to-know-about-email-in-ios-10) -->
+  <meta name="x-apple-disable-message-reformatting">
+  <!-- Desktop Outlook defaults to Times New Roman. Forces a less obscene fallback font. -->
+  <!--[if mso]>
+    <style>
+      * { font-family: sans-serif !important; }
+    </style>
+  <![endif]-->
+  <style>
+    *,
+    *:after,
+    *:before {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue;
+      font-size: 12pt;
+    }
+
+    /* Prevents small text resizing. */
+    * {
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* Removes added spacing within tables in Outlook. (https://templates.mailchimp.com/development/css/client-specific-styles) */
+    table,
+    td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+
+    /* Removes added spacing within tables in WebKit. */
+    table {
+      border-spacing: 0;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 0 auto;
+    }
+
+    /* Responsive images. Improves rendering of scaled images in IE. */
+    img {
+      max-width: 100%;
+      border: 0;
+    }
+
+    /* Overrules triggered links in iOS. */
+    *[x-apple-data-detectors] {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
+
+    /* Overrules triggered links in Gmail. */
+    .x-gmail-data-detectors,
+    .x-gmail-data-detectors *,
+    .aBn {
+      border-bottom: 0 !important;
+      cursor: default !important;
+    }
+
+    .td {
+      padding-bottom: 15px;
+      font-size: 12pt;
+      color: #1B2733;
+    }
+
+    .btn {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      background: #1561bd;
+      text-decoration: none;
+      padding: 15px 25px;
+      border-radius: 8px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    /* Media queries o' doom. */
+    @media screen and (max-width: 450px) {
+
+      /* Transitions container to a fluid layout. */
+      .container {
+        width: 100%;
+        margin: auto;
+      }
+
+      /* Collapses table cells into full-width rows. */
+      .stack {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      /* Centers and expands CTA. */
+      .btn {
+        display: block;
+        width: 100%;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" class="document">
+    <tr>
+      <td valign="top">
+
+        <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="450" class="container">
+          <tr>
+            <td bgcolor="#ffffff">
+              <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="100%">
+                <tr>
+                  <td style="padding: 20px;">
+                  {% block inner %} {% endblock %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" width="450" class="container">
+          <tr>
+            <td align="center" style="font-size: 11px; line-height: 16px; padding-top: 20px; color: #aaaaaa;">
+              Planitor
+            </td>
+          </tr>
+          {#-
+          <tr>
+            <td align="center" style="font-size: 11px; line-height: 16px; padding-bottom: 20px; color: #aaaaaa;">
+              <!-- Unsubscribe link -->
+              <unsubscribe>Unsubscribe from these emails.</unsubscribe>
+            </td>
+          </tr>
+          #}
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="px-6">
+  <div class="my-8 mt-4 sm:mt-8">
+    <ul class="breadcrumbs flex items-center text-lg  mb-8">
+      <li class="mr-4">
+        <a class="text-blue-700" href="{{ url_for('get_index') }}">
+          <span class="sf-symbol">{% include "symbols/house.fill.svg" %}</span>
+        </a>
+      </li>
+      <li class="mr-4">
+        /
+      </li>
+      <li class="mr-4">
+        <a class="text-blue-700" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}">
+          {{ council.municipality.name }}
+        </a>
+      </li>
+      <li class="mr-4">
+        /
+      </li>
+      <li class="mr-4">
+        <a class="text-blue-700" href="{{ url_for('get_council', muni_slug=municipality.slug, council_slug=council.council_type.value.slug) }}">
+          {{ council.name }}
+        </a>
+      </li>
+      <li class="mr-4">
+        /
+      </li>
+      <li class="mr-4">Verk nr. {{ case.serial }}</li>
+    </ul>
+    <div>
+      <a class="text-4xl font-thin block">{{ case.address }}</a>
+    </div>
+  </div>
+  <div class="minutes">
+    {% for m in minutes %}
+    <div class="flex">
+      <div
+        class="block bg-white rounded overflow-hidden shadow-lg mb-6"
+      >
+        <div class="px-4 py-4">
+          <div class="flex justify-between items-center mb-2">
+            <div
+              class="name mr-4 font-thin text-xs uppercase tracking-wide text-gray-700"
+              style="flex: 2 1 0;">
+              Umsókn nr. {{ m.serial }}
+            </div>
+            <div
+                class="pill pill-big pill-{{ m.status.value.color if m.status else 'none' }} font-bold"
+            >
+              {{ m.status.value.label if m.status else "Annað" }}
+            </div>
+          </div>
+          <div class="max-w-2xl">
+            <h4 class="text-xl font-bold tracking-tight">{{ m.case.address }}</h4>
+            <div class="text-xl mb-4 tracking-tight">{{ m.headline }}</div>
+            <div class="mb-4">
+              <h5 class="font-semibold text-xs uppercase tracking-wide text-gray-700">Fyrirspurn</h5>
+              <p>{{ m.inquiry }}</p>
+            </div>
+            <div class="mb-4">
+              <h5 class="font-semibold text-xs uppercase tracking-wide text-gray-700">Svar</h5>
+              <p>{{ m.remarks }}</p>
+            </div>
+            <hr class="border-1 mb-4">
+            <p class="text-xs text-gray-700">
+              Fundur
+              <a href="{{ url_for('get_meeting',
+              muni_slug=case.council.municipality.slug,
+              council_slug=case.council.council_type.value.slug,
+              meeting_id=h.encode(m.meeting_id)) }}" class="text-blue-700">
+                {{ m.meeting.name }}</a> — {{ human_date(m.meeting.start) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock body %}

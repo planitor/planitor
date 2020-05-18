@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.btn {
+  @apply rounded-md shadow-lg bg-blue-800 px-6 py-3 font-bold font-bold text-blue-100;
+}
+
+nav .btn {
+  @apply py-2;
+}
+
+.btn-disabled {
+  @apply bg-gray-500;
+  opacity: 0.3;
+}
+
+.btn-primary {
+  @apply btn bg-green-600 text-white;
+}
+
+.btn-primary:hover {
+  @apply bg-green-500;
+}
+
+.btn .sf-symbol {
+  position: relative;
+  top: -4px;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+.sf-symbol svg {
+  width: 18px;
+  height: 18px;
+  display: inline;
+}
+
+.sf-symbol svg .fill {
+  fill: #333;
+}
+
+.btn .sf-symbol svg .fill {
+  fill: #ebf8ff;
+}
+
+.pill {
+  @apply inline-block bg-gray-200 rounded-full px-2 py-0 text-xs font-semibold text-gray-700;
+}
+
+.pill-big {
+  @apply px-4 py-2 text-xs;
+}
+
+.pill-blue {
+  @apply bg-blue-200 text-blue-800;
+}
+
+.pill-red {
+  @apply bg-red-200 text-red-800;
+}
+
+.pill-yellow {
+  @apply bg-yellow-200 text-yellow-800;
+}
+
+.pill-green {
+  @apply bg-green-200 text-green-800;
+}
+
+@screen sm {
+  .munis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@screen md {
+  .munis {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@screen lg {
+  .munis {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+body {
+  background: #f7fafb;
+}
+
+nav .logo svg {
+  width: 2rem;
+  height: 2rem;
+  display: inline;
+}
+
+nav .search svg .fill {
+  fill: rgba(255, 255, 255, 0.6);
+}
+
+nav .search input {
+}
+
+nav .search input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+nav form.search {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.entities svg {
+  position: relative;
+  top: -2px;
+  margin-right: 6px;
+}
+
+.entities svg .fill {
+  fill: #2b6cb0;
+}
+
+form input.error {
+  @apply border-red-700;
+}
+
+#teaser header .logo svg {
+  @apply w-full h-auto;
+}
+
+#teaser section li {
+}
+
+#teaser section li svg {
+  height: 28px;
+  width: 28px;
+  display: inline;
+}
+
+#teaser section a svg {
+  display: inline;
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="is">
+  <head>
+    <meta charset="utf-8" />
+    <title>Planitor</title>
+    <link href="{{ url_for('static', path='/dist/styles.css') }}" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="Planitor" />
+    <meta property="og:description" content="Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.planitor.io/" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="16x16" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+  </head>
+
+  <body class="flex flex-col flex-wrap items-center min-h-screen">
+    <div class="bg-midnight w-full">
+      <nav id="navigation" class="flex items-center justify-between flex-wrap px-6 py-2 max-w-6xl mx-auto">
+        <a href="/" class="mr-6 block logo" alt="Planitor">{% include "emblem.svg" %}</a>
+        <div class="flex-grow"></div>
+        <form
+          class="search rounded-md flex items-center px-3 w-1/2"
+          method="GET"
+          action="{{ url_for('get_search') }}"
+        >
+          <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
+          <input
+            value="{{ q or '' }}"
+            name="q"
+            class="bg-transparent flex-grow py-2 px-2 text-white text-sm font-thin"
+            placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
+          />
+        </form>
+        <div class="flex-grow"></div>
+        {% if user %}
+        <div class="user text-white">
+          <span class="name font-thin" style="color: rgba(255, 255, 255, 0.6);">{{ user.full_name }}</span>
+          <button id="logout-button" class="ml-4 font-semibold text-white">Útskrá</button>
+        </div>
+        {% else %}
+        <button id="login-button" class="btn btn-primary ml-4">Innskrá</button>
+        {% endif %}
+      </nav>
+    </div>
+    <div class="flex-grow w-full">
+      <div class="max-w-6xl mx-auto">
+        {% block body %}{% endblock body %}
+      </div>
+    </div>
+    <footer class="w-full mt-8 bg-midnight">
+      <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 text-xs sm:text-sm">
+        <p class="my-1 text-white">Planitor!</p>
+        <p class="my-1 text-white">
+          <a href="mailto:hallo@planitor.io" class="font-bold text-blue-200">
+            hallo@planitor.io
+          </a>
+        </p>
+      </div>
+    </footer>
+    {% include "modal.html" %}
+    <script src="{{ url_for('static', path='/dist/app.js') }}"></script>
+    <!-- Hot reload script -->
+    {% if DEBUG %} {{ hotreload.script(url_for('hot-reload')) | safe }} {% endif %}
+  </body>
+</html>
