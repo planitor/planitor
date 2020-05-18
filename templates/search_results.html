@@ -21,7 +21,7 @@
       <li class="mr-4">{{ q }}</li>
     </ul>
     <div class="flex justify-between items-end">
-      <span class="font-bold">{{ results.count }} leitarniðurstöður</span>
+      <span class="font-bold">{{ results.page.count }} leitarniðurstöður</span>
     </div>
   </div>
   <div class="results">
@@ -68,14 +68,15 @@
 
   <div class="my-8 flex justify-between text-lg">
     <div class="flex">
+      <div class="mr-3 text-gray-600">Síða</div>
       <!-- prettier-ignore -->
       {% set head, current, tail = results.page.get_page_segments() %}
       {% if head %}
-        {% for number in head %} {{ page(number) }} {% endfor %} {{ ellipsis() }}
+        {% for number in head %} {{ page(number) }} {% endfor %} {{ ellipsis() if (head[-1] + 1) != current[0] }}
       {% endif %}
       {% for number in current %} {{ page(number) }} {% endfor %}
       {% if tail %}
-        {{ ellipsis() }} {% for number in tail %} {{ page(number) }} {% endfor %}
+        {{ ellipsis() if (tail[0] - 1 != current[-1]) }} {% for number in tail %} {{ page(number) }} {% endfor %}
       {% endif %}
     </div>
     <div>

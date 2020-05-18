@@ -99,12 +99,13 @@ def iter_preview_fragments(document: str, highlight_terms: Set[str]) -> Markup:
 
 class Pagination:
 
-    PER_PAGE = 5
+    PER_PAGE = 20
+    NAV_SEGMENT_SIZE = 6
 
     def __init__(self, query, number: int):
         self.count = query.count()
         self.number = number if number > 0 else 1
-        self.total_pages = int(math.ceil(self.count / 5))
+        self.total_pages = int(math.ceil(self.count / self.NAV_SEGMENT_SIZE))
         self.query = query.offset(self.PER_PAGE * number).limit(self.PER_PAGE)
 
     def iter_pages(self):
@@ -116,9 +117,13 @@ class Pagination:
         This is to render something like this: 1, 2, 3 ... 65 _66_ 67 ... 111, 112, 113
         """
         pages = list(self.iter_pages())
-        head = pages[0 : min(3, len(pages))]
-        tail = pages[-(min(4, len(pages))) : -1]
-        range_page = pages[max(0, self.number - 5) : min(len(pages), self.number + 4)]
+        head = pages[0 : min(self.NAV_SEGMENT_SIZE, len(pages))]
+        tail = pages[-(min(self.NAV_SEGMENT_SIZE + 1, len(pages))) : -1]
+        range_page = pages[
+            max(0, self.number - self.NAV_SEGMENT_SIZE) : min(
+                len(pages), self.number + self.NAV_SEGMENT_SIZE + 1
+            )
+        ]
         head = [p for p in head if p not in range_page]
         tail = [p for p in tail if p not in range_page]
         return head, range_page, tail
