@@ -12,7 +12,7 @@ hashids = Hashids(salt="planitor", min_length=4)
 config = Config(".env")
 
 sentry_dsn = config("SENTRY_DSN", cast=Secret)
-if sentry_dsn is None:
+if sentry_dsn is not None:
     sentry_sdk.init(
-        sentry_dsn, integrations=[SqlalchemyIntegration(), DramatiqIntegration()]
+        str(sentry_dsn), integrations=[SqlalchemyIntegration(), DramatiqIntegration()]
     )
