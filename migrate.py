@@ -12,14 +12,14 @@ Prints a migration script and offers to run it, if there is a diff.
 
 import os
 from pathlib import Path
-from sqlalchemy import text as sa_text
+
+import typer
 from migra import Migration
+from sqlalchemy import text as sa_text
 
 
-def sync():
+def sync(DB_URL: str = "postgresql://planitor:@localhost/planitor"):
     from sqlbag import S, temporary_database as temporary_db
-
-    DB_URL = "postgresql://planitor:@localhost/planitor"
 
     with temporary_db() as TEMP_DB_URL:
         os.environ["DATABASE_URL"] = TEMP_DB_URL
@@ -61,4 +61,4 @@ def sync():
 
 
 if __name__ == "__main__":
-    sync()
+    typer.run(sync)

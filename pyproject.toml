@@ -15,7 +15,7 @@ requests = "^2.23.0"
 aiofiles = "^0.4.0"
 hashids = "^1.2.0"
 sqlakeyset = "^0.1.1579837191"
-pyjwt = "^1.7.1"
+pyjwt = {extras = ["crypto"], version = "^1.7.1"}
 sqlalchemy_utils = "^0.36.3"
 passlib = {extras = ["bcrypt"], version = "^1.7.2"}
 email-validator = "^1.0.5"
@@ -42,6 +42,7 @@ migra = "^1.0.1585875302"
 arel = "^0.1.0"
 bpython = "^0.19"
 watchdog = "^0.10.2"
+typer = "^0.2.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
