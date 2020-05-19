@@ -36,7 +36,7 @@ DB_DSN = config(
     "DATABASE_URL", default="postgresql://planitor:@localhost/planitor", cast=Secret
 )
 
-pool = ReallyThreadedConnectionPool(minconn=0, maxconn=12, dsn=str(DB_DSN))
+pool = ReallyThreadedConnectionPool(minconn=0, maxconn=4, dsn=str(DB_DSN))
 engine = create_engine("postgresql+psycopg2://", creator=pool.getconn)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
