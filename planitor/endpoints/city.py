@@ -24,7 +24,7 @@ async def get_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
     q: str = "",
-    page: int = None,
+    page: int = 1,
 ) -> templates.TemplateResponse:
     if q:
         results = MinuteResults(db, q, page)
@@ -248,6 +248,4 @@ async def get_person(
 
 @router.get("/mapkit-token")
 async def mapkit_token(request: Request):
-    return PlainTextResponse(
-        mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret))
-    )
+    return PlainTextResponse(mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret)))

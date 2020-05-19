@@ -6,7 +6,6 @@ from jinja2 import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from sqlakeyset import get_page
 
 from planitor.language.search import get_wordforms, parse_lemmas
 from planitor.models import Minute
@@ -92,36 +91,30 @@ def iter_preview_fragments(document: str, highlight_terms: Set[str]) -> Markup:
         if pend != len(document):
             after = f"{after.rstrip()}…"
 
-        yield (
-            before + Markup(f"<strong>{document[start:end]}</strong>") + after
-        ).strip()
+        yield (before + Markup(f"<strong>{document[start:end]}</strong>") + after).strip()
 
 
 class Pagination:
 
-    PER_PAGE = 20
+    PER_PAGE = 15
     NAV_SEGMENT_SIZE = 6
 
     def __init__(self, query, number: int):
         self.count = query.count()
         self.number = number if number > 0 else 1
-        self.total_pages = int(math.ceil(self.count / self.NAV_SEGMENT_SIZE))
-        self.query = query.offset(self.PER_PAGE * number).limit(self.PER_PAGE)
-
-    def iter_pages(self):
-        # 1-based indexing for all pages
-        yield from range(1, self.total_pages + 1)
+        self.total_pages = int(math.ceil(self.count / self.PER_PAGE))
+        self.pages = list(range(1, self.total_pages + 1))  # 1-based indexing of all pages
+        self.query = query.offset(self.PER_PAGE * (number - 1)).limit(self.PER_PAGE)
 
     def get_page_segments(self):
         """ Always show first three pages and last three pages.
         This is to render something like this: 1, 2, 3 ... 65 _66_ 67 ... 111, 112, 113
         """
-        pages = list(self.iter_pages())
-        head = pages[0 : min(self.NAV_SEGMENT_SIZE, len(pages))]
-        tail = pages[-(min(self.NAV_SEGMENT_SIZE + 1, len(pages))) : -1]
-        range_page = pages[
+        head = self.pages[0 : min(self.NAV_SEGMENT_SIZE, len(self.pages))]
+        tail = self.pages[-(min(self.NAV_SEGMENT_SIZE + 1, len(self.pages))) : -1]
+        range_page = self.pages[
             max(0, self.number - self.NAV_SEGMENT_SIZE) : min(
-                len(pages), self.number + self.NAV_SEGMENT_SIZE + 1
+                len(self.pages), self.number + self.NAV_SEGMENT_SIZE + 1
             )
         ]
         head = [p for p in head if p not in range_page]
@@ -132,7 +125,7 @@ class Pagination:
     def has_next(self):
         if self.count == 0:
             return False
-        return self.number != list(self.iter_pages())[-1]
+        return self.number != self.pages[-1]
 
 
 class MinuteResults:
@@ -177,7 +170,7 @@ class MinuteResults:
             .order_by(func.ts_rank(tsvector, tsquery))
         )
 
-    def get_highlight_terms(self):
+    def get_highlight_terms(self) -> Set[str]:
         """ Return the query and ask Postgres what terms were indexed in the query,
         which will be used for highlighting. We ask the Postgres querytree because it
         cleans up a lot of things, removes negated terms, lowercases and more. """
@@ -198,7 +191,7 @@ class MinuteResults:
 
     def __iter__(self):
         highlight_terms = self.get_highlight_terms()
-        for minute in self.page.query:
+        for minute in self.page.query.all():
             document = self.get_document(minute)
             previews = iter_preview_fragments(document, highlight_terms)
             yield minute, previews

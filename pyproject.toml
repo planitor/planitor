@@ -41,6 +41,7 @@ pytest-ipdb = "^0.1-prerelease2"
 migra = "^1.0.1585875302"
 arel = "^0.1.0"
 bpython = "^0.19"
+watchdog = "^0.10.2"
 
 [build-system]
 requires = ["poetry>=0.12"]
