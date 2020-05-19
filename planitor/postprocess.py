@@ -11,6 +11,7 @@ from .minutes import get_minute_lemmas
 from .models import Meeting, Minute
 from .utils.kennitala import Kennitala
 from .utils.rsk import get_kennitala_from_rsk_search
+from .database import dramatiq, db_context
 
 
 def _get_entity(db: Session, name: str):
@@ -55,60 +56,66 @@ def update_minute_with_entity_relations(
     db.commit()
 
 
-def update_minute_with_entity_mentions(db: Session, minute: Minute):
+@dramatiq.actor
+def update_minute_with_entity_mentions(minute_id: int):
 
-    assert not db.new
+    with db_context() as db:
 
-    mentions = extract_company_names(minute.inquiry)
+        minute = db.query(Minute).get(minute_id)
 
-    if not mentions:
-        minute.assign_entity_mentions({})
+        mentions = extract_company_names(minute.inquiry)
+
+        if not mentions:
+            minute.assign_entity_mentions({})
+            db.add(minute)
+            db.commit()
+            return
+
+        # We only want to persist mentions that have matching local entities, this is to
+        # track those
+        _matched_mentions = {}
+
+        for co_name, locations in mentions.items():
+            entity = _get_entity(db, co_name)
+            if entity is None:
+                continue
+            case_entity, created = get_or_create_case_entity(
+                db, minute.case, entity, applicant=False
+            )
+            if created:
+                db.commit()
+            _matched_mentions[entity.kennitala] = locations
+
+        minute.assign_entity_mentions(_matched_mentions)
         db.add(minute)
         db.commit()
-        return
-
-    # We only want to persist mentions that have matching local entities, this is to
-    # track those
-    _matched_mentions = {}
-
-    for co_name, locations in mentions.items():
-        entity = _get_entity(db, co_name)
-        if entity is None:
-            continue
-        case_entity, created = get_or_create_case_entity(
-            db, minute.case, entity, applicant=False
-        )
-        if created:
-            db.commit()
-        _matched_mentions[entity.kennitala] = locations
-
-    minute.assign_entity_mentions(_matched_mentions)
-    db.add(minute)
-    db.commit()
 
 
-def update_minute_with_lemmas(db: Session, minute: Minute):
-    minute.lemmas = get_minute_lemmas(minute)
-    db.add(minute)
-    db.commit()
+@dramatiq.actor
+def update_minute_with_lemmas(minute_id: int):
+
+    with db_context() as db:
+        minute = db.query(Minute).get(minute_id)
+        minute.lemmas = get_minute_lemmas(minute)
+        db.add(minute)
+        db.commit()
 
 
 def process_minute(db: Session, items, meeting: Meeting):
 
+    entity_items = items.pop("entities", [])
     minute = create_minute(db, meeting, **items)
     db.commit()
     case = minute.case
 
     # Update minute with the entities of record
-    update_minute_with_entity_relations(
-        db, minute, entity_items=items.pop("entities", [])
-    )
+    update_minute_with_entity_relations(db, minute, entity_items)
 
     # Also associate companies mentioned in the inquiry, such as architects
-    update_minute_with_entity_mentions(db, minute)
+    update_minute_with_entity_mentions.send(minute.id)
 
     # Populate the lemma column with lemmas from Greynir and/or tokenizer
-    update_minute_with_lemmas(db, minute)
+    update_minute_with_lemmas.send(minute.id)
 
     db.add(case)
     db.commit()

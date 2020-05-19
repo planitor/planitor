@@ -92,7 +92,12 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
 
     name = "{}_{}".format(municipality_slug, council_type_slug)
 
-    start_urls = [YEAR_URL.format(year) for year in YEARS]
+    def __init__(self, year=None, *args, **kwargs):
+        super(ReykjavikByggingarfulltruiSpider, self).__init__(*args, **kwargs)
+        if year is None:
+            self.start_urls = [YEAR_URL.format(year) for year in YEARS]
+        else:
+            self.start_urls = [YEAR_URL.format(year[-2:])]
 
     def parse(self, response):
         index_year = int(response.css("h2::text").re_first(r"\d+"))

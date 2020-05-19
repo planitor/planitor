@@ -1,18 +1,45 @@
-from starlette.datastructures import Secret
+from contextlib import contextmanager
+from threading import Semaphore
+
+import dramatiq
+import psycopg2
+from dramatiq_pg import PostgresBroker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
 from sqlalchemy_utils import register_composites
+from starlette.datastructures import Secret
 
 from planitor import config
+
+
+class ReallyThreadedConnectionPool(psycopg2.pool.ThreadedConnectionPool):
+    """
+    https://stackoverflow.com/a/53437049
+    """
+
+    def __init__(self, minconn, maxconn, *args, **kwargs):
+        self._semaphore = Semaphore(maxconn)
+        super().__init__(minconn, maxconn, *args, **kwargs)
+
+    def getconn(self, *args, **kwargs):
+        self._semaphore.acquire()
+        return super().getconn(*args, **kwargs)
+
+    def putconn(self, *args, **kwargs):
+        super().putconn(*args, **kwargs)
+        self._semaphore.release()
+
 
 DB_DSN = config(
     "DATABASE_URL", default="postgresql://planitor:@localhost/planitor", cast=Secret
 )
 
-engine = create_engine(str(DB_DSN), connect_args={})
+pool = psycopg2.pool.ThreadedConnectionPool(minconn=5, maxconn=15, dsn=str(DB_DSN))
+sa_pool = QueuePool(pool.getconn, max_overflow=10, pool_size=5)
+engine = create_engine(str(DB_DSN), connect_args={}, pool=sa_pool)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
 
 
@@ -23,3 +50,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+db_context = contextmanager(get_db)
+broker = PostgresBroker(pool=pool)
+dramatiq.set_broker(broker)
