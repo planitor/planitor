@@ -2,12 +2,13 @@
 
 Planning + Monitoring = Planitor
 
-A business intelligence service for people in the planning, property, transport and construction sector in
-Iceland.
+A business intelligence service for people in the planning, property, transport
+and construction sector in Iceland.
 
 # High level
 
-There are two development servers, for bundling frontend and the backend respectively.
+There are two development servers, for bundling frontend and the backend
+respectively.
 
 # Development
 
@@ -72,6 +73,18 @@ DB Migrations
 poetry run python migrate.py
 ```
 
-This will create a test database based upon the declarative SQLAlchemy schema, then use migra to detect the
-diff, suggest to run a migration to sync the databases. It shows the SQL migration code which you can
-copy-paste to tweak.
+This will create a test database based upon the declarative SQLAlchemy schema,
+then use migra to detect the diff, suggest to run a migration to sync the
+databases. It shows the SQL migration code which you can copy-paste to tweak.
+
+Run workers
+
+```bash
+poetry run dramatiq --watch planitor --processes 2 --threads 2 planitor.actors
+```
+
+Run development bpython shell with db object and all models imported
+
+```bash
+poetry run python shell.py
+```

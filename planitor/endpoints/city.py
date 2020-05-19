@@ -24,7 +24,7 @@ async def get_search(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
     q: str = "",
-    page: int = None,
+    page: int = 1,
 ) -> templates.TemplateResponse:
     if q:
         results = MinuteResults(db, q, page)
@@ -186,19 +186,21 @@ def get_minute(
         .filter(Case.id == minute.case_id)
         .subquery()
     )
-    minute = (
+    minute, case_count = (
         db.query(Minute, sq_count.c.case_count)
         .select_from(Minute)
         .filter(Minute.id == minute.id)
         .first()
     )
     return templates.TemplateResponse(
-        "meeting.html",
+        "minute.html",
         {
             "municipality": minute.meeting.council.municipality,
             "council": minute.meeting.council,
             "meeting": minute.meeting,
             "minute": minute,
+            "case": minute.case,
+            "case_count": case_count,
             "request": request,
             "user": current_user,
         },
@@ -248,6 +250,4 @@ async def get_person(
 
 @router.get("/mapkit-token")
 async def mapkit_token(request: Request):
-    return PlainTextResponse(
-        mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret))
-    )
+    return PlainTextResponse(mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret)))

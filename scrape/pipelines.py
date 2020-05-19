@@ -73,7 +73,6 @@ class DatabasePipeline(object):
 
         self.db.commit()
 
-        # Go through minutes, update case status|entities|tags to reflect meeting minute
         for data in item["minutes"]:
             process_minute(self.db, data, meeting)
 

@@ -290,29 +290,35 @@ DNSSEC = ["pycryptodome", "ecdsa (>=0.13)"]
 IDNA = ["idna (>=2.1)"]
 
 [[package]]
-category = "dev"
-description = "Python client for Docker."
-name = "docker-py"
+category = "main"
+description = "Background Processing for Python 3."
+name = "dramatiq"
 optional = false
-python-versions = "*"
-version = "1.10.6"
+python-versions = ">=3.5"
+version = "1.8.1"
 
 [package.dependencies]
-docker-pycreds = ">=0.2.1"
-requests = ">=2.5.2,<2.11.0 || >2.11.0"
-six = ">=1.4.0"
-websocket-client = ">=0.32.0"
+prometheus-client = ">=0.2"
+
+[package.extras]
+all = ["watchdog-gevent (0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "redis (>=2.0,<4.0)", "pika (>=1.0,<2.0)"]
+dev = ["watchdog-gevent (0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "redis (>=2.0,<4.0)", "pika (>=1.0,<2.0)", "alabaster", "sphinx (<1.8)", "sphinxcontrib-napoleon", "flake8", "flake8-bugbear", "flake8-quotes", "isort", "bumpversion", "hiredis", "twine", "wheel", "pytest (<4)", "pytest-benchmark", "pytest-cov", "tox"]
+memcached = ["pylibmc (>=1.5,<2.0)"]
+rabbitmq = ["pika (>=1.0,<2.0)"]
+redis = ["redis (>=2.0,<4.0)"]
+watch = ["watchdog (>=0.8,<0.9)", "watchdog-gevent (0.1)"]
 
 [[package]]
-category = "dev"
-description = "Python bindings for the docker credentials store API"
-name = "docker-pycreds"
+category = "main"
+description = "Postgres Broker for Dramatiq Task Queue"
+name = "dramatiq-pg"
 optional = false
-python-versions = "*"
-version = "0.4.0"
+python-versions = ">=3.5,<4.0"
+version = "0.8.0"
 
 [package.dependencies]
-six = ">=1.4.0"
+dramatiq = ">=1.5,<2.0"
+tenacity = ">=5.1.1,<6.0.0"
 
 [[package]]
 category = "main"
@@ -348,7 +354,7 @@ description = "FastAPI framework, high performance, easy to learn, fast to code,
 name = "fastapi"
 optional = false
 python-versions = ">=3.6"
-version = "0.54.1"
+version = "0.54.2"
 
 [package.dependencies]
 pydantic = ">=0.32.2,<2.0.0"
@@ -419,19 +425,6 @@ chardet = ["chardet (>=2.2)"]
 datrie = ["datrie"]
 genshi = ["genshi"]
 lxml = ["lxml"]
-
-[[package]]
-category = "dev"
-description = "HTTPie - a CLI, cURL-like tool for humans."
-name = "httpie"
-optional = false
-python-versions = ">=3.6"
-version = "2.1.0"
-
-[package.dependencies]
-Pygments = ">=2.5.2"
-colorama = ">=0.2.4"
-requests = ">=2.22.0"
 
 [[package]]
 category = "main"
@@ -703,6 +696,14 @@ version = "0.8.0"
 
 [[package]]
 category = "dev"
+description = "File system general utilities"
+name = "pathtools"
+optional = false
+python-versions = "*"
+version = "0.1.2"
+
+[[package]]
+category = "dev"
 description = "Pexpect allows easy control of interactive console applications."
 marker = "python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\""
 name = "pexpect"
@@ -757,6 +758,17 @@ dev = ["tox", "twine", "therapist", "black", "flake8", "wheel"]
 test = ["nose", "mock"]
 
 [[package]]
+category = "main"
+description = "Python client for the Prometheus monitoring system."
+name = "prometheus-client"
+optional = false
+python-versions = "*"
+version = "0.7.1"
+
+[package.extras]
+twisted = ["twisted"]
+
+[[package]]
 category = "dev"
 description = "Library for building powerful interactive command lines in Python"
 name = "prompt-toolkit"
@@ -797,7 +809,7 @@ version = "2.8.5"
 [[package]]
 category = "dev"
 description = "Run a subprocess in a pseudo terminal"
-marker = "python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\""
+marker = "python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\" or python_version >= \"3.4\" and sys_platform != \"win32\" and (python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\")"
 name = "ptyprocess"
 optional = false
 python-versions = "*"
@@ -999,14 +1011,6 @@ six = ">=1.4.0"
 
 [[package]]
 category = "dev"
-description = "YAML parser and emitter for Python"
-name = "pyyaml"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "5.3.1"
-
-[[package]]
-category = "dev"
 description = "Collection of persistent (disk-based) queues"
 name = "queuelib"
 optional = false
@@ -1040,17 +1044,6 @@ security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7)", "win-inet-pton"]
 
 [[package]]
-category = "dev"
-description = "Retrying"
-name = "retrying"
-optional = false
-python-versions = "*"
-version = "1.3.3"
-
-[package.dependencies]
-six = ">=1.7.0"
-
-[[package]]
 category = "main"
 description = "A natural language parser for Icelandic"
 name = "reynir"
@@ -1064,17 +1057,6 @@ tokenizer = ">=2.0.5"
 
 [[package]]
 category = "dev"
-description = "a python refactoring library..."
-name = "rope"
-optional = false
-python-versions = "*"
-version = "0.16.0"
-
-[package.extras]
-dev = ["pytest"]
-
-[[package]]
-category = "dev"
 description = "Schema inspection for PostgreSQL (and possibly others)"
 name = "schemainspect"
 optional = false
@@ -1084,22 +1066,6 @@ version = "0.1.1588915531"
 [package.dependencies]
 six = "*"
 sqlalchemy = "*"
-
-[[package]]
-category = "dev"
-description = "Client interface for Scrapinghub API"
-name = "scrapinghub"
-optional = false
-python-versions = "*"
-version = "2.3.1"
-
-[package.dependencies]
-requests = ">=1.0"
-retrying = ">=1.3.3"
-six = ">=1.10.0"
-
-[package.extras]
-msgpack = ["msgpack (>=1.0.0)"]
 
 [[package]]
 category = "dev"
@@ -1123,6 +1089,21 @@ queuelib = ">=1.4.2"
 service-identity = ">=16.0.0"
 w3lib = ">=1.17.0"
 "zope.interface" = ">=4.1.3"
+
+[[package]]
+category = "main"
+description = "Dramatiq task processor integration for the Sentry SDK"
+name = "sentry-dramatiq"
+optional = false
+python-versions = "*"
+version = "0.3.2"
+
+[package.dependencies]
+dramatiq = "*"
+sentry-sdk = "*"
+
+[package.extras]
+test = ["coverage", "flake8", "isort", "pytest"]
 
 [[package]]
 category = "main"
@@ -1169,26 +1150,6 @@ dev = ["coverage (>=4.2.0)", "pytest", "sphinx", "idna", "pyopenssl"]
 docs = ["sphinx"]
 idna = ["idna"]
 tests = ["coverage (>=4.2.0)", "pytest"]
-
-[[package]]
-category = "dev"
-description = "Scrapinghub Command Line Client"
-name = "shub"
-optional = false
-python-versions = "*"
-version = "2.10.0"
-
-[package.dependencies]
-PyYAML = "*"
-click = "*"
-docker-py = "*"
-pip = "*"
-requests = "*"
-retrying = "*"
-scrapinghub = ">=2.0.3"
-six = ">=1.7.0"
-toml = "*"
-tqdm = "*"
 
 [[package]]
 category = "main"
@@ -1296,6 +1257,20 @@ full = ["aiofiles", "graphene", "itsdangerous", "jinja2", "python-multipart", "p
 
 [[package]]
 category = "main"
+description = "Retry code until it succeeeds"
+name = "tenacity"
+optional = false
+python-versions = "*"
+version = "5.1.5"
+
+[package.dependencies]
+six = ">=1.9.0"
+
+[package.extras]
+doc = ["reno", "sphinx", "tornado (>=4.5)"]
+
+[[package]]
+category = "main"
 description = "A tokenizer for Icelandic text"
 name = "tokenizer"
 optional = false
@@ -1309,17 +1284,6 @@ name = "toml"
 optional = false
 python-versions = "*"
 version = "0.10.1"
-
-[[package]]
-category = "dev"
-description = "Fast, Extensible Progress Meter"
-name = "tqdm"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*"
-version = "4.46.0"
-
-[package.extras]
-dev = ["py-make (>=0.1.0)", "twine", "argopt", "pydoc-markdown"]
 
 [[package]]
 category = "dev"
@@ -1427,6 +1391,20 @@ six = ">=1.4.1"
 
 [[package]]
 category = "dev"
+description = "Filesystem events monitoring"
+name = "watchdog"
+optional = false
+python-versions = "*"
+version = "0.10.2"
+
+[package.dependencies]
+pathtools = ">=0.1.1"
+
+[package.extras]
+watchmedo = ["PyYAML (>=3.10)", "argh (>=0.24.1)"]
+
+[[package]]
+category = "dev"
 description = "Simple, modern file watching and code reload in python."
 name = "watchgod"
 optional = false
@@ -1448,17 +1426,6 @@ name = "webencodings"
 optional = false
 python-versions = "*"
 version = "0.5.1"
-
-[[package]]
-category = "dev"
-description = "WebSocket client for Python. hybi13 is supported."
-name = "websocket-client"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "0.57.0"
-
-[package.dependencies]
-six = "*"
 
 [[package]]
 category = "main"
@@ -1498,7 +1465,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "5b7d8758e39650b44581d3c00a113db60c81c34e649f1795e2a5220fc89867e1"
+content-hash = "61e81bc28cb567029cc551c9988a3092b22220563924bbefa6a2bcbb8c80b93c"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1667,13 +1634,13 @@ dnspython = [
     {file = "dnspython-1.16.0-py2.py3-none-any.whl", hash = "sha256:f69c21288a962f4da86e56c4905b49d11aba7938d3d740e80d9e366ee4f1632d"},
     {file = "dnspython-1.16.0.zip", hash = "sha256:36c5e8e38d4369a08b6780b7f27d790a292b2b08eea01607865bf0936c558e01"},
 ]
-docker-py = [
-    {file = "docker-py-1.10.6.tar.gz", hash = "sha256:4c2a75875764d38d67f87bc7d03f7443a3895704efc57962bdf6500b8d4bc415"},
-    {file = "docker_py-1.10.6-py2.py3-none-any.whl", hash = "sha256:35b506e95861914fa5ad57a6707e3217b4082843b883be246190f57013948aba"},
+dramatiq = [
+    {file = "dramatiq-1.8.1-py3-none-any.whl", hash = "sha256:ad6f3bc958b9a2cfb4246772726ddc863ecc610e48dc8a5c0efa6accd5ea871f"},
+    {file = "dramatiq-1.8.1.tar.gz", hash = "sha256:36302574963fb9bfaed871c2b0d7fbffbcfe9fadaecc8938540901f8aea17eb8"},
 ]
-docker-pycreds = [
-    {file = "docker-pycreds-0.4.0.tar.gz", hash = "sha256:6ce3270bcaf404cc4c3e27e4b6c70d3521deae82fb508767870fdbf772d584d4"},
-    {file = "docker_pycreds-0.4.0-py2.py3-none-any.whl", hash = "sha256:7266112468627868005106ec19cd0d722702d2b7d5912a28e19b826c3d37af49"},
+dramatiq-pg = [
+    {file = "dramatiq-pg-0.8.0.tar.gz", hash = "sha256:55afe355ce34f476b6b55c7590a7c9861832b583b4db65879d17be443dd27eba"},
+    {file = "dramatiq_pg-0.8.0-py3-none-any.whl", hash = "sha256:fc370ba9e7458e7555d76818d22713f1978da715a64f071735c3aa473283aa74"},
 ]
 email-validator = [
     {file = "email_validator-1.1.0-py2.py3-none-any.whl", hash = "sha256:de2aad89b13574a73fd26c04a5200389b293bd9578602fc3b51537ada47af153"},
@@ -1684,8 +1651,8 @@ emails = [
     {file = "emails-0.5.15.tar.gz", hash = "sha256:fcc02567a528eae6b66d2a5c20ce7a0326e4f6b201bc8ae302f89413164db06a"},
 ]
 fastapi = [
-    {file = "fastapi-0.54.1-py3-none-any.whl", hash = "sha256:1ee9a49f28d510b62b3b51a9452b274853bfc9c5d4b947ed054366e2d49f9efa"},
-    {file = "fastapi-0.54.1.tar.gz", hash = "sha256:72f40f47e5235cb5cbbad1d4f97932ede6059290c07e12e9784028dcd1063d28"},
+    {file = "fastapi-0.54.2-py3-none-any.whl", hash = "sha256:c8651f8316956240c2ffe5bc05c334c8359a3887e642720a9b23319c51e82907"},
+    {file = "fastapi-0.54.2.tar.gz", hash = "sha256:fff1b4a7fdf4812abb4507fb7aa30ef4206a0435839626ebe3b2871ec9aa367f"},
 ]
 flake8 = [
     {file = "flake8-3.8.1-py2.py3-none-any.whl", hash = "sha256:6c1193b0c3f853ef763969238f6c81e9e63ace9d024518edc020d5f1d6d93195"},
@@ -1725,10 +1692,6 @@ hashids = [
 html5lib = [
     {file = "html5lib-1.0.1-py2.py3-none-any.whl", hash = "sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3"},
     {file = "html5lib-1.0.1.tar.gz", hash = "sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736"},
-]
-httpie = [
-    {file = "httpie-2.1.0-py3-none-any.whl", hash = "sha256:559f41d0385084f38f054a86d5df5d2e9d7af0034a6f093a3af3ee6705a06743"},
-    {file = "httpie-2.1.0.tar.gz", hash = "sha256:a76f1c72e83bd03cde3478c5f345d5570fdb2967ed19d68d09518088640b9e8e"},
 ]
 httptools = [
     {file = "httptools-0.1.1-cp35-cp35m-macosx_10_13_x86_64.whl", hash = "sha256:a2719e1d7a84bb131c4f1e0cb79705034b48de6ae486eb5297a139d6a3296dce"},
@@ -1878,6 +1841,9 @@ pathspec = [
     {file = "pathspec-0.8.0-py2.py3-none-any.whl", hash = "sha256:7d91249d21749788d07a2d0f94147accd8f845507400749ea19c1ec9054a12b0"},
     {file = "pathspec-0.8.0.tar.gz", hash = "sha256:da45173eb3a6f2a5a487efba21f050af2b41948be6ab52b6a1e3ff22bb8b7061"},
 ]
+pathtools = [
+    {file = "pathtools-0.1.2.tar.gz", hash = "sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"},
+]
 pexpect = [
     {file = "pexpect-4.8.0-py2.py3-none-any.whl", hash = "sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937"},
     {file = "pexpect-4.8.0.tar.gz", hash = "sha256:fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"},
@@ -1893,6 +1859,9 @@ pluggy = [
 premailer = [
     {file = "premailer-3.7.0-py2.py3-none-any.whl", hash = "sha256:c7ac48986984a810afea5147bc8410a8fe0659bf52f357e78b28a1b949209b91"},
     {file = "premailer-3.7.0.tar.gz", hash = "sha256:5eec9603e84cee583a390de69c75192e50d76e38ef0292b027bd64923766aca7"},
+]
+prometheus-client = [
+    {file = "prometheus_client-0.7.1.tar.gz", hash = "sha256:71cd24a2b3eb335cb800c7159f423df1bd4dcd5171b234be15e3f31ec9f622da"},
 ]
 prompt-toolkit = [
     {file = "prompt_toolkit-3.0.5-py3-none-any.whl", hash = "sha256:df7e9e63aea609b1da3a65641ceaf5bc7d05e0a04de5bd45d05dbeffbabf9e04"},
@@ -2059,19 +2028,6 @@ python-dateutil = [
 python-multipart = [
     {file = "python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"},
 ]
-pyyaml = [
-    {file = "PyYAML-5.3.1-cp27-cp27m-win32.whl", hash = "sha256:74809a57b329d6cc0fdccee6318f44b9b8649961fa73144a98735b0aaf029f1f"},
-    {file = "PyYAML-5.3.1-cp27-cp27m-win_amd64.whl", hash = "sha256:240097ff019d7c70a4922b6869d8a86407758333f02203e0fc6ff79c5dcede76"},
-    {file = "PyYAML-5.3.1-cp35-cp35m-win32.whl", hash = "sha256:4f4b913ca1a7319b33cfb1369e91e50354d6f07a135f3b901aca02aa95940bd2"},
-    {file = "PyYAML-5.3.1-cp35-cp35m-win_amd64.whl", hash = "sha256:cc8955cfbfc7a115fa81d85284ee61147059a753344bc51098f3ccd69b0d7e0c"},
-    {file = "PyYAML-5.3.1-cp36-cp36m-win32.whl", hash = "sha256:7739fc0fa8205b3ee8808aea45e968bc90082c10aef6ea95e855e10abf4a37b2"},
-    {file = "PyYAML-5.3.1-cp36-cp36m-win_amd64.whl", hash = "sha256:69f00dca373f240f842b2931fb2c7e14ddbacd1397d57157a9b005a6a9942648"},
-    {file = "PyYAML-5.3.1-cp37-cp37m-win32.whl", hash = "sha256:d13155f591e6fcc1ec3b30685d50bf0711574e2c0dfffd7644babf8b5102ca1a"},
-    {file = "PyYAML-5.3.1-cp37-cp37m-win_amd64.whl", hash = "sha256:73f099454b799e05e5ab51423c7bcf361c58d3206fa7b0d555426b1f4d9a3eaf"},
-    {file = "PyYAML-5.3.1-cp38-cp38-win32.whl", hash = "sha256:06a0d7ba600ce0b2d2fe2e78453a470b5a6e000a985dd4a4e54e436cc36b0e97"},
-    {file = "PyYAML-5.3.1-cp38-cp38-win_amd64.whl", hash = "sha256:95f71d2af0ff4227885f7a6605c37fd53d3a106fcab511b8860ecca9fcf400ee"},
-    {file = "PyYAML-5.3.1.tar.gz", hash = "sha256:b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"},
-]
 queuelib = [
     {file = "queuelib-1.5.0-py2.py3-none-any.whl", hash = "sha256:ff43b5b74b9266f8df4232a8f768dc4d67281a271905e2ed4a3689d4d304cd02"},
     {file = "queuelib-1.5.0.tar.gz", hash = "sha256:42b413295551bdc24ed9376c1a2cd7d0b1b0fa4746b77b27ca2b797a276a1a17"},
@@ -2103,9 +2059,6 @@ requests = [
     {file = "requests-2.23.0-py2.py3-none-any.whl", hash = "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee"},
     {file = "requests-2.23.0.tar.gz", hash = "sha256:b3f43d496c6daba4493e7c431722aeb7dbc6288f52a6e04e7b6023b0247817e6"},
 ]
-retrying = [
-    {file = "retrying-1.3.3.tar.gz", hash = "sha256:08c039560a6da2fe4f2c426d0766e284d3b736e355f8dd24b37367b0bb41973b"},
-]
 reynir = [
     {file = "reynir-2.2.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:73f136d17f95344cd96a8433bf1539cc9a891ba500a4c73b7cd23cbbcfb0dbbe"},
     {file = "reynir-2.2.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:0acea3874ce08fc578a7bcbbd0a8b158d45420378d4f490b3b24dace1155416a"},
@@ -2113,22 +2066,17 @@ reynir = [
     {file = "reynir-2.2.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:61e56c23036807d2052d77a2167538fa80e2253b5e1d84ff0c0f50a1873cfc6a"},
     {file = "reynir-2.2.0.tar.gz", hash = "sha256:99eab1ac9516e5f4964409285b72b1ca08e897d397ef4354a557388f401e5a3a"},
 ]
-rope = [
-    {file = "rope-0.16.0-py2-none-any.whl", hash = "sha256:ae1fa2fd56f64f4cc9be46493ce54bed0dd12dee03980c61a4393d89d84029ad"},
-    {file = "rope-0.16.0-py3-none-any.whl", hash = "sha256:52423a7eebb5306a6d63bdc91a7c657db51ac9babfb8341c9a1440831ecf3203"},
-    {file = "rope-0.16.0.tar.gz", hash = "sha256:d2830142c2e046f5fc26a022fe680675b6f48f81c7fc1f03a950706e746e9dfe"},
-]
 schemainspect = [
     {file = "schemainspect-0.1.1588915531-py2.py3-none-any.whl", hash = "sha256:a5b1335d41912ca3e604b8e519c1d377fcdb143ba04d28838fa8e1305965de5b"},
     {file = "schemainspect-0.1.1588915531.tar.gz", hash = "sha256:ce6f7da70c915dbeb757f012b6b0fd898753f0eb09a940980db3688632f2d831"},
 ]
-scrapinghub = [
-    {file = "scrapinghub-2.3.1-py2.py3-none-any.whl", hash = "sha256:9dbe4ebac719cf4ec065a4748cc513a6f9cc4190ef31b98ea24deb63992a9eff"},
-    {file = "scrapinghub-2.3.1.tar.gz", hash = "sha256:cffdfdb233af30f1e5e45d9c3e5e52b1e5d88e13c6c76c66ccf2f5231b601dbf"},
-]
 scrapy = [
     {file = "Scrapy-2.1.0-py2.py3-none-any.whl", hash = "sha256:883ab2dcb6cafb22c7448616baeb5b4d7bedef57ca6a9a5f4e902cb1d6e7aeca"},
     {file = "Scrapy-2.1.0.tar.gz", hash = "sha256:640aea0f9be9b055f5cfec5ab78ee88bb37a5be3809b138329bd2af51392ec7f"},
+]
+sentry-dramatiq = [
+    {file = "sentry_dramatiq-0.3.2-py3-none-any.whl", hash = "sha256:0830b9d99f8cb41f816df5e76af0c82c1e697fa8c18738710c9c21b6d03e4e77"},
+    {file = "sentry_dramatiq-0.3.2.tar.gz", hash = "sha256:f270fe577ffbd91f1a2fe38027060cd761a169b634f3507a27a03e724eb7f195"},
 ]
 sentry-sdk = [
     {file = "sentry-sdk-0.14.4.tar.gz", hash = "sha256:0e5e947d0f7a969314aa23669a94a9712be5a688ff069ff7b9fc36c66adc160c"},
@@ -2137,10 +2085,6 @@ sentry-sdk = [
 service-identity = [
     {file = "service_identity-18.1.0-py2.py3-none-any.whl", hash = "sha256:001c0707759cb3de7e49c078a7c0c9cd12594161d3bf06b9c254fdcb1a60dc36"},
     {file = "service_identity-18.1.0.tar.gz", hash = "sha256:0858a54aabc5b459d1aafa8a518ed2081a285087f349fe3e55197989232e2e2d"},
-]
-shub = [
-    {file = "shub-2.10.0-py2.py3-none-any.whl", hash = "sha256:b4f5a6d0a082b7988de01f34bbe406c4c7b35675240ada4ba4152d49601b7fd7"},
-    {file = "shub-2.10.0.tar.gz", hash = "sha256:5df6ec1a5613c9248c8a44b3547deae49d2d8743a5c8710a79b9b32fcbec06a0"},
 ]
 six = [
     {file = "six-1.14.0-py2.py3-none-any.whl", hash = "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"},
@@ -2195,6 +2139,10 @@ starlette = [
     {file = "starlette-0.13.2-py3-none-any.whl", hash = "sha256:6169ee78ded501095d1dda7b141a1dc9f9934d37ad23196e180150ace2c6449b"},
     {file = "starlette-0.13.2.tar.gz", hash = "sha256:a9bb130fa7aa736eda8a814b6ceb85ccf7a209ed53843d0d61e246b380afa10f"},
 ]
+tenacity = [
+    {file = "tenacity-5.1.5-py2.py3-none-any.whl", hash = "sha256:3a916e734559f1baa2cab965ee00061540c41db71c3bf25375b81540a19758fc"},
+    {file = "tenacity-5.1.5.tar.gz", hash = "sha256:e664bd94f088b17f46da33255ae33911ca6a0fe04b156d334b601a4ef66d3c5f"},
+]
 tokenizer = [
     {file = "tokenizer-2.0.5-py2.py3-none-any.whl", hash = "sha256:7c1ac32ef74e1da0be0a1b864b78cf5e13b002f494139faec21562b49a9997a4"},
     {file = "tokenizer-2.0.5.tar.gz", hash = "sha256:75961c560e6f8baed2128598220cc0177da5d0733d6a33c26922e5e4e59582e4"},
@@ -2202,10 +2150,6 @@ tokenizer = [
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
     {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
-]
-tqdm = [
-    {file = "tqdm-4.46.0-py2.py3-none-any.whl", hash = "sha256:acdafb20f51637ca3954150d0405ff1a7edde0ff19e38fb99a80a66210d2a28f"},
-    {file = "tqdm-4.46.0.tar.gz", hash = "sha256:4733c4a10d0f2a4d098d801464bdaf5240c7dadd2a7fde4ee93b0a0efd9fb25e"},
 ]
 traitlets = [
     {file = "traitlets-4.3.3-py2.py3-none-any.whl", hash = "sha256:70b4c6a1d9019d7b4f6846832288f86998aa3b9207c6821f3578a6a6a467fe44"},
@@ -2282,6 +2226,9 @@ w3lib = [
     {file = "w3lib-1.22.0-py2.py3-none-any.whl", hash = "sha256:0161d55537063e00d95a241663ede3395c4c6d7b777972ba2fd58bbab2001e53"},
     {file = "w3lib-1.22.0.tar.gz", hash = "sha256:0ad6d0203157d61149fd45aaed2e24f53902989c32fc1dccc2e2bfba371560df"},
 ]
+watchdog = [
+    {file = "watchdog-0.10.2.tar.gz", hash = "sha256:c560efb643faed5ef28784b2245cf8874f939569717a4a12826a173ac644456b"},
+]
 watchgod = [
     {file = "watchgod-0.6-py35.py36.py37-none-any.whl", hash = "sha256:59700dab7445aa8e6067a5b94f37bae90fc367554549b1ed2e9d0f4f38a90d2a"},
     {file = "watchgod-0.6.tar.gz", hash = "sha256:e9cca0ab9c63f17fc85df9fd8bd18156ff00aff04ebe5976cee473f4968c6858"},
@@ -2293,10 +2240,6 @@ wcwidth = [
 webencodings = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
-]
-websocket-client = [
-    {file = "websocket_client-0.57.0-py2.py3-none-any.whl", hash = "sha256:0fc45c961324d79c781bab301359d5a1b00b13ad1b10415a4780229ef71a5549"},
-    {file = "websocket_client-0.57.0.tar.gz", hash = "sha256:d735b91d6d1692a6a181f2a8c9e0238e5f6373356f561bb9dc4c7af36f452010"},
 ]
 websockets = [
     {file = "websockets-8.1-cp36-cp36m-macosx_10_6_intel.whl", hash = "sha256:3762791ab8b38948f0c4d281c8b2ddfa99b7e510e46bd8dfa942a5fff621068c"},
