@@ -28,5 +28,10 @@ async def get_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+@app.router.get("/_error")
+async def get_server_error(request: Request):
+    return 1 / 0
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(router)
