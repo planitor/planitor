@@ -91,13 +91,23 @@ def update_minute_with_entity_mentions(minute_id: int):
 
 
 @dramatiq.actor
-def update_minute_with_lemmas(minute_id: int):
-
-    with db_context() as db:
+def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session = None):
+    def inner(db):
         minute = db.query(Minute).get(minute_id)
-        minute.lemmas = get_minute_lemmas(minute)
-        db.add(minute)
-        db.commit()
+        if not minute.lemmas or force:
+            lemmas = get_minute_lemmas(minute)
+            minute.lemmas = " ".join(lemmas)
+            assert isinstance(minute.lemmas, str)
+            db.add(minute)
+            db.commit()
+            return lemmas
+
+    if db is not None:
+        lemmas = inner(db)
+    else:
+        with db_context() as db:
+            lemmas = inner(db)
+    return lemmas
 
 
 def process_minute(db: Session, items, meeting: Meeting):

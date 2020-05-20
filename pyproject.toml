@@ -6,7 +6,7 @@ authors = ["Jökull Sólberg <jokull@solberg.is>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-Reynir = "^2.1.0"
+Reynir = "^2.3.1"
 jinja2 = "^2.11.1"
 sqlalchemy = "^1.3.15"
 uvicorn = "^0.11.3"

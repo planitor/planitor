@@ -1,0 +1,34 @@
+import typer
+
+from planitor.actors import update_minute_with_lemmas
+from planitor.database import db_context
+from planitor.models import Minute, Meeting
+
+
+def main(last: int = 0, force: bool = False):
+    """ Reindex minutes from latest to oldest. """
+
+    with db_context() as db:
+        query = db.query(Minute).join(Meeting)
+
+        if not force:
+            query = query.filter(Minute.lemmas != None)
+
+        query = query.order_by(Meeting.start.desc())
+
+        if last > 0:
+            query = query.limit(last)
+
+        for minute in query:
+            try:
+                lemmas = update_minute_with_lemmas(minute.id, force=force, db=db) or ""
+            except KeyboardInterrupt:
+                print("^C")
+                break
+            print(
+                "Indexing Minute:{} → {}".format(minute.id, ", ".join(list(lemmas)[:10]))
+            )
+
+
+if __name__ == "__main__":
+    typer.run(main)
