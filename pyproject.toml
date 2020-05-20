@@ -22,9 +22,9 @@ emails = "^0.5.15"
 sentry-sdk = "^0.14.3"
 python-multipart = "^0.0.5"
 fastapi = "^0.54.2"
-dramatiq = {extras = ["rabbitmq", "watch"], version = "^1.8.1"}
 sentry-dramatiq = "^0.3.2"
 psycopg2 = "^2.8.5"
+dramatiq = {extras = ["rabbitmq"], version = "^1.8.1"}
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"

@@ -95,9 +95,8 @@ poetry run python shell.py
   - Install: `pip install -r requirements.txt`
   - Command: `dramatiq --processes 1 --threads 4 planitor.actors`
 - `planitor` web service
-  - Install: `pip install -r requirements.txt`
-  - Command:
-    `poetry run gunicorn -w 1 -k uvicorn.workers.UvicornWorker planitor.main:app`
+  - Install: `pip install -r requirements.txt && pip install gunicorn`
+  - Command: `gunicorn -w 1 -k uvicorn.workers.UvicornWorker planitor.main:app`
   - Domain `www.planitor.io` → `planitor-us.onrender.com`
 - `crawl` cron job
   - Install:

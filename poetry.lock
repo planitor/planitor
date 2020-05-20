@@ -36,14 +36,6 @@ starlette = "<1.0.0"
 watchgod = ">=0.6.0,<0.7.0"
 
 [[package]]
-category = "main"
-description = "An unobtrusive argparse wrapper with natural syntax"
-name = "argh"
-optional = false
-python-versions = "*"
-version = "0.26.2"
-
-[[package]]
 category = "dev"
 description = "Atomic file writes."
 marker = "sys_platform == \"win32\""
@@ -312,14 +304,6 @@ prometheus-client = ">=0.2"
 optional = true
 version = ">=1.0,<2.0"
 
-[package.dependencies.watchdog]
-optional = true
-version = ">=0.8,<0.9"
-
-[package.dependencies.watchdog-gevent]
-optional = true
-version = "0.1"
-
 [package.extras]
 all = ["watchdog-gevent (0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "redis (>=2.0,<4.0)", "pika (>=1.0,<2.0)"]
 dev = ["watchdog-gevent (0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "redis (>=2.0,<4.0)", "pika (>=1.0,<2.0)", "alabaster", "sphinx (<1.8)", "sphinxcontrib-napoleon", "flake8", "flake8-bugbear", "flake8-quotes", "isort", "bumpversion", "hiredis", "twine", "wheel", "pytest (<4)", "pytest-benchmark", "pytest-cov", "tox"]
@@ -392,27 +376,7 @@ python = "<3.8"
 version = "*"
 
 [[package]]
-category = "main"
-description = "Coroutine-based network library"
-name = "gevent"
-optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
-version = "20.5.0"
-
-[package.dependencies]
-cffi = ">=1.12.2"
-greenlet = ">=0.4.14"
-
-[package.extras]
-dnspython = ["dnspython (>=1.16.0)", "idna"]
-docs = ["repoze.sphinx.autointerface", "sphinxcontrib-programoutput"]
-events = ["zope.event", "zope.interface"]
-monitor = ["psutil (>=5.6.1)", "psutil (5.6.3)"]
-recommended = ["dnspython (>=1.16.0)", "idna", "zope.event", "zope.interface", "cffi (>=1.12.2)", "psutil (>=5.6.1)", "psutil (5.6.3)"]
-test = ["dnspython (>=1.16.0)", "idna", "zope.event", "zope.interface", "requests", "objgraph", "cffi (>=1.12.2)", "psutil (>=5.6.1)", "psutil (5.6.3)", "futures", "mock", "contextvars (2.4)", "coverage (<5.0)", "coveralls (>=1.7.0)"]
-
-[[package]]
-category = "main"
+category = "dev"
 description = "Lightweight in-process concurrent programming"
 name = "greenlet"
 optional = false
@@ -721,14 +685,6 @@ name = "pathspec"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "0.8.0"
-
-[[package]]
-category = "main"
-description = "File system general utilities"
-name = "pathtools"
-optional = false
-python-versions = "*"
-version = "0.1.2"
 
 [[package]]
 category = "dev"
@@ -1045,14 +1001,6 @@ version = "0.0.5"
 
 [package.dependencies]
 six = ">=1.4.0"
-
-[[package]]
-category = "main"
-description = "YAML parser and emitter for Python"
-name = "pyyaml"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "5.3.1"
 
 [[package]]
 category = "dev"
@@ -1438,31 +1386,6 @@ version = "1.22.0"
 six = ">=1.4.1"
 
 [[package]]
-category = "main"
-description = "Filesystem events monitoring"
-name = "watchdog"
-optional = false
-python-versions = "*"
-version = "0.8.3"
-
-[package.dependencies]
-PyYAML = ">=3.10"
-argh = ">=0.24.1"
-pathtools = ">=0.1.1"
-
-[[package]]
-category = "main"
-description = "A gevent-based observer for watchdog."
-name = "watchdog-gevent"
-optional = false
-python-versions = "*"
-version = "0.1.0"
-
-[package.dependencies]
-gevent = ">=1.1"
-watchdog = ">=0.8"
-
-[[package]]
 category = "dev"
 description = "Simple, modern file watching and code reload in python."
 name = "watchgod"
@@ -1524,7 +1447,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "b3289c0e7ecf236d83322d898b5462463e07326676922b37840b4f24d0cb4195"
+content-hash = "5bca2bf20f473639e1e37521ff6434b463237246b0d25fb8e1bc92ef28c9ac3d"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1543,10 +1466,6 @@ appnope = [
 arel = [
     {file = "arel-0.1.0-py3-none-any.whl", hash = "sha256:46843ece267450e8d018485cb5f73c4be3d6d9e58cf5058b6ea01d70f1c777a6"},
     {file = "arel-0.1.0.tar.gz", hash = "sha256:11fa0dbdd0a3f8af5b350b43768e8c215b9a428103af663f1c2808c1d81fccce"},
-]
-argh = [
-    {file = "argh-0.26.2-py2.py3-none-any.whl", hash = "sha256:a9b3aaa1904eeb78e32394cd46c6f37ac0fb4af6dc488daa58971bdc7d7fcaf3"},
-    {file = "argh-0.26.2.tar.gz", hash = "sha256:e9535b8c84dc9571a48999094fda7f33e63c3f1b74f3e5f3ac0105a58405bb65"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
@@ -1716,30 +1635,6 @@ fastapi = [
 flake8 = [
     {file = "flake8-3.8.1-py2.py3-none-any.whl", hash = "sha256:6c1193b0c3f853ef763969238f6c81e9e63ace9d024518edc020d5f1d6d93195"},
     {file = "flake8-3.8.1.tar.gz", hash = "sha256:ea6623797bf9a52f4c9577d780da0bb17d65f870213f7b5bcc9fca82540c31d5"},
-]
-gevent = [
-    {file = "gevent-20.5.0-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:efd9546468502a30ddd4699c3124ccb9d3099130f9b5ae1e2a54ad5b46e86120"},
-    {file = "gevent-20.5.0-cp27-cp27m-manylinux2010_x86_64.whl", hash = "sha256:3ff477b6d275396123faf8ce2d5b82f96d85ba264e0b9d4b56a2bac49d1b9adc"},
-    {file = "gevent-20.5.0-cp27-cp27m-win32.whl", hash = "sha256:92edc18a357473e01a4e4a82c073ed3c99ceca6e3ce93c23668dd4a2401f07dc"},
-    {file = "gevent-20.5.0-cp27-cp27m-win_amd64.whl", hash = "sha256:1dd95433be45e1115053878366e3f5332ae99c39cb345be23851327c062b9f4a"},
-    {file = "gevent-20.5.0-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:fcb64f3a28420d1b872b7ef41b12e8a1a4dcadfc8eff3c09993ab0cdf52584a1"},
-    {file = "gevent-20.5.0-cp35-cp35m-manylinux2010_x86_64.whl", hash = "sha256:4d2729dd4bf9c4d0f29482f53cdf9fc90a498aebb5cd7ae8b45d35657437d2ac"},
-    {file = "gevent-20.5.0-cp35-cp35m-win32.whl", hash = "sha256:00b03601b8dd1ee2aa07811cb60a4befe36173b15d91c6e207e37f8d77dd6fac"},
-    {file = "gevent-20.5.0-cp35-cp35m-win_amd64.whl", hash = "sha256:937d36730f2b0dee3387712074b1f15b802e2e074a3d7c6dcaf70521236d607c"},
-    {file = "gevent-20.5.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:929c33df8e9bcbe31906024fcd21580bd018196dbd3249eb5b2f19d63e11092d"},
-    {file = "gevent-20.5.0-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:52e5cd607749ed3b8aa0272cacf2c11deec61fca4c3bec57a9fea8c49316627d"},
-    {file = "gevent-20.5.0-cp36-cp36m-win32.whl", hash = "sha256:15eae3cd450dac7dae7f4ac59e01db1378965c9ef565c39c5ae78c5a888f9ac9"},
-    {file = "gevent-20.5.0-cp36-cp36m-win_amd64.whl", hash = "sha256:9b4e940fc6071afebb86ba5f48dbb5f1fc3cb96ebeb8cf145eb5b499e9c6ee33"},
-    {file = "gevent-20.5.0-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:e01d5373528e4ebdde66dc47a608d225fa3c4408ccd828d26c49b7ff75d82bd9"},
-    {file = "gevent-20.5.0-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:31dc5d4ab8172cc00c4ff17cb18edee633babd961f64bf54214244d769bc3a74"},
-    {file = "gevent-20.5.0-cp37-cp37m-win32.whl", hash = "sha256:0acc15ba2ac2a555529ad82d5a28fc85dbb6b2ff947657d67bebfd352e2b5c14"},
-    {file = "gevent-20.5.0-cp37-cp37m-win_amd64.whl", hash = "sha256:a7805934e8ce81610b61f806572c3d504cedd698cc8c9460d78d2893ba598c4a"},
-    {file = "gevent-20.5.0-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:5c604179cebcc57f10505d8db177b92a715907815a464b066e7eba322d1c33ac"},
-    {file = "gevent-20.5.0-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:88c76df4967c5229f853aa67ad1b394d9e4f985b0359c9bc9879416bba3e7c68"},
-    {file = "gevent-20.5.0-cp38-cp38-win32.whl", hash = "sha256:d07a2afe4215731eb57d5b257a2e7e7e170d8a7ae1f02f6d0682cd3403debea9"},
-    {file = "gevent-20.5.0-cp38-cp38-win_amd64.whl", hash = "sha256:28b7d83b4327ceb79668eca2049bf4b9ce66d5ace18a88335e3035b573f889fd"},
-    {file = "gevent-20.5.0-pp27-pypy_73-win32.whl", hash = "sha256:38db524ea88d81d596b2cbb6948fced26654a15fec40ea4529224e239a6f45e8"},
-    {file = "gevent-20.5.0.tar.gz", hash = "sha256:1dc7f1f6bc1f67d625e4272b01e717eba0b4fa024d2ff7934c8d320674d6f7fa"},
 ]
 greenlet = [
     {file = "greenlet-0.4.15-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:99a26afdb82ea83a265137a398f570402aa1f2b5dfb4ac3300c026931817b163"},
@@ -1924,9 +1819,6 @@ pathspec = [
     {file = "pathspec-0.8.0-py2.py3-none-any.whl", hash = "sha256:7d91249d21749788d07a2d0f94147accd8f845507400749ea19c1ec9054a12b0"},
     {file = "pathspec-0.8.0.tar.gz", hash = "sha256:da45173eb3a6f2a5a487efba21f050af2b41948be6ab52b6a1e3ff22bb8b7061"},
 ]
-pathtools = [
-    {file = "pathtools-0.1.2.tar.gz", hash = "sha256:7c35c5421a39bb82e58018febd90e3b6e5db34c5443aaaf742b3f33d4655f1c0"},
-]
 pexpect = [
     {file = "pexpect-4.8.0-py2.py3-none-any.whl", hash = "sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937"},
     {file = "pexpect-4.8.0.tar.gz", hash = "sha256:fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"},
@@ -2082,19 +1974,6 @@ python-dateutil = [
 ]
 python-multipart = [
     {file = "python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"},
-]
-pyyaml = [
-    {file = "PyYAML-5.3.1-cp27-cp27m-win32.whl", hash = "sha256:74809a57b329d6cc0fdccee6318f44b9b8649961fa73144a98735b0aaf029f1f"},
-    {file = "PyYAML-5.3.1-cp27-cp27m-win_amd64.whl", hash = "sha256:240097ff019d7c70a4922b6869d8a86407758333f02203e0fc6ff79c5dcede76"},
-    {file = "PyYAML-5.3.1-cp35-cp35m-win32.whl", hash = "sha256:4f4b913ca1a7319b33cfb1369e91e50354d6f07a135f3b901aca02aa95940bd2"},
-    {file = "PyYAML-5.3.1-cp35-cp35m-win_amd64.whl", hash = "sha256:cc8955cfbfc7a115fa81d85284ee61147059a753344bc51098f3ccd69b0d7e0c"},
-    {file = "PyYAML-5.3.1-cp36-cp36m-win32.whl", hash = "sha256:7739fc0fa8205b3ee8808aea45e968bc90082c10aef6ea95e855e10abf4a37b2"},
-    {file = "PyYAML-5.3.1-cp36-cp36m-win_amd64.whl", hash = "sha256:69f00dca373f240f842b2931fb2c7e14ddbacd1397d57157a9b005a6a9942648"},
-    {file = "PyYAML-5.3.1-cp37-cp37m-win32.whl", hash = "sha256:d13155f591e6fcc1ec3b30685d50bf0711574e2c0dfffd7644babf8b5102ca1a"},
-    {file = "PyYAML-5.3.1-cp37-cp37m-win_amd64.whl", hash = "sha256:73f099454b799e05e5ab51423c7bcf361c58d3206fa7b0d555426b1f4d9a3eaf"},
-    {file = "PyYAML-5.3.1-cp38-cp38-win32.whl", hash = "sha256:06a0d7ba600ce0b2d2fe2e78453a470b5a6e000a985dd4a4e54e436cc36b0e97"},
-    {file = "PyYAML-5.3.1-cp38-cp38-win_amd64.whl", hash = "sha256:95f71d2af0ff4227885f7a6605c37fd53d3a106fcab511b8860ecca9fcf400ee"},
-    {file = "PyYAML-5.3.1.tar.gz", hash = "sha256:b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"},
 ]
 queuelib = [
     {file = "queuelib-1.5.0-py2.py3-none-any.whl", hash = "sha256:ff43b5b74b9266f8df4232a8f768dc4d67281a271905e2ed4a3689d4d304cd02"},
@@ -2293,13 +2172,6 @@ uvloop = [
 w3lib = [
     {file = "w3lib-1.22.0-py2.py3-none-any.whl", hash = "sha256:0161d55537063e00d95a241663ede3395c4c6d7b777972ba2fd58bbab2001e53"},
     {file = "w3lib-1.22.0.tar.gz", hash = "sha256:0ad6d0203157d61149fd45aaed2e24f53902989c32fc1dccc2e2bfba371560df"},
-]
-watchdog = [
-    {file = "watchdog-0.8.3.tar.gz", hash = "sha256:7e65882adb7746039b6f3876ee174952f8eaaa34491ba34333ddf1fe35de4162"},
-]
-watchdog-gevent = [
-    {file = "watchdog_gevent-0.1.0-py3-none-any.whl", hash = "sha256:a9ef201bbbbaa1f87a6e4c164d55cd077cc9b4406b2f7444854d2bbde7a599de"},
-    {file = "watchdog_gevent-0.1.0.tar.gz", hash = "sha256:d19f1276a728dfb3ae3f1c8ada6e791f1726fd4336dff18b4ea35ed3ade35c6a"},
 ]
 watchgod = [
     {file = "watchgod-0.6-py35.py36.py37-none-any.whl", hash = "sha256:59700dab7445aa8e6067a5b94f37bae90fc367554549b1ed2e9d0f4f38a90d2a"},
