@@ -88,3 +88,19 @@ Run development bpython shell with db object and all models imported
 ```bash
 poetry run python shell.py
 ```
+
+## Render.com specs
+
+- `dramatiq` background worker
+  - Install: `pip install -r requirements.txt`
+  - Command: `dramatiq --processes 1 --threads 4 planitor.actors`
+- `planitor` web service
+  - Install: `pip install -r requirements.txt`
+  - Command:
+    `poetry run gunicorn -w 1 -k uvicorn.workers.UvicornWorker planitor.main:app`
+  - Domain `www.planitor.io` → `planitor-us.onrender.com`
+- `crawl` cron job
+  - Install:
+    `pip install -r requirements.txt && pip install beautifulsoup4 html5lib scrapy`
+  - Command: `scrapy list | xargs -n 1 scrapy crawl`
+  - Schedule: `0 * * * *` (every hour)
