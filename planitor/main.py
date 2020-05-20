@@ -8,6 +8,7 @@ from . import config
 from .endpoints import router
 from .endpoints.templates import templates
 
+
 if config("DEBUG", cast=bool, default=False):
     import arel
 
