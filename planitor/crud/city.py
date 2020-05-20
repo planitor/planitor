@@ -1,5 +1,5 @@
 import re
-from typing import Tuple
+from typing import Tuple, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -69,7 +69,7 @@ def get_or_create_meeting(db, council, name):
 
 
 def get_or_create_entity(
-    db, kennitala: Kennitala, name: str, address: str
+    db, kennitala: Kennitala, name: str, address: Optional[str]
 ) -> Tuple[Entity, bool]:
     entity = db.query(Entity).filter_by(kennitala=kennitala.kennitala).first()
     created = False
@@ -132,9 +132,7 @@ Vesturás 10 - 16
 ADDRESS_RE = re.compile(r"^([^\W\d]+) (\d+[A-Za-z]?(?: ?- ?)?(?:\d+[A-Za-z]?)?)?$")
 
 
-def get_geoname_and_housenumber_from_address_and_municipality(
-    db, address, municipality
-):
+def get_geoname_and_housenumber_from_address_and_municipality(db, address, municipality):
     match = re.match(ADDRESS_RE, address)
     if not match:
         return None, None
@@ -196,6 +194,7 @@ def update_case_status(db, case):
     become the case status.
 
     """
+    status = None
     for minute in (
         db.query(Minute)
         .join(Meeting)

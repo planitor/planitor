@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 from collections import defaultdict
 
 from tokenizer import tokenize, split_into_sentences, TOK
@@ -40,10 +41,7 @@ PATTERNS = {
         r"^ekki er gerð athugasemd við erindið",
         r"^ekki gerð athugasemd við erindið",
     ),
-    CaseStatusEnum.notice: (
-        r"^samþykkt að grenndarkynna",
-        r"^grenndarkynning samþykkt",
-    ),
+    CaseStatusEnum.notice: (r"^samþykkt að grenndarkynna", r"^grenndarkynning samþykkt",),
 }
 
 
@@ -57,9 +55,7 @@ def clean_first_sentence(text):
 
     text = next(split_into_sentences(text))
     text = text.lower()
-    text = re.sub(
-        COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text
-    )
+    text = re.sub(COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text)
 
     def tokens(sentence):
         for token in tokenize(sentence):
@@ -70,7 +66,7 @@ def clean_first_sentence(text):
     return text
 
 
-def get_case_status_from_remarks(remarks):
+def get_case_status_from_remarks(remarks) -> Optional[CaseStatusEnum]:
     if not remarks:
         return None
     remarks = clean_first_sentence(remarks)

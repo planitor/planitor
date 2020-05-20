@@ -1,17 +1,18 @@
 from sqlalchemy.orm import Session
 
+from . import dramatiq
 from .crud import (
     create_minute,
     get_or_create_case_entity,
     get_or_create_entity,
     lookup_icelandic_company_in_entities,
 )
+from .database import db_context
 from .language.companies import extract_company_names
 from .minutes import get_minute_lemmas
 from .models import Meeting, Minute
 from .utils.kennitala import Kennitala
 from .utils.rsk import get_kennitala_from_rsk_search
-from .database import dramatiq, db_context
 
 
 def _get_entity(db: Session, name: str):
@@ -31,19 +32,17 @@ def _get_entity(db: Session, name: str):
         return entity
 
 
-def update_minute_with_entity_relations(
-    db: Session, minute: Minute, entity_items: list
-):
+def update_minute_with_entity_relations(db: Session, minute: Minute, entity_items: list):
     """Here we have kennitala and name, whereas in `update_minute_with_entity_mentions`
     we only have the names. """
 
     case = minute.case
 
     # Squash duplicates
-    entity_items = ({e["kennitala"]: e for e in entity_items}).values()
+    _entity_items = {e["kennitala"]: e for e in entity_items}
 
     # Create and add applicant companies or persons
-    for items in entity_items:  # persons or companies inquiring
+    for items in _entity_items.values():  # persons or companies inquiring
         kennitala = Kennitala(items.pop("kennitala"))
         if not kennitala.validate():
             continue
