@@ -21,7 +21,7 @@ if sentry_dsn is not None:
     )
 
 
-if config("DEBUG", cast=bool, default=False):
+if config("DEBUG", cast=bool, default=False) and config("BROKER_URL", default=False):
     broker = StubBroker()
 else:
     broker = RabbitmqBroker(url=config("BROKER_URL"))
