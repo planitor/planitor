@@ -3,9 +3,17 @@
   "python.formatting.provider": "black",
   "editor.formatOnSave": true,
   "python.formatting.blackArgs": ["--line-length=90"],
+  "files.associations": {
+    "*.html": "njk"
+  },
+  /*
+  "[nunjucks]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  */
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true
