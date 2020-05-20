@@ -328,7 +328,7 @@ class Minute(Base):
         """ Use `entity_mentions` to mark linkable locations in the `inquiry` text
         """
         s = self.inquiry
-        mentions = sorted(self.entity_mentions, key=lambda i: i[1])
+        mentions = sorted(self.entity_mentions or [], key=lambda i: i[1])
 
         if not mentions:
             yield (None, s)
