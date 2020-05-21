@@ -1,6 +1,6 @@
 import dramatiq
 import sentry_sdk
-from dramatiq.brokers.rabbitmq import RabbitmqBroker
+from dramatiq.brokers.redis import RedisBroker
 from dramatiq.brokers.stub import StubBroker
 from hashids import Hashids
 from reynir import Greynir
@@ -21,9 +21,9 @@ if sentry_dsn is not None:
     )
 
 
-if config("DEBUG", cast=bool, default=False) or not config("BROKER_URL", default=False):
+if config("DEBUG", cast=bool, default=False) or not config("REDIS_URL", default=False):
     broker = StubBroker()
 else:
-    broker = RabbitmqBroker(url=config("BROKER_URL"))
+    broker = RedisBroker(url=config("REDIS_URL"))
 
 dramatiq.set_broker(broker)

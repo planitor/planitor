@@ -300,10 +300,6 @@ version = "1.8.1"
 [package.dependencies]
 prometheus-client = ">=0.2"
 
-[package.dependencies.pika]
-optional = true
-version = ">=1.0,<2.0"
-
 [package.extras]
 all = ["watchdog-gevent (0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "redis (>=2.0,<4.0)", "pika (>=1.0,<2.0)"]
 dev = ["watchdog-gevent (0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "redis (>=2.0,<4.0)", "pika (>=1.0,<2.0)", "alabaster", "sphinx (<1.8)", "sphinxcontrib-napoleon", "flake8", "flake8-bugbear", "flake8-quotes", "isort", "bumpversion", "hiredis", "twine", "wheel", "pytest (<4)", "pytest-benchmark", "pytest-cov", "tox"]
@@ -707,18 +703,6 @@ python-versions = "*"
 version = "0.7.5"
 
 [[package]]
-category = "main"
-description = "Pika Python AMQP Client Library"
-name = "pika"
-optional = false
-python-versions = "*"
-version = "1.1.0"
-
-[package.extras]
-tornado = ["tornado"]
-twisted = ["twisted"]
-
-[[package]]
 category = "dev"
 description = "plugin and hook calling mechanisms for python"
 name = "pluggy"
@@ -1009,6 +993,17 @@ name = "queuelib"
 optional = false
 python-versions = "*"
 version = "1.5.0"
+
+[[package]]
+category = "main"
+description = "Python client for Redis key-value store"
+name = "redis"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "3.5.2"
+
+[package.extras]
+hiredis = ["hiredis (>=0.1.3)"]
 
 [[package]]
 category = "dev"
@@ -1447,7 +1442,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "048733061793af9139f1a9918d155288d07bc1d063d078db1e33eec00d5a7354"
+content-hash = "af5acc1fc1a8e281e70dd26fc259b07f67a6ba4f8085acf9fdc28df681c509a4"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1827,10 +1822,6 @@ pickleshare = [
     {file = "pickleshare-0.7.5-py2.py3-none-any.whl", hash = "sha256:9649af414d74d4df115d5d718f82acb59c9d418196b7b4290ed47a12ce62df56"},
     {file = "pickleshare-0.7.5.tar.gz", hash = "sha256:87683d47965c1da65cdacaf31c8441d12b8044cdec9aca500cd78fc2c683afca"},
 ]
-pika = [
-    {file = "pika-1.1.0-py2.py3-none-any.whl", hash = "sha256:4e1a1a6585a41b2341992ec32aadb7a919d649eb82904fd8e4a4e0871c8cf3af"},
-    {file = "pika-1.1.0.tar.gz", hash = "sha256:9fa76ba4b65034b878b2b8de90ff8660a59d925b087c5bb88f8fdbb4b64a1dbf"},
-]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
@@ -1978,6 +1969,10 @@ python-multipart = [
 queuelib = [
     {file = "queuelib-1.5.0-py2.py3-none-any.whl", hash = "sha256:ff43b5b74b9266f8df4232a8f768dc4d67281a271905e2ed4a3689d4d304cd02"},
     {file = "queuelib-1.5.0.tar.gz", hash = "sha256:42b413295551bdc24ed9376c1a2cd7d0b1b0fa4746b77b27ca2b797a276a1a17"},
+]
+redis = [
+    {file = "redis-3.5.2-py2.py3-none-any.whl", hash = "sha256:2ef11f489003f151777c064c5dbc6653dfb9f3eade159bcadc524619fddc2242"},
+    {file = "redis-3.5.2.tar.gz", hash = "sha256:6d65e84bc58091140081ee9d9c187aab0480097750fac44239307a3bdf0b1251"},
 ]
 regex = [
     {file = "regex-2020.5.14-cp27-cp27m-win32.whl", hash = "sha256:e565569fc28e3ba3e475ec344d87ed3cd8ba2d575335359749298a0899fe122e"},
