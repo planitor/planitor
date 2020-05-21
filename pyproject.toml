@@ -25,6 +25,7 @@ fastapi = "^0.54.2"
 sentry-dramatiq = "^0.3.2"
 psycopg2 = "^2.8.5"
 dramatiq = {extras = ["rabbitmq"], version = "^1.8.1"}
+redis = "^3.5.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"
