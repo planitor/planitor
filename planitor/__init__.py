@@ -21,9 +21,9 @@ if sentry_dsn is not None:
     )
 
 
-if config("DEBUG", cast=bool, default=False) or not config("BROKER_URL", default=False):
+if config("DEBUG", cast=bool, default=False) or not config("REDIS_URL", default=False):
     broker = StubBroker()
 else:
-    broker = RedisBroker(url=config("BROKER_URL"))
+    broker = RedisBroker(url=config("REDIS_URL"))
 
 dramatiq.set_broker(broker)

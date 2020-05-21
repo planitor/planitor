@@ -11,6 +11,6 @@ def test_actor(num):
 
 
 __all__ = [
-    update_minute_with_entity_mentions,
-    update_minute_with_lemmas,
+    "update_minute_with_entity_mentions",
+    "update_minute_with_lemmas",
 ]
