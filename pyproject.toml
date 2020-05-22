@@ -45,3 +45,8 @@ typer = "^0.2.1"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+dev-server = "scripts.development:"
+migrate = "scripts.migrate:"
+debug = "scripts.shell:main"
