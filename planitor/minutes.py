@@ -7,16 +7,9 @@ REPLACE = (("Málinu vísað", "Málinu er vísað"),)
 
 
 def get_minute_document(minute) -> str:
-    return "\n".join(
-        part
-        for part in (
-            minute.headline,
-            minute.inquiry,
-            minute.remarks,
-            minute.case.address,
-        )
-        if part
-    )
+    parts = [minute.headline, minute.inquiry, minute.remarks, minute.case.address]
+    parts += [e.entity.name for e in (minute.case.entities or [])]
+    return "\n".join(part for part in parts if part)
 
 
 def get_minute_lemmas(minute) -> List[str]:
