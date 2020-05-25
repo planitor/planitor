@@ -96,7 +96,7 @@ def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session =
         minute = db.query(Minute).get(minute_id)
         if not minute.lemmas or force:
             lemmas = get_minute_lemmas(minute)
-            minute.lemmas = " ".join(lemmas)
+            minute.lemmas = ", ".join(lemmas)
             assert isinstance(minute.lemmas, str)
             db.add(minute)
             db.commit()
