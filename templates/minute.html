@@ -22,11 +22,18 @@ breadcrumb %}
   <div class="grid grid-cols-1 gap-4 md:grid-cols-3 items-end md:px-6">
 
     {% call section(class = "mb-2 sm:mb-4 md:col-span-2 align-bottom") %}
-    <div class="text-2xl font-bold">{{ case.address }}</div>
+    <div class="flex justify-between items-start mb-2">
+      <div class="flex-shrink text-2xl tracking-tight">{{ minute.headline }}</div>
+      <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
+        {{ minute.status.value.label if minute.status else "Annað" }}
+      </div>
+    </div>
     <div class="text-sm font-bold">
       Verknúmer
-      <a href="url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial)" class="text-midnight underline">{{ case.serial }}
-        ({{ case_count }})</a>
+      <a href="url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial)" class="underline">
+        {{ case.serial }}
+        ({{ case_count }})
+      </a>
     </div>
     {% endcall %}
 
@@ -54,12 +61,7 @@ breadcrumb %}
     <div class="p-4 bg-white rounded-md shadow-lg">
       <div class="flex">
         <div class="case flex-1">
-          <div class="flex justify-between items-start mb-2">
-            <div class="flex-shrink text-2xl tracking-tight">{{ minute.headline }}</div>
-            <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
-              {{ minute.status.value.label if minute.status else "Annað" }}
-            </div>
-          </div>
+          <div class="text-2xl font-bold mb-2">{{ case.address }}</div>
           <div class="mb-4">
             <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
             <div>
