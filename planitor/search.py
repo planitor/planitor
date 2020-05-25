@@ -1,13 +1,13 @@
 import re
 import math
-from typing import Set
+from typing import Set, Generator
 
 from jinja2 import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from planitor.language.search import get_wordforms, parse_lemmas
+from planitor.language.search import get_wordforms, lemmatize_query
 from planitor.models import Minute
 
 
@@ -26,7 +26,9 @@ def get_terms_from_query(tsquerytree: str):
 HIGHLIGHT_RANGE = 30
 
 
-def iter_preview_fragments(document: str, highlight_terms: Set[str]) -> Markup:
+def iter_preview_fragments(
+    document: str, highlight_terms: Set[str]
+) -> Generator[Markup, None, None]:
     """ Find segments within a document where instances of terms appear. Used to display
     segments of meeting minutes in search results (like google does where matched search
     terms) are bolded. Uses Jinja Markup and adds the <em> tag around matched terms.
@@ -74,7 +76,7 @@ def iter_preview_fragments(document: str, highlight_terms: Set[str]) -> Markup:
         before = Markup.escape(document[pstart:start])
         # Add ellipses if the cursor hasn’t moved to the start of the document.
         if pstart != 0:
-            before = f"…{before.lstrip()}"
+            before = Markup(f"…{before.lstrip()}")
 
         while True:
             if pend == len(document):
@@ -89,7 +91,7 @@ def iter_preview_fragments(document: str, highlight_terms: Set[str]) -> Markup:
         after = Markup.escape(document[end:pend])
         # Add ellipses if the cursor hasn’t moved to the end of the document.
         if pend != len(document):
-            after = f"{after.rstrip()}…"
+            after = Markup(f"{after.rstrip()}…")
 
         yield (before + Markup(f"<strong>{document[start:end]}</strong>") + after).strip()
 
@@ -154,12 +156,7 @@ class MinuteResults:
         "bílakjallarar" or use non-nominative inclensions. It’s important to depluralize
         this. The `parse_lemmas` achieves this for us. """
 
-        def repl(matchobj):
-            lemmas = list(parse_lemmas(matchobj.group(0).title()))
-            return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
-
-        search_query = re.sub(r"\w+", repl, self.search_query)
-        return func.websearch_to_tsquery("simple", search_query)
+        return func.websearch_to_tsquery("simple", lemmatize_query(self.search_query))
 
     def get_query(self):
         tsvector = func.to_tsvector("simple", Minute.lemmas)

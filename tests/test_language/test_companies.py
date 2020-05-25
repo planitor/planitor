@@ -18,6 +18,9 @@ def test_parse_icelandic_companies():
         "V-16 ehf.",
     ]:
         assert tuple(parse_icelandic_companies(company)) == (company,)
+    assert tuple(parse_icelandic_companies("2018, bréf Faxaflóahafna sf.")) == (
+        "Faxaflóahafna sf.",
+    )
 
 
 def test_titleize():

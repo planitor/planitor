@@ -14,7 +14,7 @@ COMPANY_SUFFIXES = (
 )
 
 ICELANDIC_COMPANY_RE = re.compile(
-    r"([0-9A-ZÉÝÚÍÓÁÖÞÐÆ](?:(?:(?:[\w,/]+)|og|&|,|-) ){{1,3}}(?:{})\.)".format(
+    r"([0-9A-ZÉÝÚÍÓÁÖÞÐÆ](?:(?:(?:[\w/-]+)|og|&|-) ){{1,3}}(?:{})\.)".format(
         "|".join(suff.strip(".") for suff in COMPANY_SUFFIXES)
     )
 )

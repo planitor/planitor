@@ -14,7 +14,7 @@ This module helps find lemmas suitable for fulltext indexing.
 """
 
 import re
-from typing import List, Generator, Optional
+from typing import List, Generator, Optional, Set
 
 from reynir.bintokenizer import tokenize, PersonName
 from tokenizer import TOK
@@ -23,20 +23,33 @@ from planitor import greynir
 from planitor.utils.stopwords import stopwords
 
 
-def get_token_meanings(token, ignore=None) -> Optional[list]:
-    if ignore is None:
-        ignore = []
-    if token.kind not in (TOK.WORD, TOK.ENTITY, TOK.PERSON, TOK.HASHTAG):
-        return None
-    if token.txt in ignore:
-        return None
-    return token.val
+INDEXABLE_TOKEN_TYPES = frozenset(
+    (
+        TOK.ENTITY,
+        TOK.HASHTAG,
+        TOK.NUMBER,
+        TOK.NUMWLETTER,
+        TOK.ORDINAL,
+        TOK.PERSON,
+        TOK.SERIALNUMBER,
+        TOK.WORD,
+        TOK.YEAR,
+    )
+)
 
 
 def get_token_lemmas(token, ignore) -> List[str]:
+    if ignore is None:
+        ignore = []
     lemmas = []
-    meanings = get_token_meanings(token, ignore)
-    for word in meanings or []:
+    if token.kind not in INDEXABLE_TOKEN_TYPES or token.txt in ignore:
+        return []
+    if token.kind == TOK.NUMWLETTER:
+        num, letter = token.val
+        return [f"{num}{letter}", str(num)]
+    if token.kind not in (TOK.PERSON, TOK.WORD, TOK.ENTITY):
+        return [token.txt]
+    for word in token.val:
         if isinstance(word, PersonName):
             lemma = word.name
         else:
@@ -52,7 +65,7 @@ def get_lemma_terminals(terminals, ignore) -> List[str]:
     for text, lemma, category, variants, index in terminals:
         if text in ignore:
             continue
-        if category not in ("no", "so", "gata", "person"):
+        if category not in ("no", "so", "gata", "person", "talameðbókstaf", "tala"):
             continue
         if text.lower() in stopwords:
             continue
@@ -103,9 +116,7 @@ def get_lemmas(text, ignore=None) -> Generator[str, None, None]:
     yield from with_wordbases(parse_lemmas(text, ignore))
 
 
-def get_wordforms(bindb, term):
-
-    # Create big string with both inquiry and remarks
+def get_wordforms(bindb, term) -> Set[str]:
     matches = set()
 
     _, meanings = bindb.lookup_word(term, auto_uppercase=True)
@@ -119,3 +130,11 @@ def get_wordforms(bindb, term):
             matches.update(tuple(m.ordmynd.lower() for m in (f(meaning.stofn) or [])))
 
     return matches
+
+
+def lemmatize_query(search_query) -> str:
+    def repl(matchobj):
+        lemmas = list(parse_lemmas(matchobj.group(0).title()))
+        return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
+
+    return re.sub(r"\w+", repl, search_query)
