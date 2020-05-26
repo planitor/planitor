@@ -16,7 +16,7 @@ def get_terms_from_query(tsquerytree: str):
     This returns the terms considered, stripped of the boolean logic tokens. """
 
     # split on <->, | and & characters
-    quoted_terms = re.split(r" <-> | \| | & ", tsquerytree)
+    quoted_terms = re.split(r" <\d+> | <-> | \| | & ", tsquerytree)
 
     # remove single quotes around terms
     terms = [t[1:-1] for t in quoted_terms]
@@ -182,9 +182,9 @@ class MinuteResults:
         return highlight_terms
 
     def get_document(self, minute: Minute) -> str:
-        return " \n".join(
-            part for part in (minute.headline, minute.inquiry, minute.remarks) if part
-        )
+        parts = [minute.headline, minute.inquiry, minute.remarks]
+        parts += [ec.entity.name for ec in (minute.case.entities or [])]
+        return "\n".join(part for part in parts if part if part)
 
     def __iter__(self):
         highlight_terms = self.get_highlight_terms()

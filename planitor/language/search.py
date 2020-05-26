@@ -141,6 +141,11 @@ def lemmatize_query(search_query) -> str:
 
     """
 
+    # Only title case if this is an "exact" web query with quotes
+    if (search_query[0], search_query[-1]) == ('"', '"'):
+        terms = search_query.strip('"').split()
+        return '"{}"'.format(" ".join(term.title() for term in terms))
+
     def repl(matchobj):
         query = matchobj.group(0).title()
         # Use titleize the term because the Postgres simple dictionary doesn’t lowercase
@@ -159,6 +164,6 @@ def lemmatize_query(search_query) -> str:
             # Return the
             return lemmas.pop()
 
-        return "({})".format(" or ".join(lemmas))
+        return " or ".join(lemmas)
 
     return re.sub(r"\w+", repl, search_query)
