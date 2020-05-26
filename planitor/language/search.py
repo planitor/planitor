@@ -60,7 +60,9 @@ def get_token_lemmas(token, ignore) -> List[str]:
     return lemmas
 
 
-def get_lemma_terminals(terminals, ignore) -> List[str]:
+def get_lemma_terminals(terminals, ignore=None) -> List[str]:
+    if ignore is None:
+        ignore = []
     lemmas = []
     for text, lemma, category, variants, index in terminals:
         if text in ignore:
@@ -133,8 +135,30 @@ def get_wordforms(bindb, term) -> Set[str]:
 
 
 def lemmatize_query(search_query) -> str:
+    """ We need to alter the query to get around a few limitations of the Postgres simple
+    dictionary and the way things are indexed. Read the inline comments for a step by
+    step explanation.
+
+    """
+
     def repl(matchobj):
-        lemmas = list(parse_lemmas(matchobj.group(0).title()))
-        return lemmas[0].replace("-", "") if lemmas else matchobj.group(0)
+        query = matchobj.group(0).title()
+        # Use titleize the term because the Postgres simple dictionary doesn’t lowercase
+        # accented characters and the lemma column preserves case
+        lemmas = parse_lemmas(query)
+
+        # Take the first matched lemma, if there are lemmas, and remove dashes from
+        # compound words
+        lemmas = [lemma.replace("-", "").title() for lemma in lemmas][:1]
+
+        # Ensure the search term is included as is, because sometimes we interpret
+        # things like "Árni" as a verb
+        lemmas = {query, *lemmas}
+
+        if len(lemmas) == 1:
+            # Return the
+            return lemmas.pop()
+
+        return "({})".format(" or ".join(lemmas))
 
     return re.sub(r"\w+", repl, search_query)
