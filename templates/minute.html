@@ -2,7 +2,23 @@
 breadcrumb %}
 
 {% macro section(class = "") %}
-  <div class="px-4 sm:px-6 md:px-0 mb-4 sm:mb-6 {{ class }}">{{ caller() }}</div>
+  <div class="mb-4 sm:mb-6 {{ class }}">{{ caller() }}</div>
+{% endmacro %}
+
+{% macro meeting_card() %}
+  {% set meeting_url = url_for('get_meeting', muni_slug = municipality.slug, council_slug = council.council_type.value.slug, meeting_id = h.encode(meeting.id)) %}
+  <div class="rounded-md bg-midnight text-white p-4 shadow-lg">
+    <div class="text-lg font-extrabold">
+      Fundur
+      <a href="{{ meeting_url }}" class="underline font-semibold">
+        nr.
+        {{ meeting.name }}
+      </a>
+    </div>
+    <div class="text-sm">
+      {{ human_date(meeting.start) }}
+    </div>
+  </div>
 {% endmacro %}
 
 {% extends "base.html" %}
@@ -10,7 +26,7 @@ breadcrumb %}
 
   {% set council_slug = council.council_type.value.slug %}
 
-  {% call section(class = "mt-4 sm:mt-8 md:px-6") %}
+  {% call section(class = "mt-4 sm:mt-8") %}
   {% call breadcrumbs() %}
   {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
   {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
@@ -19,85 +35,48 @@ breadcrumb %}
   {% endcall %}
   {% endcall %}
 
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-3 items-end md:px-6">
+  <div class="block md:hidden mb-6">{{ meeting_card() }}</div>
 
-    {% call section(class = "mb-2 sm:mb-4 md:col-span-2 align-bottom") %}
-    <div class="flex justify-between items-start mb-2">
-      <div class="flex-shrink text-2xl tracking-tight">{{ minute.headline }}</div>
-      <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
-        {{ minute.status.value.label if minute.status else "Annað" }}
-      </div>
+  {% call section() %}
+  <div class="flex justify-between items-start mb-2">
+    <div class="flex-shrink text-2xl tracking-tight">{{ minute.headline }}</div>
+    <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
+      {{ minute.status.value.label if minute.status else "Annað" }}
     </div>
-    <div class="text-sm font-bold">
-      Verknúmer
-      <a href="url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial)" class="underline">
-        {{ case.serial }}
-        ({{ case_count }})
-      </a>
-    </div>
-    {% endcall %}
-
-    {% set meeting_url = url_for('get_meeting', muni_slug = municipality.slug, council_slug = council.council_type.value.slug, meeting_id = h.encode(meeting.id)) %}
-    {% call section(class = "mb-4 sm:mb-8 md:order-last md:col-span-1") %}
-    <div class="rounded-md bg-midnight text-white p-4 shadow-lg">
-      <div class="text-lg font-extrabold">
-        Fundur
-        <a href="{{ meeting_url }}" class="underline font-semibold">
-          nr.
-          {{ meeting.name }}
-        </a>
-      </div>
-      <div class="text-sm">
-        {{ human_date(meeting.start) }}
-      </div>
-    </div>
-    {% endcall %}
-
   </div>
+  <div class="text-sm font-bold">
+    Verknúmer
+    <a href="url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial)" class="underline">
+      {{ case.serial }}
+      ({{ case_count }})
+    </a>
+  </div>
+  {% endcall %}
 
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-3 md:px-6">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 
     {% call section(class = "mb-2 sm:mb-4 md:col-span-2") %}
     <div class="p-4 bg-white rounded-md shadow-lg">
-      <div class="flex">
-        <div class="case flex-1">
-          <div class="text-2xl font-bold mb-2">{{ case.address }}</div>
-          <div class="mb-4">
-            <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
-            <div>
-              {% for kennitala, token in minute.get_inquiry_mention_tokens() -%}
-                {% if not kennitala -%}
-                  {{ token.replace('\n\n', '<br />')|safe }}
-                {% else -%}
-                  {% if kennitala.is_person() -%}
-                    <a class="text-blue-900 underline" href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
-                  {% else -%}
-                    <a class="text-blue-900 underline" href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
-                  {% endif -%}
-                {% endif -%}
-              {% endfor -%}
-            </div>
-          </div>
-          <div>
-            <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
-            <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
-          </div>
+      <div class="mb-4">
+        <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
+        <div>
+          {% for kennitala, token in minute.get_inquiry_mention_tokens() -%}
+            {% if not kennitala -%}
+              {{ token.replace('\n\n', '<br />')|safe }}
+            {% else -%}
+              {% if kennitala.is_person() -%}
+                <a class="text-blue-900 underline" href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+              {% else -%}
+                <a class="text-blue-900 underline" href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+              {% endif -%}
+            {% endif -%}
+          {% endfor -%}
         </div>
       </div>
-    </div>
-    {% endcall %}
-
-    {% call section(class = "mb-2 sm:mb-4") %}
-
-    {% if case.get_coordinates() %}
-      <div class="mb-4 sm:mb-6 rounded-md shadow-lg overflow-hidden">
-        {% set lat,
-        lon = case.get_coordinates() %}
-        <div class="map h-48 sm:h-56 md:h-64 w-full lazyload" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+      <div class="mb-4">
+        <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
+        <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
       </div>
-    {% endif %}
-
-    <div class="my-8">
       {% for applicant, case_entities in case.entities | groupby('applicant') %}
         <div class="mb-2 uppercase tracking-wide text-gray-700 font-thin text-xs">
           {{ "Málsaðilar" if applicant else "Aðilar sem vísað er í" }}
@@ -124,7 +103,24 @@ breadcrumb %}
         </div>
       {% endfor %}
     </div>
+    {% endcall %}
+
+    {% call section(class = "mb-2 sm:mb-4 order-first md:order-2") %}
+
+    <div class="hidden md:block mb-6">{{ meeting_card() }}</div>
+
+    <div class="text-xl font-bold mb-2">{{ case.address }}</div>
+
+    {% if case.get_coordinates() %}
+      <div class="mb-4 sm:mb-6 rounded-md shadow-lg overflow-hidden">
+        {% set lat,
+        lon = case.get_coordinates() %}
+        <div class="map h-48 sm:h-56 md:h-64 w-full lazyload" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+      </div>
+    {% endif %}
 
     {% endcall %}
 
-  {% endblock body %}
+  </div>
+
+{% endblock body %}

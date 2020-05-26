@@ -6,8 +6,16 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+td {
+  vertical-align: top;
+}
+
+.minilabel {
+  @apply uppercase tracking-wide text-gray-700 font-thin text-xs;
+}
+
 .btn {
-  @apply rounded-md shadow-lg bg-blue-800 px-4 py-2 font-bold text-blue-100;
+  @apply rounded-md shadow-lg bg-blue-800 px-4 py-2 font-bold text-white;
 }
 
 .btn-disabled {
@@ -41,11 +49,11 @@ body {
 }
 
 .btn .sf-symbol svg .fill {
-  fill: #ebf8ff;
+  fill: white;
 }
 
 .pill {
-  @apply inline-block bg-gray-200 rounded-full px-1 py-0 text-xs text-gray-700;
+  @apply inline-block bg-gray-200 rounded-lg px-1 py-0 text-xs text-gray-700 leading-tight;
   border: 1px solid transparent;
   border-width: 0 1px 1px 0;
 }

@@ -1,27 +1,65 @@
-<!-- prettier-ignore -->
-{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% from "includes/breadcrumbs.html" import breadcrumbs,
+breadcrumb %}
 
-{% extends "base.html" %} {% block body %}
-<div class="px-6">
+{% set council_slug = council.council_type.value.slug %}
+
+{% extends "base.html" %}
+{% block body %}
   <div class="my-8 mt-4 sm:mt-8">
-    <!-- prettier-ignore -->
-    {% set council_slug = council.council_type.value.slug %}
     {% call breadcrumbs() %}
-      {{ breadcrumb(url_for('get_index'), "Heim", mobile_collapse=True) }}
-      {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name) }}
-      {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
-      {{ breadcrumb(None, "Nr. {}".format(meeting.name)) }}
+    {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
+    {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
+    {{ breadcrumb(None, "Nr. {}".format(meeting.name)) }}
     {% endcall %}
-    <div class="font-bold text-gray-700">{{ human_date(meeting.start) }}</div>
-    <div class="flex justify-between items-end">
-      <a class="text-4xl font-thin block">Fundur nr. {{ meeting.name }}</a>
+
+    <div class="mb-6 flex justify-between items-start">
+      <div>
+        <div class="text-2xl tracking-tight">Fundur nr.
+          {{ meeting.name }}</div>
+        <div class="text-sm font-bold">{{ human_date(meeting.start) }}</div>
+      </div>
       <a class="btn block" href="{{ meeting.url }}">
-        Fundargerð <span class="sf-symbol">{% include "symbols/arrow.up.right.circle.fill.svg" %}</span>
+        {{ urlparse(meeting.url).netloc }}
+        <span class="sf-symbol">{% include "symbols/arrow.up.right.circle.fill.svg" %}</span>
       </a>
     </div>
-  </div>
-  <div class="minutes">
-    {% for minute, case_count in minutes %} {% include "includes/minute.html" %} {% endfor %}
-  </div>
-</div>
-{% endblock body %}
+
+    <div class="mb-6">
+      <table class="table-auto">
+        <thead>
+          <tr>
+            <th class="px-0 sm:px-4 py-2 minilabel text-left">Bókun</th>
+            <th class="px-0 sm:px-4 py-2 minilabel text-left hidden md:table-cell">Mál</th>
+            <th class="px-0 sm:px-4 py-2 minilabel text-right">Staða</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for minute, case_count in minutes%}
+            <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
+              <td class="md:border px-0 sm:px-4 py-2">
+                <a href="{{ url_for('get_minute',
+                    muni_slug=minute.case.council.municipality.slug,
+                    council_slug=minute.case.council.council_type.value.slug,
+                    case_id=minute.case.serial,
+                    minute_id=h.encode(minute.id)) }}" class="font-bold text-midnight hover:underline">{{ minute.case.address }}</a>
+                <div class="md:hidden text-sm">{{ minute.headline }}</div>
+              </td>
+              <td class="md:border px-0 sm:px-4 py-2 hidden md:table-cell">
+                <a href="{{ url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=minute.case.serial) }}" class="underline">
+                  {{ minute.case.serial }}
+                  {{ "({})".format(case_count) if case_count > 1 else "" -}}
+                </a>:
+                {{ minute.headline }}
+              </td>
+              <td class="md:border px-0 sm:px-4 py-2 text-right">
+                <div style="max-width: 128px;" class="pill pill-big whitespace-no-wrap truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
+                  {{ minute.status.value.label if minute.status else "Annað" }}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% endblock body %}

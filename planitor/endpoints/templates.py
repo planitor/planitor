@@ -1,4 +1,5 @@
 import datetime as dt
+from urllib.parse import urlparse
 
 from starlette.templating import Jinja2Templates
 
@@ -28,6 +29,7 @@ templates = Jinja2Templates(directory="templates")
 templates.env.globals.update(
     {
         "h": hashids,
+        "urlparse": urlparse,
         "timeago": timeago,
         "human_date": human_date,
         "DEBUG": config("DEBUG", cast=bool, default=False),
