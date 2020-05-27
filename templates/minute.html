@@ -30,6 +30,9 @@ breadcrumb %}
 
 {% extends "case.html" %}
 
+{% block title %}Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+{% block og_title %}Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+
 {% set council_slug = council.council_type.value.slug %}
 
 {% block breadcrumbs %}

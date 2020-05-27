@@ -2,13 +2,13 @@
 <html lang="is">
   <head>
     <meta charset="utf-8"/>
-    <title>Planitor</title>
+    <title>{% block title %}Planitor{% endblock %}</title>
     <link href="{{ url_for('static', path='/dist/styles.css') }}" rel="stylesheet"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta property="og:title" content="Planitor"/>
-    <meta property="og:description" content="Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi"/>
+    <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}"/>
+    <meta property="og:description" content="{% block og_description %}Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi{% endblock %}"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:url" content="https://www.planitor.io/"/>
+    <meta property="og:url" content="{{ request.url }}"/>
     <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="16x16"/>
     <link rel="icon" href="{{ url_for('static', path='/favicon-32.png') }}" sizes="32x32"/>
     <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192"/>
