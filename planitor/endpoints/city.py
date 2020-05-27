@@ -142,14 +142,14 @@ async def get_case(
     ):
         raise HTTPException(status_code=404, detail="Verk fannst ekki")
 
-    minutes = list(
+    minutes = (
         db.query(Minute)
         .join(Meeting)
         .filter(Minute.case_id == case.id)
-        .order_by(Meeting.start)
+        .order_by(Meeting.start.desc())
     )
 
-    last_minute = minutes[0]
+    last_minute = minutes.first()
     headline = last_minute.headline
     last_updated = last_minute.meeting.start
 
