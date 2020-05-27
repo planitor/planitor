@@ -142,14 +142,9 @@ async def get_case(
     ):
         raise HTTPException(status_code=404, detail="Verk fannst ekki")
 
-    minutes = (
-        db.query(Minute)
-        .join(Meeting)
-        .filter(Minute.case_id == case.id)
-        .order_by(Meeting.start.desc())
-    )
+    minutes = db.query(Minute).join(Meeting).filter(Minute.case_id == case.id)
 
-    last_minute = minutes.first()
+    last_minute = minutes.order_by(Meeting.start.desc()).first()
     headline = last_minute.headline
     last_updated = last_minute.meeting.start
 
@@ -159,7 +154,7 @@ async def get_case(
             "municipality": case.council.municipality,
             "case": case,
             "council": case.council,
-            "minutes": minutes,
+            "minutes": minutes.order_by(Meeting.start),
             "request": request,
             "user": current_user,
             "headline": headline,
