@@ -1,0 +1,25 @@
+{% for applicant, case_entities in case.entities | groupby('applicant') %}
+  <div class="mb-2 uppercase tracking-wide text-gray-700 font-thin text-xs">
+    {{ "Málsaðilar" if applicant else "Aðilar sem vísað er í" }}
+  </div>
+  <div class="entities mb-2">
+    {% for case_entity in case_entities %}
+      {% set e = case_entity.entity %}
+      <div class="mb-1">
+        <!-- prettier-ignore -->
+        <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
+                    if e.entity_type.name == 'company' else
+                    url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}" class="text-blue-700 font-semibold font-sm block truncate">
+          <span class="sf-symbol">
+            {% if e.entity_type.name == "company" %}
+              {% include "symbols/briefcase.fill.svg" %}
+            {% else %}
+              {% include "symbols/person.fill.svg" %}
+            {% endif %}
+          </span>
+          <span>{{ e.name }}</span>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endfor %}

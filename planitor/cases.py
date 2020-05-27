@@ -22,7 +22,7 @@ PATTERNS = {
         r"^jákvætt með vísan til umsagnar",
     ),
     CaseStatusEnum.delayed: (r"^frestað\.",),
-    CaseStatusEnum.denied: (r"^neikvætt\.", r"^neikvætt með vísan",),
+    CaseStatusEnum.denied: (r"^neikvætt\.", r"^neikvætt með vísan", r"^synjað.", r"nei."),
     CaseStatusEnum.directed_to_adalskipulag: (
         r"^vísað til umsagnar deildarstjóra aðalskipulags\.",
     ),

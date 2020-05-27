@@ -6,6 +6,7 @@ breadcrumb %}
 {% extends "base.html" %}
 {% block body %}
   <div class="my-8 mt-4 sm:mt-8">
+
     {% call breadcrumbs() %}
     {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
     {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
@@ -25,18 +26,18 @@ breadcrumb %}
     </div>
 
     <div class="mb-6">
-      <table class="table-auto min-w-full">
+      <table class="table-auto min-w-full max-w-full">
         <thead>
           <tr>
-            <th class="px-0 sm:px-4 py-2 minilabel text-left">Bókun</th>
-            <th class="px-0 sm:px-4 py-2 minilabel text-left hidden md:table-cell">Mál</th>
-            <th class="px-0 sm:px-4 py-2 minilabel text-right">Staða</th>
+            <th class="px-0 md:px-4 py-2 minilabel text-left">Bókun</th>
+            <th class="px-0 md:px-4 py-2 minilabel text-left hidden md:table-cell">Mál</th>
+            <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
           </tr>
         </thead>
         <tbody>
           {% for minute, case_count in minutes%}
             <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
-              <td class="md:border px-0 sm:px-4 py-2">
+              <td class="md:border px-0 md:px-4 py-2">
                 <a href="{{ url_for('get_minute',
                     muni_slug=minute.case.council.municipality.slug,
                     council_slug=minute.case.council.council_type.value.slug,
@@ -44,14 +45,14 @@ breadcrumb %}
                     minute_id=h.encode(minute.id)) }}" class="font-bold text-midnight hover:underline">{{ minute.case.address }}</a>
                 <div class="md:hidden text-sm">{{ minute.headline }}</div>
               </td>
-              <td class="md:border px-0 sm:px-4 py-2 hidden md:table-cell">
+              <td class="md:border px-0 md:px-4 py-2 hidden md:table-cell">
                 <a href="{{ url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=minute.case.serial) }}" class="underline">
                   {{ minute.case.serial }}
                   {{ "({})".format(case_count) if case_count > 1 else "" -}}
                 </a>:
                 {{ minute.headline }}
               </td>
-              <td class="md:border px-0 sm:px-4 py-2 text-right">
+              <td class="md:border px-0 md:px-4 py-2 text-right">
                 <div style="max-width: 128px;" class="pill pill-big whitespace-no-wrap truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
                   {{ minute.status.value.label if minute.status else "Annað" }}
                 </div>

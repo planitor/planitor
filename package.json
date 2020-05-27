@@ -29,12 +29,12 @@
   "devDependencies": {
     "parcel-bundler": "^1.12.4",
     "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.0.2",
+    "prettier": "^2.0.5",
     "tailwindcss": "^1.4.6"
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "lazysizes": "^5.2.0",
-    "preact": "^10.4.0"
+    "lazysizes": "^5.2.2",
+    "preact": "^10.4.4"
   }
 }

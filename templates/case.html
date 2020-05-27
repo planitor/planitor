@@ -1,24 +1,71 @@
 {% from "includes/breadcrumbs.html" import breadcrumbs,
 breadcrumb %}
 
+{% set council_slug = council.council_type.value.slug %}
+
+{% macro table(minutes) %}
+  <table class="table-auto min-w-full max-w-full">
+    <thead>
+      <tr>
+        <th class="px-0 md:px-4 py-2 minilabel text-left">Bókun</th>
+        <th class="px-0 md:px-4 py-2 minilabel text-left">Fundur</th>
+        <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for minute in minutes %}
+      <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
+        <td class="md:border px-0 md:px-4 lg:px-4 py-2">
+          <a href="{{ url_for('get_minute',
+            muni_slug=minute.case.council.municipality.slug,
+            council_slug=minute.case.council.council_type.value.slug,
+            case_id=minute.case.serial,
+            minute_id=h.encode(minute.id)) }}" class="underline">
+            {{ human_date(minute.meeting.start) -}}</a>
+          <span class="hidden md:inline">
+            -
+            {{ timeago(minute.meeting.start) }}</span>
+        </td>
+        <td class="md:border px-0 md:px-4 py-2">
+          <a href="{{ url_for('get_meeting',
+            muni_slug=municipality.slug,
+            council_slug=council.council_type.value.slug,
+            meeting_id=h.encode(minute.meeting.id)) }}" class="font-bold text-midnight hover:underline whitespace-no-wrap">
+            Nr.
+            {{ minute.meeting.name }}
+          </a>
+        </td>
+        <td class="md:border px-0 md:px-4 py-2 text-right">
+          <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
+            {{ minute.status.value.label if minute.status else "Annað" }}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
 {% extends "base.html" %}
 {% block body %}
   <div class="my-8 mt-4 sm:mt-8">
-    {% set council_slug = council.council_type.value.slug %}
-    {% call breadcrumbs() %}
-    {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-    {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
-    {{ breadcrumb(None, case.serial) }}
-    {% endcall %}
+
+    {% block breadcrumbs %}
+      {% call breadcrumbs() %}
+      {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
+      {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
+      {{ breadcrumb(None, case.serial) }}
+      {% endcall %}
+    {% endblock %}
 
     <div class="flex flex-col lg:flex-row">
 
-      <div class="mb-6 lg:flex-grow">
+      <div class="mb-6">
 
         <div class="mb-6">
           <div class="flex justify-between items-center">
             <div class="flex-shrink">
-              <div class="flex-shrink text-2xl tracking-tight">{{ minutes[0].headline }}</div>
+              <div class="flex-shrink text-2xl tracking-tight">{{ headline }}</div>
             </div>
           </div>
           <div class="text-sm font-bold">{{ case.address }}</div>
@@ -30,89 +77,29 @@ breadcrumb %}
             {{ case.status.value.label if case.status else "tekið fyrir" }}
           </div>
           á fundi
-          {{ timeago(minutes[-1].meeting.start).lower() }}.
+          {{ timeago(last_updated).lower() }}.
         </div>
 
         <div class="mb-6">
-          {% for applicant, case_entities in case.entities | groupby('applicant') %}
-            <div class="mb-2 uppercase tracking-wide text-gray-700 font-thin text-xs">
-              {{ "Málsaðilar" if applicant else "Aðilar sem vísað er í" }}
-            </div>
-            <div class="entities mb-2">
-              {% for case_entity in case_entities %}
-                {% set e = case_entity.entity %}
-                <div class="mb-1">
-                  <!-- prettier-ignore -->
-                  <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
-                if e.entity_type.name == 'company' else
-                url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}" class="text-blue-700 font-semibold font-sm block truncate">
-                    <span class="sf-symbol">
-                      {% if e.entity_type.name == "company" %}
-                        {% include "symbols/briefcase.fill.svg" %}
-                      {% else %}
-                        {% include "symbols/person.fill.svg" %}
-                      {% endif %}
-                    </span>
-                    <span>{{ e.name }}</span>
-                  </a>
-                </div>
-              {% endfor %}
-            </div>
-          {% endfor %}
+          {% include "includes/entities.html" %}
         </div>
 
-        <table class="table-auto min-w-full max-w-full">
-          <thead>
-            <tr>
-              <th class="px-0 md:px-4 py-2 minilabel text-left">Bókun</th>
-              <th class="px-0 md:px-4 py-2 minilabel text-left">Fundur</th>
-              <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for minute in minutes %}
-              <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
-                <td class="md:border px-0 md:px-4 py-2">
-                  <a href="{{ url_for('get_minute',
-                    muni_slug=minute.case.council.municipality.slug,
-                    council_slug=minute.case.council.council_type.value.slug,
-                    case_id=minute.case.serial,
-                    minute_id=h.encode(minute.id)) }}" class="underline">
-                    {{ human_date(minute.meeting.start) -}}</a>
-                  <span class="hidden md:inline">
-                    -
-                    {{ timeago(minute.meeting.start) }}</span>
-                </td>
-                <td class="md:border px-0 md:px-4 py-2">
-                  <a href="{{ url_for('get_meeting',
-                    muni_slug=municipality.slug,
-                    council_slug=council.council_type.value.slug,
-                    meeting_id=h.encode(minute.meeting.id)) }}" class="font-bold text-midnight hover:underline whitespace-no-wrap">
-                    Nr.
-                    {{ minute.meeting.name }}
-                  </a>
-                </td>
-                <td class="md:border px-0 md:px-4 py-2 text-right">
-                  <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
-                    {{ minute.status.value.label if minute.status else "Annað" }}
-                  </div>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+        {% block inner %}
+        {{ table(minutes) }}
+        {% endblock%}
 
-      <div class="mb-6 lg:ml-4 lg:w-2/5">
-        {% if case.get_coordinates() %}
-          {% set lat,
-          lon = case.get_coordinates() %}
-          <div class="map h-64 w-full shadow-lg lazyload mb-6 rounded-md overflow-hidden" style="height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
-        {% endif %}
-        <div class="hidden">{{ case.get_coordinates() }}</div>
+        </div>
+
+        <div class="mb-6 lg:ml-8 lg:w-2/5 lg:flex-none">
+          {% if case.get_coordinates() %}
+            {% set lat,
+            lon = case.get_coordinates() %}
+            <div class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden" style="height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+          {% endif %}
+          <div class="hidden">{{ case.get_coordinates() }}</div>
+        </div>
+
       </div>
 
     </div>
-
-  </div>
-{% endblock body %}
+  {% endblock body %}

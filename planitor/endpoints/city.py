@@ -142,12 +142,17 @@ async def get_case(
     ):
         raise HTTPException(status_code=404, detail="Verk fannst ekki")
 
-    minutes = (
+    minutes = list(
         db.query(Minute)
         .join(Meeting)
         .filter(Minute.case_id == case.id)
         .order_by(Meeting.start)
     )
+
+    last_minute = minutes[0]
+    headline = last_minute.headline
+    last_updated = last_minute.meeting.start
+
     return templates.TemplateResponse(
         "case.html",
         {
@@ -157,6 +162,8 @@ async def get_case(
             "minutes": minutes,
             "request": request,
             "user": current_user,
+            "headline": headline,
+            "last_updated": last_updated,
         },
     )
 
@@ -192,6 +199,15 @@ def get_minute(
         .filter(Minute.id == minute.id)
         .first()
     )
+
+    last_updated = (
+        db.query(Minute)
+        .join(Meeting)
+        .filter(Minute.case_id == minute.case.id)
+        .order_by(Meeting.start.desc())
+        .first()
+    ).meeting.start
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -203,6 +219,8 @@ def get_minute(
             "case_count": case_count,
             "request": request,
             "user": current_user,
+            "headline": minute.headline,
+            "last_updated": last_updated,
         },
     )
 
