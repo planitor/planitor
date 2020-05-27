@@ -1,81 +1,79 @@
-{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% from "includes/breadcrumbs.html" import breadcrumbs,
+breadcrumb %}
 
-{% extends "base.html" %} {% block body %}
-<div class="px-6">
+{% extends "base.html" %}
+{% block body %}
   <div class="my-8 mt-4 sm:mt-8">
     {% set council_slug = council.council_type.value.slug %}
     {% call breadcrumbs() %}
-      {{ breadcrumb(url_for('get_index'), "Heim", mobile_collapse=True) }}
-      {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name) }}
-      {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
-      {{ breadcrumb(None, case.serial) }}
+    {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
+    {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
+    {{ breadcrumb(None, case.serial) }}
     {% endcall %}
-    <div>
-      <div class="font-bold text-gray-700">{{ case.address }}</div>
-      <a class="text-4xl font-thin block">{{ minutes[0].headline }}</a>
-    </div>
-  </div>
-  <div class="minutes">
-    <div class="flex mb-6 items-start">
-      <div class="w-1/2">
-        {% for minute in minutes %}
-        <div class="block bg-white rounded overflow-hidden shadow-lg mb-6">
-          <div class="px-4 py-4">
-            <div class="flex justify-between items-center mb-2">
-              <div class="name mr-4 text-xs uppercase tracking-wide text-gray-700" style="flex: 2 1 0;">
-                <a
-                  href="{{ url_for('get_minute',
-                    muni_slug=minute.case.council.municipality.slug,
-                    council_slug=minute.case.council.council_type.value.slug,
-                    case_id=minute.case.serial,
-                    minute_id=h.encode(minute.id)) }}"
-                  class="text-midnight underline"
-                  >{{ human_date(minute.meeting.start) }}</a
-                >
-                — Nr.
-                <a
-                  href="{{ url_for('get_meeting',
-                    muni_slug=case.council.municipality.slug,
-                    council_slug=case.council.council_type.value.slug,
-                    meeting_id=h.encode(minute.meeting_id)) }}"
-                  class="text-midnight underline"
-                >
-                  {{ minute.meeting.name }}</a
-                >
-              </div>
-              <div
-                class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold"
-              >
-                {{ minute.status.value.label if minute.status else "Annað" }}
-              </div>
-            </div>
-            <div class="max-w-2xl">
-              <div class="mb-4">
-                <h5 class="font-semibold text-xs uppercase tracking-wide text-gray-700">Fyrirspurn</h5>
-                <p>{{ minute.inquiry }}</p>
-              </div>
-              <div>
-                <h5 class="font-semibold text-xs uppercase tracking-wide text-gray-700">Svar</h5>
-                <p>{{ minute.remarks }}</p>
-              </div>
-            </div>
-          </div>
+
+    <div class="mb-6">
+      <div class="flex justify-between items-center">
+        <div class="flex-shrink">
+          <div class="flex-shrink text-2xl tracking-tight">{{ minutes[0].headline }}</div>
         </div>
-        {% endfor %}
       </div>
-      <div class="flex-1 ml-6">
-        {% if case.get_coordinates() %} {% set lat, lon = case.get_coordinates() %}
-        <div
-          class="map h-64 w-full shadow-lg lazyload mb-6 rounded-md overflow-hidden"
-          style="height: 24rem;"
-          id="map-{{ case.id }}"
-          data-lat="{{ lat }}"
-          data-lon="{{ lon }}"
-          data-address="{{ case.address }}"
-        ></div>
-        {% endif %}
-      </div>
+      <div class="text-sm font-bold">{{ case.address }}</div>
     </div>
+
+    <div class="mb-6">
+      Síðast
+      <div class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle">
+        {{ case.status.value.label if case.status else "tekið fyrir" }}
+      </div>
+      á fundi
+      {{ timeago(minutes[-1].meeting.start).lower() }}.
+    </div>
+
+    <div class="mb-6">
+      <table class="table-fixed min-w-full max-w-full">
+        <thead>
+          <tr>
+            <th class="px-0 sm:px-4 py-2 minilabel text-left">Fundur</th>
+            <th class="px-0 sm:px-4 py-2 minilabel text-left" style="max-width: 60vw;"></th>
+            <th class="px-0 sm:px-4 py-2 minilabel text-right">Staða</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for minute in minutes %}
+            <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
+              <td class="md:border px-0 sm:px-4 py-2">
+                <a href="{{ url_for('get_meeting',
+                  muni_slug=municipality.slug,
+                  council_slug=council.council_type.value.slug,
+                  meeting_id=h.encode(minute.meeting.id)) }}" class="font-bold text-midnight hover:underline">Nr.
+                  {{ minute.meeting.name }}</a>
+              </td>
+              <td class="md:border px-0 sm:px-4 py-2 truncate" style="max-width: 60vw;">
+                {{ human_date(minute.meeting.start) -}}
+                <span class="hidden md:inline">:
+                  {{ minute.inquiry }}</span>
+
+              </td>
+              <td class="md:border px-0 sm:px-4 py-2 text-right">
+                <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
+                  {{ minute.status.value.label if minute.status else "Annað" }}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {#
+    <div class="mb-6">
+      {% if case.get_coordinates() %}
+        {% set lat,
+        lon = case.get_coordinates() %}
+        <div class="map h-64 w-full shadow-lg lazyload mb-6 rounded-md overflow-hidden" style="height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+      {% endif %}
+    </div>
+    #}
+
   </div>
-</div>
 {% endblock body %}

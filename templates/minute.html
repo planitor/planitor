@@ -1,6 +1,8 @@
 {% from "includes/breadcrumbs.html" import breadcrumbs,
 breadcrumb %}
 
+{% set council_slug = council.council_type.value.slug %}
+
 {% macro section(class = "") %}
   <div class="mb-4 sm:mb-6 {{ class }}">{{ caller() }}</div>
 {% endmacro %}
@@ -24,8 +26,6 @@ breadcrumb %}
 {% extends "base.html" %}
 {% block body %}
 
-  {% set council_slug = council.council_type.value.slug %}
-
   {% call section(class = "mt-4 sm:mt-8") %}
   {% call breadcrumbs() %}
   {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
@@ -46,7 +46,7 @@ breadcrumb %}
   </div>
   <div class="text-sm font-bold">
     Verknúmer
-    <a href="url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial)" class="underline">
+    <a href="{{ url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=minute.case.serial) }}" class="underline">
       {{ case.serial }}
       ({{ case_count }})
     </a>
@@ -54,6 +54,22 @@ breadcrumb %}
   {% endcall %}
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+
+    {% call section(class = "mb-2 sm:mb-4") %}
+
+    <div class="hidden md:block mb-6">{{ meeting_card() }}</div>
+
+    <div class="text-xl font-bold mb-2">{{ case.address }}</div>
+
+    {% if case.get_coordinates() %}
+      <div class="mb-4 sm:mb-6 rounded-md shadow-lg overflow-hidden">
+        {% set lat,
+        lon = case.get_coordinates() %}
+        <div class="map h-48 sm:h-56 md:h-64 w-full lazyload" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+      </div>
+    {% endif %}
+
+    {% endcall %}
 
     {% call section(class = "mb-2 sm:mb-4 md:col-span-2") %}
     <div class="p-4 bg-white rounded-md shadow-lg">
@@ -103,22 +119,6 @@ breadcrumb %}
         </div>
       {% endfor %}
     </div>
-    {% endcall %}
-
-    {% call section(class = "mb-2 sm:mb-4 order-first md:order-2") %}
-
-    <div class="hidden md:block mb-6">{{ meeting_card() }}</div>
-
-    <div class="text-xl font-bold mb-2">{{ case.address }}</div>
-
-    {% if case.get_coordinates() %}
-      <div class="mb-4 sm:mb-6 rounded-md shadow-lg overflow-hidden">
-        {% set lat,
-        lon = case.get_coordinates() %}
-        <div class="map h-48 sm:h-56 md:h-64 w-full lazyload" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
-      </div>
-    {% endif %}
-
     {% endcall %}
 
   </div>

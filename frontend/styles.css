@@ -58,6 +58,14 @@ td {
   border-width: 0 1px 1px 0;
 }
 
+@screen md {
+  td .pill {
+    @apply inline; /* needs to be inline-block for overflow ellipsis on mobile,
+                      but on desktop it takes too much vertical space unless it’s
+                      inline */
+  }
+}
+
 .pill-big {
   @apply px-2 py-1;
 }

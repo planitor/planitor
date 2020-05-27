@@ -13,17 +13,18 @@ greynir = Greynir()
 hashids = Hashids(salt="planitor", min_length=4)
 
 config = Config(".env")
+DEBUG = config("DEBUG", cast=bool, default=False)
+SENTRY_DSN = config("SENTRY_DSN", cast=Secret)
 
-sentry_dsn = config("SENTRY_DSN", cast=Secret)
-if sentry_dsn is not None:
+if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(
-        str(sentry_dsn), integrations=[SqlalchemyIntegration(), DramatiqIntegration()]
+        str(SENTRY_DSN), integrations=[SqlalchemyIntegration(), DramatiqIntegration()]
     )
 
 
-if config("DEBUG", cast=bool, default=False) or not config("REDIS_URL", default=False):
-    broker = StubBroker()
-else:
+if not DEBUG and config("REDIS_URL", default=False):
     broker = RedisBroker(url=config("REDIS_URL"))
+else:
+    broker = StubBroker()
 
 dramatiq.set_broker(broker)
