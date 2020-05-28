@@ -13,12 +13,11 @@ from planitor.models import (
     CouncilTypeEnum,
     Entity,
     EntityTypeEnum,
-    Geoname,
-    Housenumber,
     Meeting,
     Minute,
     Municipality,
 )
+from planitor.geo import get_geoname_and_housenumber_from_address_and_city
 from planitor.utils.kennitala import Kennitala
 from planitor.utils.text import slugify, fold
 
@@ -120,42 +119,6 @@ def get_or_create_case_entity(db: Session, case: Case, entity: Entity, applicant
     return case_entity, created
 
 
-""" The following regex matches street and house numbers like these:
-Síðumúli 24-26
-Prófgata 12b-14b
-Sæmundargata 21
-Tjarnargata 10D
-Bauganes 3A
-Vesturás 10 - 16
-"""
-
-ADDRESS_RE = re.compile(r"^([^\W\d]+) (\d+[A-Za-z]?(?: ?- ?)?(?:\d+[A-Za-z]?)?)?$")
-
-
-def get_geoname_and_housenumber_from_address_and_municipality(db, address, municipality):
-    match = re.match(ADDRESS_RE, address)
-    if not match:
-        return None, None
-
-    street_name, number = match.groups()
-    street = (
-        db.query(Geoname)
-        .filter_by(name=street_name, city=municipality.name)
-        .order_by(Geoname.importance)
-        .first()
-    )
-
-    if street is None:
-        return None, None
-
-    housenumber = (
-        db.query(Housenumber)
-        .filter_by(street=street, housenumber=number.replace(" ", ""))
-        .first()
-    )
-    return street, housenumber
-
-
 def create_minute(db, meeting, **items):
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
@@ -167,8 +130,8 @@ def create_minute(db, meeting, **items):
         (
             case.geoname,
             case.housenumber,
-        ) = get_geoname_and_housenumber_from_address_and_municipality(
-            db, address=case_address, municipality=meeting.council.municipality,
+        ) = get_geoname_and_housenumber_from_address_and_city(
+            db, address=case_address, city=meeting.council.municipality.name,
         )
         case.updated = meeting.start
         db.add(case)

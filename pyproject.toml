@@ -26,6 +26,7 @@ sentry-dramatiq = "^0.3.2"
 psycopg2 = "^2.8.5"
 redis = "^3.5.2"
 dramatiq = "^1.8.1"
+iceaddr = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"
@@ -42,11 +43,11 @@ arel = "^0.1.0"
 bpython = "^0.19"
 typer = "^0.2.1"
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
-
 [tool.poetry.scripts]
 dev-server = "scripts.development:main"
 migrate = "scripts.migrate:sync"
 debug = "scripts.shell:main"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
