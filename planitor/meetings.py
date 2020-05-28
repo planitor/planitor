@@ -24,6 +24,21 @@ class MeetingWrap:
     def minute_count(self):
         return sum(self.counts.values())
 
+    @property
+    def folded_counts(self):
+        """ Condense statuses to approve/denied/other """
+        counts = self.counts.copy()
+        none = NoneEnum()
+        folded = {CaseStatusEnum.approved: 0, CaseStatusEnum.denied: 0, none: 0}
+        for enum in CaseStatusEnum:
+            count = counts.pop(enum)
+            if count is not None:
+                if enum in (CaseStatusEnum.approved, CaseStatusEnum.denied):
+                    folded[enum] = count
+                else:
+                    folded[none] += count
+        return folded
+
 
 class NoneEnum:
     name = "other"
@@ -44,7 +59,7 @@ class MeetingView:
 
     Usage:
 
-    >>> for meeting in MeetingView(db, muni, offset=0, limit=100):
+    >>> for meeting in MeetingView(db, offset=0, limit=100):
     >>>     print(meeting.name, meeting.counter[CaseStatusEnum.delayed])
 
     This would give you a list of meetings along with number of minutes where the
@@ -54,9 +69,8 @@ class MeetingView:
 
     PER_PAGE = 20
 
-    def __init__(self, db, muni, page_bookmark):
+    def __init__(self, db, page_bookmark, *filters):
         self.db = db
-        self.muni = muni
         self.page_bookmark = page_bookmark
 
         def get_sq(enum):
@@ -76,9 +90,8 @@ class MeetingView:
             query = query.outerjoin(sq, sq.c.meeting_id == Meeting.id).add_columns(
                 func.coalesce(sq.c.count, 0).label(enum.name)
             )
-        query = query.filter(Council.municipality_id == muni.id).order_by(
-            Meeting.start.desc()
-        )
+        query = query.filter(*filters)
+        query = query.order_by(Meeting.start.desc())
 
         self.query = query
         self.page = get_page(query, per_page=self.PER_PAGE, page=page_bookmark)

@@ -1,5 +1,6 @@
-{% from "includes/breadcrumbs.html" import breadcrumbs,
-breadcrumb %}
+{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+
+{% extends "base.html" %}
 
 {% set council_slug = council.council_type.value.slug %}
 
@@ -73,8 +74,6 @@ breadcrumb %}
   </table>
 {% endmacro %}
 
-{% extends "base.html" %}
-
 {% block title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 {% block og_title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 
@@ -89,7 +88,7 @@ breadcrumb %}
       {% endcall %}
     {% endblock %}
 
-    <div class="grid grid-cols-1 lg:grid-cols-5 col-gap-8 w-full">
+    <div class="grid grid-cols-1 col-gap-8 w-full {{ 'lg:grid-cols-5' if case.get_coordinates() }}">
 
       <div class="mb-6 lg:col-span-3">
 
@@ -125,7 +124,7 @@ breadcrumb %}
         {% if case.get_coordinates() %}
           {% set lat,
           lon = case.get_coordinates() %}
-          <div class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden lg:h-full" style="min-height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+          <div class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden lg:h-full lg:max-h-screen" style="min-height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
         {% endif %}
         <div class="hidden">{{ case.get_coordinates() }}</div>
       </div>

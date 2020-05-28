@@ -27,7 +27,9 @@
     "watch": "parcel watch frontend/app.js frontend/styles.css --out-dir static/dist/ --public-url /static/dist/"
   },
   "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^2.2.0",
     "parcel-bundler": "^1.12.4",
+    "postcss-cli": "^7.1.1",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.0.5",
     "tailwindcss": "^1.4.6"

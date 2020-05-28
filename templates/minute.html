@@ -12,14 +12,9 @@ breadcrumb %}
       <div>
         <div class="text-lg font-extrabold">
           Fundur
-          <a href="{{ meeting_url }}" class="underline font-semibold">
-            nr.
-            {{ meeting.name }}
-          </a>
+          <a href="{{ meeting_url }}" class="underline font-semibold"> nr. {{ meeting.name }}</a>
         </div>
-        <div class="text-sm">
-          {{ human_date(meeting.start) }}
-        </div>
+        <div class="text-sm">{{ human_date(meeting.start) }}</div>
       </div>
       <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
         {{ minute.status.value.label if minute.status else "Annað" }}
@@ -46,7 +41,7 @@ breadcrumb %}
 
 {% block inner %}
   <div class="mb-6">{{ meeting_card() }}</div>
-  <div class="p-4 bg-white rounded-md shadow-lg mb-6">
+  <div class="p-4 bg-white rounded-md shadow-lg">
     <div class="mb-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
       <div>
@@ -63,7 +58,7 @@ breadcrumb %}
         {% endfor -%}
       </div>
     </div>
-    <div class="mb-4">
+    <div>
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
       <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
     </div>

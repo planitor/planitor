@@ -1,6 +1,6 @@
 module.exports = {
   plugins: [],
-  purge: ["./templates/*.html", "./templates/**/*.html"],
+  purge: false, // manually configured in postcss.config.js
   theme: {
     extend: {
       colors: {
