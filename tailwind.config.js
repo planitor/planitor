@@ -1,6 +1,6 @@
 module.exports = {
   plugins: [],
-  purge: ["./templates/*.html", "./templates/**/*.html"],
+  purge: ["./testtemplates/*.html", "./testtemplates/**/*.html"],
   theme: {
     extend: {
       colors: {

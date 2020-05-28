@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import PlainTextResponse, RedirectResponse
-from sqlalchemy import func
+from sqlalchemy import func, extract, distinct
 from sqlalchemy.orm import Session
 from starlette.datastructures import Secret
 from starlette.requests import Request
@@ -9,7 +9,16 @@ from planitor import config, hashids
 from planitor.database import get_db
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
-from planitor.models import Case, Entity, Meeting, Minute, Municipality, User
+from planitor.models import (
+    Case,
+    Entity,
+    Meeting,
+    Minute,
+    Municipality,
+    User,
+    Council,
+    CouncilTypeEnum,
+)
 from planitor.security import get_current_active_user_or_none
 from planitor.search import MinuteResults
 
@@ -38,36 +47,68 @@ async def get_search(
 
 
 @router.get("/s")
-async def get_index(
-    request: Request,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user_or_none),
-) -> templates.TemplateResponse:
-    municipalities = db.query(Municipality)
-    return templates.TemplateResponse(
-        "municipalities.html",
-        {"municipalities": municipalities, "request": request, "user": current_user},
-    )
+async def get_index():
+    return RedirectResponse("/s/reykjavik")
 
 
 @router.get("/s/{muni_slug}")
+@router.get("/s/{muni_slug}/{council_slug}")
 async def get_municipality(
     request: Request,
     muni_slug: str,
+    council_slug: str = None,
     page: str = None,
+    year: int = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
-    muni = db.query(Municipality).filter_by(slug=muni_slug).first()
+    muni = db.query(Municipality).filter(Municipality.slug == muni_slug).first()
     if muni is None:
         raise HTTPException(status_code=404, detail="Sveitarfélag fannst ekki")
 
-    meetings = MeetingView(db, muni, page)
+    councils = db.query(Council).filter(Council.municipality == muni)
+    council_slugs = [ct.value.slug for ct in CouncilTypeEnum]
+    councils = sorted(
+        councils, key=lambda ct: council_slugs.index(ct.council_type.value.slug)
+    )
+
+    if council_slug is not None:
+        if council_slug not in council_slugs:
+            raise HTTPException(status_code=404, detail="Sveitarfélag fannst ekki")
+        council = db.query(Council).filter(Council.council_type == council_slug).first()
+        if council is None:
+            return RedirectResponse(
+                request.url_for("get_municipality", muni_slug=muni.slug)
+            )
+    else:
+        council = None
+
+    filters = []
+    if council is not None:
+        filters.append(Meeting.council == council)
+    else:
+        filters.append(Council.municipality_id == muni.id)
+
+    years = (
+        db.query(distinct(extract("year", Meeting.start)))
+        .filter(*filters)
+        .order_by(extract("year", Meeting.start).desc())
+    )
+    years = [int(y[0]) for y in years]
+
+    if year and year > 1900:
+        filters.append(extract("year", Meeting.start) == year)
+
+    meetings = MeetingView(db, page, *filters)
 
     return templates.TemplateResponse(
         "municipality.html",
         {
             "municipality": muni,
+            "council": council,
+            "councils": councils,
+            "year": year,
+            "years": years,
             "meetings": meetings,
             "paging": meetings.paging,
             "request": request,

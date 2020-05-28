@@ -1,21 +1,27 @@
+{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+
 {% extends "base.html" %}
 
 {% macro pagination() %}
   <ul class="my-6 flex justify-between">
   {% if paging.has_previous %}
     <li>
-      <a class="text-blue-800 font-semibold" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}?page={{ paging.bookmark_previous }}">
+      <a
+        class="text-midnight font-semibold"
+        href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}?page={{ paging.bookmark_previous }}">
         ← Fyrri síða
       </a>
     </li>
   {% else %}
     <li>
-      <span class="text-gray-900" style="opacity: 0.2;">← Fyrri síða</span>
+      <span class="text-gray-900 opacity-25">← Fyrri síða</span>
     </li>
   {% endif %}
   {% if paging.has_next %}
     <li>
-      <a class="text-blue-800 font-semibold" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}?page={{ paging.bookmark_next }}">
+      <a
+        class="text-midnight font-semibold"
+        href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}?page={{ paging.bookmark_next }}">
         Næsta síða →
       </a>
     </li>
@@ -23,66 +29,141 @@
   </ul>
 {% endmacro %}
 
-
-{% block body %}
-<div class="px-6">
-  <div class="my-8 mt-4 sm:mt-8">
-    <div class="font-bold">
-      <a href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}">Fundargerðir<br><span class="text-4xl font-thin">{{ municipality.name }}</a></a>
+{% macro filters() %}
+  <div class="my-8 grid grid-cols-2 md:grid-cols-1 col-gap-4 md:my-0">
+    <div class="mb-4">
+      <div class="minilabel mb-2">Embætti</div>
+      <ul>
+        <li>
+          <a class="text-sm leading-relaxed {{ 'font-bold' if not council }}" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}">
+            Öll
+          </a>
+        </li>
+      {% for _council in councils %}
+        <li>
+          <a
+            class="text-sm leading-relaxed {{ 'font-bold' if _council == council }}"
+            href="
+            {{-
+              url_for(
+                'get_municipality',
+                muni_slug=municipality.slug,
+                council_slug=_council.council_type.value.slug
+              )
+            -}}{{ '?year={}'.format(year) if year }}
+            ">
+            {{ _council.council_type.value.label }}
+          </a>
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+    <div class="mb-4">
+      <div class="minilabel mb-2">Ár</div>
+      <ul>
+        <li class="inline">
+          <a
+            class="text-sm leading-relaxed {{ 'font-bold' if not year }}"
+            href="
+              {{-
+                url_for('get_municipality',
+                  muni_slug=municipality.slug,
+                  council_slug=council.council_type.value.slug
+                ) if council else url_for(
+                'get_municipality',
+                muni_slug=municipality.slug
+              )
+              -}}">
+            Öll{{- "" -}}
+          </a>{{- ", " }}
+        </li>
+      {% for _year in years %}
+        <li class="inline">
+          <a
+            class="text-sm leading-relaxed {{ 'font-bold' if _year == year }}"
+            href="
+            {{-
+              url_for(
+                'get_municipality',
+                muni_slug=municipality.slug,
+                council_slug=council.council_type.value.slug
+              )  if council else url_for(
+                'get_municipality',
+                muni_slug=municipality.slug
+              )
+            -}}?year={{ _year }}
+            ">
+            {{ _year -}}
+          </a>{{ ", " if not loop.last -}}
+        </li>
+      {% endfor %}
+      </ul>
     </div>
   </div>
-  {{ pagination() }}
-  <div class="meetings">
+{% endmacro %}
+
+{% macro results(meetings) %}
   {% for year, meetings in meetings|groupby('year')|sort(reverse=True) %}
-    <div class="my-2 font-bold text-xl font-semibold text-center">{{ year }}</div>
-    <div class="mb-6">
-      {% for m in meetings -%}
-      <div
-        class="block bg-white rounded overflow-hidden shadow-lg mb-6"
-      >
-        <div class="px-4 py-4">
-          <div class="flex justify-between items-center mb-2">
+    {% if loop.index != 1 %}
+    <div class="mb-2 mt-4 font-bold text-xl font-semibold">{{ year }}</div>
+    {% endif %}
+    <div class="mb-4">
+    {% for m in meetings -%}
+      <div class="mb-4 md:mb-6">
+        <div class="mb-1">
+          <div class="font-bold">
             <a
-              class="name font-bold mr-4 text-sm md:text-base"
-              style="flex: 2 1 0;"
               href="{{
                 url_for('get_meeting',
                   muni_slug=municipality.slug,
                   council_slug=m.council.council_type.value.slug,
                   meeting_id=h.encode(m.id)) }}">
-              {{ m.council.name }} nr. {{ m.name }}
+              {{ m.council.name }} Nr. {{ m.name }}
             </a>
-            <div class="text-gray-700 mr-4 text-sm md:text-base" style="flex: 1 1 0;">{{ human_date(m.start) }}</div>
-            <div class="text-gray-700 mr-4 text-sm md:text-base hidden lg:block" style="flex: 1 1 0;">{{ timeago(m.start) }}</div>
-            <div class="text-gray-700 mr-4 text-sm md:text-base" style="flex: 1 1 0;">
+          </div>
+          <div class="text-xs text-gray-600">
+            <div class="">{{ human_date(m.start) }},
               {{ m.minute_count }}
               {% if m.minute_count == 1 %}fundarliður{% else %}fundarliðir{% endif %}
             </div>
-            <a
-                href="{{
-                  url_for('get_meeting',
-                    muni_slug=municipality.slug,
-                    council_slug=m.council.council_type.value.slug,
-                    meeting_id=h.encode(m.id)) }}"
-                class="block rounded-md border-blue-800 border-2 px-4 py-1 text-sm font-bold text-blue-800"
-            >
-              Nánar
-            </a>
           </div>
-          <ul class="my-1">
-          {% for enum, count in m.counts.items() if count -%}
-            <li class="mr-1 mb-1 inline-block">
-              <span class="pill pill-{{ enum.value.color }}">{{ count }}</span>
-              <span class="text-xs text-gray-800">{{ enum.value.label }}</span>
-            </li>
-          {% endfor -%}
-          </ul>
         </div>
+        <ul>
+        {% for enum, count in m.folded_counts.items() if count -%}
+          <li class="mr-1 mb-1 inline truncate">
+            <span class="pill pill-{{ 'yellow' if enum.name == 'other' else enum.value.color }}">{{ count }}</span>
+            <span class="text-xs text-gray-800">{{ enum.value.label }}</span>
+          </li>
+        {% endfor -%}
+        </ul>
       </div>
-      {% endfor %}
+    {% endfor %}
     </div>
   {% endfor %}
-  </div>
+{% endmacro %}
+
+{% block title %}{{ "{} í ".format(council.name) if council else "Fundargerðir, " }}{{ municipality.name }} — {{ super() }}{% endblock %}
+{% block og_title %}{{ "{} í ".format(council.name) if council else "Fundargerðir, " }}{{ municipality.name }} — {{ super() }}{% endblock %}
+
+{% block body %}
+<div class="my-8 mt-4 sm:mt-8">
+
+  {% call breadcrumbs() %}
+    {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
+    {{ breadcrumb(None, council.name if council else "Fundargerðir") }}
+  {% endcall %}
+
   {{ pagination() }}
+
+  <div class="grid grid-cols-1 md:grid-cols-3 col-gap-4">
+    <div class="md:order-last">{{ filters() }}</div>
+    <div class="meetings md:col-span-2">
+      {{ results(meetings) }}
+    </div>
+  </div>
+
+  {{ pagination() }}
+
 </div>
+
 {% endblock body %}
