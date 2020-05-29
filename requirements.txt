@@ -120,6 +120,8 @@ httptools==0.1.1; sys_platform != "win32" and sys_platform != "cygwin" and platf
     --hash=sha256:3592e854424ec94bd17dc3e0c96a64e459ec4147e6d53c0a42d0ebcef9cb9c5d \
     --hash=sha256:0a4b1b2012b28e68306575ad14ad5e9120b34fccd02a81eb08838d7e3bbb48be \
     --hash=sha256:41b573cf33f64a8f8f3400d0a7faf48e1888582b6f6e02b82b9bd4f0bf7497ce
+iceaddr==0.4.0 \
+    --hash=sha256:c25650cbd8fc32da5ba904a2e6895dac345a6e8b42990484309a47ca67929212
 idna==2.9 \
     --hash=sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa \
     --hash=sha256:7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb
