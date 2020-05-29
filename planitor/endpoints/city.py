@@ -193,9 +193,14 @@ async def get_case(
     last_minute = minutes.first()
     last_updated = last_minute.meeting.start
 
-    related_cases = (
-        db.query(Case).filter(Case.iceaddr == case.iceaddr).order_by(Case.updated.desc())
-    )
+    if case.iceaddr is not None:
+        related_cases = (
+            db.query(Case)
+            .filter(Case.iceaddr == case.iceaddr)
+            .order_by(Case.updated.desc())
+        )
+    else:
+        related_cases = []
 
     return templates.TemplateResponse(
         "case.html",
