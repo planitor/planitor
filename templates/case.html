@@ -154,7 +154,7 @@
         <div class="">
           {{ table(minutes) }}
         </div>
-        {% if related_cases.count() %}
+        {% if related_cases and related_cases.count() %}
         <div class="mt-6">
           <hr>
           <div class="text-xl font-thin tracking-tight mb-4 mt-8">Önnur mál á sama heimilisfangi</div>
