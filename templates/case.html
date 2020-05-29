@@ -127,6 +127,13 @@
           <div class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden lg:h-full lg:max-h-screen" style="min-height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
         {% endif %}
         <div class="hidden">{{ case.get_coordinates() }}</div>
+        {% if case.iceaddr %}
+        <div class="mb-4 text-right font-bold">
+          <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
+            Fasteignaskrá →
+          </a>
+        </div>
+        {% endif %}
       </div>
 
     </div>

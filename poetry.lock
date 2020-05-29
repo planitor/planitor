@@ -439,6 +439,14 @@ idna = ">=2.5"
 
 [[package]]
 category = "main"
+description = "Look up information about Icelandic street addresses, postcodes and placenames"
+name = "iceaddr"
+optional = false
+python-versions = "*"
+version = "0.4.0"
+
+[[package]]
+category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
@@ -1442,7 +1450,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "af5acc1fc1a8e281e70dd26fc259b07f67a6ba4f8085acf9fdc28df681c509a4"
+content-hash = "c8b932d6aba9d8064d3741625395e2926b43d01914ac90fc66c75d823de2b377"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1683,6 +1691,9 @@ httptools = [
 hyperlink = [
     {file = "hyperlink-19.0.0-py2.py3-none-any.whl", hash = "sha256:ab4a308feb039b04f855a020a6eda3b18ca5a68e6d8f8c899cbe9e653721d04f"},
     {file = "hyperlink-19.0.0.tar.gz", hash = "sha256:4288e34705da077fada1111a24a0aa08bb1e76699c9ce49876af722441845654"},
+]
+iceaddr = [
+    {file = "iceaddr-0.4.0.tar.gz", hash = "sha256:c25650cbd8fc32da5ba904a2e6895dac345a6e8b42990484309a47ca67929212"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},

@@ -11,11 +11,9 @@ Prints a migration script and offers to run it, if there is a diff.
 """
 
 import os
-from pathlib import Path
 
 import typer
 from migra import Migration
-from sqlalchemy import text as sa_text
 
 
 def sync(DB_URL: str = "postgresql://planitor:@localhost/planitor"):
@@ -35,12 +33,6 @@ def sync(DB_URL: str = "postgresql://planitor:@localhost/planitor"):
         with engine.connect() as connection:
             register_composites(connection)
         Base.metadata.create_all(engine)
-
-        project_dir = Path(__file__).parent.parent
-
-        with open(project_dir.absolute() / "sql" / "dramatiq.sql") as fp:
-            escaped_sql = sa_text(fp.read())
-            engine.execute(escaped_sql)
 
         with S(DB_URL) as s_current, S(TEMP_DB_URL) as s_target:
             m = Migration(s_current, s_target)

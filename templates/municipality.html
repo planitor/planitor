@@ -8,7 +8,16 @@
     <li>
       <a
         class="text-midnight font-semibold"
-        href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}?page={{ paging.bookmark_previous }}">
+        href="{{-
+          url_for(
+            'get_municipality',
+            muni_slug=municipality.slug,
+            council_slug=council.council_type.value.slug,
+          ) if council else url_for(
+            'get_municipality',
+            muni_slug=municipality.slug,
+          )
+        }}?page={{ paging.bookmark_previous }}{{ ("&year={}".format(year) if year else '')|safe }}">
         ← Fyrri síða
       </a>
     </li>
@@ -21,7 +30,16 @@
     <li>
       <a
         class="text-midnight font-semibold"
-        href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}?page={{ paging.bookmark_next }}">
+        href="{{-
+          url_for(
+            'get_municipality',
+            muni_slug=municipality.slug,
+            council_slug=council.council_type.value.slug,
+          ) if council else url_for(
+            'get_municipality',
+            muni_slug=municipality.slug,
+          )
+        }}?page={{ paging.bookmark_next }}{{ ("&year={}".format(year) if year else '')|safe }}">
         Næsta síða →
       </a>
     </li>

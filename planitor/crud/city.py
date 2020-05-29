@@ -1,4 +1,3 @@
-import re
 from typing import Tuple, Optional
 
 from sqlalchemy import func
@@ -7,18 +6,20 @@ from sqlalchemy.orm import Session
 from planitor.cases import get_case_status_from_remarks
 from planitor.language.companies import clean_company_name
 from planitor.models import (
+    Address,
     Case,
     CaseEntity,
     Council,
     CouncilTypeEnum,
     Entity,
     EntityTypeEnum,
+    Meeting,
     Geoname,
     Housenumber,
-    Meeting,
     Minute,
     Municipality,
 )
+from planitor.geo import get_address_lookup_params, lookup_address
 from planitor.utils.kennitala import Kennitala
 from planitor.utils.text import slugify, fold
 
@@ -120,42 +121,6 @@ def get_or_create_case_entity(db: Session, case: Case, entity: Entity, applicant
     return case_entity, created
 
 
-""" The following regex matches street and house numbers like these:
-Síðumúli 24-26
-Prófgata 12b-14b
-Sæmundargata 21
-Tjarnargata 10D
-Bauganes 3A
-Vesturás 10 - 16
-"""
-
-ADDRESS_RE = re.compile(r"^([^\W\d]+) (\d+[A-Za-z]?(?: ?- ?)?(?:\d+[A-Za-z]?)?)?$")
-
-
-def get_geoname_and_housenumber_from_address_and_municipality(db, address, municipality):
-    match = re.match(ADDRESS_RE, address)
-    if not match:
-        return None, None
-
-    street_name, number = match.groups()
-    street = (
-        db.query(Geoname)
-        .filter_by(name=street_name, city=municipality.name)
-        .order_by(Geoname.importance)
-        .first()
-    )
-
-    if street is None:
-        return None, None
-
-    housenumber = (
-        db.query(Housenumber)
-        .filter_by(street=street, housenumber=number.replace(" ", ""))
-        .first()
-    )
-    return street, housenumber
-
-
 def create_minute(db, meeting, **items):
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
@@ -164,12 +129,7 @@ def create_minute(db, meeting, **items):
     case.address = case_address
 
     if case_created:
-        (
-            case.geoname,
-            case.housenumber,
-        ) = get_geoname_and_housenumber_from_address_and_municipality(
-            db, address=case_address, municipality=meeting.council.municipality,
-        )
+        update_case_address(db, case)
         case.updated = meeting.start
         db.add(case)
 
@@ -187,6 +147,86 @@ def create_minute(db, meeting, **items):
 
     db.add(minute)
     return minute
+
+
+# Just to be careful, list the keys we are interested in in case iceaddr adds new fields
+# which would not yet be columns on our side - in addition to dropping the x_isn93,
+# y_isn93 fields.
+ADDRESS_KEYS = [
+    "hnitnum",
+    "bokst",
+    "byggd",
+    "heiti_nf",
+    "heiti_tgf",
+    "husnr",
+    "landnr",
+    "lat_wgs84",
+    "long_wgs84",
+    "lysing",
+    "postnr",
+    "serheiti",
+    "stadur_nf",
+    "stadur_tgf",
+    "svaedi_nf",
+    "svaedi_tgf",
+    "svfnr",
+    "tegund",
+    "vidsk",
+]
+
+
+def get_or_create_address(db, iceaddr_match):
+    address = db.query(Address).get(iceaddr_match["hnitnum"])
+    if address is None:
+        address = Address(**{k: v for k, v in iceaddr_match.items() if k in ADDRESS_KEYS})
+        db.add(address)
+        db.commit()
+    return address
+
+
+def get_geoname_and_housenumber(db, street, number, letter, city):
+
+    street = (
+        db.query(Geoname)
+        .filter_by(name=street, city=city)
+        .order_by(Geoname.importance)
+        .first()
+    )
+
+    if street is None:
+        return None, None
+
+    housenumber = (
+        db.query(Housenumber)
+        .filter(Housenumber.street == street)
+        .filter(
+            (Housenumber.housenumber == f"{number}{letter}")
+            | (Housenumber.housenumber == str(number))
+        )
+        .first()
+    )
+
+    return street, housenumber
+
+
+def update_case_address(db, case):
+    """ Update the iceaddr, geoname and housenumber attributes. There is significant
+    overlaps between iceaddr and geoname functionality but good to have both.
+
+    """
+    city = case.council.municipality.name
+    street, number, letter = get_address_lookup_params(case.address)
+
+    iceaddr_match = lookup_address(street, number, letter, city)
+    if iceaddr_match:
+        address = get_or_create_address(db, iceaddr_match)
+        case.iceaddr = address
+
+    geoname, housenumber = get_geoname_and_housenumber(db, street, number, letter, city)
+    case.geoname, case.housenumber = geoname, housenumber
+
+    db.add(case)
+    db.commit()
 
 
 def update_case_status(db, case):

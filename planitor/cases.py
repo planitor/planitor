@@ -22,7 +22,12 @@ PATTERNS = {
         r"^jákvætt með vísan til umsagnar",
     ),
     CaseStatusEnum.delayed: (r"^frestað\.",),
-    CaseStatusEnum.denied: (r"^neikvætt\.", r"^neikvætt með vísan", r"^synjað.", r"nei."),
+    CaseStatusEnum.denied: (
+        r"^neikvætt\.",
+        r"^neikvætt með vísan",
+        r"^synjað\.",
+        r"nei\.",
+    ),
     CaseStatusEnum.directed_to_adalskipulag: (
         r"^vísað til umsagnar deildarstjóra aðalskipulags\.",
     ),
@@ -77,7 +82,7 @@ def get_case_status_from_remarks(remarks) -> Optional[CaseStatusEnum]:
     return None
 
 
-def _print_statistics(db):
+def _print_statistics(db) -> None:
     """ Usage
 
     >>> from planitor.cases import _print_statistics
