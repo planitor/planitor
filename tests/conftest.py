@@ -54,14 +54,30 @@ def _c(db, obj):
     return obj
 
 
-@pytest.fixture(scope="function", name="minute")
-def minute_fixture(db):
-    from planitor.models import Municipality, Council, Meeting, Minute, Case
+@pytest.fixture(scope="function", name="case")
+def case_fixture(db):
+    from planitor.models import Municipality, Council, Case
 
     muni = _c(db, Municipality(name="Acropolis", slug="acropolis"))
     council = _c(db, Council(name="Building Office", municipality=muni))
-    meeting = _c(db, Meeting(council=council, name="1", start=dt.datetime(2000, 1, 1)))
     case = _c(db, Case(council=council))
+    return case
+
+
+@pytest.fixture(scope="function", name="meeting")
+def meeting_fixture(db, case):
+    from planitor.models import Meeting
+
+    meeting = _c(
+        db, Meeting(council=case.council, name="1", start=dt.datetime(2000, 1, 1))
+    )
+    return meeting
+
+
+@pytest.fixture(scope="function", name="minute")
+def minute_fixture(db, case, meeting):
+    from planitor.models import Minute
+
     minute = _c(db, Minute(meeting=meeting, case=case))
     return minute
 
