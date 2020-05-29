@@ -42,7 +42,7 @@
     </div>
     <footer class="w-full mt-8 bg-midnight">
       <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 text-xs sm:text-sm">
-        <p class="my-1 text-white">Planitor!</p>
+        <p class="my-1 text-white"><a href="https://planitor.substack.com/" target="_blank">Fréttabréf</a></p>
         <p class="my-1 text-white">
           <a href="mailto:hallo@planitor.io" class="font-bold text-blue-200">
             hallo@planitor.io
@@ -52,7 +52,7 @@
     </footer>
     {% include "modal.html" %}
     <script src="{{ url_for('static', path='/dist/app.js') }}"></script>
-    <!-- Hot reload script -->
+    {# Hot reload script #}
     {% if DEBUG %}
       {{ hotreload.script(url_for('hot-reload')) | safe }}
     {% endif %}

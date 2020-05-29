@@ -74,6 +74,42 @@
   </table>
 {% endmacro %}
 
+{% macro cases_table(cases) %}
+  <table class="table-auto min-w-full max-w-full">
+    <thead>
+      <tr>
+        <th class="px-0 md:px-4 py-2 minilabel text-left">Mál</th>
+        <th class="px-0 md:px-4 py-2 minilabel text-left"></th>
+        <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case in cases %}
+      <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
+        <td class="md:border px-0 md:px-4 py-2">
+          <div class="font-bold">{{ human_date(case.updated) }}</div>
+          <div class="text-gray-600 text-sm">{{ case.council.name }}</div>
+        </td>
+        <td class="md:border px-0 md:px-4 lg:px-4 py-2">
+          <a href="{{ url_for('get_case',
+            muni_slug=case.council.municipality.slug,
+            council_slug=case.council.council_type.value.slug,
+            case_id=case.serial) }}" class="underline block">
+            {{- case.serial -}}
+          </a>
+          <div class="text-gray-600 text-sm">{{ case.headline }}</div>
+        </td>
+        <td class="md:border px-0 md:px-4 py-2 text-right">
+          <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold">
+            {{ case.status.value.label if case.status else "Annað" }}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
 {% block title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 {% block og_title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 
@@ -95,7 +131,7 @@
         <div class="mb-6">
           <div class="flex justify-between items-center">
             <div class="flex-shrink">
-              <div class="flex-shrink text-2xl tracking-tight">{{ headline }}</div>
+              <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
             </div>
           </div>
           <div class="text-sm font-bold">{{ case.address }}</div>
@@ -115,7 +151,16 @@
         </div>
 
         {% block inner %}
-        {{ table(minutes) }}
+        <div class="">
+          {{ table(minutes) }}
+        </div>
+        {% if related_cases.count() %}
+        <div class="mt-6">
+          <hr>
+          <div class="text-xl font-thin tracking-tight mb-4 mt-8">Önnur mál á sama heimilisfangi</div>
+          {{ cases_table(related_cases) }}
+        </div>
+        {% endif %}
         {% endblock%}
 
       </div>

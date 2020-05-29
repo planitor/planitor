@@ -183,11 +183,19 @@ async def get_case(
     ):
         raise HTTPException(status_code=404, detail="Verk fannst ekki")
 
-    minutes = db.query(Minute).join(Meeting).filter(Minute.case_id == case.id)
+    minutes = (
+        db.query(Minute)
+        .join(Meeting)
+        .filter(Minute.case_id == case.id)
+        .order_by(Meeting.start.desc())
+    )
 
-    last_minute = minutes.order_by(Meeting.start.desc()).first()
-    headline = last_minute.headline
+    last_minute = minutes.first()
     last_updated = last_minute.meeting.start
+
+    related_cases = (
+        db.query(Case).filter(Case.iceaddr == case.iceaddr).order_by(Case.updated.desc())
+    )
 
     return templates.TemplateResponse(
         "case.html",
@@ -195,11 +203,11 @@ async def get_case(
             "municipality": case.council.municipality,
             "case": case,
             "council": case.council,
-            "minutes": minutes.order_by(Meeting.start),
+            "minutes": minutes,
             "request": request,
             "user": current_user,
-            "headline": headline,
             "last_updated": last_updated,
+            "related_cases": related_cases,
         },
     )
 

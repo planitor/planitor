@@ -273,6 +273,7 @@ class Case(Base):
     serial = Column(String)
     created = Column(DateTime, server_default=func.now())
     address = Column(String)
+    headline = Column(String)
 
     # This field is denormalized, is derived from most recent minute
     status = Column(Enum(CaseStatusEnum), nullable=True)
