@@ -144,7 +144,7 @@ def create_minute(db, meeting, **items):
     if case_created or case.updated < meeting.start:
         case.status = minute.status
         case.updated = meeting.start
-        case.headline = meeting.headline
+        case.headline = minute.headline
 
     db.add(minute)
     return minute
