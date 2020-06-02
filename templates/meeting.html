@@ -18,16 +18,26 @@ breadcrumb %}
   {{ breadcrumb(None, "Nr. {}".format(meeting.name)) }}
   {% endcall %}
 
-  <div class="mb-6 flex justify-between items-start">
-    <div>
+  <div class="flex justify-between items-start flex-col sm:flex-row">
+    <div class="mb-6">
       <div class="text-2xl tracking-tight">Fundur nr.
         {{ meeting.name }}</div>
       <div class="text-sm font-bold">{{ human_date(meeting.start) }}</div>
     </div>
-    <a class="btn block" href="{{ meeting.url }}">
+    <a class="mb-6 btn block whitespace-no-wrap" href="{{ meeting.url }}">
       {{ urlparse(meeting.url).netloc }}
       <span class="sf-symbol">{% include "symbols/arrow.up.right.circle.fill.svg" %}</span>
     </a>
+    <div class="mb-6">
+    {% for status, count in status_counts if count %}
+      <div class="mb-1">
+        <div class="pill pill-big mr-2 inline align-middle whitespace-no-wrap truncate pill-{{ status.value.color if status else 'none' }} font-bold">
+          {{ count }}
+        </div>
+        <span class="text-sm">{{ status.value.label if status else "Annað" }}</span>
+      </div>
+    {% endfor %}
+    </div>
   </div>
 
   <div class="mb-6">
@@ -52,8 +62,8 @@ breadcrumb %}
             </td>
             <td class="md:border px-0 md:px-4 py-2 hidden md:table-cell">
               <a href="{{ url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=minute.case.serial) }}" class="underline">
-                {{ minute.case.serial }}
-                {{ "({})".format(case_count) if case_count > 1 else "" -}}
+                {{ minute.case.serial -}}
+                {{ " ({})".format(case_count) if case_count > 1 else "" -}}
               </a>:
               {{ minute.headline }}
             </td>

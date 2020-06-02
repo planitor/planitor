@@ -15,7 +15,7 @@ td {
 }
 
 .btn {
-  @apply rounded-md shadow-lg bg-blue-800 px-4 py-2 font-bold text-white;
+  @apply rounded-md shadow-lg bg-midnight px-4 py-2 font-bold text-white;
 }
 
 .btn-disabled {

@@ -1,6 +1,6 @@
-{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
-
 {% extends "base.html" %}
+
+{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 
 {% set council_slug = council.council_type.value.slug %}
 
@@ -140,7 +140,7 @@
         <div class="mb-6">
           Síðast
           <div class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle">
-            {{ case.status.value.label if case.status else "tekið fyrir" }}
+            {{- case.status.value.label if case.status else "tekið fyrir" -}}
           </div>
           á fundi
           {{ timeago(last_updated).lower() }}.
@@ -169,7 +169,15 @@
         {% if case.get_coordinates() %}
           {% set lat,
           lon = case.get_coordinates() %}
-          <div class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden lg:h-full lg:max-h-screen" style="min-height: 24rem;" id="map-{{ case.id }}" data-lat="{{ lat }}" data-lon="{{ lon }}" data-address="{{ case.address }}"></div>
+          <div
+              class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden lg:h-full lg:max-h-screen"
+              data-address="{{ case.address }}"
+              data-lat="{{ lat }}"
+              data-lon="{{ lon }}"
+              id="map-{{ case.id }}"
+              style="min-height: 24rem;"
+          >
+          </div>
         {% endif %}
         <div class="hidden">{{ case.get_coordinates() }}</div>
         {% if case.iceaddr %}

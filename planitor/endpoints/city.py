@@ -133,12 +133,20 @@ async def get_meeting(
         or meeting.council.municipality.slug != muni_slug
     ):
         raise HTTPException(status_code=404, detail="Fundargerð fannst ekki")
+
+    status_counts = (
+        db.query(Minute.status, func.count(Minute.status))
+        .group_by(Minute.status, Minute.meeting_id)
+        .having(Minute.meeting_id == meeting.id)
+    )
+
     sq_count = (
         db.query(Case.id, func.count(Minute.id).label("case_count"))
         .join(Minute, Case.id == Minute.case_id)
         .group_by(Case.id)
         .subquery()
     )
+
     minutes = (
         db.query(Minute, sq_count.c.case_count)
         .select_from(Minute)
@@ -146,10 +154,12 @@ async def get_meeting(
         .join(sq_count, sq_count.c.id == Minute.case_id)
         .order_by(Minute.id)
     )
+
     return templates.TemplateResponse(
         "meeting.html",
         {
             "municipality": meeting.council.municipality,
+            "status_counts": status_counts,
             "council": meeting.council,
             "meeting": meeting,
             "minutes": minutes,
