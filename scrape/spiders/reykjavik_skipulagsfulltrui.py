@@ -119,7 +119,10 @@ class ReykjavikSkipulagsfulltruiSpider(scrapy.Spider):
                 if month.lower() == long_.lower():
                     month = i
                     break
-            start = dt.datetime(*(int(i) for i in (year, month, day, hour, minute)))
+            year, month, day, hour, minute = [
+                int(i) for i in (year, month, day, hour, minute)
+            ]
+            start = dt.datetime(year, month, day, hour, minute, tzinfo=None)
         else:
             if start is None:
                 raise Exception(

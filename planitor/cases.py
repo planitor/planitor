@@ -15,9 +15,9 @@ PATTERNS = {
     CaseStatusEnum.approved: (
         r"^samþykkt\.",
         r"^umsögn skipulagsfulltrúa samþykkt\.",
-        r"^samþykkt með vísan",
+        r"^samþykkt með",
         r"^samþykkt að gefa út framkvæmdaleyfi með vísan til",
-        r"^umsögn deildarstjóra aðalskipulags samþykkt\.",
+        r"^umsögn.+ samþykkt\.",
         r"^jákvætt\.",
         r"^jákvætt með vísan til umsagnar",
     ),
@@ -26,10 +26,20 @@ PATTERNS = {
         r"^neikvætt\.",
         r"^neikvætt með vísan",
         r"^synjað\.",
-        r"nei\.",
+        r"^nei\.",
     ),
+    CaseStatusEnum.dismissed: (r"^vísað frá með atkvæðum",),
+    CaseStatusEnum.directed_to_mayor: (
+        r"^framsent til skrifstofu borgarstjóra",
+        r"^vísað til skrifstofu borgarstjóra",
+    ),
+    CaseStatusEnum.directed_to_borgarrad: (r"^vísað til borgarráðs",),
     CaseStatusEnum.directed_to_adalskipulag: (
         r"^vísað til umsagnar deildarstjóra aðalskipulags\.",
+    ),
+    CaseStatusEnum.directed_to_skipulagssvid: (
+        r"^vísað til umsagnar umhverfis- og skipulagssviðs",
+        r"^vísað til meðferðar umhverfis- og skipulagssvið",
     ),
     CaseStatusEnum.directed_to_skipulagsrad: (
         r"^vísað til umhverfis- og skipulagsráðs",

@@ -50,7 +50,10 @@ class DatabasePipeline(object):
         if created:
             self.db.commit()  # Do this so that municipality has an id
         council, created = get_or_create_council(
-            self.db, muni, spider.council_type_slug
+            self.db,
+            muni,
+            spider.council_type_slug,
+            label=getattr(spider, "council_label", None),
         )
         if created:
             self.db.commit()

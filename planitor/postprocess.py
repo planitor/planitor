@@ -1,3 +1,5 @@
+from planitor.crud.city import get_or_create_address
+from typing import List
 from sqlalchemy.orm import Session
 
 from . import dramatiq
@@ -5,12 +7,13 @@ from .crud import (
     create_minute,
     get_or_create_case_entity,
     get_or_create_entity,
+    get_or_create_attachment,
     lookup_icelandic_company_in_entities,
 )
 from .database import db_context
 from .language.companies import extract_company_names
 from .minutes import get_minute_lemmas
-from .models import Meeting, Minute
+from .models import Meeting, Minute, Response
 from .utils.kennitala import Kennitala
 from .utils.rsk import get_kennitala_from_rsk_search
 
@@ -90,6 +93,15 @@ def update_minute_with_entity_mentions(minute_id: int):
         db.commit()
 
 
+def update_minute_with_response_items(
+    db: Session, minute: Minute, response_items: List[List[str]]
+) -> None:
+    for i, (headline, contents) in enumerate(response_items):
+        response = Response(order=i, headline=headline, contents=contents, minute=minute)
+        db.add(response)
+        db.commit()
+
+
 @dramatiq.actor
 def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session = None):
     def inner(db):
@@ -110,9 +122,18 @@ def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session =
     return lemmas
 
 
-def process_minute(db: Session, items, meeting: Meeting):
+def update_minute_with_attachments(db, minute, attachments_items):
+    for items in attachments_items:
+        get_or_create_attachment(db, minute, **items)
+        db.commit()
+
+
+def process_minute(db: Session, items: dict, meeting: Meeting):
 
     entity_items = items.pop("entities", [])
+    response_items = items.pop("responses", [])
+    attachment_items = items.pop("attachments", [])
+
     minute = create_minute(db, meeting, **items)
     db.commit()
     case = minute.case
@@ -120,11 +141,17 @@ def process_minute(db: Session, items, meeting: Meeting):
     # Update minute with the entities of record
     update_minute_with_entity_relations(db, minute, entity_items)
 
+    # Update minute with the responses
+    update_minute_with_response_items(db, minute, response_items)
+
     # Also associate companies mentioned in the inquiry, such as architects
     update_minute_with_entity_mentions.send(minute.id)
 
     # Populate the lemma column with lemmas from Greynir and/or tokenizer
     update_minute_with_lemmas.send(minute.id)
+
+    # Add attachment
+    update_minute_with_attachments(db, minute, attachment_items)
 
     db.add(case)
     db.commit()
