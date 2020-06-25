@@ -1,4 +1,5 @@
 import enum
+import re
 from collections import namedtuple
 
 from sqlalchemy import (
@@ -19,6 +20,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
 from sqlalchemy_utils import CompositeArray, CompositeType
 
+from planitor import greynir
 from ..utils.kennitala import Kennitala
 from ..database import Base
 
@@ -61,11 +63,21 @@ class CaseStatusEnum(enum.Enum):
         "Vísað til umsagnar deildarstjóra aðalskipulags",
         "yellow",
     )
+    directed_to_mayor = ColorEnumValue(
+        "visad-til-skrifstofu-borgarstjora", "Vísað til skrifstofu borgarstjóra", "yellow"
+    )
+    directed_to_borgarrad = ColorEnumValue(
+        "visad-til-borgarrads", "Vísað til borgarráðs", "yellow"
+    )
+    directed_to_skipulagssvid = ColorEnumValue(
+        "visad-til-skipulagssvids", "Vísað til umhverfis- og skipulagssviðs", "yellow"
+    )
     assigned_project_manager = ColorEnumValue(
         "visad-til-verkefnastjora", "Vísað til verkefnisstjóra", "yellow"
     )
     answered_negative = ColorEnumValue("neikvaett", "Neikvætt", "red")
     denied = ColorEnumValue("neitad", "Synjað", "red")
+    dismissed = ColorEnumValue("visad-fra", "Vísað frá", "red")
     no_comment = ColorEnumValue("engar-athugasemdir", "Engar athugasemdir", "blue")
 
 
@@ -236,9 +248,13 @@ class Attachment(Base):
     __tablename__ = "attachments"
 
     id = Column(Integer, primary_key=True, index=True)
-    file_url = Column(String)
-    file_type = Column(String, nullable=True)
-    name = Column(String)
+    created = Column(DateTime, server_default=func.now())
+    url = Column(String)
+    type = Column(String, nullable=True)
+    label = Column(String)
+    length = Column(Integer)
+    minute_id = Column(Integer, ForeignKey("minutes.id"))
+    minute = relationship("Minute")
 
 
 class CaseEntity(Base):
@@ -252,18 +268,6 @@ class CaseEntity(Base):
     # inquiry field and re-assess the entities mentioned of a minute we cannot remove
     # an entity no longer in the minute because another minute of the same case could
     # have contributed it. This should be ok since inquiries never change.
-
-
-class CaseAttachment(Base):
-    # We want to collate all attachments to cases, but they can be associated with a
-    # meeting minute about a case where they first appeared
-    __tablename__ = "case_attachments"
-    attachment_id = Column(Integer, ForeignKey("attachments.id"), primary_key=True)
-    case_id = Column(Integer, ForeignKey("cases.id"), primary_key=True)
-    created = Column(DateTime, server_default=func.now())
-
-    minute_id = Column(Integer, ForeignKey("minutes.id"))
-    minute = relationship("Minute")
 
 
 class Case(Base):
@@ -297,7 +301,6 @@ class Case(Base):
     plan_id = Column(Integer, ForeignKey(Plan.id))
     plan = relationship(Plan)
 
-    attachments = relationship(CaseAttachment)
     entities = relationship(CaseEntity)
 
     __table_args__ = (UniqueConstraint("serial", "council_id"),)
@@ -339,6 +342,18 @@ class EntityMention(object):
         )
 
 
+class Response(Base):
+    __tablename__ = "responses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order = Column(Integer)
+    headline = Column(String)
+    contents = Column(String)
+    minute = relationship("Minute")
+    minute_id = Column(Integer, ForeignKey("minutes.id"), nullable=False, index=True)
+    subjects = Column(ARRAY(String))
+
+
 class Minute(Base):
     __tablename__ = "minutes"
 
@@ -353,6 +368,14 @@ class Minute(Base):
     inquiry = Column(String)
     remarks = Column(String)
     lemmas = Column(String)
+    subcategory = Column(String)
+    participants = Column(ARRAY(String))
+    entrants_and_leavers = Column(ARRAY(String))
+    responses = relationship(Response)
+    stadgreinir = Column(String)
+
+    attachments = relationship(Attachment)
+
     entity_mentions = Column(
         CompositeArray(
             CompositeType(

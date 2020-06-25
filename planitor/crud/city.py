@@ -7,6 +7,7 @@ from planitor.cases import get_case_status_from_remarks
 from planitor.language.companies import clean_company_name
 from planitor.models import (
     Address,
+    Attachment,
     Case,
     CaseEntity,
     Council,
@@ -40,7 +41,7 @@ def get_or_create_municipality(db, slug):
     return muni, created
 
 
-def get_or_create_council(db, municipality, slug):
+def get_or_create_council(db, municipality, slug, label=None):
     council_type = getattr(CouncilTypeEnum, slug)
     created = False
     council = (
@@ -52,7 +53,7 @@ def get_or_create_council(db, municipality, slug):
         council = Council(
             council_type=council_type,
             municipality=municipality,
-            name=council_type.value["long"],
+            name=label or council_type.value["label"],
         )
         db.add(council)
         created = True
@@ -121,6 +122,20 @@ def get_or_create_case_entity(db: Session, case: Case, entity: Entity, applicant
     return case_entity, created
 
 
+def get_or_create_attachment(db, minute, url, **items):
+    attachment = (
+        db.query(Attachment)
+        .filter(Attachment.url == url, Attachment.minute == minute)
+        .first()
+    )
+    created = False
+    if attachment is None:
+        attachment = Attachment(minute=minute, url=url, **items)
+        db.add(attachment)
+        created = True
+    return attachment, created
+
+
 def create_minute(db, meeting, **items):
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
@@ -128,7 +143,7 @@ def create_minute(db, meeting, **items):
     case, case_created = get_or_create_case(db, case_serial, meeting.council)
     case.address = case_address
 
-    if case_created:
+    if case_created and case_address:
         update_case_address(db, case)
         case.updated = meeting.start
         db.add(case)

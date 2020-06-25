@@ -6,6 +6,7 @@ from .city import (  # noqa
     get_or_create_entity,
     get_or_create_meeting,
     get_or_create_municipality,
+    get_or_create_attachment,
     levenshtein_company_lookup,
     lookup_icelandic_company_in_entities,
     update_case_status,

@@ -2,7 +2,6 @@ from .city import (  # noqa
     Address,
     Attachment,
     Case,
-    CaseAttachment,
     CaseEntity,
     CaseStatusEnum,
     Council,
@@ -17,6 +16,7 @@ from .city import (  # noqa
     Municipality,
     Plan,
     PlanTypeEnum,
+    Response,
 )
 
 from .accounts import User  # noqa

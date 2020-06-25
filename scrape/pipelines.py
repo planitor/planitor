@@ -46,11 +46,17 @@ class DatabasePipeline(object):
         self.db.close()
 
     def process_item(self, item, spider):
+        if item is None:
+            raise DropItem
+
         muni, created = get_or_create_municipality(self.db, spider.municipality_slug)
         if created:
             self.db.commit()  # Do this so that municipality has an id
         council, created = get_or_create_council(
-            self.db, muni, spider.council_type_slug
+            self.db,
+            muni,
+            spider.council_type_slug,
+            label=getattr(spider, "council_label", None),
         )
         if created:
             self.db.commit()
@@ -74,7 +80,8 @@ class DatabasePipeline(object):
         self.db.commit()
 
         for data in item["minutes"]:
-            process_minute(self.db, data, meeting)
+            if data is not None:
+                process_minute(self.db, data, meeting)
 
         self.db.commit()
 

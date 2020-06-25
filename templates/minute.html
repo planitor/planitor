@@ -1,9 +1,4 @@
-{% from "includes/breadcrumbs.html" import breadcrumbs,
-breadcrumb %}
-
-{% macro asdf() %}
-<div class="grid-cols-12"></div>
-{% endmacro %}
+{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 
 {% macro meeting_card() %}
   {% set meeting_url = url_for('get_meeting', muni_slug = municipality.slug, council_slug = council.council_type.value.slug, meeting_id = h.encode(meeting.id)) %}
@@ -42,7 +37,7 @@ breadcrumb %}
 {% block inner %}
   <div class="mb-6">{{ meeting_card() }}</div>
   <div class="p-4 bg-white rounded-md shadow-lg">
-    <div class="mb-4">
+    <div>
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
       <div>
         {% for kennitala, token in minute.get_inquiry_mention_tokens() -%}
@@ -58,9 +53,60 @@ breadcrumb %}
         {% endfor -%}
       </div>
     </div>
-    <div>
+    {% if minute.remarks %}
+    <div class="mt-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
       <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
     </div>
+    {% endif %}
+    {% if minute.attachments %}
+    <div class="mt-4">
+      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fylgigögn</h5>
+      <ul class="list-disc ml-4 text-sm">
+      {% for attachment in minute.attachments %}
+        <li class="text-gray-800">
+          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
+          <span class="text-gray-400 ml-2">{{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}</span>
+        </li>
+      {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if minute.participants %}
+    <div class="mt-4">
+      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Gestir</h5>
+      <ul class="list-disc ml-4 text-sm">
+      {% for participant in minute.participants %}
+        <li class="text-gray-800">{{ participant }}</li>
+      {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if minute.entrants_and_leavers %}
+    <div class="mt-4">
+      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Komur og brottfarir</h5>
+      <ul class="list-disc ml-4 text-sm">
+      {% for _ in minute.entrants_and_leavers %}
+        <li class="text-gray-800">{{ _ }}</li>
+      {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
   </div>
+  {% if minute.responses %}
+  <div class="mt-6 p-4 bg-white rounded-md shadow-lg">
+    <div>
+      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Gagnbókanir</h5>
+      <ol>
+      {% for response in minute.responses|sort(attribute="order") %}
+        <li class="mt-2">
+          <div class="font-bold">{{ ", ".join(response.subjects) or response.headline }}</div>
+          <div class="">{{ response.contents }}</div>
+        </li>
+      {% endfor %}
+      </ol>
+    </div>
+  </div>
+  {% endif %}
+
 {% endblock %}
