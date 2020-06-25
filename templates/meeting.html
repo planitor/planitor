@@ -57,7 +57,12 @@ breadcrumb %}
                   muni_slug=minute.case.council.municipality.slug,
                   council_slug=minute.case.council.council_type.value.slug,
                   case_id=minute.case.serial,
-                  minute_id=h.encode(minute.id)) }}" class="font-bold text-midnight hover:underline">{{ minute.case.address }}</a>
+                  minute_id=h.encode(minute.id)) }}" class="text-midnight hover:underline">
+
+                <span class="font-bold">{{ minute.serial }}</span>
+                {{- ": {}".format(minute.case.address) if minute.case.address else "" }}
+
+              </a>
               <div class="md:hidden text-sm">{{ minute.headline }}</div>
             </td>
             <td class="md:border px-0 md:px-4 py-2 hidden md:table-cell">

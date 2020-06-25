@@ -134,7 +134,9 @@
               <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
             </div>
           </div>
+          {% if case.address %}
           <div class="text-sm font-bold">{{ case.address }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-6">

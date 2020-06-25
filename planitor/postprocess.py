@@ -1,8 +1,8 @@
-from planitor.crud.city import get_or_create_address
+import re
 from typing import List
 from sqlalchemy.orm import Session
 
-from . import dramatiq
+from . import dramatiq, greynir
 from .crud import (
     create_minute,
     get_or_create_case_entity,
@@ -93,11 +93,44 @@ def update_minute_with_entity_mentions(minute_id: int):
         db.commit()
 
 
+headline_pattern = re.compile(
+    r"(?:Áheyrnarfulltrúi|Fulltrúar) (.+) (?:leggur|leggja) fram svohljóðandi bókun:"
+)
+
+
+def get_subjects(headline):
+    subjects = []
+    corrections = {
+        "Pírati": "Píratar",
+        "fólk": "Flokkur fólksins",
+        "flokkur": None,
+    }
+    match = re.match(headline_pattern, headline)
+    if match is not None:
+        sentence = greynir.parse_single(headline)
+        if not sentence.score:
+            return subjects
+        try:
+            nouns = sentence.tree.S.IP.NP_SUBJ.NP_POSS.nouns
+        except AttributeError:
+            return subjects
+        for noun in nouns:
+            if noun in corrections:
+                noun = corrections[noun]
+                if noun is None:
+                    continue
+            else:
+                noun = noun.title()
+            subjects.append(noun)
+    return subjects
+
+
 def update_minute_with_response_items(
     db: Session, minute: Minute, response_items: List[List[str]]
 ) -> None:
     for i, (headline, contents) in enumerate(response_items):
         response = Response(order=i, headline=headline, contents=contents, minute=minute)
+        response.subjects = get_subjects(response.headline)
         db.add(response)
         db.commit()
 

@@ -6,7 +6,6 @@ import re
 from bs4 import BeautifulSoup as bs
 import scrapy
 
-
 from planitor.geo import lookup_address, get_address_lookup_params
 
 
@@ -28,7 +27,14 @@ def parse_entities(string: str):
     assert re.match(r"(\d{6}-\d{4}) ", string)
     _, kennitala, string = re.split(r"(\d{6}-\d{4}) ", string)
     name, *address = string.rsplit(", ", 2)
-    return kennitala.replace("-", ""), name, ", ".join(address)
+    return {
+        "kennitala": kennitala.replace("-", ""),
+        "name": name,
+        "address": ", ".join(address),
+    }
+
+
+CASE_SERIAL_RE = re.compile(r"Mál nr\. ((?:[A-Z]{2})\d+)")
 
 
 def parse_minute_first_line(string: str):
@@ -49,17 +55,18 @@ def parse_minute_first_line(string: str):
 
     stadgreinir, serial = None, None
 
-    _pattern = r"Mál nr\. ((?:[A-Z]{2})\d+)"
-    match = re.search(_pattern, string)
+    pattern = CASE_SERIAL_RE
+
+    match = re.search(pattern, string)
     if match is not None:
         serial = match.group(1)
-        string = re.sub(_pattern, "", string)
+        string = re.sub(pattern, "", string)
 
-    _pattern = r"\([\d\.]{2,}\)"
-    match = re.search(_pattern, string)
+    pattern = r"\([\d\.]{2,}\)"
+    match = re.search(pattern, string)
     if match is not None:
         stadgreinir = "{}".format(match.group(0))
-        string = re.sub(_pattern, "", string)
+        string = re.sub(pattern, "", string)
 
     headline = re.sub(r" +", " ", string.replace("\xa0", " ")).strip()
 
@@ -194,10 +201,13 @@ def process_first_paragraph(paragraph):
 
     This rejoins lines not beginning with kennitala
 
+    We can also encountered orphan lines that should be in the next paragraph.
+
     """
 
     first_line = paragraph.pop(0)
     entity_lines = []
+    orphan_lines = []
     if "\xa0" in first_line:
         insert_point = first_line.index("\xa0")
     else:
@@ -206,14 +216,18 @@ def process_first_paragraph(paragraph):
     for line in paragraph:
         if re.match(r"^\d{6}", line):
             entity_lines.append(line)
+        elif len(line) > 80 and not re.search(CASE_SERIAL_RE, line):
+            orphan_lines.append([line])
         else:
             first_line = first_line[:insert_point] + line + first_line[insert_point:]
 
-    return first_line, entity_lines
+    return first_line, entity_lines, orphan_lines
 
 
-def parse_minute_el(el: scrapy.selector.unified.Selector):
+def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
     """ From a high level the structure is like this
+
+    **********************************************************************
 
     {number}. {address or title}, {title} Mál nr {caseid}
     {optional list of entities}
@@ -236,6 +250,13 @@ def parse_minute_el(el: scrapy.selector.unified.Selector):
 
     {optional sub-classification designated by letters in paranthesis}
 
+    **********************************************************************
+
+    There are examples of completely fucked up and unparsable meetings like this one
+    https://reykjavik.is/fundargerdir/dagskra-fundar-7-november-2018
+
+    It will result in each minute to not be parsed.
+
     """
 
     paragraphs = [
@@ -245,12 +266,21 @@ def parse_minute_el(el: scrapy.selector.unified.Selector):
         for p in el.css(".field-name-field-heiti-dagskrarlidar p")
     ]
 
-    first_line, entity_lines = process_first_paragraph(paragraphs.pop(0))
+    first_paragraph = paragraphs.pop(0)
+    first_line, entity_lines, orphan_lines = process_first_paragraph(first_paragraph)
 
-    inquiry = "\n".join(paragraphs.pop(0))
+    # Sometimes there is no paragraph split and the first paragraph
+    # includes the inquiry, which is normally the second paragraph
+    # so we move it back
+    paragraphs.extend(orphan_lines)
 
     headline, stadgreinir, serial = parse_minute_first_line(first_line)
+    if serial is None:
+        return None
+
     entities = [parse_entities(s) for s in entity_lines]
+
+    inquiry = "\n".join(paragraphs.pop(0))
 
     # We have now treated the first paragraph which is special. The rest is even more
     # unstructured. In short, we have an inquiry, an optional response, then an optional
@@ -290,7 +320,7 @@ def parse_minute_el(el: scrapy.selector.unified.Selector):
     return {
         "headline": headline,
         "inquiry": inquiry,
-        "serial": None,
+        "serial": f"{index}. fundarliður",
         "case_serial": serial,
         "case_address": get_address(headline),
         "entities": entities,
@@ -305,8 +335,8 @@ def parse_minute_el(el: scrapy.selector.unified.Selector):
 
 
 def get_minutes(response):
-    for el in response.css(".agenda-items>ol>li")[:10]:
-        yield parse_minute_el(el)
+    for i, el in enumerate(response.css(".agenda-items>ol>li")):
+        yield parse_minute_el(i + 1, el)
 
 
 """
@@ -334,15 +364,23 @@ class ReykjavikSkipulagsradSpider(scrapy.Spider):
     council_type_slug = "skipulagsrad"
     council_label = "Skipulags- og samgönguráð"
     name = "{}_{}".format(municipality_slug, council_type_slug)
-    start_urls = [get_url()]
+    start_urls = [get_url(page=0)]
 
-    def parse(self, response):
+    def parse(self, response, page=0):
         soup = bs(json.loads(response.text)[1]["data"], "html5lib")
+        count = len(soup.select(".filter-bl-item"))
+
         for el in soup.select(".filter-bl-item"):
             isodate, _ = el.select_one(".date-display-single").get("content").split("T")
             date = dt.date.fromisoformat(isodate)
             href = el.select_one("a").get("href")
             yield response.follow(href, self.parse_meeting, cb_kwargs={"start": date})
+
+        if count == 20:
+            # Keep paginating if we have full pages
+            yield response.follow(
+                get_url(page=page + 1), self.parse, cb_kwargs={"page": page + 1}
+            )
 
     def parse_meeting(self, response, start):
         name = response.css(".page-header::text").re_first(r"\d+")
@@ -357,7 +395,7 @@ class ReykjavikSkipulagsradSpider(scrapy.Spider):
             r"(\n)+", "\n", description
         )  # normalize multiple \n to a single linebreak
 
-        minutes = list(get_minutes(response))
+        minutes = [m for m in get_minutes(response) if m]  # filter out unparsable minutes
 
         yield {
             "url": response.url,

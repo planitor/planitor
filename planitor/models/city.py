@@ -1,4 +1,5 @@
 import enum
+import re
 from collections import namedtuple
 
 from sqlalchemy import (
@@ -19,6 +20,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
 from sqlalchemy_utils import CompositeArray, CompositeType
 
+from planitor import greynir
 from ..utils.kennitala import Kennitala
 from ..database import Base
 
@@ -349,6 +351,7 @@ class Response(Base):
     contents = Column(String)
     minute = relationship("Minute")
     minute_id = Column(Integer, ForeignKey("minutes.id"), nullable=False, index=True)
+    subjects = Column(ARRAY(String))
 
 
 class Minute(Base):
