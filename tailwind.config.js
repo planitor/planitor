@@ -4,7 +4,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        powder: "#AAE0E3",
+        powder: {
+          default: "#AAE0E3",
+          light: "#D6F9F5",
+          dark: "#8ADAE4",
+          darker: "#46BCCC",
+        },
         midnight: "#27226B",
       },
     },

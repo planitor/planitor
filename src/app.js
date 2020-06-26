@@ -4,6 +4,8 @@ import "./maps";
 import { Login, NewPassword } from "./accounts";
 import { openModal } from "./modals";
 
+import "./styles.css";
+
 document.getElementById("login-button").addEventListener("click", (event) => {
   event.stopPropagation();
   const [el, cleanup] = openModal();
@@ -23,4 +25,10 @@ if (loginEl) {
     window.location.pathname = loginEl.dataset.redirectTo;
   };
   render(<Login success={cleanup} />, el);
+}
+
+// Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
+// Learn more: https://www.snowpack.dev/#hot-module-replacement
+if (import.meta.hot) {
+  import.meta.hot.accept();
 }

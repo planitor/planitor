@@ -1,0 +1,18 @@
+{
+  "extends": "@snowpack/app-scripts-preact",
+  "scripts": { "build:css": "postcss" },
+  "plugins": ["@snowpack/plugin-webpack"],
+  "proxy": {
+    "/s": {
+      "secure": false,
+      "changeOrigin": false,
+      "ignorePath": false,
+      "xfwd": true,
+      "target": "http://localhost:5000/"
+    },
+    "/static": {
+      "ignorePath": false,
+      "target": "http://localhost:5000/"
+    }
+  }
+}
