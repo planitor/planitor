@@ -55,7 +55,7 @@ poetry run uvicorn planitor.main:app --host 0.0.0.0 --port 5000 --reload
 Run frontend
 
 ```bash
-yarn run watch
+yarn run start
 ```
 
 Preparing deployment

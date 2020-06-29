@@ -1,5 +1,4 @@
 import enum
-import re
 from collections import namedtuple
 
 from sqlalchemy import (
@@ -20,7 +19,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
 from sqlalchemy_utils import CompositeArray, CompositeType
 
-from planitor import greynir
 from ..utils.kennitala import Kennitala
 from ..database import Base
 

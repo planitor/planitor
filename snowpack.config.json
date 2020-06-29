@@ -1,0 +1,10 @@
+{
+  "extends": "@snowpack/app-scripts-preact",
+  "scripts": { "build:css": "postcss" },
+  "plugins": [
+    [
+      "@snowpack/plugin-webpack",
+      { "outputPattern": { "js": "bundle.js", "css": "styles.css" } }
+    ]
+  ]
+}

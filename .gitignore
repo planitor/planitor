@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-build/
 *.egg-info/
 
 # VSCode
@@ -19,3 +18,4 @@ poetry.lock
 .cache
 .env
 .pytest_cache
+public

@@ -15,7 +15,9 @@
       <div class="mb-1">
         <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
                     if e.entity_type.name == 'company' else
-                    url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}" class="text-blue-700 font-semibold font-sm block truncate">
+                    url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}"
+          class="text-blue-700 font-semibold font-sm truncate"
+        >
           <span class="sf-symbol">
             {% if e.entity_type.name == "company" %}
               {% include "symbols/briefcase.fill.svg" %}
@@ -135,13 +137,22 @@
             </div>
           </div>
           {% if case.address %}
-          <div class="text-sm font-bold">{{ case.address }}</div>
+          <div class="text-sm font-bold">
+            {{ case.address }}
+            {% if case.iceaddr %}
+            <span class="ml-2 text-powder-dark hover:text-powder-darker font-bold">
+              <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
+                → skra.is
+              </a>
+            </span>
+            {% endif %}
+          </div>
           {% endif %}
         </div>
 
         <div class="mb-6">
           Síðast
-          <div class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle">
+          <div class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle shadow-lg">
             {{- case.status.value.label if case.status else "tekið fyrir" -}}
           </div>
           á fundi
@@ -182,13 +193,6 @@
           </div>
         {% endif %}
         <div class="hidden">{{ case.get_coordinates() }}</div>
-        {% if case.iceaddr %}
-        <div class="mb-4 text-right font-bold">
-          <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
-            Fasteignaskrá →
-          </a>
-        </div>
-        {% endif %}
       </div>
 
     </div>
