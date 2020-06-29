@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8"/>
     <title>{% block title %}Planitor{% endblock %}</title>
-    {% if DEBUG -%}
-    <link href="{{ url_for('static', path='/dist/styles.css') }}" rel="stylesheet"/>
+    {% if not DEBUG -%}
+    <link href="{{ url_for('build', path='/styles.css') }}" rel="stylesheet"/>
     {% endif -%}
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}"/>
@@ -54,13 +54,11 @@
     </footer>
     {% include "modal.html" %}
     {% if DEBUG %}
-    <script type="module" src="/_dist_/app.js"></script>
-    {% else %}
-    <script src="{{ url_for('static', path='/dist/app.js') }}"></script>
-    {% endif %}
     {# Hot reload script #}
-    {% if DEBUG %}
-      {{ hotreload.script(url_for('hot-reload')) | safe }}
+    {{ hotreload.script(url_for('hot-reload')) | safe }}
+    <script type="module" src="http://localhost:8080/_dist_/index.js"></script>
+    {% else %}
+    <script src="{{ url_for('build', path='/bundle.js') }}"></script>
     {% endif %}
-  </body>
+    </body>
 </html>

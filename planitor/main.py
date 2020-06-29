@@ -35,4 +35,5 @@ async def get_server_error(request: Request):
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/build", StaticFiles(directory="build"), name="build")
 app.include_router(router)
