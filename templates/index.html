@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Planitor</title>
-    <link href="{{ url_for('static', path='/dist/styles.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('build', path='/styles.css') }}" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:title" content="Planitor" />
     <meta property="og:description" content="Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi" />
@@ -19,21 +19,21 @@
     <meta property="og:image" content="{{ url_for('static', path='/opengraph.png') }}" />
     <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
   </head>
-  <body id="teaser" class="flex flex-col flex-wrap items-center min-h-screen">
+  <body id="teaser" class="flex flex-col flex-wrap items-center">
     <div
       class="w-full fixed bg-powder z-0 h-screen"
       style="background-image: linear-gradient(180deg, #c0dfe1 0%, #8dbcbf 100%);"
     ></div>
     <div
       style="box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.5);"
-      class="z-1 relative w-full sm:px-10 md:max-w-screen-md md:my-8 md:py-6 md:rounded-lg m-auto bg-midnight min-h-screen text-white"
+      class="z-1 relative w-full sm:px-10 md:max-w-screen-md md:my-8 md:py-6 md:rounded-lg m-auto bg-midnight text-white"
     >
       <header class="p-4 my-2">
         <div class="flex items-center">
           <div class="logo h-12 w-12 mr-3">{% include "emblem.svg" %}</div>
           <div class="font-semibold text-5xl">Planitor</div>
         </div>
-        <p class="pl-16 mb-2 font-light font-medium">
+        <p class="pl-16 mb-2 font-medium">
           Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi*
         </p>
       </header>
@@ -72,7 +72,7 @@
           skemmtilegasta rakleitt í pósthólfið þitt.
         </p>
         <a
-          class="inline-block rounded-full bg-powder text-midnight text-xl font-bold py-3 my-3 w-full md:w-2/3 flex items-center justify-center"
+          class="rounded-full bg-powder text-midnight text-xl font-bold py-3 my-3 w-full md:w-2/3 flex items-center justify-center"
           href="https://planitor.substack.com/"
         >
           <span class="icon mr-2">{% include "teaser/mail.svg" %}</span>
@@ -82,7 +82,7 @@
       <section class="p-4 md:py-8">
         <div class="flex items-center mb-4">
           <img
-            class="w-16 mr-2"
+            class="w-16 h-16 mr-4"
             src="{{ url_for('static', path='/teaser/gummi.png') }}"
             alt="Mynd af Gumma"
           />
@@ -95,7 +95,7 @@
         </div>
         <div class="flex items-center">
           <img
-            class="w-16 mr-2"
+            class="w-16 h-16 mr-4"
             src="{{ url_for('static', path='/teaser/jokull.png') }}"
             alt="Mynd af Jökli"
           />

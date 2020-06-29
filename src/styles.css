@@ -71,7 +71,7 @@ td {
 }
 
 .pill-blue {
-  @apply bg-blue-200 text-blue-800 border-blue-800 border-blue-800 border-opacity-25;
+  @apply bg-blue-200 text-blue-800 border-blue-800 border-opacity-25;
 }
 
 .pill-red {
