@@ -272,7 +272,7 @@ def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
     # Sometimes there is no paragraph split and the first paragraph
     # includes the inquiry, which is normally the second paragraph
     # so we move it back
-    paragraphs.extend(orphan_lines)
+    paragraphs = orphan_lines + paragraphs
 
     headline, stadgreinir, serial = parse_minute_first_line(first_line)
     if serial is None:

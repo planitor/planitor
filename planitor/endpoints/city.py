@@ -207,6 +207,7 @@ async def get_case(
         related_cases = (
             db.query(Case)
             .filter(Case.iceaddr == case.iceaddr)
+            .filter(Case.id != case.id)
             .order_by(Case.updated.desc())
         )
     else:
