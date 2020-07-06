@@ -268,6 +268,20 @@ def get_minute(
         .first()
     ).meeting.start
 
+    next_minute = (
+        db.query(Minute)
+        .filter(Minute.meeting == minute.meeting, Minute.id > minute.id)
+        .order_by(Minute.id)
+        .first()
+    )
+
+    previous_minute = (
+        db.query(Minute)
+        .filter(Minute.meeting == minute.meeting, Minute.id < minute.id)
+        .order_by(Minute.id.desc())
+        .first()
+    )
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -281,6 +295,8 @@ def get_minute(
             "user": current_user,
             "headline": minute.headline,
             "last_updated": last_updated,
+            "next_minute": next_minute,
+            "previous_minute": previous_minute,
         },
     )
 

@@ -2,7 +2,7 @@ import re
 from typing import Optional
 from collections import defaultdict
 
-from tokenizer import tokenize, split_into_sentences, TOK
+from tokenizer import tokenize, TOK
 
 from planitor.models import Minute, Meeting, CaseStatusEnum
 

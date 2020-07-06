@@ -36,6 +36,32 @@
 
 {% block inner %}
   <div class="mb-6">{{ meeting_card() }}</div>
+  <div class="mb-4 flex">
+    {% if previous_minute %}
+    <a
+      class="bg-gray-200 rounded-md text-gray-900 text-sm p-2 px-4"
+      href="{{ url_for('get_minute',
+      muni_slug=municipality.slug,
+      council_slug=council_slug,
+      case_id=previous_minute.case.serial,
+      minute_id=h.encode(previous_minute.id)) }}"
+    >‹ {{ previous_minute.serial }}</a>
+    {% endif %}
+    <div class="flex-grow p-2 px-4 text-center font-bold">
+      {{ minute.serial }}
+    </div>
+    {% if next_minute %}
+    <a
+      class="bg-gray-200 rounded-md text-gray-900 text-sm p-2 px-4"
+      href="{{ url_for('get_minute',
+        muni_slug=municipality.slug,
+        council_slug=council_slug,
+        case_id=next_minute.case.serial,
+        minute_id=h.encode(next_minute.id)) }}"
+      >{{ next_minute.serial }} ›
+    </a>
+    {% endif %}
+  </div>
   <div class="p-4 bg-white rounded-md shadow-lg">
     <div>
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
