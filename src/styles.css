@@ -86,6 +86,22 @@ td {
   @apply bg-green-200 text-green-800 border-green-800 border-opacity-25;
 }
 
+.highlight-blue {
+  @apply text-blue-600;
+}
+
+.highlight-red {
+  @apply text-red-600;
+}
+
+.highlight-yellow {
+  @apply text-yellow-600;
+}
+
+.highlight-green {
+  @apply text-green-600;
+}
+
 @screen sm {
   .munis {
     grid-template-columns: repeat(2, 1fr);

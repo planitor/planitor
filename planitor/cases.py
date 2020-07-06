@@ -20,6 +20,7 @@ PATTERNS = {
         r"^umsögn.+ samþykkt\.",
         r"^jákvætt\.",
         r"^jákvætt með vísan til umsagnar",
+        r"^samþykkt að falla frá kynningu",
     ),
     CaseStatusEnum.delayed: (r"^frestað\.",),
     CaseStatusEnum.denied: (
@@ -30,37 +31,38 @@ PATTERNS = {
     ),
     CaseStatusEnum.dismissed: (r"^vísað frá með atkvæðum",),
     CaseStatusEnum.directed_to_mayor: (
-        r"^framsent til skrifstofu borgarstjóra",
-        r"^vísað til skrifstofu borgarstjóra",
+        r"framsent til skrifstofu borgarstjóra",
+        r"vísað til skrifstofu borgarstjóra",
     ),
-    CaseStatusEnum.directed_to_borgarrad: (r"^vísað til borgarráðs",),
+    CaseStatusEnum.directed_to_borgarrad: (r"vísað til borgarráðs",),
     CaseStatusEnum.directed_to_adalskipulag: (
-        r"^vísað til umsagnar deildarstjóra aðalskipulags\.",
+        r"vísað til umsagnar deildarstjóra aðalskipulags\.",
     ),
     CaseStatusEnum.directed_to_skipulagssvid: (
-        r"^vísað til umsagnar umhverfis- og skipulagssviðs",
-        r"^vísað til meðferðar umhverfis- og skipulagssvið",
+        r"vísað til umhverfis- og skipulagssvið",
+        r"vísað til umsagnar umhverfis- og skipulagssviðs",
+        r"vísað til meðferðar umhverfis- og skipulagssvið",
     ),
     CaseStatusEnum.directed_to_skipulagsrad: (
-        r"^vísað til umhverfis- og skipulagsráðs",
-        r"^vísað til skipulags- og samgönguráðs",
+        r"vísað til umhverfis- og skipulagsráðs",
+        r"vísað til skipulags- og samgönguráðs",
     ),
     CaseStatusEnum.assigned_project_manager: (
-        r"^vísað til umsagnar verkefnisstjóra\.",
-        r"^vísað til umsagnar hjá verkefnisstjóra\.",
-        r"^vísað til meðferðar verkefnisstjóra\.",
-        r"^vísað til meðferðar hjá verkefnisstjóra\.",
+        r"vísað til umsagnar verkefnisstjóra\.",
+        r"vísað til umsagnar hjá verkefnisstjóra\.",
+        r"vísað til meðferðar verkefnisstjóra\.",
+        r"vísað til meðferðar hjá verkefnisstjóra\.",
     ),
     CaseStatusEnum.no_comment: (
-        r"^ekki eru gerðar skipulagslegar athugasemdir við erindið",
-        r"^ekki er gerð athugasemd við erindið",
-        r"^ekki gerð athugasemd við erindið",
+        r"ekki eru gerðar skipulagslegar athugasemdir við erindið",
+        r"ekki er gerð athugasemd við erindið",
+        r"ekki gerð athugasemd við erindið",
     ),
     CaseStatusEnum.notice: (r"^samþykkt að grenndarkynna", r"^grenndarkynning samþykkt",),
 }
 
 
-def clean_first_sentence(text):
+def clean_sentence(text: str) -> str:
     """ This is written to clean up and consolidate as many remarks as possible.
     They are hand written and when initially analyzing it was very useful to count
     instances of certain sentence structures. Therefore date tokens are being
@@ -68,12 +70,11 @@ def clean_first_sentence(text):
 
     """
 
-    text = next(split_into_sentences(text))
     text = text.lower()
     text = re.sub(COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text)
 
-    def tokens(sentence):
-        for token in tokenize(sentence):
+    def tokens(text):
+        for token in tokenize(text):
             if token.txt and token.kind == TOK.WORD and token.txt != "dags.":
                 yield token.txt
 
@@ -84,10 +85,10 @@ def clean_first_sentence(text):
 def get_case_status_from_remarks(remarks) -> Optional[CaseStatusEnum]:
     if not remarks:
         return None
-    remarks = clean_first_sentence(remarks)
+    remarks = clean_sentence(remarks)
     for case_status, patterns in PATTERNS.items():
         for pattern in patterns:
-            if re.match(pattern, remarks) is not None:
+            if re.search(pattern, remarks) is not None:
                 return case_status
     return None
 

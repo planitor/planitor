@@ -37,15 +37,15 @@
   <table class="table-auto min-w-full max-w-full">
     <thead>
       <tr>
-        <th class="px-0 md:px-4 py-2 minilabel text-left">Bókun</th>
-        <th class="px-0 md:px-4 py-2 minilabel text-left">Fundur</th>
-        <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
+        <th class="px-0 md:px-3 py-2 minilabel text-left">Bókun</th>
+        <th class="px-0 md:px-3 py-2 minilabel text-left">Fundur</th>
+        <th class="px-0 md:px-3 py-2 minilabel text-right">Staða</th>
       </tr>
     </thead>
     <tbody>
       {% for minute in minutes %}
       <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
-        <td class="md:border px-0 md:px-4 lg:px-4 py-2">
+        <td class="md:border px-0 md:px-3 lg:px-3 py-2">
           <a href="{{ url_for('get_minute',
             muni_slug=minute.case.council.municipality.slug,
             council_slug=minute.case.council.council_type.value.slug,
@@ -56,7 +56,7 @@
             -
             {{ timeago(minute.meeting.start) }}</span>
         </td>
-        <td class="md:border px-0 md:px-4 py-2">
+        <td class="md:border px-0 md:px-3 py-2">
           <a href="{{ url_for('get_meeting',
             muni_slug=municipality.slug,
             council_slug=council.council_type.value.slug,
@@ -65,7 +65,7 @@
             {{ minute.meeting.name }}
           </a>
         </td>
-        <td class="md:border px-0 md:px-4 py-2 text-right">
+        <td class="md:border px-0 md:px-3 py-2 text-right">
           <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
             {{ minute.status.value.label if minute.status else "Annað" }}
           </div>
@@ -76,40 +76,40 @@
   </table>
 {% endmacro %}
 
-{% macro cases_table(cases) %}
-  <table class="table-auto min-w-full max-w-full">
-    <thead>
-      <tr>
-        <th class="px-0 md:px-4 py-2 minilabel text-left">Mál</th>
-        <th class="px-0 md:px-4 py-2 minilabel text-left"></th>
-        <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for case in cases %}
-      <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
-        <td class="md:border px-0 md:px-4 py-2">
-          <div class="font-bold">{{ human_date(case.updated) }}</div>
-          <div class="text-gray-600 text-sm">{{ case.council.name }}</div>
-        </td>
-        <td class="md:border px-0 md:px-4 lg:px-4 py-2">
+{% macro get_cases(cases, count) %}
+  <ul>
+    {% for case in cases[:3] %}
+    <li class="mb-2 list-disc ml-4">
+      <div class="text-sm">
+        <span>
           <a href="{{ url_for('get_case',
             muni_slug=case.council.municipality.slug,
             council_slug=case.council.council_type.value.slug,
-            case_id=case.serial) }}" class="underline block">
-            {{- case.serial -}}
+            case_id=case.serial) }}">
+            <span class="underline">{{ case.headline }}</span>
+            <span class="text-gray-600 font-thin">{{- case.serial -}}</span>
           </a>
-          <div class="text-gray-600 text-sm">{{ case.headline }}</div>
-        </td>
-        <td class="md:border px-0 md:px-4 py-2 text-right">
-          <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold">
-            {{ case.status.value.label if case.status else "Annað" }}
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        </span>
+      </div>
+      <div class="font-light text-xs">
+        <span class="highlight-{{ case.status.value.color if case.status else 'none' }}">
+          {{ case.status.value.label if case.status else "Annað" }}
+        </span> {{ human_date(case.updated) }}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if count > 3 %}
+    <div class="text-sm font-bold">
+      <a href="#" class="text-midnight">
+      {% if count == 4 %}
+        … og eitt annað mál
+      {% else %}
+        … og {{ count - 3 }} önnur mál
+      {% endif %}
+      </a>
+    </div>
+  {% endif %}
 {% endmacro %}
 
 {% block title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
@@ -137,16 +137,7 @@
             </div>
           </div>
           {% if case.address %}
-          <div class="text-sm font-bold">
-            {{ case.address }}
-            {% if case.iceaddr %}
-            <span class="ml-2 text-powder-dark hover:text-powder-darker font-bold">
-              <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
-                → skra.is
-              </a>
-            </span>
-            {% endif %}
-          </div>
+          <div class="text-sm font-bold">{{ case.address }}</div>
           {% endif %}
         </div>
 
@@ -167,32 +158,50 @@
         <div class="">
           {{ table(minutes) }}
         </div>
-        {% if related_cases and related_cases.count() %}
-        <div class="mt-6">
-          <hr>
-          <div class="text-xl font-thin tracking-tight mb-4 mt-8">Aðrar bókanir á sama heimilisfangi</div>
-          {{ cases_table(related_cases) }}
-        </div>
-        {% endif %}
         {% endblock%}
 
       </div>
 
       <div class="mb-6 lg:col-span-2">
-        {% if case.get_coordinates() %}
-          {% set lat,
-          lon = case.get_coordinates() %}
-          <div
-              class="map h-64 w-full h-full shadow-lg lazyload mb-6 rounded-md overflow-hidden lg:h-full lg:max-h-screen"
-              data-address="{{ case.address }}"
-              data-lat="{{ lat }}"
-              data-lon="{{ lon }}"
+        <div class="shadow-lg rounded-md overflow-hidden bg-white">
+
+          {% if case.get_coordinates() %}
+            {% set lat, lon = case.get_coordinates() %}
+            <div
+              class="map w-full lazyload"
+              data-address="{{ case.address }}" data-lat="{{ lat }}" data-lon="{{ lon }}"
               id="map-{{ case.id }}"
-              style="min-height: 24rem;"
-          >
-          </div>
-        {% endif %}
-        <div class="hidden">{{ case.get_coordinates() }}</div>
+              style="height: 18rem;"
+            >
+            </div>
+          {% endif %}
+
+          {% set case_count = (related_cases.count() if related_cases else 0) %}
+
+          {% if case_count %}
+            <div class="p-3">
+              <div class="text-xl font-bold">{{ case.iceaddr }}</div>
+              <div class="text-sm font-thin tracking-tight mb-4">
+                {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
+              </div>
+              {{ get_cases(related_cases, case_count) }}
+              <div class="text-xs font-thin tracking-tight mt-4">
+                Landnúmer: {{ case.iceaddr.landnr }}
+                {% if case.iceaddr %}
+                <span class="ml-2 text-powder-dark hover:text-powder-darker font-bold">
+                  <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
+                    → skrá.is
+                  </a>
+                </span>
+                {% endif %}
+                <br>
+                Hnitnúmer: {{ case.iceaddr.hnitnum }}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="hidden">{{ case.get_coordinates() }}</div>
+        </div>
       </div>
 
     </div>
