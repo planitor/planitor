@@ -1,6 +1,7 @@
 from .city import (  # noqa
     Address,
     Attachment,
+    AttachmentThumbnail,
     Case,
     CaseEntity,
     CaseStatusEnum,

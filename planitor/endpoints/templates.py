@@ -1,10 +1,16 @@
 import datetime as dt
 from urllib.parse import urlparse
 
+import imgix
 from starlette.templating import Jinja2Templates
 
 from planitor import hashids, config
 from planitor.utils.timeago import timeago
+
+
+imgix_url_builder = imgix.UrlBuilder(
+    "planitor.imgix.net", sign_key=config.get("IMGIX_TOKEN")
+)
 
 
 def human_date(date: dt.datetime) -> str:
@@ -32,6 +38,7 @@ templates.env.globals.update(
         "urlparse": urlparse,
         "timeago": timeago,
         "human_date": human_date,
+        "imgix": imgix_url_builder.create_url,
         "DEBUG": config("DEBUG", cast=bool, default=False),
     }
 )

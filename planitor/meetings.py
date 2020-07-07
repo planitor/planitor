@@ -1,7 +1,7 @@
 from sqlalchemy import func
 from sqlakeyset import get_page
 
-from planitor.models import CaseStatusEnum, Minute, Meeting, Council
+from .models import CaseStatusEnum, Minute, Meeting, Council
 
 
 class MeetingWrap:
