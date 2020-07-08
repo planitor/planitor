@@ -76,11 +76,8 @@ def get_thumbnails(url: str) -> Iterator[Tuple[int, Image]]:
             with get_pdf_page_image(pdf_image, page) as page_image:
                 page_image.background_color = Color("#fff")
                 page_image.alpha_channel = "remove"
-                page_image.transform(resize=f"2000x")
+                page_image.transform(resize="1800x")
                 yield page, page_image
-                from wand.display import display
-
-                display(Image(blob=page_image.make_blob("PNG"), format="PNG"))
                 page += 1
 
 
