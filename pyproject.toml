@@ -30,6 +30,9 @@ tokenizer = "^2.0.6"
 sentry-dramatiq = "^0.3.2"
 html5lib = "^1.1"
 migra = "^1.0.1592301305"
+boto3 = "^1.14.17"
+wand = "^0.6.2"
+imgix = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"

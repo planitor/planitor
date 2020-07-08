@@ -20,8 +20,19 @@
 
 {% extends "case.html" %}
 
-{% block title %}Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
-{% block og_title %}Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+{% block title -%}
+  Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+{% block og_title -%}
+  Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+
+{% block og_image -%}
+  {% if minute.attachments and minute.attachments[0].thumbnails %}
+    <meta property="og:image" content="{{ imgix(minute.attachments[0].thumbnails[0].key) }}" />
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
 
 {% set council_slug = council.council_type.value.slug %}
 
@@ -36,10 +47,10 @@
 
 {% block inner %}
   <div class="mb-6">{{ meeting_card() }}</div>
-  <div class="mb-4 flex">
+  <div class="mb-4 flex text-xs md:text-sm">
     {% if previous_minute %}
     <a
-      class="bg-gray-200 rounded-md text-gray-900 text-sm p-2 px-4"
+      class="bg-gray-200 rounded-md text-gray-900 p-2 px-2 md:px-4"
       href="{{ url_for('get_minute',
       muni_slug=municipality.slug,
       council_slug=council_slug,
@@ -47,12 +58,12 @@
       minute_id=h.encode(previous_minute.id)) }}"
     >‹ {{ previous_minute.serial }}</a>
     {% endif %}
-    <div class="flex-grow p-2 px-4 text-center font-bold">
+    <div class="flex-grow p-2 px-2 md:px-4 text-center font-bold">
       {{ minute.serial }}
     </div>
     {% if next_minute %}
     <a
-      class="bg-gray-200 rounded-md text-gray-900 text-sm p-2 px-4"
+      class="bg-gray-200 rounded-md text-gray-900 p-2 px-2 md:px-4"
       href="{{ url_for('get_minute',
         muni_slug=municipality.slug,
         council_slug=council_slug,
@@ -83,19 +94,6 @@
     <div class="mt-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
       <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
-    </div>
-    {% endif %}
-    {% if minute.attachments %}
-    <div class="mt-4">
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fylgigögn</h5>
-      <ul class="list-disc ml-4 text-sm">
-      {% for attachment in minute.attachments %}
-        <li class="text-gray-800">
-          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
-          <span class="text-gray-400 ml-2">{{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}</span>
-        </li>
-      {% endfor %}
-      </ul>
     </div>
     {% endif %}
     {% if minute.participants %}
@@ -132,6 +130,34 @@
       {% endfor %}
       </ul>
     </div>
+  </div>
+  {% endif %}
+
+  {% if minute.attachments %}
+  <div class="mt-6 ">
+    <ul class="list-disc ml-4 text-sm">
+    {% for attachment in minute.attachments %}
+      <li class="text-gray-800">
+        <div>
+          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
+          <span class="text-gray-400 ml-2">{{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}</span>
+        </div>
+        {% if attachment.thumbnails %}
+        <div>
+          <ul class="overflow-y-scroll py-3 px-1">
+            {% for thumbnail in attachment.thumbnails %}
+            <li class="overflow-hidden rounded shadow-md mr-2 mb-2 float-left block">
+              <a href="{{ imgix(thumbnail.key) }}" target="_blank">
+                <img src="{{ imgix(thumbnail.key, {'h': '100'}) }}">
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
   </div>
   {% endif %}
 

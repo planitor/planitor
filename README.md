@@ -49,7 +49,7 @@ poetry install
 Run server
 
 ```bash
-poetry run uvicorn planitor.main:app --host 0.0.0.0 --port 5000 --reload
+poetry run dev-server
 ```
 
 Run frontend
@@ -70,7 +70,7 @@ Then commit this to repo and push to GitHub. Render takes over from there.
 DB Migrations
 
 ```bash
-poetry run python migrate.py
+poetry run migrate
 ```
 
 This will create a test database based upon the declarative SQLAlchemy schema,
@@ -80,13 +80,13 @@ databases. It shows the SQL migration code which you can copy-paste to tweak.
 Run workers
 
 ```bash
-poetry run dramatiq --watch planitor --processes 2 --threads 2 planitor.actors
+poetry run dramatiq --processes 2 --threads 2 planitor.actors
 ```
 
 Run development bpython shell with db object and all models imported
 
 ```bash
-poetry run python shell.py
+poetry run debug
 ```
 
 ## Render.com specs

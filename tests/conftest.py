@@ -82,6 +82,14 @@ def minute_fixture(db, case, meeting):
     return minute
 
 
+@pytest.fixture(scope="function", name="attachment")
+def attachment_fixture(db, minute):
+    from planitor.models import Attachment
+
+    attachment = _c(db, Attachment(minute=minute, url="foo"))
+    return attachment
+
+
 @pytest.fixture(scope="function", name="company")
 def company_fixture(db):
     from planitor.crud import get_or_create_entity
