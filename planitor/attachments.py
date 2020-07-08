@@ -9,7 +9,7 @@ import dramatiq
 from wand.image import Image
 from wand.color import Color
 
-from . import config
+from . import config, ENV
 from .database import db_context
 from .models import Attachment, AttachmentThumbnail
 
@@ -55,21 +55,9 @@ def update_attachment_with_pdf_thumbnails(id: int) -> None:
         if attachment.type != "application/pdf":
             return
         for page, thumbnail in get_thumbnails(attachment.url):
-            key = f"attachments/{attachment.id}/{page}.png"
+            key = f"{ENV}/attachments/{attachment.id}/{page}.png"
             upload(BytesIO(thumbnail.make_blob("PNG")), key)
             db.add(
                 AttachmentThumbnail(attachment=attachment, bucket=BUCKET_NAME, key=key)
             )
         db.commit()
-
-
-"""
-m = db.query(Meeting).filter_by(name="77").first()
-for min in db.query(Minute).filter(Minute.meeting == m):
-    for a in db.query(Attachment).filter(Attachment.minute == min):
-        if a.url and a.type == "application/pdf":
-            break
-
-from planitor.attachments import update_attachment_with_pdf_thumbnails
-update_attachment_with_pdf_thumbnails(a.id)
-"""

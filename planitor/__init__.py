@@ -14,6 +14,7 @@ hashids = Hashids(salt="planitor", min_length=4)
 
 config = Config(".env")
 DEBUG = config("DEBUG", cast=bool, default=False)
+ENV = config("ENV", default="production")
 SENTRY_DSN = config("SENTRY_DSN", cast=Secret)
 
 if not DEBUG and SENTRY_DSN:
