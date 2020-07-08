@@ -24,7 +24,7 @@
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
     <div class="bg-midnight w-full">
       <nav id="navigation" class="flex items-center justify-between px-4 sm:px-6 py-2 sm:py-3 max-w-6xl mx-auto">
-        <a href="/" class="block logo" alt="Planitor">{% include "emblem.svg" %}</a>
+        <a href="/s" class="block logo" alt="Planitor">{% include "emblem.svg" %}</a>
         <form class="search rounded-md flex-grow flex items-center px-3 mx-3 sm:mx-6 md:mx-12" method="GET" action="{{ url_for('get_search') }}">
           <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
           <input
