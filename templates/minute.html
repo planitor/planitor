@@ -21,9 +21,12 @@
 {% extends "case.html" %}
 
 {% block title -%}
-  Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+  {{ minute.headline }} / {{ case.council.name }} — {{ super.super() }}
+{%- endblock %}
+
 {% block og_title -%}
-  Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+  {{ minute.headline }} / {{ case.council.name }} — {{ super.super() }}
+{%- endblock %}
 
 {% block og_image -%}
   {% if minute.attachments and minute.attachments[0].pdf %}
@@ -32,7 +35,6 @@
     {{ super() }}
   {% endif %}
 {% endblock %}
-
 
 {% set council_slug = council.council_type.value.slug %}
 
