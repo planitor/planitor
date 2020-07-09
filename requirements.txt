@@ -353,9 +353,6 @@ uvloop==0.14.0; sys_platform != "win32" and sys_platform != "cygwin" and platfor
     --hash=sha256:bcac356d62edd330080aed082e78d4b580ff260a677508718f88016333e2c9c5 \
     --hash=sha256:4315d2ec3ca393dd5bc0b0089d23101276778c304d42faff5dc4579cb6caef09 \
     --hash=sha256:123ac9c0c7dd71464f58f1b4ee0bbd81285d96cdda8bc3519281b8973e3a461e
-wand==0.6.2 \
-    --hash=sha256:b56b96189df2ac3db586afdc6ba67ca37c886d234c3fd98d94172f03248a8e3b \
-    --hash=sha256:65440e478b595aaa18483e25091adacf6d4458c49c2fd8d59e0fd44a7393a14a
 webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923

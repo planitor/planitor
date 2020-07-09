@@ -1,7 +1,7 @@
 import dramatiq
 from .database import db_context
 from .postprocess import update_minute_with_entity_mentions, update_minute_with_lemmas
-from .attachments import update_attachment_with_pdf_thumbnails
+from .attachments import update_pdf_attachment
 
 
 @dramatiq.actor
@@ -14,5 +14,5 @@ def test_actor(num):
 __all__ = [
     "update_minute_with_entity_mentions",
     "update_minute_with_lemmas",
-    "update_attachment_with_pdf_thumbnails",
+    "update_pdf_attachment",
 ]

@@ -140,15 +140,18 @@
       <li class="text-gray-800">
         <div>
           <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
-          <span class="text-gray-400 ml-2">{{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}</span>
+          <span class="text-gray-400 ml-2">
+            {{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}
+          </span>
         </div>
-        {% if attachment.thumbnails %}
+        {% if attachment.pdf %}
         <div>
           <ul class="overflow-y-scroll py-3 px-1">
-            {% for thumbnail in attachment.thumbnails %}
+            {% for i in range(attachment.pdf.page_count) %}
+            {% set page = "{}".format(i + 1) %}
             <li class="overflow-hidden rounded shadow-md mr-2 mb-2 float-left block">
-              <a href="{{ imgix(thumbnail.key) }}" target="_blank">
-                <img src="{{ imgix(thumbnail.key, {'h': '100'}) }}">
+              <a href="{{ imgix(attachment.pdf.key, {'page': page }) }}" target="_blank">
+                <img src="{{ imgix(attachment.pdf.key, {'h': '100', 'page': page }) }}">
               </a>
             </li>
             {% endfor %}
