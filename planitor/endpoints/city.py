@@ -241,7 +241,6 @@ def get_minute(
     # Minutes are available on both case and meeting pages but it’s nice to have
     # permalinks for each minute as well, for links.
     minute = db.query(Minute).get(hashids.decode(minute_id)[0])
-    print(hashids.decode(minute_id)[0])
     if (
         minute is None
         or minute.case.serial != case_id
