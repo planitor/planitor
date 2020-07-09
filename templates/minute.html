@@ -26,8 +26,8 @@
   Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
 
 {% block og_image -%}
-  {% if minute.attachments and minute.attachments[0].thumbnails %}
-    <meta property="og:image" content="{{ imgix(minute.attachments[0].thumbnails[0].key) }}" />
+  {% if minute.attachments and minute.attachments[0].pdf %}
+    <meta property="og:image" content="{{ imgix(minute.attachments[0].pdf.key, {'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) }}" />
   {% else %}
     {{ super() }}
   {% endif %}
