@@ -242,13 +242,15 @@ class Meeting(Base):
     council = relationship(Council)
 
 
-class AttachmentThumbnail(Base):
-    __tablename__ = "attachment_thumbnails"
+class PDFAttachment(Base):
+    __tablename__ = "pdf_attachments"
 
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
     bucket = Column(String)
     key = Column(String)
+    page_count = Column(Integer)
+    page_highlight = Column(Integer)
     attachment_id = Column(Integer, ForeignKey("attachments.id"))
     attachment = relationship("Attachment")
 
@@ -265,7 +267,7 @@ class Attachment(Base):
     minute_id = Column(Integer, ForeignKey("minutes.id"))
     minute = relationship("Minute")
 
-    thumbnails = relationship(AttachmentThumbnail)
+    pdf = relationship(PDFAttachment, uselist=False)
 
 
 class CaseEntity(Base):

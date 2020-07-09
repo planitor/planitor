@@ -1041,6 +1041,20 @@ ipdb = "*"
 pytest = "*"
 
 [[package]]
+category = "dev"
+description = "Thin-wrapper around the mock package for easier use with pytest"
+name = "pytest-mock"
+optional = false
+python-versions = ">=3.5"
+version = "3.1.1"
+
+[package.dependencies]
+pytest = ">=2.7"
+
+[package.extras]
+dev = ["pre-commit", "tox", "pytest-asyncio"]
+
+[[package]]
 category = "main"
 description = "Extensions to the standard Python datetime module"
 name = "python-dateutil"
@@ -1468,18 +1482,6 @@ version = "1.22.0"
 six = ">=1.4.1"
 
 [[package]]
-category = "main"
-description = "Ctypes-based simple MagickWand API binding for Python"
-name = "wand"
-optional = false
-python-versions = "*"
-version = "0.6.2"
-
-[package.extras]
-doc = ["Sphinx (>=2.4.1)"]
-test = ["pytest (>=5.3.5)"]
-
-[[package]]
 category = "dev"
 description = "Simple, modern file watching and code reload in python."
 name = "watchgod"
@@ -1541,7 +1543,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "fa8ef6e8952ff5bbce8b0cc24cf6fb7fc370232a7db9ba04f7a65a53dfe67445"
+content-hash = "67f4d3974ca2b15fee2d4d7fc10c86808f1838b8c808f1f97d7c6f59112a21a5"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -2085,6 +2087,10 @@ pytest-ipdb = [
     {file = "pytest-ipdb-0.1-prerelease2.macosx-10.9-x86_64.tar.gz", hash = "sha256:a0c77a02ea2cbc5c41520087956f60bd151eaa725e3244cb46d7be747f7e9ae7"},
     {file = "pytest-ipdb-0.1-prerelease2.tar.gz", hash = "sha256:81203606c14374eb15b605194ba7165403024d5c5514bb83589b9c257de74917"},
 ]
+pytest-mock = [
+    {file = "pytest-mock-3.1.1.tar.gz", hash = "sha256:636e792f7dd9e2c80657e174c04bf7aa92672350090736d82e97e92ce8f68737"},
+    {file = "pytest_mock-3.1.1-py3-none-any.whl", hash = "sha256:a9fedba70e37acf016238bb2293f2652ce19985ceb245bbd3d7f3e4032667402"},
+]
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
@@ -2297,10 +2303,6 @@ uvloop = [
 w3lib = [
     {file = "w3lib-1.22.0-py2.py3-none-any.whl", hash = "sha256:0161d55537063e00d95a241663ede3395c4c6d7b777972ba2fd58bbab2001e53"},
     {file = "w3lib-1.22.0.tar.gz", hash = "sha256:0ad6d0203157d61149fd45aaed2e24f53902989c32fc1dccc2e2bfba371560df"},
-]
-wand = [
-    {file = "Wand-0.6.2-py2.py3-none-any.whl", hash = "sha256:b56b96189df2ac3db586afdc6ba67ca37c886d234c3fd98d94172f03248a8e3b"},
-    {file = "Wand-0.6.2.tar.gz", hash = "sha256:65440e478b595aaa18483e25091adacf6d4458c49c2fd8d59e0fd44a7393a14a"},
 ]
 watchgod = [
     {file = "watchgod-0.6-py35.py36.py37-none-any.whl", hash = "sha256:59700dab7445aa8e6067a5b94f37bae90fc367554549b1ed2e9d0f4f38a90d2a"},
