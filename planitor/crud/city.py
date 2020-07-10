@@ -139,9 +139,11 @@ def get_or_create_attachment(db, minute, url, **items):
 def create_minute(db, meeting, **items):
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
+    case_stadgreinir = items.pop("case_stadgreinir")
 
     case, case_created = get_or_create_case(db, case_serial, meeting.council)
     case.address = case_address
+    case.stagreinir = case_stadgreinir
 
     if case_created and case_address:
         update_case_address(db, case)

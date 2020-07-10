@@ -137,7 +137,12 @@
             </div>
           </div>
           {% if case.address %}
-          <div class="text-sm font-bold">{{ case.address }}</div>
+          <div class="text-sm font-bold">
+            {{ case.address }}
+            {% if case.stadgreinir %}
+            <span class="text-gray-600 font-thin ml-2">{{ case.stadgreinir }}</span>
+            {% endif %}
+          </div>
           {% endif %}
         </div>
 
