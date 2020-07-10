@@ -56,7 +56,11 @@ def get_minutes(response):
     for i, link in enumerate(links):
         data = {}
         els = link.parent.previous_sibling.text.split("\n")
-        data["serial"] = els.pop(0).strip().replace("Umsókn nr. ", "")
+        serial = els.pop(0).strip().replace("Umsókn nr. ", "")
+        if " " in serial:
+            serial, stadgreinir = serial.split(" ", 1)
+            data["case_stadgreinir"] = stadgreinir.strip("()").split()[0]
+        data["serial"] = serial
         entities = [el for el in els[1:-1] if el]
         data["entities"] = []
         for i in range(0, len(entities), 3):
@@ -69,7 +73,10 @@ def get_minutes(response):
                 }
             )
         data["case_serial"] = link.get("href").split("=")[-1:][0]
-        data["case_address"] = link.text.lstrip('">').strip()
+        case_address = link.text.strip()
+        if '">' in case_address:
+            _, case_address = case_address.split('">', 1)
+        data["case_address"] = case_address
         tegund = link.find_next("i")
         data["headline"] = tegund.text.strip()
         text = ""

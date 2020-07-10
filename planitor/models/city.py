@@ -53,6 +53,9 @@ class CaseStatusEnum(enum.Enum):
 
     notice = ColorEnumValue("grenndarkynning", "Samþykkt að grenndarkynna", "yellow")
 
+    directed_to_skipulagsfulltrui = ColorEnumValue(
+        "visad-til-skipulagsfulltrua", "Vísað til skipulagsfulltrúa", "yellow"
+    )
     directed_to_skipulagsrad = ColorEnumValue(
         "visad-til-skipulags", "Vísað til Skipulags- og samgönguráðs", "yellow"
     )
@@ -241,6 +244,8 @@ class Meeting(Base):
     council_id = Column(Integer, ForeignKey(Council.id))
     council = relationship(Council)
 
+    minutes = relationship("Minute")
+
 
 class PDFAttachment(Base):
     __tablename__ = "pdf_attachments"
@@ -290,6 +295,7 @@ class Case(Base):
     serial = Column(String)
     created = Column(DateTime, server_default=func.now())
     address = Column(String)
+    stadgreinir = Column(String)
     headline = Column(String)
 
     # This field is denormalized, is derived from most recent minute

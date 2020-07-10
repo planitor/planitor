@@ -2,7 +2,7 @@ import re
 from typing import Optional
 from collections import defaultdict
 
-from tokenizer import tokenize, TOK
+from tokenizer import tokenize, TOK, split_into_sentences
 
 from planitor.models import Minute, Meeting, CaseStatusEnum
 
@@ -14,15 +14,12 @@ COMPOUND_ENTITY_DASH_TYPO = re.compile(r"(?:([^\ ])(?:\ ?-\ ?og))")
 PATTERNS = {
     CaseStatusEnum.approved: (
         r"^samþykkt\.",
-        r"^umsögn skipulagsfulltrúa samþykkt\.",
         r"^samþykkt með",
         r"^samþykkt að gefa út framkvæmdaleyfi með vísan til",
-        r"^umsögn.+ samþykkt\.",
         r"^jákvætt\.",
         r"^jákvætt með vísan til umsagnar",
         r"^samþykkt að falla frá kynningu",
     ),
-    CaseStatusEnum.delayed: (r"^frestað\.",),
     CaseStatusEnum.denied: (
         r"^neikvætt\.",
         r"^neikvætt með vísan",
@@ -43,6 +40,9 @@ PATTERNS = {
         r"vísað til umsagnar umhverfis- og skipulagssviðs",
         r"vísað til meðferðar umhverfis- og skipulagssvið",
     ),
+    CaseStatusEnum.directed_to_skipulagsfulltrui: (
+        r"vísað til umsagnar skipulagsfulltrúa",
+    ),
     CaseStatusEnum.directed_to_skipulagsrad: (
         r"vísað til umhverfis- og skipulagsráðs",
         r"vísað til skipulags- og samgönguráðs",
@@ -58,7 +58,12 @@ PATTERNS = {
         r"ekki er gerð athugasemd við erindið",
         r"ekki gerð athugasemd við erindið",
     ),
-    CaseStatusEnum.notice: (r"^samþykkt að grenndarkynna", r"^grenndarkynning samþykkt",),
+    CaseStatusEnum.notice: (
+        r"^samþykkt að grenndarkynna",
+        r"^grenndarkynning samþykkt",
+        r"málinu vísað til skipulagsfulltrúa í grenndarkynningu\.",
+    ),
+    CaseStatusEnum.delayed: (r"^frestað\.",),
 }
 
 
@@ -78,14 +83,15 @@ def clean_sentence(text: str) -> str:
             if token.txt and token.kind == TOK.WORD and token.txt != "dags.":
                 yield token.txt
 
-    text = " ".join(tokens(text)) + "."
+    text = " ".join(tokens(text))
     return text
 
 
 def get_case_status_from_remarks(remarks) -> Optional[CaseStatusEnum]:
     if not remarks:
         return None
-    remarks = clean_sentence(remarks)
+    sentences = split_into_sentences(remarks)
+    remarks = "".join(((clean_sentence(sentence) + ". ")) for sentence in sentences)
     for case_status, patterns in PATTERNS.items():
         for pattern in patterns:
             if re.search(pattern, remarks) is not None:
