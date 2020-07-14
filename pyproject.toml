@@ -30,6 +30,8 @@ tokenizer = "^2.0.6"
 sentry-dramatiq = "^0.3.2"
 html5lib = "^1.1"
 migra = "^1.0.1592301305"
+boto3 = "^1.14.17"
+imgix = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"
@@ -45,6 +47,7 @@ migra = "^1.0.1585875302"
 arel = "^0.1.0"
 bpython = "^0.19"
 typer = "^0.2.1"
+pytest-mock = "^3.1.1"
 
 [tool.poetry.scripts]
 dev-server = "scripts.development:main"

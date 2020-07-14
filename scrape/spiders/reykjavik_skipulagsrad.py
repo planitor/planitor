@@ -9,15 +9,7 @@ import scrapy
 from planitor.geo import lookup_address, get_address_lookup_params
 
 
-def segment_parts(parts):
-    """ After extracting the first paragraph which includes the address, headline,
-    entities and serial, we are left with a flat list of paragraphs. This stream has
-    no denotations for the following segments: inquiry, remarks and comments from
-    minority party representatives or majority coalition party representatives.
-    """
-
-
-def parse_entities(string: str):
+def parse_entities(string: str) -> dict:
     """
     Turn a flat list into a list of dicts
 
@@ -160,7 +152,8 @@ def take_responses(paragraphs: List[List[str]]):
 
     indexes = []
     pattern = (
-        r"(?:Áheyrnarfulltrúi|Fulltrúar) .+ (?:leggur|leggja) fram svohljóðandi bókun:"
+        r"(?:Áheyrnarfulltrúi|Fulltrúar) .+ (?:leggur|leggja) "
+        r"fram svohljóðandi (?:gagn)bókun:"
     )
     for i, segments in enumerate(paragraphs):
         if re.match(pattern, "".join(segments)):
@@ -323,8 +316,8 @@ def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
         "serial": f"{index}. fundarliður",
         "case_serial": serial,
         "case_address": get_address(headline),
+        "case_stadgreinir": stadgreinir,
         "entities": entities,
-        "stadgreinir": stadgreinir,
         "subcategory": subcategory,
         "responses": responses,
         "remarks": remarks,

@@ -3,6 +3,7 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from . import dramatiq, greynir
+from .attachments import update_pdf_attachment
 from .crud import (
     create_minute,
     get_or_create_case_entity,
@@ -157,7 +158,8 @@ def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session =
 
 def update_minute_with_attachments(db, minute, attachments_items):
     for items in attachments_items:
-        get_or_create_attachment(db, minute, **items)
+        attachment = get_or_create_attachment(db, minute, **items)
+        update_pdf_attachment.send(attachment.id)
         db.commit()
 
 

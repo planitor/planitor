@@ -20,8 +20,21 @@
 
 {% extends "case.html" %}
 
-{% block title %}Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
-{% block og_title %}Bókun {{ minute.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super.super() }}{% endblock %}
+{% block title -%}
+  {{ minute.headline }} / {{ case.council.name }} — {{ super.super() }}
+{%- endblock %}
+
+{% block og_title -%}
+  {{ minute.headline }} / {{ case.council.name }} — {{ super.super() }}
+{%- endblock %}
+
+{% block og_image -%}
+  {% if minute.attachments and minute.attachments[0].pdf %}
+    <meta property="og:image" content="{{ imgix(minute.attachments[0].pdf.key, {'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) }}" />
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
 
 {% set council_slug = council.council_type.value.slug %}
 
@@ -36,6 +49,32 @@
 
 {% block inner %}
   <div class="mb-6">{{ meeting_card() }}</div>
+  <div class="mb-4 flex text-xs md:text-sm">
+    {% if previous_minute %}
+    <a
+      class="bg-gray-200 rounded-md text-gray-900 p-2 px-2 md:px-4"
+      href="{{ url_for('get_minute',
+      muni_slug=municipality.slug,
+      council_slug=council_slug,
+      case_id=previous_minute.case.serial,
+      minute_id=h.encode(previous_minute.id)) }}"
+    >‹ {{ previous_minute.serial }}</a>
+    {% endif %}
+    <div class="flex-grow p-2 px-2 md:px-4 text-center font-bold">
+      {{ minute.serial }}
+    </div>
+    {% if next_minute %}
+    <a
+      class="bg-gray-200 rounded-md text-gray-900 p-2 px-2 md:px-4"
+      href="{{ url_for('get_minute',
+        muni_slug=municipality.slug,
+        council_slug=council_slug,
+        case_id=next_minute.case.serial,
+        minute_id=h.encode(next_minute.id)) }}"
+      >{{ next_minute.serial }} ›
+    </a>
+    {% endif %}
+  </div>
   <div class="p-4 bg-white rounded-md shadow-lg">
     <div>
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
@@ -57,19 +96,6 @@
     <div class="mt-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
       <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
-    </div>
-    {% endif %}
-    {% if minute.attachments %}
-    <div class="mt-4">
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fylgigögn</h5>
-      <ul class="list-disc ml-4 text-sm">
-      {% for attachment in minute.attachments %}
-        <li class="text-gray-800">
-          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
-          <span class="text-gray-400 ml-2">{{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}</span>
-        </li>
-      {% endfor %}
-      </ul>
     </div>
     {% endif %}
     {% if minute.participants %}
@@ -106,6 +132,37 @@
       {% endfor %}
       </ul>
     </div>
+  </div>
+  {% endif %}
+
+  {% if minute.attachments %}
+  <div class="mt-6 ">
+    <ul class="list-disc ml-4 text-sm">
+    {% for attachment in minute.attachments %}
+      <li class="text-gray-800">
+        <div>
+          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
+          <span class="text-gray-400 ml-2">
+            {{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}
+          </span>
+        </div>
+        {% if attachment.pdf %}
+        <div>
+          <ul class="overflow-y-scroll py-3 px-1">
+            {% for i in range(attachment.pdf.page_count) %}
+            {% set page = "{}".format(i + 1) %}
+            <li class="overflow-hidden rounded shadow-md mr-2 mb-2 float-left block">
+              <a href="{{ imgix(attachment.pdf.key, {'page': page }) }}" target="_blank">
+                <img src="{{ imgix(attachment.pdf.key, {'h': '100', 'page': page }) }}">
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
   </div>
   {% endif %}
 

@@ -143,6 +143,36 @@ version = "1.7"
 six = "*"
 
 [[package]]
+category = "main"
+description = "The AWS SDK for Python"
+name = "boto3"
+optional = false
+python-versions = "*"
+version = "1.14.17"
+
+[package.dependencies]
+botocore = ">=1.17.17,<1.18.0"
+jmespath = ">=0.7.1,<1.0.0"
+s3transfer = ">=0.3.0,<0.4.0"
+
+[[package]]
+category = "main"
+description = "Low-level, data-driven core of boto 3."
+name = "botocore"
+optional = false
+python-versions = "*"
+version = "1.17.17"
+
+[package.dependencies]
+docutils = ">=0.10,<0.16"
+jmespath = ">=0.7.1,<1.0.0"
+python-dateutil = ">=2.1,<3.0.0"
+
+[package.dependencies.urllib3]
+python = "<3.4.0 || >=3.5.0"
+version = ">=1.20,<1.26"
+
+[[package]]
 category = "dev"
 description = "Fancy Interface to the Python Interpreter"
 name = "bpython"
@@ -291,6 +321,14 @@ IDNA = ["idna (>=2.1)"]
 
 [[package]]
 category = "main"
+description = "Docutils -- Python Documentation Utilities"
+name = "docutils"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.15.2"
+
+[[package]]
+category = "main"
 description = "Background Processing for Python 3."
 name = "dramatiq"
 optional = false
@@ -372,6 +410,14 @@ python = "<3.8"
 version = "*"
 
 [[package]]
+category = "main"
+description = "Clean single-source support for Python 3 and 2"
+name = "future"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.18.2"
+
+[[package]]
 category = "dev"
 description = "Lightweight in-process concurrent programming"
 name = "greenlet"
@@ -451,6 +497,21 @@ name = "idna"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.9"
+
+[[package]]
+category = "main"
+description = "Python client library for imgix."
+name = "imgix"
+optional = false
+python-versions = "*"
+version = "3.2.1"
+
+[package.dependencies]
+future = "*"
+
+[package.extras]
+dev = ["tox"]
+test = ["pytest", "pytest-cov", "flake8"]
 
 [[package]]
 category = "dev"
@@ -562,6 +623,14 @@ MarkupSafe = ">=0.23"
 
 [package.extras]
 i18n = ["Babel (>=0.8)"]
+
+[[package]]
+category = "main"
+description = "JSON Matching Expressions"
+name = "jmespath"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "0.10.0"
 
 [[package]]
 category = "main"
@@ -972,6 +1041,20 @@ ipdb = "*"
 pytest = "*"
 
 [[package]]
+category = "dev"
+description = "Thin-wrapper around the mock package for easier use with pytest"
+name = "pytest-mock"
+optional = false
+python-versions = ">=3.5"
+version = "3.1.1"
+
+[package.dependencies]
+pytest = ">=2.7"
+
+[package.extras]
+dev = ["pre-commit", "tox", "pytest-asyncio"]
+
+[[package]]
 category = "main"
 description = "Extensions to the standard Python datetime module"
 name = "python-dateutil"
@@ -1049,6 +1132,17 @@ version = "2.3.1"
 [package.dependencies]
 cffi = ">=1.13.0"
 tokenizer = ">=2.0.5"
+
+[[package]]
+category = "main"
+description = "An Amazon S3 Transfer Manager"
+name = "s3transfer"
+optional = false
+python-versions = "*"
+version = "0.3.3"
+
+[package.dependencies]
+botocore = ">=1.12.36,<2.0a.0"
 
 [[package]]
 category = "main"
@@ -1449,7 +1543,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "c78a048b3df7886418fe809c5106106057dcca691b17bb55a7f2decdb45969e9"
+content-hash = "67f4d3974ca2b15fee2d4d7fc10c86808f1838b8c808f1f97d7c6f59112a21a5"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1518,6 +1612,14 @@ blessings = [
     {file = "blessings-1.7-py2-none-any.whl", hash = "sha256:caad5211e7ba5afe04367cdd4cfc68fa886e2e08f6f35e76b7387d2109ccea6e"},
     {file = "blessings-1.7-py3-none-any.whl", hash = "sha256:b1fdd7e7a675295630f9ae71527a8ebc10bfefa236b3d6aa4932ee4462c17ba3"},
     {file = "blessings-1.7.tar.gz", hash = "sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d"},
+]
+boto3 = [
+    {file = "boto3-1.14.17-py2.py3-none-any.whl", hash = "sha256:ae57df1fbad7e29954a160d77cbf650d6562eb0d304c1206afa71d914e771a66"},
+    {file = "boto3-1.14.17.tar.gz", hash = "sha256:cbe618d61cb8f75cd9495ea36e69bad7c8984eb11f02ad247be4c9a2eb7eb647"},
+]
+botocore = [
+    {file = "botocore-1.17.17-py2.py3-none-any.whl", hash = "sha256:5528c04c360019c24f2706ce82872c9ab767a8c581beffdfdaf006cce7499cac"},
+    {file = "botocore-1.17.17.tar.gz", hash = "sha256:d65b5574dad8c221344496352245828d9ffecaa0868199eb04ccd2eb2ff09133"},
 ]
 bpython = [
     {file = "bpython-0.19-py2.py3-none-any.whl", hash = "sha256:95d95783bfadfa0a25300a648de5aba4423b0ee76b034022a81dde2b5e853c00"},
@@ -1618,6 +1720,11 @@ dnspython = [
     {file = "dnspython-1.16.0-py2.py3-none-any.whl", hash = "sha256:f69c21288a962f4da86e56c4905b49d11aba7938d3d740e80d9e366ee4f1632d"},
     {file = "dnspython-1.16.0.zip", hash = "sha256:36c5e8e38d4369a08b6780b7f27d790a292b2b08eea01607865bf0936c558e01"},
 ]
+docutils = [
+    {file = "docutils-0.15.2-py2-none-any.whl", hash = "sha256:9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827"},
+    {file = "docutils-0.15.2-py3-none-any.whl", hash = "sha256:6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0"},
+    {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
+]
 dramatiq = [
     {file = "dramatiq-1.9.0-py3-none-any.whl", hash = "sha256:360cd436a434a513c87a9769943543c1d065835e3fa0b01f96c4fdd959bfa1c3"},
     {file = "dramatiq-1.9.0.tar.gz", hash = "sha256:8112941ab2eda4f0288bacd137a991f9b1b1c600fe3dd5960eaba4256c873839"},
@@ -1637,6 +1744,9 @@ fastapi = [
 flake8 = [
     {file = "flake8-3.8.2-py2.py3-none-any.whl", hash = "sha256:ccaa799ef9893cebe69fdfefed76865aeaefbb94cb8545617b2298786a4de9a5"},
     {file = "flake8-3.8.2.tar.gz", hash = "sha256:c69ac1668e434d37a2d2880b3ca9aafd54b3a10a3ac1ab101d22f29e29cf8634"},
+]
+future = [
+    {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
 ]
 greenlet = [
     {file = "greenlet-0.4.15-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:99a26afdb82ea83a265137a398f570402aa1f2b5dfb4ac3300c026931817b163"},
@@ -1698,6 +1808,10 @@ idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
     {file = "idna-2.9.tar.gz", hash = "sha256:7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb"},
 ]
+imgix = [
+    {file = "imgix-3.2.1-py3-none-any.whl", hash = "sha256:e0dbf139723fb8d86cf8e63dc9804cbf1239e26f2e1f79936fefd09c3390bafc"},
+    {file = "imgix-3.2.1.tar.gz", hash = "sha256:67b402f8d876afd8d1db6dea95fe9fe432ae5fed69730fc4fb58610362874a24"},
+]
 importlib-metadata = [
     {file = "importlib_metadata-1.6.0-py2.py3-none-any.whl", hash = "sha256:2a688cbaa90e0cc587f1df48bdc97a6eadccdcd9c35fb3f976a09e3b5016d90f"},
     {file = "importlib_metadata-1.6.0.tar.gz", hash = "sha256:34513a8a0c4962bc66d35b359558fd8a5e10cd472d37aec5f66858addef32c1e"},
@@ -1724,6 +1838,10 @@ jedi = [
 jinja2 = [
     {file = "Jinja2-2.11.2-py2.py3-none-any.whl", hash = "sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035"},
     {file = "Jinja2-2.11.2.tar.gz", hash = "sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0"},
+]
+jmespath = [
+    {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
+    {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 lxml = [
     {file = "lxml-4.5.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:0701f7965903a1c3f6f09328c1278ac0eee8f56f244e66af79cb224b7ef3801c"},
@@ -1969,6 +2087,10 @@ pytest-ipdb = [
     {file = "pytest-ipdb-0.1-prerelease2.macosx-10.9-x86_64.tar.gz", hash = "sha256:a0c77a02ea2cbc5c41520087956f60bd151eaa725e3244cb46d7be747f7e9ae7"},
     {file = "pytest-ipdb-0.1-prerelease2.tar.gz", hash = "sha256:81203606c14374eb15b605194ba7165403024d5c5514bb83589b9c257de74917"},
 ]
+pytest-mock = [
+    {file = "pytest-mock-3.1.1.tar.gz", hash = "sha256:636e792f7dd9e2c80657e174c04bf7aa92672350090736d82e97e92ce8f68737"},
+    {file = "pytest_mock-3.1.1-py3-none-any.whl", hash = "sha256:a9fedba70e37acf016238bb2293f2652ce19985ceb245bbd3d7f3e4032667402"},
+]
 python-dateutil = [
     {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
@@ -2017,6 +2139,10 @@ reynir = [
     {file = "reynir-2.3.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:88ce6ba06f89dae00ccce783a1bca5d76c8a742bc2a60b8129c6450677ac91cf"},
     {file = "reynir-2.3.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:25db15b7e60e47e0b279044a14a815c9ebf369beba24025a2f3fefd3752e50bd"},
     {file = "reynir-2.3.1.tar.gz", hash = "sha256:8352baf8cdcc889ab8be626ee30b726b1bd23c478d68562e2e400202efd44f54"},
+]
+s3transfer = [
+    {file = "s3transfer-0.3.3-py2.py3-none-any.whl", hash = "sha256:2482b4259524933a022d59da830f51bd746db62f047d6eb213f2f8855dcb8a13"},
+    {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 schemainspect = [
     {file = "schemainspect-0.1.1592300770-py2.py3-none-any.whl", hash = "sha256:a35500da466f0765338504f1f33623d323f6daf52edc9a077fcbd70a50372d79"},
