@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "classnames": "^2.2.6",
     "lazysizes": "^5.2.2",
     "preact": "^10.4.5"
   }

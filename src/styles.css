@@ -4,6 +4,7 @@
 
 body {
   font-family: "Inter", sans-serif;
+  fill: currentColor;
 }
 
 td {
@@ -135,10 +136,6 @@ nav .search input {
 
 nav .search input::placeholder {
   color: rgba(255, 255, 255, 0.6);
-}
-
-nav form.search {
-  background: rgba(255, 255, 255, 0.3);
 }
 
 .entities svg {
