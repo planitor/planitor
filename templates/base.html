@@ -27,77 +27,7 @@
 
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
     <div class="bg-midnight w-full text-white">
-
       <nav id="navigation"></nav>
-
-      {#
-        <div class="sm:order-2 sm:flex-grow text-center sm:px-10">
-          <a id="reveal-search" role="button" class="sm:hidden block">{{ magnifyingglass("w-5 h-5") }}</a>
-          <form
-            class="search hidden sm:flex bg-white bg-opacity-25 rounded-md items-center mr-3 px-3 sm:mx-3 md:mx-12"
-            method="GET"
-            action="{{ url_for('get_search') }}"
-          >
-            <div>{{ magnifyingglass("w-5 h-5") }}</div>
-            <input
-              value="{{ q or '' }}"
-              name="q"
-              size="1"
-              class="bg-transparent flex-grow py-2 px-2 text-sm font-thin overflow-hidden"
-              placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
-            />
-          </form>
-        </div>
-
-        <div class="flex-grow sm:order-1 sm:flex-grow-0 text-center">
-          <a href="/s" class="font-black text-lg sm:text-xl">Planitor</a>
-        </div>
-
-        <div class="order-last text-right">
-        {% if user %}
-          <div class="flex flex-row sm:flex-col">
-            <div>
-              <a href="/" class="text-sm block truncate">
-                <span class="sm:hidden inline-block pl-4" style="position: relative; top: 2px;">{{ person_fill("w-5 h-5") }}</span>
-                <span class="hidden sm:inline">{{ user.email }}</span>
-              </a>
-            </div>
-            <div class="order-first sm:order-last flex-grow">
-              <a href="{{ url_for('logout') }}" id="logout-button" class="text-sm font-bold text-powder-light">Útskrá</a>
-            </div>
-          </div>
-        {% else %}
-          <div id="login-button" role="button">{{ person_fill("w-5 h-5") }}</div>
-        {% endif %}
-        </div>
-
-      #}
-
-      {#
-      <nav id="navigation" class="flex items-center justify-between px-4 sm:px-6 py-2 sm:py-3 max-w-6xl mx-auto">
-        <a href="/s" class="block logo" alt="Planitor">{% include "emblem.svg" %}</a>
-        <form class="search rounded-md flex-grow flex items-center px-3 mx-3 sm:mx-6 md:mx-12" method="GET" action="{{ url_for('get_search') }}">
-          <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
-          <input
-            value="{{ q or '' }}"
-            name="q"
-            size="1"
-            style="min-width: 120px; height: 2.9em;"
-            class="bg-transparent flex-grow py-2 px-2 text-white text-sm font-thin overflow-hidden"
-            placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
-          />
-        </form>
-        {% if user %}
-          <div class="user text-white">
-            <span class="name font-thin" style="color: rgba(255, 255, 255, 0.6);">{{ user.full_name }}</span>
-            <button id="logout-button" class="font-semibold text-white">Útskrá</button>
-          </div>
-        {% else %}
-          <button id="login-button" class="btn btn-primary">Innskrá</button>
-        {% endif %}
-      </nav>
-      #}
-
     </div>
 
     <div class="flex-grow w-full sheet">
