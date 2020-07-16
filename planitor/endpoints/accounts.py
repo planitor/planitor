@@ -45,7 +45,6 @@ def logout(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     response.delete_cookie(COOKIE_NAME, path="/")
-    return RedirectResponse(request.headers.get("referer", "/s"))
 
 
 @router.post("/login/access-token", response_model=Token, tags=["login"])

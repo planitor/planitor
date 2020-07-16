@@ -2,14 +2,10 @@ import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
 
-const getLocalToken = () => localStorage.getItem("token");
-const saveLocalToken = (token) => localStorage.setItem("token", token);
-const removeLocalToken = () => localStorage.removeItem("token");
-
 const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
 export const LoginForm = (props) => {
-  const { success, setScreen } = props;
+  const { onSuccess, setScreen } = props;
   const [username, setUsername] = useState({
     value: "",
     isDirty: false,
@@ -28,8 +24,8 @@ export const LoginForm = (props) => {
     api
       .logInGetToken(username.value, password.value)
       .then((response) => {
-        saveLocalToken(response.data.access_token);
-        success();
+        localStorage.setItem("token", response.data.access_token);
+        onSuccess();
       })
       .catch(function (error) {
         // handle error

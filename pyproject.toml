@@ -44,10 +44,10 @@ beautifulsoup4 = "^4.9.1"
 html5lib = "^1.0.1"
 pytest-ipdb = "^0.1-prerelease2"
 migra = "^1.0.1585875302"
-arel = "^0.1.0"
 bpython = "^0.19"
 typer = "^0.2.1"
 pytest-mock = "^3.1.1"
+arel = "^0.2.0"
 
 [tool.poetry.scripts]
 dev-server = "scripts.development:main"

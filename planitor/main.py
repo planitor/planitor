@@ -12,7 +12,7 @@ from .endpoints.templates import templates
 if config("DEBUG", cast=bool, default=False):
     import arel
 
-    hotreload = arel.HotReload("templates")
+    hotreload = arel.HotReload(paths=[arel.Path("./templates")])
     app = FastAPI(
         routes=[WebSocketRoute("/hot-reload", hotreload, name="hot-reload")],
         on_startup=[hotreload.startup],

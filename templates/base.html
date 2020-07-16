@@ -22,10 +22,8 @@
   </head>
 
   <script>
-  document._user = {{ user.to_dict()|tojson if user else (None)|tojson }};
+  document._user = {{ (user.to_dict() if user else None)|tojson }};
   </script>
-
-{% from "symbols/symbols.html" import magnifyingglass, person_fill %}
 
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
     <div class="bg-midnight w-full text-white">

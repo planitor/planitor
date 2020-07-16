@@ -29,7 +29,7 @@ description = "Browser hot reload for Python ASGI web apps"
 name = "arel"
 optional = false
 python-versions = ">=3.7"
-version = "0.1.0"
+version = "0.2.0"
 
 [package.dependencies]
 starlette = "<1.0.0"
@@ -1543,7 +1543,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "67f4d3974ca2b15fee2d4d7fc10c86808f1838b8c808f1f97d7c6f59112a21a5"
+content-hash = "d3355adfef84abf914d4f6c30926619ad2d6dc29461629e49e41777295b29b9d"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1560,8 +1560,8 @@ appnope = [
     {file = "appnope-0.1.0.tar.gz", hash = "sha256:8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"},
 ]
 arel = [
-    {file = "arel-0.1.0-py3-none-any.whl", hash = "sha256:46843ece267450e8d018485cb5f73c4be3d6d9e58cf5058b6ea01d70f1c777a6"},
-    {file = "arel-0.1.0.tar.gz", hash = "sha256:11fa0dbdd0a3f8af5b350b43768e8c215b9a428103af663f1c2808c1d81fccce"},
+    {file = "arel-0.2.0-py3-none-any.whl", hash = "sha256:7875bfafab61dfdc4c338a426ff6d0a2755343278fce18242cad8f07baac2a1f"},
+    {file = "arel-0.2.0.tar.gz", hash = "sha256:754dbd92968067cb5d1598b70159a881d917891ce8f561edd47db7ca4042cd73"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},

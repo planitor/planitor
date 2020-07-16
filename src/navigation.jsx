@@ -1,6 +1,15 @@
-import { h } from "preact";
+import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import classNames from "classnames";
+import { Login, NewPassword } from "./accounts";
+import { openModal } from "./modals";
+import { api } from "./api";
+
+const passwordRecoveryEl = document.getElementById("password-recovery");
+if (passwordRecoveryEl) {
+  const el = openModal();
+  render(<NewPassword token={passwordRecoveryEl.dataset.token} />, el);
+}
 
 const MagnifyingGlass = (props) => {
   return (
@@ -32,8 +41,56 @@ const PersonFill = (props) => {
   );
 };
 
+const LogoutButton = (props) => {
+  const onClick = (event) => {
+    event.stopPropagation();
+    api.logout().then((response) => {
+      localStorage.removeItem("token");
+      location.reload();
+    });
+  };
+  return (
+    <span
+      onClick={onClick}
+      role="button"
+      class="text-sm font-bold text-powder-light"
+    >
+      Útskrá
+    </span>
+  );
+};
+
+const LoginButton = (props) => {
+  const { onLogin } = props;
+  const onClick = (event) => {
+    event.stopPropagation();
+    const [el, closeModal] = openModal();
+    const onSuccess = () => {
+      onLogin();
+      closeModal();
+    };
+    render(<Login onSuccess={onSuccess} />, el);
+  };
+
+  return (
+    <div role="button" onClick={onClick}>
+      <PersonFill />
+    </div>
+  );
+};
+
 const User = (props) => {
-  const { user } = props;
+  const [user, setUser] = useState(document._user);
+  const onLogin = () => {
+    api
+      .getMe()
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
   if (!!user) {
     return (
       <div class="flex flex-row sm:flex-col">
@@ -49,26 +106,15 @@ const User = (props) => {
           </a>
         </div>
         <div class="order-first sm:order-last flex-grow">
-          <a
-            href="/notendur/logout"
-            id="logout-button"
-            class="text-sm font-bold text-powder-light"
-          >
-            Útskrá
-          </a>
+          <LogoutButton />
         </div>
       </div>
     );
   }
-  return (
-    <div id="login-button" role="button">
-      <PersonFill />
-    </div>
-  );
+  return <LoginButton onLogin={onLogin} />;
 };
 
 export const Navigation = (props) => {
-  const { user } = props;
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const searchExpand = () => {
     setIsSearchExpanded(true);
@@ -113,7 +159,7 @@ export const Navigation = (props) => {
       )}
 
       <div class="order-last text-right">
-        <User user={user} />
+        <User />
       </div>
     </div>
   );

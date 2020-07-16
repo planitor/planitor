@@ -7,7 +7,8 @@ def main():
         host="0.0.0.0",
         port=5000,
         log_level="info",
-        reload=True,
+        reload=False,
+        reload_dirs=["./planitor"],
         proxy_headers=True,
     )
 
