@@ -50,13 +50,14 @@ const LogoutButton = (props) => {
     });
   };
   return (
-    <span
+    <a
       onClick={onClick}
+      href="/notendur/logout"
       role="button"
       class="text-sm font-bold text-powder-light"
     >
       Útskrá
-    </span>
+    </a>
   );
 };
 
