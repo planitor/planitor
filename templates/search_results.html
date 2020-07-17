@@ -21,10 +21,13 @@
       <li class="mr-4">{{ q }}</li>
     </ul>
     <div class="flex justify-between items-end">
-      <span class="font-bold">{{ results.page.count }} leitarniðurstöður</span>
+      <span class="font-bold">{{ results.page.count if results else 0 }} leitarniðurstöður</span>
     </div>
   </div>
   <div class="results">
+  {% if results == None %}
+    <h5 class="font-medium text-xs text-gray-700">Engar niðurstöður fundust</h5>
+  {% else %}
     {% for minute, previews in results %}
     <a
       href="{{ url_for('get_minute',
@@ -46,6 +49,7 @@
       <p class="text-xs text-gray-500">{{ human_date(minute.meeting.start) }}</p>
     </a>
     {% endfor %}
+  {% endif %}
   </div>
 
   <!-- prettier-ignore -->
@@ -66,10 +70,10 @@
   <div class="mr-3 text-gray-600">…</div>
   {% endmacro %}
 
+  {% if results %}
   <div class="my-8 flex justify-between text-lg">
     <div class="flex">
       <div class="mr-3 text-gray-600">Síða</div>
-      <!-- prettier-ignore -->
       {% set head, current, tail = results.page.get_page_segments() %}
       {% if head %}
         {% for number in head %} {{ page(number) }} {% endfor %} {{ ellipsis() if (head[-1] + 1) != current[0] }}
@@ -90,5 +94,6 @@
       {% endif %}
     </div>
   </div>
+  {% endif %}
 </div>
 {% endblock body %}

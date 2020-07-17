@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, Request
-from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 

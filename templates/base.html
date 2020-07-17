@@ -22,12 +22,13 @@
   </head>
 
   <script>
-  document._user = {{ (user.to_dict() if user else None)|tojson }};
+  document._user = {{ (user.to_dict() if user else None) | tojson }};
+  document._searchQuery = {{ (q if q is defined else None ) | tojson }}
   </script>
 
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
     <div class="bg-midnight w-full text-white">
-      <nav id="navigation"></nav>
+      <nav id="navigation" class="px-4 py-2 sm:px-6"></nav>
     </div>
 
     <div class="flex-grow w-full sheet">
@@ -37,7 +38,7 @@
     </div>
 
     <footer class="w-full mt-4">
-      <div class="mx-auto max-w-6xl px-4 py-4 sm:px-6 mb-4 text-sm sm:text-base">
+      <div class="mx-auto max-w-6xl p-4 sm:px-6 mb-4 text-sm sm:text-base">
         <hr class="mb-4">
         <div class="flex">
           <p class="my-1 text-gray-700">

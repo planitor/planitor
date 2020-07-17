@@ -1,5 +1,5 @@
 import { h, render } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useRef, useEffect } from "preact/hooks";
 import classNames from "classnames";
 import { Login, NewPassword } from "./accounts";
 import { openModal } from "./modals";
@@ -114,50 +114,73 @@ const User = (props) => {
   return <LoginButton onLogin={onLogin} />;
 };
 
-export const Navigation = (props) => {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const searchExpand = () => {
-    setIsSearchExpanded(true);
+export const Navigation = () => {
+  const [isSearchExpanded, setIsSearchExpanded] = useState(
+    typeof document._searchQuery === "string"
+  );
+  const [value, setValue] = useState(document._searchQuery);
+
+  const onChange = (event) => {
+    setValue(event.target.value);
   };
+
+  // When mobile user clicks to expand search, focus the input
+  const input = useRef(null);
+  useEffect(() => {
+    input.current && input.current.focus();
+  }, [isSearchExpanded]);
+
   return (
-    <div class="flex items-center p-2 sm:px-6 h-16">
+    <div class="flex items-center align-middle h-12">
       <div
         class={classNames("sm:order-2 sm:flex-grow text-center sm:px-10", {
           "flex-grow": isSearchExpanded,
         })}
       >
         {!isSearchExpanded && (
-          <a onClick={searchExpand} role="button" class="sm:hidden block">
+          <span
+            onClick={() => {
+              setIsSearchExpanded(true);
+            }}
+            role="button"
+            class="sm:hidden block"
+          >
             <MagnifyingGlass />
-          </a>
+          </span>
         )}
-        <form
-          class={classNames(
-            "search sm:flex bg-white bg-opacity-25 rounded-md items-center mr-3 px-3 md:mx-12",
-            { hidden: !isSearchExpanded, flex: isSearchExpanded }
-          )}
-          method="GET"
-          action="/leit"
+        <div
+          class={classNames("sm:flex pr-4 sm:pr-0", {
+            hidden: !isSearchExpanded,
+          })}
         >
-          <MagnifyingGlass />
-          <input
-            value=""
-            name="q"
-            size="1"
-            class="bg-transparent flex-grow py-2 px-2 text-sm font-thin overflow-hidden"
-            placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
-          />
-        </form>
-      </div>
-
-      {!isSearchExpanded && (
-        <div class="flex-grow sm:order-1 sm:flex-grow-0 text-center">
-          <a href="/s" class="font-black text-lg sm:text-xl">
-            Planitor
-          </a>
+          <form
+            class="search flex bg-white bg-opacity-25 rounded-md items-center mr-3 px-3 w-full"
+            method="GET"
+            action="/leit"
+          >
+            <MagnifyingGlass />
+            <input
+              value={value}
+              ref={input}
+              onChange={onChange}
+              name="q"
+              size="1"
+              class="bg-transparent flex-grow py-2 px-2 text-sm font-thin overflow-hidden"
+              placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
+            />
+          </form>
         </div>
-      )}
-
+      </div>
+      <div
+        class={classNames("flex-grow sm:order-1 sm:flex-grow-0 text-center", {
+          hidden: isSearchExpanded,
+          "sm:block": isSearchExpanded,
+        })}
+      >
+        <a href="/s" class="font-black text-lg sm:text-xl">
+          Planitor
+        </a>
+      </div>
       <div class="order-last text-right">
         <User />
       </div>

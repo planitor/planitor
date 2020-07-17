@@ -5,5 +5,5 @@ import { Navigation } from "./navigation";
 
 const navigationEl = document.getElementById("navigation");
 if (navigationEl) {
-  render(<Navigation user={document._user} />, navigationEl);
+  render(<Navigation />, navigationEl);
 }
