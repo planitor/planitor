@@ -18,7 +18,7 @@ from starlette.datastructures import Secret
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
-from planitor import config, crud
+from planitor import config, crud, ENV
 from planitor.database import get_db
 from planitor.models.accounts import User
 
@@ -51,7 +51,9 @@ async def auth(request: Request) -> Optional[str]:
 def get_login_response(user: User, response: Response) -> dict:
     """ set-cookie but also return oauth2 compatible login response """
     token = create_access_token({"user_id": user.id})
-    response.set_cookie(COOKIE_NAME, token, path="/", secure=True, httponly=True)
+    response.set_cookie(
+        COOKIE_NAME, token, path="/", secure=(ENV == "production"), httponly=True
+    )
     return {
         "access_token": token,
         "token_type": "bearer",
