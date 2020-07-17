@@ -7,7 +7,7 @@ import { PasswordRecoveryForm } from "./forms/password-recovery";
 export const NewPassword = NewPasswordForm;
 
 export const Login = (props) => {
-  const { success } = props;
+  const { onSuccess } = props;
   const [[screen, emailDefaultValue], setScreen] = useState(["login", ""]);
   const Form = { login: LoginForm, "password-recovery": PasswordRecoveryForm }[
     screen
@@ -17,7 +17,7 @@ export const Login = (props) => {
       <Form
         setScreen={setScreen}
         emailDefaultValue={emailDefaultValue}
-        success={success}
+        onSuccess={onSuccess}
       />
     </div>
   );

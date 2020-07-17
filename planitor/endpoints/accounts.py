@@ -9,6 +9,7 @@ from planitor.security import (
     generate_password_reset_token,
     verify_password_reset_token,
     get_login_response,
+    COOKIE_NAME,
 )
 from planitor.models import User as DBUser
 from planitor.schemas import User, Token, Msg
@@ -34,6 +35,15 @@ def read_user_me(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     return current_user
+
+
+@router.get("/logout")
+def logout(
+    response: Response,
+    request: Request,
+    current_user: DBUser = Depends(get_current_active_user),
+):
+    response.delete_cookie(COOKIE_NAME, path="/")
 
 
 @router.post("/login/access-token", response_model=Token, tags=["login"])

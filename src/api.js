@@ -29,4 +29,7 @@ export const api = {
       token,
     });
   },
+  logout() {
+    return axios.get("/notendur/logout");
+  },
 };

@@ -21,38 +21,24 @@
     <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
   </head>
 
+  <script>
+  document._user = {{ (user.to_dict() if user else None) | tojson }};
+  document._searchQuery = {{ (q if q is defined else None ) | tojson }}
+  </script>
+
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
-    <div class="bg-midnight w-full">
-      <nav id="navigation" class="flex items-center justify-between px-4 sm:px-6 py-2 sm:py-3 max-w-6xl mx-auto">
-        <a href="/s" class="block logo" alt="Planitor">{% include "emblem.svg" %}</a>
-        <form class="search rounded-md flex-grow flex items-center px-3 mx-3 sm:mx-6 md:mx-12" method="GET" action="{{ url_for('get_search') }}">
-          <div class="sf-symbol">{% include "symbols/magnifyingglass.svg" %}</div>
-          <input
-            value="{{ q or '' }}"
-            name="q"
-            size="1"
-            style="min-width: 120px; height: 2.9em;"
-            class="bg-transparent flex-grow py-2 px-2 text-white text-sm font-thin overflow-hidden"
-            placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
-          />
-        </form>
-        {% if user %}
-          <div class="user text-white">
-            <span class="name font-thin" style="color: rgba(255, 255, 255, 0.6);">{{ user.full_name }}</span>
-            <button id="logout-button" class="font-semibold text-white">Útskrá</button>
-          </div>
-        {% else %}
-          <button id="login-button" class="btn btn-primary">Innskrá</button>
-        {% endif %}
-      </nav>
+    <div class="bg-midnight w-full text-white">
+      <nav id="navigation" class="px-4 py-2 sm:px-6"></nav>
     </div>
+
     <div class="flex-grow w-full sheet">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         {% block body %}{% endblock body %}
       </div>
     </div>
+
     <footer class="w-full mt-4">
-      <div class="mx-auto max-w-6xl px-4 py-4 sm:px-6 mb-4 text-sm sm:text-base">
+      <div class="mx-auto max-w-6xl p-4 sm:px-6 mb-4 text-sm sm:text-base">
         <hr class="mb-4">
         <div class="flex">
           <p class="my-1 text-gray-700">
@@ -81,6 +67,7 @@
     {% if DEBUG %}
     {# Hot reload script #}
     {{ hotreload.script(url_for('hot-reload')) | safe }}
+    <script>window.HMR_WEBSOCKET_URL = 'ws://localhost:8080';</script>
     <script type="module" src="http://localhost:8080/_dist_/index.js"></script>
     {% else %}
     <script src="{{ url_for('build', path='/bundle.js') }}"></script>
