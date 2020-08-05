@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.requests import Request
 from starlette.routing import WebSocketRoute
@@ -25,8 +26,8 @@ else:
 
 
 @app.router.get("/")
-async def get_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def get_index():
+    return RedirectResponse("/s/reykjavik")
 
 
 @app.router.get("/_error")
