@@ -7,9 +7,11 @@ from starlette.requests import Request
 
 from planitor import config, hashids
 from planitor.database import get_db
+from planitor.crud.follow import get_case_subscription, get_address_subscription
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import (
+    Address,
     Case,
     Entity,
     Meeting,
@@ -34,7 +36,7 @@ async def get_search(
     current_user: User = Depends(get_current_active_user_or_none),
     q: str = "",
     page: int = 1,
-) -> templates.TemplateResponse:
+):
     if q:
         results = MinuteResults(db, q, page)
     else:
@@ -213,6 +215,10 @@ async def get_case(
     else:
         related_cases = []
 
+    subscription = get_case_subscription(db, current_user, case)
+
+    address_subscription = get_address_subscription(db, current_user, case.iceaddr)
+
     return templates.TemplateResponse(
         "case.html",
         {
@@ -224,6 +230,8 @@ async def get_case(
             "user": current_user,
             "last_updated": last_updated,
             "related_cases": related_cases,
+            "subscription": subscription,
+            "address_subscription": address_subscription,
         },
     )
 
@@ -282,6 +290,8 @@ def get_minute(
         .first()
     )
 
+    subscription = get_case_subscription(db, current_user, minute.case)
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -297,6 +307,7 @@ def get_minute(
             "last_updated": last_updated,
             "next_minute": next_minute,
             "previous_minute": previous_minute,
+            "subscription": subscription,
         },
     )
 
@@ -345,3 +356,18 @@ async def get_person(
 @router.get("/mapkit-token")
 async def mapkit_token(request: Request):
     return PlainTextResponse(mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret)))
+
+
+@router.get("/hnit/{hnitnum}")
+async def get_address(
+    request: Request,
+    hnitnum: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user_or_none),
+):
+    address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
+    if address is None:
+        return HTTPException(404)
+    return templates.TemplateResponse(
+        "address.html", {"address": address, "request": request, "user": current_user}
+    )

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% from 'symbols/symbols.html' import house_fill, arrow_up_right_circle_fill %}
+{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+
+
+{% block body %}
+  <div class="my-8 mt-4 sm:mt-8">
+
+    {% call breadcrumbs() %}
+    {{ breadcrumb(None, "Hnitnúmer", dash=False) }}
+    {{ breadcrumb(None, address) }}
+    {% endcall %}
+
+    <div class="flex justify-between items-end">
+      <a class="text-xl font-bold block">{{ address }}</a>
+      <a class="btn block" href="https://skra.is/leit-i-fasteignaskra?streetname={{ address.landnr }}&pos=fp-advanced-search">
+        Skrá.is <span class="sf-symbol">{{ arrow_up_right_circle_fill(class="") }}</span>
+      </a>
+    </div>
+  </div>
+  <div class="">
+    Hér koma mál tengd hnitnúmeri (heimilisfangi)
+  </div>
+{% endblock body %}

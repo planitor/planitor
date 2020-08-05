@@ -120,6 +120,7 @@ def get_subjects(headline):
         except AttributeError:
             return subjects
         for noun in nouns:
+            noun = str(noun)
             if noun in corrections:
                 noun = corrections[noun]
                 if noun is None:
@@ -144,6 +145,8 @@ def update_minute_with_response_items(
 def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session = None):
     def inner(db):
         minute = db.query(Minute).get(minute_id)
+        if minute is None:
+            return
         if not minute.lemmas or force:
             lemmas = get_minute_lemmas(minute)
             minute.lemmas = ", ".join(lemmas)

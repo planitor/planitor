@@ -90,6 +90,7 @@ const User = (props) => {
       .getMe()
       .then((response) => {
         setUser(response.data);
+        document._user = response.data;
       })
       .catch(function (error) {
         console.log(error);

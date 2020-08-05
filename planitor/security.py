@@ -45,7 +45,9 @@ async def auth(request: Request) -> Optional[str]:
     if request.method != "GET":
         return await oauth2_auth(request)
     for backend in [cookie_auth, oauth2_auth]:
-        return await backend(request)
+        result = await backend(request)
+        if result:
+            return result
 
 
 def get_login_response(user: User, response: Response) -> dict:
