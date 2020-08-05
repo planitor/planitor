@@ -44,19 +44,21 @@ const PersonFill = (props) => {
 const LogoutButton = (props) => {
   const onClick = (event) => {
     event.stopPropagation();
+    event.preventDefault();
     api.logout().then((response) => {
       localStorage.removeItem("token");
       location.reload();
     });
   };
   return (
-    <span
+    <a
       onClick={onClick}
+      href="/notendur/logout"
       role="button"
       class="text-sm font-bold text-powder-light"
     >
       Útskrá
-    </span>
+    </a>
   );
 };
 
@@ -64,7 +66,9 @@ const LoginButton = (props) => {
   const { onLogin } = props;
   const onClick = (event) => {
     event.stopPropagation();
+    event.preventDefault();
     const [el, closeModal] = openModal();
+    console.log(el, closeModal);
     const onSuccess = () => {
       onLogin();
       closeModal();
@@ -73,9 +77,9 @@ const LoginButton = (props) => {
   };
 
   return (
-    <div role="button" onClick={onClick}>
+    <a href="#" role="button" onClick={onClick} class="block p-2">
       <PersonFill />
-    </div>
+    </a>
   );
 };
 
