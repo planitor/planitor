@@ -131,7 +131,7 @@
       <div class="mb-6 lg:col-span-3">
 
         <div class="mb-6">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-start">
             <div>
               <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
               {% if case.address %}
@@ -143,7 +143,8 @@
               </div>
               {% endif %}
             </div>
-            <div class="follow" data-state="{{ "following" if subscription else "" }}" data-id="{{ case.id }}">
+            <div class="follow-case" data-state="{{ "following" if subscription else "" }}" data-id="{{ case.id }}">
+              Vakta {{ case.serial }}
             </div>
           </div>
         </div>
@@ -187,9 +188,17 @@
 
           {% if case_count %}
             <div class="p-3">
-              <div class="text-xl font-bold">{{ case.iceaddr }}</div>
-              <div class="text-sm font-thin tracking-tight mb-4">
-                {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="text-xl font-bold">
+                    <a href="{{ url_for("get_address", hnitnum=case.iceaddr.hnitnum) }}" class="underline">{{ case.iceaddr }}</a>
+                  </div>
+                  <div class="text-sm font-thin tracking-tight mb-4">
+                    {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
+                  </div>
+                </div>
+                <div class="follow-address" data-state="{{ "following" if address_subscription else "" }}" data-hnitnum="{{ case.iceaddr.hnitnum }}">
+                </div>
               </div>
               {{ get_cases(related_cases, case_count) }}
               <div class="text-xs font-thin tracking-tight mt-4">

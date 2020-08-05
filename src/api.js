@@ -38,4 +38,14 @@ export const api = {
   unfollowCase(id) {
     return axios.delete(`/subscriptions/cases/${id}`, authHeaders());
   },
+  followAddress(hnitnum) {
+    return axios.post(
+      `/subscriptions/addresses/${hnitnum}`,
+      null,
+      authHeaders()
+    );
+  },
+  unfollowAddress(hnitnum) {
+    return axios.delete(`/subscriptions/addresses/${hnitnum}`, authHeaders());
+  },
 };

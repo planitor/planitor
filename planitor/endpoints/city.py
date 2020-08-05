@@ -7,10 +7,11 @@ from starlette.requests import Request
 
 from planitor import config, hashids
 from planitor.database import get_db
-from planitor.crud.follow import get_case_subscription
+from planitor.crud.follow import get_case_subscription, get_address_subscription
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import (
+    Address,
     Case,
     Entity,
     Meeting,
@@ -216,6 +217,8 @@ async def get_case(
 
     subscription = get_case_subscription(db, current_user, case)
 
+    address_subscription = get_address_subscription(db, current_user, case.iceaddr)
+
     return templates.TemplateResponse(
         "case.html",
         {
@@ -228,6 +231,7 @@ async def get_case(
             "last_updated": last_updated,
             "related_cases": related_cases,
             "subscription": subscription,
+            "address_subscription": address_subscription,
         },
     )
 
@@ -352,3 +356,18 @@ async def get_person(
 @router.get("/mapkit-token")
 async def mapkit_token(request: Request):
     return PlainTextResponse(mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret)))
+
+
+@router.get("/hnit/{hnitnum}")
+async def get_address(
+    request: Request,
+    hnitnum: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user_or_none),
+):
+    address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
+    if address is None:
+        return HTTPException(404)
+    return templates.TemplateResponse(
+        "address.html", {"address": address, "request": request, "user": current_user}
+    )
