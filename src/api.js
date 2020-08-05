@@ -32,4 +32,10 @@ export const api = {
   logout() {
     return axios.get("/notendur/logout");
   },
+  followCase(id) {
+    return axios.post(`/subscriptions/cases/${id}`, null, authHeaders());
+  },
+  unfollowCase(id) {
+    return axios.delete(`/subscriptions/cases/${id}`, authHeaders());
+  },
 };

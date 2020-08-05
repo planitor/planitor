@@ -48,6 +48,7 @@ bpython = "^0.19"
 typer = "^0.2.1"
 pytest-mock = "^3.1.1"
 arel = "^0.2.0"
+sqlalchemy-stubs = "^0.3"
 
 [tool.poetry.scripts]
 dev-server = "scripts.development:main"

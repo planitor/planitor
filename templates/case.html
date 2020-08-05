@@ -132,18 +132,20 @@
 
         <div class="mb-6">
           <div class="flex justify-between items-center">
-            <div class="flex-shrink">
+            <div>
               <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
+              {% if case.address %}
+              <div class="text-sm font-bold">
+                {{ case.address }}
+                {% if case.stadgreinir %}
+                <span class="text-gray-600 font-thin ml-2">{{ case.stadgreinir }}</span>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="follow" data-state="{{ "following" if subscription else "" }}" data-id="{{ case.id }}">
             </div>
           </div>
-          {% if case.address %}
-          <div class="text-sm font-bold">
-            {{ case.address }}
-            {% if case.stadgreinir %}
-            <span class="text-gray-600 font-thin ml-2">{{ case.stadgreinir }}</span>
-            {% endif %}
-          </div>
-          {% endif %}
         </div>
 
         <div class="mb-6">

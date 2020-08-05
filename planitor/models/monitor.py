@@ -20,7 +20,7 @@ EnumValue = namedtuple("EnumValue", ("slug", "label"))
 
 class SubscriptionTypeEnum(enum.Enum):
     case = EnumValue("malsnumer", "Málsnúmer")
-    address = EnumValue("heimilsfang", "Heimilisfang")
+    address = EnumValue("heimilisfang", "Heimilisfang")
     street = EnumValue("gata", "Stræti")
     entity = EnumValue("kennitala", "Kennitala")
     radius = EnumValue("radius", "Radíus")
@@ -36,7 +36,7 @@ class Subscription(Base):
 
     type = Column(Enum(SubscriptionTypeEnum), nullable=False)
 
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User")
 
     address_hnitnum = Column(Integer, ForeignKey("addresses.hnitnum"), nullable=True)
@@ -48,7 +48,7 @@ class Subscription(Base):
     case_id = Column(Integer, ForeignKey("cases.id"), nullable=True)
     case = relationship("Case")
 
-    entity_kennitala = Column(Integer, ForeignKey("entities.kennitala"), nullable=True)
+    entity_kennitala = Column(String, ForeignKey("entities.kennitala"), nullable=True)
     entity = relationship("Entity")
 
 

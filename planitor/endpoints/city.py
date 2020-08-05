@@ -7,6 +7,7 @@ from starlette.requests import Request
 
 from planitor import config, hashids
 from planitor.database import get_db
+from planitor.crud.follow import get_case_subscription
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import (
@@ -34,7 +35,7 @@ async def get_search(
     current_user: User = Depends(get_current_active_user_or_none),
     q: str = "",
     page: int = 1,
-) -> templates.TemplateResponse:
+):
     if q:
         results = MinuteResults(db, q, page)
     else:
@@ -213,6 +214,8 @@ async def get_case(
     else:
         related_cases = []
 
+    subscription = get_case_subscription(db, current_user, case)
+
     return templates.TemplateResponse(
         "case.html",
         {
@@ -224,6 +227,7 @@ async def get_case(
             "user": current_user,
             "last_updated": last_updated,
             "related_cases": related_cases,
+            "subscription": subscription,
         },
     )
 
@@ -282,6 +286,8 @@ def get_minute(
         .first()
     )
 
+    subscription = get_case_subscription(db, current_user, minute.case)
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -297,6 +303,7 @@ def get_minute(
             "last_updated": last_updated,
             "next_minute": next_minute,
             "previous_minute": previous_minute,
+            "subscription": subscription,
         },
     )
 
