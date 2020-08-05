@@ -58,17 +58,17 @@ def test_get_lemmas_singularizes_plural_words():
 
 
 def test_lemmatize_query_for_webquery():
-    assert lemmatize_query("veitingastaðir") == "veitingastaður"
-    assert lemmatize_query("skemmdir") == "skemmd"
+    assert lemmatize_query("veitingastaðir") == "Veitingastaðir or Veitingastaður"
+    assert lemmatize_query("skemmdir") == "Skemmd or Skemmdir"
 
 
 def test_lemmatize_query_capitalize():
-    assert lemmatize_query("brautarholti") == "Brautarholt"
+    assert lemmatize_query("brautarholti") == "Brautarholt or Brautarholti"
 
 
 def test_lemmatize_query_unknown_lemma():
     assert lemmatize_query("unknown") == "Unknown"
-    assert lemmatize_query("svalir") == "svalir"
+    assert lemmatize_query("svalir") == "Svalir"
 
 
 def test_get_lemmas_large_sentence():

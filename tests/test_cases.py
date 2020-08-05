@@ -18,19 +18,3 @@ def test_get_case_status_from_remarks():
         )
         == CaseStatusEnum.directed_to_skipulagsfulltrui
     )
-
-
-def get(serial):
-
-
-for m in db.query(Minute):
-    if m.meeting.council.name == "Byggingarfulltrúi":
-        if '">' in m.address:
-            _, m.address = m.address.split('">', 1)
-            print(address)
-            db.add(m)
-        if " " in serial:
-            m.serial, stadgreinir = m.serial.split(" ", 1)
-            m.stadgreinir = stadgreinir.strip("()").split()[0]
-            db.add(m)
-

@@ -59,39 +59,43 @@ def update_minute_with_entity_relations(db: Session, minute: Minute, entity_item
     db.commit()
 
 
+def _update_minute_with_entity_mentions(db, minute):
+
+    mentions = extract_company_names(minute.inquiry)
+
+    if not mentions:
+        minute.assign_entity_mentions({})
+        db.add(minute)
+        db.commit()
+        return
+
+    # We only want to persist mentions that have matching local entities, this is to
+    # track those
+    _matched_mentions = {}
+
+    for co_name, locations in mentions.items():
+        entity = _get_entity(db, co_name)
+        if entity is None:
+            continue
+        case_entity, created = get_or_create_case_entity(
+            db, minute.case, entity, applicant=False
+        )
+        if created:
+            db.commit()
+        _matched_mentions[entity.kennitala] = locations
+
+    minute.assign_entity_mentions(_matched_mentions)
+    db.add(minute)
+    db.commit()
+
+
 @dramatiq.actor
 def update_minute_with_entity_mentions(minute_id: int):
 
     with db_context() as db:
 
         minute = db.query(Minute).get(minute_id)
-
-        mentions = extract_company_names(minute.inquiry)
-
-        if not mentions:
-            minute.assign_entity_mentions({})
-            db.add(minute)
-            db.commit()
-            return
-
-        # We only want to persist mentions that have matching local entities, this is to
-        # track those
-        _matched_mentions = {}
-
-        for co_name, locations in mentions.items():
-            entity = _get_entity(db, co_name)
-            if entity is None:
-                continue
-            case_entity, created = get_or_create_case_entity(
-                db, minute.case, entity, applicant=False
-            )
-            if created:
-                db.commit()
-            _matched_mentions[entity.kennitala] = locations
-
-        minute.assign_entity_mentions(_matched_mentions)
-        db.add(minute)
-        db.commit()
+        _update_minute_with_entity_mentions(db, minute)
 
 
 headline_pattern = re.compile(
