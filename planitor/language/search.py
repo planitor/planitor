@@ -164,6 +164,6 @@ def lemmatize_query(search_query) -> str:
             # Return the
             return lemmas.pop()
 
-        return " or ".join(lemmas)
+        return " or ".join(sorted(lemmas))
 
     return re.sub(r"\w+", repl, search_query)
