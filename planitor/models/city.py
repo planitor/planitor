@@ -308,7 +308,7 @@ class Case(Base):
     housenumber_osm_id = Column(BIGINT, ForeignKey(Housenumber.osm_id))
     housenumber = relationship(Housenumber)
 
-    address_id = Column(Integer, ForeignKey(Address.hnitnum))
+    address_id = Column(Integer, ForeignKey(Address.hnitnum), index=True)
     iceaddr = relationship(
         Address
     )  # not `address` because that column is taken for scraped address
