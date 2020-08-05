@@ -34,16 +34,18 @@ const Button = (props) => {
   );
 };
 
-const Banner = () => {
-  const Link = (
-    <a class="text-midnight underline" href="mailto:hallo@planitor.io">
-      hallo@planitor.io
-    </a>
-  );
+const Banner = (props) => {
+  const Link = () => {
+    return (
+      <a class="text-midnight underline" href="mailto:hallo@planitor.io">
+        hallo@planitor.io
+      </a>
+    );
+  };
   return (
     <p class="text-center">
-      Vaktarinn stendur öllum til boða gegn mánaðargjaldi. Til að fá aðgang
-      sendu okkur línu á <Link />.
+      Vaktarinn stendur öllum til boða gegn mánaðargjaldi. <br />
+      Til að fá aðgang sendu okkur línu á <Link />.
     </p>
   );
 };
