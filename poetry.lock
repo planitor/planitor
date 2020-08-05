@@ -380,17 +380,17 @@ description = "FastAPI framework, high performance, easy to learn, fast to code,
 name = "fastapi"
 optional = false
 python-versions = ">=3.6"
-version = "0.58.0"
+version = "0.60.1"
 
 [package.dependencies]
 pydantic = ">=0.32.2,<2.0.0"
-starlette = "0.13.4"
+starlette = "0.13.6"
 
 [package.extras]
-all = ["requests", "aiofiles", "jinja2", "python-multipart", "itsdangerous", "pyyaml", "graphene", "ujson", "orjson", "email-validator", "uvicorn", "async-exit-stack", "async-generator"]
-dev = ["pyjwt", "passlib", "autoflake", "flake8", "uvicorn", "graphene"]
-doc = ["mkdocs", "mkdocs-material", "markdown-include", "typer", "typer-cli", "pyyaml"]
-test = ["pytest (>=5.4.3)", "pytest-cov", "mypy", "black", "isort", "requests", "email-validator", "sqlalchemy", "peewee", "databases", "orjson", "async-exit-stack", "async-generator", "python-multipart", "aiofiles", "flask"]
+all = ["requests (>=2.24.0,<3.0.0)", "aiofiles (>=0.5.0,<0.6.0)", "jinja2 (>=2.11.2,<3.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "itsdangerous (>=1.1.0,<2.0.0)", "pyyaml (>=5.3.1,<6.0.0)", "graphene (>=2.1.8,<3.0.0)", "ujson (>=3.0.0,<4.0.0)", "orjson (>=3.2.1,<4.0.0)", "email_validator (>=1.1.1,<2.0.0)", "uvicorn (>=0.11.5,<0.12.0)", "async_exit_stack (>=1.0.1,<2.0.0)", "async_generator (>=1.10,<2.0.0)"]
+dev = ["python-jose (>=3.1.0,<4.0.0)", "passlib (>=1.7.2,<2.0.0)", "autoflake (>=1.3.1,<2.0.0)", "flake8 (>=3.8.3,<4.0.0)", "uvicorn (>=0.11.5,<0.12.0)", "graphene (>=2.1.8,<3.0.0)"]
+doc = ["mkdocs (>=1.1.2,<2.0.0)", "mkdocs-material (>=5.4.0,<6.0.0)", "markdown-include (>=0.5.1,<0.6.0)", "mkdocs-markdownextradata-plugin (>=0.1.7,<0.2.0)", "typer (>=0.3.0,<0.4.0)", "typer-cli (>=0.0.9,<0.0.10)", "pyyaml (>=5.3.1,<6.0.0)"]
+test = ["pytest (5.4.3)", "pytest-cov (2.10.0)", "mypy (0.782)", "black (19.10b0)", "isort (>=5.0.6,<6.0.0)", "requests (>=2.24.0,<3.0.0)", "email_validator (>=1.1.1,<2.0.0)", "sqlalchemy (>=1.3.18,<2.0.0)", "peewee (>=3.13.3,<4.0.0)", "databases (>=0.3.2,<0.4.0)", "orjson (>=3.2.1,<4.0.0)", "async_exit_stack (>=1.0.1,<2.0.0)", "async_generator (>=1.10,<2.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "aiofiles (>=0.5.0,<0.6.0)", "flask (>=1.1.2,<2.0.0)"]
 
 [[package]]
 category = "dev"
@@ -398,7 +398,7 @@ description = "the modular source code checker: pep8 pyflakes and co"
 name = "flake8"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
-version = "3.8.2"
+version = "3.8.3"
 
 [package.dependencies]
 mccabe = ">=0.6.0,<0.7.0"
@@ -542,6 +542,14 @@ scripts = ["click (>=6.0)", "twisted (>=16.4.0)"]
 
 [[package]]
 category = "dev"
+description = "iniconfig: brain-dead simple config-ini parsing"
+name = "iniconfig"
+optional = false
+python-versions = "*"
+version = "1.0.1"
+
+[[package]]
+category = "dev"
 description = "IPython-enabled pdb"
 name = "ipdb"
 optional = false
@@ -668,10 +676,10 @@ description = "Like `diff` but for PostgreSQL schemas"
 name = "migra"
 optional = false
 python-versions = "*"
-version = "1.0.1592301305"
+version = "1.0.1596263757"
 
 [package.dependencies]
-schemainspect = ">=0.1.1592300770"
+schemainspect = ">=0.1.1596263228"
 six = "*"
 sqlbag = "*"
 
@@ -893,7 +901,7 @@ description = "library with cross-python path, ini-parsing, io, code, log facili
 name = "py"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.8.1"
+version = "1.9.0"
 
 [[package]]
 category = "dev"
@@ -1032,24 +1040,25 @@ description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
 python-versions = ">=3.5"
-version = "5.4.3"
+version = "6.0.1"
 
 [package.dependencies]
 atomicwrites = ">=1.0"
 attrs = ">=17.4.0"
 colorama = "*"
+iniconfig = "*"
 more-itertools = ">=4.0.0"
 packaging = "*"
 pluggy = ">=0.12,<1.0"
-py = ">=1.5.0"
-wcwidth = "*"
+py = ">=1.8.2"
+toml = "*"
 
 [package.dependencies.importlib-metadata]
 python = "<3.8"
 version = ">=0.12"
 
 [package.extras]
-checkqa-mypy = ["mypy (v0.761)"]
+checkqa_mypy = ["mypy (0.780)"]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
@@ -1151,11 +1160,11 @@ description = "A natural language parser for Icelandic"
 name = "reynir"
 optional = false
 python-versions = "*"
-version = "2.3.1"
+version = "2.5.0"
 
 [package.dependencies]
 cffi = ">=1.13.0"
-tokenizer = ">=2.0.5"
+tokenizer = ">=2.1.0"
 
 [[package]]
 category = "main"
@@ -1174,7 +1183,7 @@ description = "Schema inspection for PostgreSQL (and possibly others)"
 name = "schemainspect"
 optional = false
 python-versions = "*"
-version = "0.1.1592300770"
+version = "0.1.1596263228"
 
 [package.dependencies]
 six = "*"
@@ -1375,7 +1384,7 @@ description = "The little ASGI library that shines."
 name = "starlette"
 optional = false
 python-versions = ">=3.6"
-version = "0.13.4"
+version = "0.13.6"
 
 [package.extras]
 full = ["aiofiles", "graphene", "itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests", "ujson"]
@@ -1386,7 +1395,7 @@ description = "A tokenizer for Icelandic text"
 name = "tokenizer"
 optional = false
 python-versions = "*"
-version = "2.0.6"
+version = "2.1.0"
 
 [[package]]
 category = "dev"
@@ -1587,7 +1596,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "b2b326ec026a0404baf04b568c08da68822663a095dc98a420afe8192e158ce4"
+content-hash = "0b52d6b3723d1c6a7d56198d3c1b901677100c222b4b644be3a949940331205a"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1782,12 +1791,12 @@ emails = [
     {file = "emails-0.6.tar.gz", hash = "sha256:a4c2d67ea8b8831967a750d8edc6e77040d7693143fe280e6d2a367d9c36ff88"},
 ]
 fastapi = [
-    {file = "fastapi-0.58.0-py3-none-any.whl", hash = "sha256:cdd953e806d5c6bee879178d4e6c7b2ebcee219ea252a39c1c98ad8c7b798235"},
-    {file = "fastapi-0.58.0.tar.gz", hash = "sha256:bfea20cc164885af99bad4bc680a99fe3b75d8d43b278ad51f1501d97cf8f762"},
+    {file = "fastapi-0.60.1-py3-none-any.whl", hash = "sha256:96f964c3d9da8183f824857ad67c16c00ff3297e7bbca6748f60bd8485ded38c"},
+    {file = "fastapi-0.60.1.tar.gz", hash = "sha256:9a4faa0e2b9c88a3772f7ce15eb4005bbdd27d1230ab4a0cd3517316175014a6"},
 ]
 flake8 = [
-    {file = "flake8-3.8.2-py2.py3-none-any.whl", hash = "sha256:ccaa799ef9893cebe69fdfefed76865aeaefbb94cb8545617b2298786a4de9a5"},
-    {file = "flake8-3.8.2.tar.gz", hash = "sha256:c69ac1668e434d37a2d2880b3ca9aafd54b3a10a3ac1ab101d22f29e29cf8634"},
+    {file = "flake8-3.8.3-py2.py3-none-any.whl", hash = "sha256:15e351d19611c887e482fb960eae4d44845013cc142d42896e9862f775d8cf5c"},
+    {file = "flake8-3.8.3.tar.gz", hash = "sha256:f04b9fcbac03b0a3e58c0ab3a0ecc462e023a9faf046d57794184028123aa208"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1863,6 +1872,10 @@ importlib-metadata = [
 incremental = [
     {file = "incremental-17.5.0-py2.py3-none-any.whl", hash = "sha256:717e12246dddf231a349175f48d74d93e2897244939173b01974ab6661406b9f"},
     {file = "incremental-17.5.0.tar.gz", hash = "sha256:7b751696aaf36eebfab537e458929e194460051ccad279c72b755a167eebd4b3"},
+]
+iniconfig = [
+    {file = "iniconfig-1.0.1-py3-none-any.whl", hash = "sha256:80cf40c597eb564e86346103f609d74efce0f6b4d4f30ec8ce9e2c26411ba437"},
+    {file = "iniconfig-1.0.1.tar.gz", hash = "sha256:e5f92f89355a67de0595932a6c6c02ab4afddc6fcdc0bfc5becd0d60884d3f69"},
 ]
 ipdb = [
     {file = "ipdb-0.13.2.tar.gz", hash = "sha256:77fb1c2a6fccdfee0136078c9ed6fe547ab00db00bebff181f1e8c9e13418d49"},
@@ -1956,8 +1969,8 @@ mccabe = [
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 migra = [
-    {file = "migra-1.0.1592301305-py2.py3-none-any.whl", hash = "sha256:57fb576cef44aaa52eb4beea1ca6ecea4a71f0fc63cd710159c368ea8502c325"},
-    {file = "migra-1.0.1592301305.tar.gz", hash = "sha256:4a4eb1a6c6942d82ee85e0e6afd82d305bae4dbe0e51a92ed3941daa6e42aab2"},
+    {file = "migra-1.0.1596263757-py2.py3-none-any.whl", hash = "sha256:55953234d792b1e4f8e74920736a8b9b6bf2d86aa32f86e3abf1efaf080bc3da"},
+    {file = "migra-1.0.1596263757.tar.gz", hash = "sha256:2ce0f795bd706bfdf06a53fc70d3ea23f7fb1017e2ce48aed12ae46100f145f3"},
 ]
 more-itertools = [
     {file = "more-itertools-8.2.0.tar.gz", hash = "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"},
@@ -2052,8 +2065,8 @@ ptyprocess = [
     {file = "ptyprocess-0.6.0.tar.gz", hash = "sha256:923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0"},
 ]
 py = [
-    {file = "py-1.8.1-py2.py3-none-any.whl", hash = "sha256:c20fdd83a5dbc0af9efd622bee9a5564e278f6380fffcacc43ba6f43db2813b0"},
-    {file = "py-1.8.1.tar.gz", hash = "sha256:5e27081401262157467ad6e7f851b7aa402c5852dbcb3dae06768434de5752aa"},
+    {file = "py-1.9.0-py2.py3-none-any.whl", hash = "sha256:366389d1db726cd2fcfc79732e75410e5fe4d31db13692115529d34069a043c2"},
+    {file = "py-1.9.0.tar.gz", hash = "sha256:9ca6883ce56b4e8da7e79ac18787889fa5206c79dcc67fb065376cd2fe03f342"},
 ]
 pyasn1 = [
     {file = "pyasn1-0.4.8-py2.4.egg", hash = "sha256:fec3e9d8e36808a28efb59b489e4528c10ad0f480e57dcc32b4de5c9d8c9fdf3"},
@@ -2144,8 +2157,8 @@ pypydispatcher = [
     {file = "PyPyDispatcher-2.1.2.tar.gz", hash = "sha256:b6bec5dfcff9d2535bca2b23c80eae367b1ac250a645106948d315fcfa9130f2"},
 ]
 pytest = [
-    {file = "pytest-5.4.3-py3-none-any.whl", hash = "sha256:5c0db86b698e8f170ba4582a492248919255fcd4c79b1ee64ace34301fb589a1"},
-    {file = "pytest-5.4.3.tar.gz", hash = "sha256:7979331bfcba207414f5e1263b5a0f8f521d0f457318836a7355531ed1a4c7d8"},
+    {file = "pytest-6.0.1-py3-none-any.whl", hash = "sha256:8b6007800c53fdacd5a5c192203f4e531eb2a1540ad9c752e052ec0f7143dbad"},
+    {file = "pytest-6.0.1.tar.gz", hash = "sha256:85228d75db9f45e06e57ef9bf4429267f81ac7c0d742cc9ed63d09886a9fe6f4"},
 ]
 pytest-ipdb = [
     {file = "pytest-ipdb-0.1-prerelease2.macosx-10.9-x86_64.tar.gz", hash = "sha256:a0c77a02ea2cbc5c41520087956f60bd151eaa725e3244cb46d7be747f7e9ae7"},
@@ -2198,19 +2211,19 @@ requests = [
     {file = "requests-2.24.0.tar.gz", hash = "sha256:b3559a131db72c33ee969480840fff4bb6dd111de7dd27c8ee1f820f4f00231b"},
 ]
 reynir = [
-    {file = "reynir-2.3.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:0571dee9e79d03eb40ffc9a9cd5e79dd73e21f4a0073bb8dc2cd1bbbab65d0ba"},
-    {file = "reynir-2.3.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:3f277aa21bea78311e1c479d19dbf9edcb366124d8b0391c902a10f38352e32c"},
-    {file = "reynir-2.3.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:88ce6ba06f89dae00ccce783a1bca5d76c8a742bc2a60b8129c6450677ac91cf"},
-    {file = "reynir-2.3.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:25db15b7e60e47e0b279044a14a815c9ebf369beba24025a2f3fefd3752e50bd"},
-    {file = "reynir-2.3.1.tar.gz", hash = "sha256:8352baf8cdcc889ab8be626ee30b726b1bd23c478d68562e2e400202efd44f54"},
+    {file = "reynir-2.5.0-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:a3ce6b58e225896b850cff9c2eb467a24bb57f4574a8b3e03984044d18711abc"},
+    {file = "reynir-2.5.0-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:c7184400ea23bfc69ee55787c2f26c248639cfb7f7d385911c5b1ee99e3589a9"},
+    {file = "reynir-2.5.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:c5975d3374b3f5bd14e1fe4b816523f32cbda5f481aad1c4c4a2d92d8b9f05eb"},
+    {file = "reynir-2.5.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:1e7007ed980c649b44596d9374aacbbf7026deaa0a63aad49914d8db19e3e1a4"},
+    {file = "reynir-2.5.0.tar.gz", hash = "sha256:c7e7620c020e1978b2e57e56fa38c5ee42dcceceead26bd8b42558b3de667a65"},
 ]
 s3transfer = [
     {file = "s3transfer-0.3.3-py2.py3-none-any.whl", hash = "sha256:2482b4259524933a022d59da830f51bd746db62f047d6eb213f2f8855dcb8a13"},
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 schemainspect = [
-    {file = "schemainspect-0.1.1592300770-py2.py3-none-any.whl", hash = "sha256:a35500da466f0765338504f1f33623d323f6daf52edc9a077fcbd70a50372d79"},
-    {file = "schemainspect-0.1.1592300770.tar.gz", hash = "sha256:929226c0c729bff74f1ad801a83ba96d1de789fdca5cd9d7304c0e1c10be7aef"},
+    {file = "schemainspect-0.1.1596263228-py2.py3-none-any.whl", hash = "sha256:5fcf8d8af83ac631d14967d367f9d9c0a2b508a737e17def588912d25af80295"},
+    {file = "schemainspect-0.1.1596263228.tar.gz", hash = "sha256:e4402cc1f690d793bd146a716a937ea957895752bca05730ed9cb2b5d83374fd"},
 ]
 scrapy = [
     {file = "Scrapy-2.1.0-py2.py3-none-any.whl", hash = "sha256:883ab2dcb6cafb22c7448616baeb5b4d7bedef57ca6a9a5f4e902cb1d6e7aeca"},
@@ -2282,12 +2295,12 @@ sqlbag = [
     {file = "sqlbag-0.1.1579049654.tar.gz", hash = "sha256:bf1aba13a062b0ef61d37ab6f4aa8808bc4bd830e0c14178238ac8185d298f42"},
 ]
 starlette = [
-    {file = "starlette-0.13.4-py3-none-any.whl", hash = "sha256:0fb4b38d22945b46acb880fedee7ee143fd6c0542992501be8c45c0ed737dd1a"},
-    {file = "starlette-0.13.4.tar.gz", hash = "sha256:04fe51d86fd9a594d9b71356ed322ccde5c9b448fc716ac74155e5821a922f8d"},
+    {file = "starlette-0.13.6-py3-none-any.whl", hash = "sha256:bd2ffe5e37fb75d014728511f8e68ebf2c80b0fa3d04ca1479f4dc752ae31ac9"},
+    {file = "starlette-0.13.6.tar.gz", hash = "sha256:ebe8ee08d9be96a3c9f31b2cb2a24dbdf845247b745664bd8a3f9bd0c977fdbc"},
 ]
 tokenizer = [
-    {file = "tokenizer-2.0.6-py2.py3-none-any.whl", hash = "sha256:deb66812d4ac460f2fbf96fe7170e510973138810fe23abe9283b81562675484"},
-    {file = "tokenizer-2.0.6.tar.gz", hash = "sha256:142664e6dc0d257fee208fa52a7e1b9c63436479a683b4c2c57987570d07e646"},
+    {file = "tokenizer-2.1.0-py2.py3-none-any.whl", hash = "sha256:5c248c2abd11def4598872abef6b1f432c5ebe8ec23724f1656a8fed35b65f6b"},
+    {file = "tokenizer-2.1.0.tar.gz", hash = "sha256:4f1723f024b03ee649af8688b08e001011c6bc6c0580c50e3a2452f0aa6e5bc9"},
 ]
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
