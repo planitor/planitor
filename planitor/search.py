@@ -6,9 +6,10 @@ from jinja2 import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from iceaddr import iceaddr_suggest
 
 from planitor.language.search import get_wordforms, lemmatize_query
-from planitor.models import Minute
+from planitor.models import Minute, Case
 
 
 def get_terms_from_query(tsquerytree: str):
@@ -155,16 +156,17 @@ class MinuteResults:
         """ People frequently compose search queries with plural form, for example
         "bílakjallarar" or use non-nominative inclensions. It’s important to depluralize
         this. The `parse_lemmas` achieves this for us. """
-
         return func.websearch_to_tsquery("simple", lemmatize_query(self.search_query))
 
     def get_query(self):
         tsvector = func.to_tsvector("simple", Minute.lemmas)
         tsquery = self.get_tsquery()
+        hnitnums = {address["hnitnum"] for address in iceaddr_suggest(self.search_query)}
         return (
             self.db.query(Minute)
-            .filter(tsvector.op("@@")(tsquery))
-            .order_by(func.ts_rank(tsvector, tsquery))
+            .join(Case)
+            .filter(tsvector.op("@@")(tsquery) | Case.address_id.in_(hnitnums))
+            .order_by(Case.address_id.in_(hnitnums), func.ts_rank(tsvector, tsquery))
         )
 
     def get_highlight_terms(self) -> Set[str]:
