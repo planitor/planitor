@@ -131,8 +131,8 @@
       <div class="mb-6 lg:col-span-3">
 
         <div class="mb-6">
-          <div class="flex justify-between items-start">
-            <div>
+          <div class="flex flex-col sm:flex-row justify-between items-start">
+            <div class="mb-8 sm:mb-0">
               <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
               {% if case.address %}
               <div class="text-sm font-bold">
@@ -143,7 +143,7 @@
               </div>
               {% endif %}
             </div>
-            <div class="follow-case" data-state="{{ "following" if subscription else "" }}" data-id="{{ case.id }}">
+            <div class="follow-case w-full sm:w-auto mb-4 sm:mb-0" data-state="{{ "following" if subscription else "" }}" data-id="{{ case.id }}">
               Vakta {{ case.serial }}
             </div>
           </div>

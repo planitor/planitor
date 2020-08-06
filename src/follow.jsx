@@ -9,12 +9,15 @@ const Button = (props) => {
   const { loading, onClick, hover, setHover, following, defaultLabel } = props;
   return (
     <button
-      class={classNames("px-4 py-2 border rounded-lg font-bold", {
-        "text-gray-500 border-gray-500": loading,
-        "bg-midnight text-white": following && !loading,
-        "text-midnight": !following && !loading,
-        "border-midnight": !loading,
-      })}
+      class={classNames(
+        "px-4 py-2 border rounded-lg font-bold sm:inline block mx-auto",
+        {
+          "text-gray-500 border-gray-500": loading,
+          "bg-midnight text-white": following && !loading,
+          "text-midnight": !following && !loading,
+          "border-midnight": !loading,
+        }
+      )}
       onClick={onClick}
       onMouseOver={(event) => {
         setHover(true);
