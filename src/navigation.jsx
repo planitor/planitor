@@ -68,7 +68,6 @@ const LoginButton = (props) => {
     event.stopPropagation();
     event.preventDefault();
     const [el, closeModal] = openModal();
-    console.log(el, closeModal);
     const onSuccess = () => {
       onLogin();
       closeModal();
