@@ -28,7 +28,7 @@ HIGHLIGHT_RANGE = 30
 
 
 def iter_preview_fragments(
-    document: str, highlight_terms: Set[str]
+    document: str, highlight_terms: Set[str], max_fragments: int = 3
 ) -> Generator[Markup, None, None]:
     """ Find segments within a document where instances of terms appear. Used to display
     segments of meeting minutes in search results (like google does where matched search
@@ -58,6 +58,16 @@ def iter_preview_fragments(
                 break
         else:
             spans.append([start, end])
+
+    if max_fragments:
+        spans = spans[:max_fragments]
+
+    if not spans:
+        # No search terms to highlight, create three zero-length highlights so that the
+        # start of the document is included as a preview
+        spans = [
+            (HIGHLIGHT_RANGE, HIGHLIGHT_RANGE),
+        ]
 
     for start, end in spans:
 
@@ -102,8 +112,8 @@ class Pagination:
     PER_PAGE = 15
     NAV_SEGMENT_SIZE = 6
 
-    def __init__(self, query, count, number: int):
-        self.count = count.scalar()
+    def __init__(self, query, count_query, number: int):
+        self.count = count_query.scalar()
         self.number = number if number > 0 else 1
         self.total_pages = int(math.ceil(self.count / self.PER_PAGE))
         self.pages = list(range(1, self.total_pages + 1))  # 1-based indexing of all pages
@@ -160,19 +170,24 @@ class MinuteResults:
     def get_query_and_count(self):
         tsvector = func.to_tsvector("simple", Minute.lemmas)
         tsquery = self.get_tsquery()
-        hnitnums = {address["hnitnum"] for address in iceaddr_suggest(self.search_query)}
+
+        # Only take first three suggestions
+        hnitnums = [
+            address["hnitnum"] for address in iceaddr_suggest(self.search_query)[:3]
+        ]
+
+        filters = tsvector.op("@@")(tsquery)
+        if hnitnums:
+            filters = filters | Case.address_id.in_(hnitnums)
+
         return (
             (
                 self.db.query(Minute)
                 .join(Case)
-                .filter(tsvector.op("@@")(tsquery) | Case.address_id.in_(hnitnums))
+                .filter(filters)
                 .order_by(Case.address_id.in_(hnitnums), func.ts_rank(tsvector, tsquery))
             ),
-            (
-                self.db.query(func.count(Minute.id))
-                .join(Case)
-                .filter(tsvector.op("@@")(tsquery) | Case.address_id.in_(hnitnums))
-            ),
+            (self.db.query(func.count(Minute.id)).join(Case).filter(filters)),
         )
 
     def get_highlight_terms(self) -> Set[str]:
@@ -190,9 +205,9 @@ class MinuteResults:
         return highlight_terms
 
     def get_document(self, minute: Minute) -> str:
-        parts = [minute.headline, minute.inquiry, minute.remarks]
+        parts = [minute.inquiry, minute.remarks]
         parts += [ec.entity.name for ec in (minute.case.entities or [])]
-        return "\n".join(part for part in parts if part if part)
+        return "\n".join(part for part in parts if part)
 
     def __iter__(self):
         highlight_terms = self.get_highlight_terms()
