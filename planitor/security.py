@@ -14,7 +14,6 @@ from fastapi.security import APIKeyCookie, OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import InvalidTokenError, PyJWTError
 from sqlalchemy.orm import Session
-from starlette.datastructures import Secret
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
@@ -127,7 +126,7 @@ def generate_password_reset_token(email):
     exp = expires.timestamp()
     encoded_jwt = jwt.encode(
         {"exp": exp, "nbf": now, "sub": password_reset_jwt_subject, "email": email},
-        config("SECRET_KEY", cast=Secret),
+        config("SECRET_KEY"),
         algorithm=ALGORITHM,
     )
     return encoded_jwt
@@ -135,9 +134,7 @@ def generate_password_reset_token(email):
 
 def verify_password_reset_token(token) -> Optional[str]:
     try:
-        decoded_token = jwt.decode(
-            token, config("SECRET_KEY", cast=Secret), algorithms=[ALGORITHM]
-        )
+        decoded_token = jwt.decode(token, config("SECRET_KEY"), algorithms=[ALGORITHM])
         assert decoded_token["sub"] == password_reset_jwt_subject
         return decoded_token["email"]
     except InvalidTokenError:

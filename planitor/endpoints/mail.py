@@ -43,13 +43,10 @@ def send_test_email(email_to: str):
     )
 
 
-def send_reset_password_email(email_to: str, email: str, token: str):
+def send_reset_password_email(email_to: str, email: str, token: bytes):
     project_name = config("PROJECT_NAME")
     subject = f"{project_name} - Nýtt lykilorð"
-    if hasattr(token, "decode"):
-        use_token = token.decode()
-    else:
-        use_token = token
+    use_token = token.decode()
     server_host = config("SERVER_HOST")
     link = f"http://{server_host}/notendur/reset-password?token={use_token}"
     send_email(

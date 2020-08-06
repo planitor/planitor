@@ -77,7 +77,7 @@ def recover_password(email: str, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=404, detail="Netfang fannst ekki.",
         )
-    password_reset_token = str(generate_password_reset_token(email=email))
+    password_reset_token = generate_password_reset_token(email=email)
     send_reset_password_email(
         email_to=user.email, email=email, token=password_reset_token
     )

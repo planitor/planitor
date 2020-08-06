@@ -3,6 +3,14 @@ import { h, render } from "preact";
 import "./maps";
 import { Navigation } from "./navigation";
 import { FollowCase, FollowAddress } from "./follow";
+import { NewPasswordForm } from "./forms/new-password";
+import { openModal } from "./modals";
+
+const passwordRecoveryEl = document.getElementById("password-recovery");
+if (passwordRecoveryEl) {
+  const [el, closeModal] = openModal();
+  render(<NewPasswordForm token={passwordRecoveryEl.dataset.token} />, el);
+}
 
 const navigationEl = document.getElementById("navigation");
 if (navigationEl) {

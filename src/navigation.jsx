@@ -1,15 +1,9 @@
 import { h, render } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 import classNames from "classnames";
-import { Login, NewPassword } from "./accounts";
+import { Login } from "./accounts";
 import { openModal } from "./modals";
 import { api } from "./api";
-
-const passwordRecoveryEl = document.getElementById("password-recovery");
-if (passwordRecoveryEl) {
-  const el = openModal();
-  render(<NewPassword token={passwordRecoveryEl.dataset.token} />, el);
-}
 
 const MagnifyingGlass = (props) => {
   return (
