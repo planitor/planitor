@@ -161,9 +161,8 @@ class Address(Base):
 
     def __str__(self):
         address = self.heiti_nf
-        number = f"{self.husnr}{self.bokst}"
-        if number:
-            address = f"{address} {number}"
+        if self.husnr:
+            address = f"{address} {self.husnr}{self.bokst}"
         return address
 
     def get_coordinates(self):

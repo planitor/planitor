@@ -292,6 +292,19 @@ def get_minute(
 
     subscription = get_case_subscription(db, current_user, minute.case)
 
+    case = minute.case
+    if case.iceaddr is not None:
+        related_cases = (
+            db.query(Case)
+            .filter(Case.iceaddr == case.iceaddr)
+            .filter(Case.id != case.id)
+            .order_by(Case.updated.desc())
+        )
+    else:
+        related_cases = []
+
+    address_subscription = get_address_subscription(db, current_user, case.iceaddr)
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -299,7 +312,7 @@ def get_minute(
             "council": minute.meeting.council,
             "meeting": minute.meeting,
             "minute": minute,
-            "case": minute.case,
+            "case": case,
             "case_count": case_count,
             "request": request,
             "user": current_user,
@@ -308,6 +321,8 @@ def get_minute(
             "next_minute": next_minute,
             "previous_minute": previous_minute,
             "subscription": subscription,
+            "related_cases": related_cases,
+            "address_subscription": address_subscription,
         },
     )
 

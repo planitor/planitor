@@ -102,8 +102,8 @@ class Pagination:
     PER_PAGE = 15
     NAV_SEGMENT_SIZE = 6
 
-    def __init__(self, query, number: int):
-        self.count = query.count()
+    def __init__(self, query, count, number: int):
+        self.count = count.scalar()
         self.number = number if number > 0 else 1
         self.total_pages = int(math.ceil(self.count / self.PER_PAGE))
         self.pages = list(range(1, self.total_pages + 1))  # 1-based indexing of all pages
@@ -148,9 +148,8 @@ class MinuteResults:
     def __init__(self, db: Session, search_query: str, page: int):
         self.db = db
         self.search_query = search_query
-
-        query = self.get_query()
-        self.page = Pagination(query, page or 0)
+        self.query, count = self.get_query_and_count()
+        self.page = Pagination(self.query, count, page or 0)
 
     def get_tsquery(self):
         """ People frequently compose search queries with plural form, for example
@@ -158,15 +157,22 @@ class MinuteResults:
         this. The `parse_lemmas` achieves this for us. """
         return func.websearch_to_tsquery("simple", lemmatize_query(self.search_query))
 
-    def get_query(self):
+    def get_query_and_count(self):
         tsvector = func.to_tsvector("simple", Minute.lemmas)
         tsquery = self.get_tsquery()
         hnitnums = {address["hnitnum"] for address in iceaddr_suggest(self.search_query)}
         return (
-            self.db.query(Minute)
-            .join(Case)
-            .filter(tsvector.op("@@")(tsquery) | Case.address_id.in_(hnitnums))
-            .order_by(Case.address_id.in_(hnitnums), func.ts_rank(tsvector, tsquery))
+            (
+                self.db.query(Minute)
+                .join(Case)
+                .filter(tsvector.op("@@")(tsquery) | Case.address_id.in_(hnitnums))
+                .order_by(Case.address_id.in_(hnitnums), func.ts_rank(tsvector, tsquery))
+            ),
+            (
+                self.db.query(func.count(Minute.id))
+                .join(Case)
+                .filter(tsvector.op("@@")(tsquery) | Case.address_id.in_(hnitnums))
+            ),
         )
 
     def get_highlight_terms(self) -> Set[str]:
