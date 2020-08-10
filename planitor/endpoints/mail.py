@@ -38,15 +38,14 @@ def send_test_email(email_to: str):
     project_name = config("PROJECT_NAME")
     send_email(
         email_to=email_to,
-        subject=f"{project_name} - Test email",
+        subject="Test email",
         html_template="test_email.html",
         context={"project_name": project_name, "email": email_to},
     )
 
 
 def send_reset_password_email(email_to: str, email: str, token: bytes):
-    project_name = config("PROJECT_NAME")
-    subject = f"{project_name} - Nýtt lykilorð"
+    subject = "Leiðbeiningar fyrir nýtt lykilorð"
     use_token = token.decode()
     server_host = config("SERVER_HOST")
     link = f"http://{server_host}/notendur/reset-password?token={use_token}"
