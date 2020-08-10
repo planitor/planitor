@@ -28,7 +28,7 @@
           minute_id=h.encode(minute.id)) }}"
         class="mb-6 flex flex-col sm:flex-row"
       >
-        <div class="pr-4 sm:flex-shrink-0 sm:flex-grow-0" style="@media (min-width: 640px) { flex-basis: 12em; }">
+        <div class="address pr-4 sm:flex-shrink-0 sm:flex-grow-0 overflow-hidden">
           <h4 class="sm:text-lg inline sm:block">{{ minute.case.address }}<span class="sm:hidden">,</span></h4>
           <h5 class="text-gray-700 mb-1 inline sm:block">
             {{ minute.case.serial }}
@@ -39,14 +39,12 @@
           </p>
         </div>
         <div class="flex-grow">
-          <h4 class="text-lg font-semibold text-midnight flex">
-            <div class="flex-grow">
-              {{ minute.headline }}
-            </div>
-            <div>
-              <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
+          <h4 class="font-semibold text-midnight flex">
+            <div class="sm:text-lg flex-grow">
+              <div class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold align-middle ml-2 float-right">
                 {{ minute.status.value.label if minute.status else "Annað" }}
               </div>
+              {{ minute.headline }}
             </div>
           </h4>
           <p class="mb-1" style="max-width: 660px;">

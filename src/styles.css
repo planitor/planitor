@@ -75,19 +75,19 @@ td {
 }
 
 .pill-blue {
-  @apply bg-blue-200 text-blue-800 border-blue-800 border-opacity-25;
+  @apply bg-blue-200 text-blue-800 shadow-sm;
 }
 
 .pill-red {
-  @apply bg-red-200 text-red-800 border-red-800 border-opacity-25;
+  @apply bg-red-200 text-red-800 shadow-sm;
 }
 
 .pill-yellow {
-  @apply bg-yellow-200 text-yellow-800 border-yellow-800 border-opacity-25;
+  @apply bg-yellow-200 text-yellow-800 shadow-sm;
 }
 
 .pill-green {
-  @apply bg-green-200 text-green-800 border-green-800 border-opacity-25;
+  @apply bg-green-200 text-green-800 shadow-sm;
 }
 
 .highlight-blue {
@@ -157,6 +157,12 @@ nav .search input::placeholder {
 
 form input.error {
   @apply border-red-700;
+}
+
+@screen sm {
+  .results .address {
+    flex-basis: 12em;
+  }
 }
 
 #teaser header .logo svg {
