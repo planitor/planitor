@@ -44,18 +44,13 @@ def send_test_email(email_to: str):
     )
 
 
-def send_reset_password_email(email_to: str, email: str, token: bytes):
-    subject = "Leiðbeiningar fyrir nýtt lykilorð"
-    use_token = token.decode()
-    server_host = config("SERVER_HOST")
-    link = f"http://{server_host}/notendur/reset-password?token={use_token}"
+def send_reset_password_email(email_to: str, link: str):
     send_email(
         email_to=email_to,
-        subject=subject,
+        subject="Leiðbeiningar fyrir nýtt lykilorð",
         html_template="reset_password.html",
         context={
             "project_name": config("PROJECT_NAME"),
-            "username": email,
             "email": email_to,
             "valid_hours": config("EMAILS_RESET_TOKEN_EXPIRE_HOURS", cast=int),
             "link": link,
