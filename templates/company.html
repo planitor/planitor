@@ -24,14 +24,15 @@
 
   </div>
 
-  <div class="flex flex-col lg:flex-row">
-    <div class="shadow-lg rounded-md overflow-hidden bg-white lg:ml-4 mb-4 w-full lg:w-1/3 order-0 lg:order-1">
-      <div class="entity-map h-64" data-kennitala="{{ entity.kennitala }}"></div>
+  <div class="flex flex-col">
+    <div class="mb-4">
+      <div class="entity-map h-64 shadow-lg rounded-md overflow-hidden bg-white w-full" data-kennitala="{{ entity.kennitala }}"></div>
     </div>
-    <div class="lg:w-2/3 order-1 lg:order-0">
-
+    <div class="">
       <table class="table-auto min-w-full max-w-full">
+        {% for group in cases|groupby(2)|sort(attribute=0, reverse=True) %} {# because 2 is the tuple index #}
         <thead>
+          <tr><td colspan=4 class="py-4 md:p-4 text-center font-bold">{{ group.grouper|int }}</td></tr>
           <tr>
             <th class="px-0 md:px-4 py-2 minilabel text-left">Mál</th>
             <th class="px-0 md:px-4 py-2 minilabel text-left hidden sm:table-cell"></th>
@@ -39,31 +40,29 @@
           </tr>
         </thead>
         <tbody>
-        {% for group in cases|groupby(2)|sort(attribute=0, reverse=True) %} {# because 2 is the tuple index #}
-          <tr><td colspan=4 class="py-4 md:p-4">{{ group.grouper|int }}</td></tr>
-            {% for case, applicant, year, minute_count in group.list %}
-            {% set url = url_for('get_case',
-              muni_slug=case.council.municipality.slug,
-              council_slug=case.council.council_type.value.slug,
-              case_id=case.serial) %}
-            <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
-              <td class="md:border pr-2 md:px-4 py-2">
-                <a class="font-bold block" href="{{ url }}">{{ case.headline }}</a>
-                <div class="text-xs text-black text-opacity-50">{{ case.address }}</div>
-              </td>
-              <td class="md:border pr-2 md:px-4 py-2 hidden sm:table-cell">
-                <a href="{{ url }}" class="underline whitespace-no-wrap block">
-                  {{ case.serial -}}
-                  {{ " ({})".format(minute_count) if minute_count > 1 else "" -}}
-                </a>
-                <div class="hidden md:block text-xs text-black text-opacity-50">{{ case.council }}, {{ case.council.municipality }}</div>
-              </td>
-              <td class="md:border px-0 md:px-4 py-2 text-right">
-                <div class="pill pill-big whitespace-no-wrap truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold block"  style="max-width: 128px">
-                  {{ case.status.value.label if case.status else "Annað" }}
-                </div>
-              </td>
-            </tr>
+          {% for case, applicant, year, minute_count in group.list %}
+          {% set url = url_for('get_case',
+            muni_slug=case.council.municipality.slug,
+            council_slug=case.council.council_type.value.slug,
+            case_id=case.serial) %}
+          <tr class="{{ 'md:bg-white' if loop.index % 2 != 0 }} leading-relaxed">
+            <td class="md:border pr-2 md:px-4 py-2">
+              <a class="font-bold block" href="{{ url }}">{{ case.headline }}</a>
+              <div class="text-xs text-black text-opacity-50">{{ case.address }}</div>
+            </td>
+            <td class="md:border pr-2 md:px-4 py-2 hidden sm:table-cell">
+              <a href="{{ url }}" class="underline whitespace-no-wrap block">
+                {{ case.serial -}}
+                {{ " ({})".format(minute_count) if minute_count > 1 else "" -}}
+              </a>
+              <div class="hidden md:block text-xs text-black text-opacity-50">{{ case.council }}, {{ case.council.municipality }}</div>
+            </td>
+            <td class="md:border px-0 md:px-4 py-2 text-right">
+              <div class="pill pill-big whitespace-no-wrap truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold block"  style="max-width: 128px">
+                {{ case.status.value.label if case.status else "Annað" }}
+              </div>
+            </td>
+          </tr>
           {% endfor %}
         {% endfor %}
         </tbody>

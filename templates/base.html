@@ -3,9 +3,6 @@
   <head>
     <meta charset="utf-8"/>
     <title>{% block title %}Planitor{% endblock %}</title>
-    {% if not DEBUG -%}
-    <link href="{{ url_for('build', path='/styles.css') }}" rel="stylesheet"/>
-    {% endif -%}
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}"/>
     <meta property="og:description" content="{% block og_description %}Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi{% endblock %}"/>
@@ -69,7 +66,7 @@
         </div>
       </div>
     </footer>
-    {% include "modal.html" %}
+    {% include "modal.html" -%}
     {% if DEBUG -%}
     {# Hot reload script #}
     {{ hotreload.script(url_for('hot-reload')) | safe }}
@@ -77,6 +74,8 @@
     <script type="module" src="http://localhost:8080/_dist_/index.js"></script>
     {% else -%}
     <script src="{{ url_for('build', path='/bundle.js') }}"></script>
+    <script src="{{ url_for('build', path='/0.bundle.js') }}"></script>
+    <script src="{{ url_for('build', path='/1.bundle.js') }}"></script>
     {% endif -%}
     {# fathom analytics #}
     <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>

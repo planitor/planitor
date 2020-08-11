@@ -10,6 +10,7 @@ __pycache__/
 # Yarn
 node_modules
 yarn.lock
+yarn-error.log
 
 # Poetry
 poetry.lock
@@ -19,3 +20,5 @@ poetry.lock
 .env
 .pytest_cache
 public
+build/_dist_
+build/web_modules

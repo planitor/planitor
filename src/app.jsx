@@ -4,7 +4,7 @@ import { Navigation } from "./navigation";
 import { FollowCase, FollowAddress } from "./follow";
 import { NewPasswordForm } from "./forms/new-password";
 import { openModal } from "./modals";
-import { mapkit, buildEntityMap } from "./maps";
+import { mapkit, getEntityMapOptions } from "./maps";
 
 mapkit.init({
   authorizationCallback: (done) => {
@@ -29,15 +29,11 @@ if (navigationEl) {
 }
 
 mapkit.addEventListener("configuration-change", function (event) {
-  switch (event.status) {
-    case "Initialized":
-      [...document.querySelectorAll(".entity-map")].forEach((el) => {
-        const map = new mapkit.Map(el);
-        buildEntityMap(map, el.dataset.kennitala);
-      });
-      break;
-    case "Refreshed":
-      break;
+  if (event.status === "Initialized") {
+    [...document.querySelectorAll(".entity-map")].forEach(async (el) => {
+      const options = await getEntityMapOptions(el.dataset.kennitala);
+      if (options) new mapkit.Map(el, options);
+    });
   }
 });
 

@@ -27,33 +27,46 @@ document.addEventListener("lazybeforeunveil", function (e) {
   }
 });
 
-export async function buildEntityMap(map, kennitala) {
-  return await api.getEntityAddresses(kennitala).then((response) => {
-    const addresses = response.data.addresses;
-    var north = 0.0,
-      south = 0.0,
-      west = 0.0,
-      east = 0.0,
-      pins = [];
-
-    // Shift direction variables to the outermost parts of pins to create a boundary region
-    for (var address of addresses) {
-      const { lat, lon, label } = address;
-      if (lat > north || north === 0.0) north = lat;
-      if (lat < south || south === 0.0) south = lat;
-      if (lon > west || west === 0.0) west = lon;
-      if (lon < east || east === 0.0) east = lon;
-      const coordinate = new mapkit.Coordinate(lat, lon);
-      pins.push(new mapkit.MarkerAnnotation(coordinate, { title: label }));
-    }
-
-    // Set as coordinate region of map
-    map.region = new mapkit.BoundingRegion(
-      north,
-      east,
-      south,
-      west
-    ).toCoordinateRegion();
-    map.showItems(pins);
+export async function getEntityMapOptions(kennitala) {
+  const addresses = await api.getEntityAddresses(kennitala).then((response) => {
+    return response.data.addresses;
   });
+  if (addresses === []) return null;
+
+  var north = addresses[0].lat,
+    south = north,
+    west = addresses[0].lon,
+    east = west,
+    pins = [];
+
+  // Shift direction variables to the outermost parts of pins to create a boundary region
+  for (var address of addresses) {
+    const { lat, lon, label } = address;
+    const coordinate = new mapkit.Coordinate(lat, lon);
+    pins.push(new mapkit.MarkerAnnotation(coordinate, { title: label }));
+    if (lat > north) north = lat;
+    if (lat < south) south = lat;
+    if (lon > west) west = lon;
+    if (lon < east) east = lon;
+  }
+
+  if (addresses.length === 1) {
+    return {
+      annotations: pins,
+      region: new mapkit.CoordinateRegion(
+        new mapkit.Coordinate(north, west),
+        new mapkit.CoordinateSpan(0.03, 0.04)
+      ),
+    };
+  } else {
+    return {
+      annotations: pins,
+      region: new mapkit.BoundingRegion(
+        north,
+        east,
+        south,
+        west
+      ).toCoordinateRegion(),
+    };
+  }
 }
