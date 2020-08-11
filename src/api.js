@@ -48,4 +48,7 @@ export const api = {
   unfollowAddress(hnitnum) {
     return axios.delete(`/subscriptions/addresses/${hnitnum}`, authHeaders());
   },
+  getEntityAddresses(kennitala) {
+    return axios.get(`/entities/${kennitala}/addresses`);
+  },
 };

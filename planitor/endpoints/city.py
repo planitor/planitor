@@ -13,6 +13,7 @@ from planitor.meetings import MeetingView
 from planitor.models import (
     Address,
     Case,
+    CaseEntity,
     Entity,
     Meeting,
     Minute,
@@ -143,14 +144,14 @@ async def get_meeting(
     )
 
     sq_count = (
-        db.query(Case.id, func.count(Minute.id).label("case_count"))
+        db.query(Case.id, func.count(Minute.id).label("minute_count"))
         .join(Minute, Case.id == Minute.case_id)
         .group_by(Case.id)
         .subquery()
     )
 
     minutes = (
-        db.query(Minute, sq_count.c.case_count)
+        db.query(Minute, sq_count.c.minute_count)
         .select_from(Minute)
         .filter(Minute.meeting_id == meeting.id)
         .join(sq_count, sq_count.c.id == Minute.case_id)
@@ -327,7 +328,7 @@ def get_minute(
     )
 
 
-def _get_entity(db, kennitala, slug) -> Entity:
+def _get_entity(db: Session, kennitala: str, slug: str = None) -> Entity:
     entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
     if entity is None or (slug is not None and entity.slug != slug):
         raise HTTPException(status_code=404, detail="Kennitala fannst ekki")
@@ -346,9 +347,50 @@ async def get_company(
     entity = _get_entity(db, kennitala, slug)
     if slug is None:
         return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
-    return templates.TemplateResponse(
-        "company.html", {"entity": entity, "request": request, "user": current_user}
+
+    sq_count = (
+        db.query(Case.id, func.count(Minute.id).label("minute_count"))
+        .join(CaseEntity)
+        .filter(CaseEntity.entity == entity)
+        .join(Minute, Case.id == Minute.case_id)
+        .group_by(Case.id)
+        .subquery()
     )
+
+    cases = (
+        db.query(
+            Case,
+            CaseEntity.applicant,
+            extract("year", Case.updated),
+            sq_count.c.minute_count,
+        )
+        .select_from(Case)
+        .join(CaseEntity)
+        .filter(CaseEntity.entity == entity)
+        .join(sq_count, sq_count.c.id == Case.id)
+        .order_by(Case.updated.desc())
+    )
+
+    return templates.TemplateResponse(
+        "company.html",
+        {"entity": entity, "cases": cases, "request": request, "user": current_user},
+    )
+
+
+@router.get("/entities/{kennitala}/addresses")
+async def get_entity_addresses(
+    request: Request, kennitala: str, db: Session = Depends(get_db)
+):
+    entity = _get_entity(db, kennitala)
+    cases = db.query(Case.address_id).join(CaseEntity).filter(CaseEntity.entity == entity)
+    addresses = db.query(Address).filter(Address.hnitnum.in_(cases))
+
+    return {
+        "addresses": [
+            dict(lat=address.lat_wgs84, lon=address.long_wgs84, label=str(address))
+            for address in addresses
+        ]
+    }
 
 
 @router.get("/p/{kennitala}")

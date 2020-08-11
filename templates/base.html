@@ -70,14 +70,14 @@
       </div>
     </footer>
     {% include "modal.html" %}
-    {% if DEBUG %}
+    {% if DEBUG -%}
     {# Hot reload script #}
     {{ hotreload.script(url_for('hot-reload')) | safe }}
     <script>window.HMR_WEBSOCKET_URL = 'ws://localhost:8080';</script>
     <script type="module" src="http://localhost:8080/_dist_/index.js"></script>
-    {% else %}
+    {% else -%}
     <script src="{{ url_for('build', path='/bundle.js') }}"></script>
-    {% endif %}
+    {% endif -%}
     {# fathom analytics #}
     <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>
   </body>

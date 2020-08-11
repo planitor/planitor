@@ -20,6 +20,8 @@ module.exports = {
     require("tailwindcss"),
     require("postcss-preset-env")({ stage: 1 }),
     require("postcss-100vh-fix"),
-    ...(process.env.NODE_ENV === "production" ? [purgecss] : []),
+    ...(process.env.NODE_ENV === "production"
+      ? [purgecss, require("cssnano")]
+      : []),
   ],
 };

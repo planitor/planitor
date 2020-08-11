@@ -199,6 +199,9 @@ class Municipality(Base):
     geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
 
+    def __str__(self):
+        return self.name
+
 
 class Plan(Base):
     __tablename__ = "plans"
@@ -226,6 +229,9 @@ class Council(Base):
     municipality = relationship(Municipality)
 
     council_type = Column(Enum(CouncilTypeEnum))
+
+    def __str__(self):
+        return self.name
 
 
 class Meeting(Base):
