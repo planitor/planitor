@@ -3,6 +3,8 @@
 {% from 'symbols/symbols.html' import house_fill, arrow_up_right_circle_fill %}
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 
+{% block title %}{{ entity.name }} — {{ super() }}{% endblock %}
+{% block og_title %}{{ entity.name }} — {{ super() }}{% endblock %}
 
 {% block body %}
   <div class="my-8 mt-4 sm:mt-8">
