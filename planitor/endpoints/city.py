@@ -335,6 +335,22 @@ def _get_entity(db: Session, kennitala: str, slug: str = None) -> Entity:
     return entity
 
 
+@router.get("/entities/{kennitala}/addresses")
+async def get_entity_addresses(
+    request: Request, kennitala: str, db: Session = Depends(get_db)
+):
+    entity = _get_entity(db, kennitala)
+    cases = db.query(Case.address_id).join(CaseEntity).filter(CaseEntity.entity == entity)
+    addresses = db.query(Address).filter(Address.hnitnum.in_(cases))
+
+    return {
+        "addresses": [
+            dict(lat=address.lat_wgs84, lon=address.long_wgs84, label=str(address))
+            for address in addresses
+        ]
+    }
+
+
 @router.get("/f/{kennitala}")
 @router.get("/f/{slug}-{kennitala}")
 async def get_company(
@@ -377,22 +393,6 @@ async def get_company(
     )
 
 
-@router.get("/entities/{kennitala}/addresses")
-async def get_entity_addresses(
-    request: Request, kennitala: str, db: Session = Depends(get_db)
-):
-    entity = _get_entity(db, kennitala)
-    cases = db.query(Case.address_id).join(CaseEntity).filter(CaseEntity.entity == entity)
-    addresses = db.query(Address).filter(Address.hnitnum.in_(cases))
-
-    return {
-        "addresses": [
-            dict(lat=address.lat_wgs84, lon=address.long_wgs84, label=str(address))
-            for address in addresses
-        ]
-    }
-
-
 @router.get("/p/{kennitala}")
 @router.get("/p/{slug}-{kennitala}")
 async def get_person(
@@ -402,12 +402,7 @@ async def get_person(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
-    entity = _get_entity(db, kennitala, slug)
-    if slug is None:
-        return RedirectResponse("/p/{}-{}".format(entity.slug, entity.kennitala))
-    return templates.TemplateResponse(
-        "person.html", {"entity": entity, "request": request, "user": current_user}
-    )
+    return await get_company(request, kennitala, slug, db, current_user)
 
 
 @router.get("/mapkit-token")
