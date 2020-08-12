@@ -12,7 +12,9 @@ DB_DSN = config(
     "DATABASE_URL", default="postgresql://planitor:@localhost/planitor", cast=Secret
 )
 
-engine = create_engine(str(DB_DSN), connect_args={})
+engine = create_engine(
+    str(DB_DSN), connect_args={}, echo="debug" if config("DEBUG") else False
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

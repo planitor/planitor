@@ -5,11 +5,11 @@ from typing import Set, Generator
 from jinja2 import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, contains_eager
 from iceaddr import iceaddr_suggest
 
 from planitor.language.search import get_wordforms, lemmatize_query
-from planitor.models import Minute, Case
+from planitor.models import Minute, Case, Meeting, Council
 
 
 def get_terms_from_query(tsquerytree: str):
@@ -179,13 +179,27 @@ class MinuteResults:
         filters = tsvector.op("@@")(tsquery)
         if hnitnums:
             filters = filters | Case.address_id.in_(hnitnums)
+        order_bys = [Meeting.start.desc()]
+        if hnitnums:
+            order_bys.insert(0, Case.address_id.in_(hnitnums))
 
         return (
             (
                 self.db.query(Minute)
-                .join(Case)
+                .join(Minute.case)
+                .join(Minute.meeting)
+                .join(Meeting.council)
+                .join(Council.municipality)
+                .options(
+                    contains_eager(Minute.meeting)
+                    .contains_eager(Meeting.council)
+                    .contains_eager(Council.municipality),
+                    contains_eager(Minute.case),
+                )
                 .filter(filters)
-                .order_by(Case.address_id.in_(hnitnums), func.ts_rank(tsvector, tsquery))
+                .order_by(
+                    *order_bys
+                )  # Relavance ranking is `func.ts_rank(tsvector, tsquery)`
             ),
             (self.db.query(func.count(Minute.id)).join(Case).filter(filters)),
         )
@@ -206,12 +220,13 @@ class MinuteResults:
 
     def get_document(self, minute: Minute) -> str:
         parts = [minute.inquiry, minute.remarks]
-        parts += [ec.entity.name for ec in (minute.case.entities or [])]
+        # parts += [ec.entity.name for ec in (minute.case.entities or [])]
         return "\n".join(part for part in parts if part)
 
     def __iter__(self):
         highlight_terms = self.get_highlight_terms()
-        for minute in self.page.query.all():
+        minutes = self.page.query.all()
+        for minute in minutes:
             document = self.get_document(minute)
             previews = iter_preview_fragments(document, highlight_terms)
             yield minute, previews
