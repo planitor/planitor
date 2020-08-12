@@ -31,7 +31,7 @@ export async function getEntityMapOptions(kennitala) {
   const addresses = await api.getEntityAddresses(kennitala).then((response) => {
     return response.data.addresses;
   });
-  if (addresses === []) return null;
+  if (addresses.length === 0) return null;
 
   var north = addresses[0].lat,
     south = north,
@@ -42,12 +42,15 @@ export async function getEntityMapOptions(kennitala) {
   // Shift direction variables to the outermost parts of pins to create a boundary region
   for (var address of addresses) {
     const { lat, lon, label } = address;
-    const coordinate = new mapkit.Coordinate(lat, lon);
-    pins.push(new mapkit.MarkerAnnotation(coordinate, { title: label }));
+    pins.push(
+      new mapkit.MarkerAnnotation(new mapkit.Coordinate(lat, lon), {
+        title: label,
+      })
+    );
     if (lat > north) north = lat;
     if (lat < south) south = lat;
-    if (lon > west) west = lon;
-    if (lon < east) east = lon;
+    if (lon < west) west = lon;
+    if (lon > east) east = lon;
   }
 
   if (addresses.length === 1) {
@@ -59,14 +62,17 @@ export async function getEntityMapOptions(kennitala) {
       ),
     };
   } else {
+    const latDiff = Math.abs(north - south) * 0.2;
+    const lonDiff = Math.abs(east - west) * 0.2;
+    const region = new mapkit.BoundingRegion(
+      north + latDiff,
+      east + lonDiff,
+      south - latDiff,
+      west - lonDiff
+    ).toCoordinateRegion();
     return {
       annotations: pins,
-      region: new mapkit.BoundingRegion(
-        north,
-        east,
-        south,
-        west
-      ).toCoordinateRegion(),
+      region: region,
     };
   }
 }

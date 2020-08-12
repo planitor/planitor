@@ -186,6 +186,18 @@ form input.error {
   display: inline;
 }
 
-#test {
-  color: red;
+.entity-map {
+  height: 240px;
+}
+
+@screen sm {
+  .entity-map {
+    height: 360px;
+  }
+}
+
+@screen lg {
+  .entity-map {
+    height: 480px;
+  }
 }
