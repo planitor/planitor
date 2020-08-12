@@ -13,7 +13,9 @@ DB_DSN = config(
 )
 
 engine = create_engine(
-    str(DB_DSN), connect_args={}, echo="debug" if config("DEBUG") else False
+    str(DB_DSN),
+    connect_args={},
+    echo="debug" if config("DEBUG", default=False) else False,
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
