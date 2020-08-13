@@ -1,47 +1,68 @@
 import pprint
+
+import requests
 from parsel import Selector
+from sqlalchemy.orm import contains_eager
+
 from scrape.spiders.reykjavik_skipulagsrad import parse_minute_el
 
 html = """<li>
 <div class="field field-name-field-heiti-dagskrarlidar field-type-text-long field-label-hidden">
 <div class="field-items">
 <div class="field-item even">
-<p>Heklureitur - Laugavegur 168 og 170-174, nýtt deiliskipulag&nbsp;&nbsp; &nbsp; (01.242)&nbsp;&nbsp; &nbsp;Mál nr. SN190730<br>
-600169-5139 Hekla hf., Pósthólf 5310, 125 Reykjavík<br>
-560997-3109 Yrki arkitektar ehf, Mýrargötu 26, 101 Reykjavík</p>
+<p>Hopp rafskútuleiga, &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;Mál nr. US200204</p>
+<p>Eyþór Máni Steinarsson og Ægir Þorsteinsson frá Hopp segja frá reynslunni af starfinu og tölfræði um notkun flotans.</p>
+<p>Fulltrúar Samfylkingarinnar, Viðreisnar og Pírata leggja fram svohljóðandi bókun:</p>
+<p>Meirihlutinn fagnar fjölbreyttum ferðamátum og tók nýrri tækni fagnandi þegar
+rafskútur bættust í flóru vistvænna samgagna. Borgin hefur markvisst byggt upp
+innviði fyrir samgönguhjólreiðar á síðustu árum og mun vera áframhaldandi samhliða
+uppbyggingu borgalínu. Það verður gert með nýrri hjólreiðaáætlun, sem nú þegar er hafin vinna við. Kannanir er sýna fram á mikla fjölgun virkra notenda á hjólastígum borgarinnar. Við mætum auknum fjölda þeirra sem nýta sér virka ferðamáta ekki með boðum og bönnum heldur með betri innviðum og aukinni fjárfestingu.</p>
+<p>Áheyrnarfulltrúi Flokks fólksins leggur fram svohljóðandi bókun:</p>
+<p>Gríðarleg fjölgun er á notkun slíkrar hjóla. Fulltrúi Flokks fólksins hefur áhyggjur af slysum sem hafa orðið á þessum hjólum og kunna að verða. Nú þegar hafa verið skráð nokkur slys. Fulltrúi Flokks fólksins hefur áhyggjur af þróuninni í ljósi reynslu annarra þjóða. Velta má fyrir sér hvort skipulagsyfirvöld Reykjavíkurborgar, ásamt rafskútuleigum hafi unnið með og verið í samvinnu við samgöngustofu og lögreglu um þessi mál? Rafhjólin eru komin til að vera, ekki er um það deilt. Samkvæmt umferðarlögum mega „rafhlaupahjól eingöngu vera á gangstéttum og göngustígum, ekki á götum. Gangandi vegfarendur eiga alltaf réttinn á gangstéttum eða göngustígum. Hjólreiðamaður eða sá sem er á rafmagnshlaupahjóli á að víkja fyrir gangandi vegfarenda. Þá er hjálmaskylda fyrir alla undir 16 ára aldri. Einnig er bannað að keyra á þeim undir áhrifum áfengis“. Borgaryfirvöld eiga að gera allt sem í þeirra valdi stendur til að upplýsa um þessar reglur. Einnig er það á herðum skipulagsyfirvalda að sjá til þess að innviðir séu tilbúnir til að taka við þessari miklu fjölgun rafskútna/hjóla og að allar merkingar og skilti séu í lagi. Fulltrúi Flokks fólksins veltir fyrir sér hvort byrjað hafi verið á öfugum enda?</p>
+<p>Eyþór Máni Steinarsson og Ægir Þorsteinsson frá Hopp tekur sæti á fundinum undir þessum lið.</p>
+</div>
+</div>
+</div>
+</li>"""
 
-<p>Lögð fram umsókn Yrki arkitekta ehf. dags. 9. desember 2019 um nýtt deiliskipulag
-fyrir Lóðirnar að Laugavegi 168 og 170-174, Heklureitur. Í tillögunni felst að
-lóðinni Laugavegur 170-174 verði skipt í tvennt og vestari hluti hennar verði
-lóðirnar Laugavegur 170 og 172. Lóðirnar nr. 168 og 172 verði nýttar undir allt að
-250 íbúðir. Valkvæð heimild er um að lóðin nr. 168 verði nýtt undir gististarfsemi.
-Eystri hluti lóðarinnar Laugavegur 170-174 verður Laugavegur 174. Heimilt verðu að
-auka byggingarmagn á lóðinni, byggja þrjár hæðir ofan á núverandi byggingar og byggja
-við 3. hæð norðurhliðar núverandi álmu við Laugaveg. Nýju hæðirnar og viðbyggingin eru
-undir atvinnustarfsemi. Valkvæð heimild er um að nýja byggingarmagnið verði nýtt undir
-allt að 90 íbúðir. Gert er ráð fyrir sex hæða bílgeymsluhúsi og núverandi byggingar verða
-nýttar undir atvinnustarfsemi. Á öllum lóðum er gert ráð fyrir verslun og þjónustu á
-jarðhæð, samkvæmt uppdr. Yrki arkitekta ehf. dags. 10. janúar 2020. Einnig er lögð fram
-umsögn skipulagsfulltrúa dags. 2. júlí 2020.</p>
 
-<p>
-Samþykkt, með fjórum greiddum atkvæðum, fulltrúa Samfylkingarinnar, Viðreisnar og
-Pírata, að synja beiðni um breytingu á deiliskipulagi með vísun til umsagnar
-skipulagsfulltrúa dags. 2. júlí 2020. Fulltrúar Sjálfstæðisflokksins sitja hjá.<br>
-Vísað til borgarráðs.</p>
-<p>Fulltrúar Sjálfstæðisflokksins leggja fram svohljóðandi bókun:</p>
-<p>Skipulag Heklureits er algeru uppnámi en meira en þrjú ár eru síðan borgin gerði viljayfirlýsingu um uppbyggingu á reitnum. Samskipti borgarinnar við þróunaraðila hafa verið stirð og lítil. Nú er borgin að hafna hugmyndum lóðarhafa og uppbygging sett enn frekar á ís.&nbsp;</p>
-<p>Áheyrnarfulltrúi Miðflokksins leggur fram svohljóðandi bókun:</p>
-<p>Að hafna þessari umsókn á breytingu á deiliskipulagi á Heklureit er valdníðsla stjórnvaldsins Reykjavíkurborgar á hendur einkaaðila gæti hugsanlega verið brot á eignarétti og yfirráðum eigna í þessu tilfelli lóðar. Í borgarráði þann 25. júní sl. var afturkölluð viljayfirlýsing frá 3. maí 2017 um samstarf milli borgarinnar og Heklu hf. vegna fyrirhugaðs flutnings fyrirtækisins í Suður Mjódd og þróun lóða félagsins við Laugaveg, samhliða flutningi á starfsemi þess. Afturköllunin var ákveðin í ljósi þess að samþykktar voru breyttar skipulagsáætlanir fyrir lóðir Heklu hf að Laugavegi og af því að ekki voru skilgreind ákvæði um uppbyggingarhraða í Suður Mjódd innan 2 ára frá undirritun viljayfirlýsingarinnar. Engin niðurstaða er því í málinu, nema sú að málið er á byrjunarreit og er til þess fallin að hrekja fyrirtækið úr borginni. Þetta mál er dæmalaust klúður að hálfu borgarinnar.&nbsp;</p>
-<p>Fulltrúar Samfylkingarinnar, Viðreisnar og Pírata leggja fram svohljóðandi gagnbókun:</p>
-<p>Sveitarfélög fara með ábyrgð á skipulagi alls lands innan sinna marka. Umrædd lóð er á lykilsvæði á nýjum þróunarás og fyrsta áfanga borgarlínu og því mikilvægt að vel til takist. Uppbyggingin þarf að taka mið af aðalskipulagi og framtíðaruppbyggingu innan borgarinnar. Það er ekki valdníðsla að samþykkja ekki allar hugmyndir sem koma frá lóðarhöfum heldur ábyrgð yfirvalda að skipuleggja byggt umhverfi á sjálfbæran hátt með þarfir núverandi og komandi kynslóðir í huga.</p>
-<p>Björn Ingi Edvardsson verkefnastjóri tekur sæti á fundinum undir þessum lið.</p>
-</div>
-</div>
-</div>
-<p>Fylgigögn
-</p><ul><li><img class="file-icon" alt="PDF icon" title="application/pdf" src="/modules/file/icons/application-pdf.png"><a href="https://fundur.reykjavik.is/sites/default/files/agenda-items/heklureitur_-_laugavegur_168_og_170-174.pdf" type="application/pdf; length=52462763" title="heklureitur_-_laugavegur_168_og_170-174.pdf">Heklureitur - Laugavegur 168 og 170-174</a></li>
-</ul></li>"""
+def get_rescraped_items(minutes):
+    meeting = minutes[0].meeting
+    text = requests.get(meeting.url).text
+    for i, el in enumerate(Selector(text=text).css(".agenda-items>ol>li")):
+        item = parse_minute_el(i + 1, el)
+        for minute in minutes:
+            if minute.case.serial == item["case_serial"]:
+                yield item, minute
+
+
+def fix_minutes():
+    from planitor.database import db_context
+    from planitor.models import Meeting, Minute
+    from planitor.postprocess import get_subjects
+
+    with db_context() as db:
+        minutes = (
+            db.query(Minute)
+            .join(Meeting)
+            .join(Minute.case)
+            .options(contains_eager(Minute.case))
+            .filter(Minute.meeting_id == 1072)
+        )
+        for item, minute in get_rescraped_items(minutes):
+            for response in minute.responses:
+                headline, contents = item["responses"][response.order]
+                response.headline = headline
+                response.contents = contents
+                response.subjects = get_subjects(headline)
+                db.add(response)
+                db.commit()
+            minute.inquiry = item["inquiry"]
+            minute.remarks = item["remarks"]
+            db.add(minute)
+            db.commit()
+
 
 if __name__ == "__main__":
-    pprint.pprint(parse_minute_el(1, Selector(html)))
+    # pprint.pprint(parse_minute_el(1, Selector(html)))
+    fix_minutes()

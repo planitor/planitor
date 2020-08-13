@@ -159,8 +159,10 @@ def take_responses(paragraphs: List[List[str]]):
         if re.match(pattern, "".join(segments)):
             indexes.append(i)
 
-    for i in indexes[::-1]:
+    for i in indexes:
         yield ["\n".join(_) for _ in paragraphs[i : i + 2]]
+
+    for i in indexes[::-1]:
         paragraphs.pop(i + 1)
         paragraphs.pop(i)
 
@@ -274,6 +276,9 @@ def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
     entities = [parse_entities(s) for s in entity_lines]
 
     inquiry = "\n".join(paragraphs.pop(0))
+
+    if paragraphs and paragraphs[0] == ["Tillögunni fylgir greinargerð."]:
+        inquiry += "\n\n" + paragraphs.pop(0)[0]
 
     # We have now treated the first paragraph which is special. The rest is even more
     # unstructured. In short, we have an inquiry, an optional response, then an optional

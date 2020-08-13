@@ -122,9 +122,9 @@
   {% if minute.responses %}
   <div class="mt-6 p-4 bg-white rounded-md shadow-lg">
     <div>
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Gagnbókanir</h5>
+      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Bókanir og gagnbókanir</h5>
       <ul>
-      {% for response in minute.responses|sort(attribute="order") %}
+      {% for response in minute.responses %}
         <li class="mt-2">
           <div class="font-bold">{{ ", ".join(response.subjects) or response.headline }}</div>
           <div class="">{{ response.contents }}</div>

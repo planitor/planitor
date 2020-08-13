@@ -14,7 +14,7 @@ COMPOUND_ENTITY_DASH_TYPO = re.compile(r"(?:([^\ ])(?:\ ?-\ ?og))")
 PATTERNS = {
     CaseStatusEnum.approved: (
         r"^samþykkt\.",
-        r"^samþykkt með",
+        r"^samþykkt með(?!.+að synja)",
         r"^samþykkt að gefa út framkvæmdaleyfi með vísan til",
         r"^jákvætt\.",
         r"^jákvætt með vísan til umsagnar",
@@ -22,6 +22,7 @@ PATTERNS = {
     ),
     CaseStatusEnum.denied: (
         r"^neikvætt\.",
+        r"^samþykkt með.+að synja",
         r"^neikvætt með vísan",
         r"^synjað\.",
         r"^nei\.",

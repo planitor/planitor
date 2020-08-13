@@ -395,7 +395,7 @@ class Minute(Base):
     subcategory = Column(String)
     participants = Column(ARRAY(String))
     entrants_and_leavers = Column(ARRAY(String))
-    responses = relationship(Response)
+    responses = relationship(Response, order_by="Response.order")
     stadgreinir = Column(String)
 
     attachments = relationship(Attachment)
