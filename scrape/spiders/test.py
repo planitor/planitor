@@ -43,4 +43,5 @@ Vísað til borgarráðs.</p>
 </p><ul><li><img class="file-icon" alt="PDF icon" title="application/pdf" src="/modules/file/icons/application-pdf.png"><a href="https://fundur.reykjavik.is/sites/default/files/agenda-items/heklureitur_-_laugavegur_168_og_170-174.pdf" type="application/pdf; length=52462763" title="heklureitur_-_laugavegur_168_og_170-174.pdf">Heklureitur - Laugavegur 168 og 170-174</a></li>
 </ul></li>"""
 
-pprint.pprint(parse_minute_el(1, Selector(html)))
+if __name__ == "__main__":
+    pprint.pprint(parse_minute_el(1, Selector(html)))

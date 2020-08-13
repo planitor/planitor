@@ -156,7 +156,6 @@ def take_responses(paragraphs: List[List[str]]):
         r"fram svohljóðandi (?:gagn)?bókun:"
     )
     for i, segments in enumerate(paragraphs):
-        print(re.match(pattern, "".join(segments)))
         if re.match(pattern, "".join(segments)):
             indexes.append(i)
 
