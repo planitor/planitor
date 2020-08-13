@@ -30,7 +30,7 @@ MUNICIPALITIES_OSM_IDS = {
 }
 
 
-def get_or_create_municipality(db, slug):
+def get_or_create_municipality(db, slug) -> Tuple[Attachment, bool]:
     name, osm_id = MUNICIPALITIES_OSM_IDS[slug]
     muni = db.query(Municipality).filter_by(geoname_osm_id=osm_id).first()
     created = False
@@ -41,7 +41,7 @@ def get_or_create_municipality(db, slug):
     return muni, created
 
 
-def get_or_create_council(db, municipality, slug, label=None):
+def get_or_create_council(db, municipality, slug, label=None) -> Tuple[Attachment, bool]:
     council_type = getattr(CouncilTypeEnum, slug)
     created = False
     council = (
@@ -60,7 +60,7 @@ def get_or_create_council(db, municipality, slug, label=None):
     return council, created
 
 
-def get_or_create_meeting(db, council, name):
+def get_or_create_meeting(db, council, name) -> Tuple[Attachment, bool]:
     meeting = db.query(Meeting).filter_by(council=council, name=name).first()
     created = False
     if meeting is None:
@@ -94,7 +94,7 @@ def get_or_create_entity(
     return entity, created
 
 
-def get_or_create_case(db, serial, council):
+def get_or_create_case(db, serial, council) -> Tuple[Attachment, bool]:
     case = db.query(Case).filter_by(serial=serial, council=council).first()
     created = False
     if case is None:
@@ -104,7 +104,9 @@ def get_or_create_case(db, serial, council):
     return case, created
 
 
-def get_or_create_case_entity(db: Session, case: Case, entity: Entity, applicant: bool):
+def get_or_create_case_entity(
+    db: Session, case: Case, entity: Entity, applicant: bool
+) -> Tuple[Attachment, bool]:
     case_entity = (
         db.query(CaseEntity)
         .filter_by(entity_id=entity.kennitala, case_id=case.id)
@@ -122,7 +124,7 @@ def get_or_create_case_entity(db: Session, case: Case, entity: Entity, applicant
     return case_entity, created
 
 
-def get_or_create_attachment(db, minute, url, **items):
+def get_or_create_attachment(db, minute, url, **items) -> Tuple[Attachment, bool]:
     attachment = (
         db.query(Attachment)
         .filter(Attachment.url == url, Attachment.minute == minute)
@@ -136,7 +138,7 @@ def get_or_create_attachment(db, minute, url, **items):
     return attachment, created
 
 
-def create_minute(db, meeting, **items):
+def create_minute(db, meeting, **items) -> Minute:
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
     case_stadgreinir = items.pop("case_stadgreinir", None)

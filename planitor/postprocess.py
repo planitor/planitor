@@ -165,7 +165,7 @@ def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session =
 
 def update_minute_with_attachments(db, minute, attachments_items):
     for items in attachments_items:
-        attachment = get_or_create_attachment(db, minute, **items)
+        attachment, _ = get_or_create_attachment(db, minute, **items)
         update_pdf_attachment.send(attachment.id)
         db.commit()
 
