@@ -101,11 +101,7 @@
     {% if minute.participants %}
     <div class="mt-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Gestir</h5>
-      <ul class="text-sm">
-      {% for participant in minute.participants %}
-        <li class="text-gray-800">{{ participant }}</li>
-      {% endfor %}
-      </ul>
+      <div class="text-sm text-gray-800">{{ minute.participants }}</div>
     </div>
     {% endif %}
     {% if minute.entrants_and_leavers %}

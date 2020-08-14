@@ -393,7 +393,7 @@ class Minute(Base):
     remarks = Column(String)
     lemmas = Column(String)
     subcategory = Column(String)
-    participants = Column(ARRAY(String))
+    participants = Column(String)
     entrants_and_leavers = Column(ARRAY(String))
     responses = relationship(Response, order_by="Response.order")
     stadgreinir = Column(String)
