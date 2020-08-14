@@ -14,7 +14,7 @@ def parse_entities(string: str) -> dict:
     Turn a flat list into a list of dicts
 
     >>> parse_entities('660504-2060 Plúsarkitektar ehf, Fiskislóð 31, 101 Reykjavík')
-    ('6605042060', 'Plúsarkitektar ehf', 'Fiskislóð 31, 101 Reykjavík')
+    {'kennitala': '6605042060', 'name': 'Plúsarkitektar ehf', 'address': 'Fiskislóð 31, 101 Reykjavík'}
     """
     assert re.match(r"(\d{6}-\d{4}) ", string)
     _, kennitala, string = re.split(r"(\d{6}-\d{4}) ", string)
@@ -123,22 +123,25 @@ def take_participants(paragraphs: List[List[str]]):
     ...     '-\xa0\xa0 \xa0Kl. 10:53 tekur Sara Björg Sigurðardóttir sæti á fundinum.'
     ... ]
     ... ]
-    >>> list(take_participants(paragraphs))
-    ['Erna Bára Hreinsdóttir og Rúna Ásmundsdóttir frá Vegagerðinni taka sæti á fundinum undir þessum lið.\xa0']
+    >>> take_participants(paragraphs)
+    'Erna Bára Hreinsdóttir og Rúna Ásmundsdóttir frá Vegagerðinni taka sæti á fundinum undir þessum lið.\xa0'
     >>> assert len(paragraphs) == 2
     """
 
     indexes = set()
     pattern = r"(?:tekur|taka) sæti á fundinum undir þessum lið."
+    participant = None
 
     for i, segments in enumerate(paragraphs):
         segment = "".join(segments)
         if re.search(pattern, segment):
-            yield segment
+            participant = segment
             indexes.add(i)
 
     for i in sorted(indexes, reverse=True):
         paragraphs.pop(i)
+
+    return participant
 
 
 def take_responses(paragraphs: List[List[str]]):
@@ -302,7 +305,7 @@ def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
     responses = []
     remarks = None
     entrants_and_leavers = []
-    participants = []
+    participants = None
 
     if paragraphs:
         responses = list(take_responses(paragraphs))
@@ -311,7 +314,7 @@ def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
     if paragraphs:
         entrants_and_leavers = list(take_entrants_and_leavers(paragraphs))
     if paragraphs:
-        participants = list(take_participants(paragraphs))
+        participants = take_participants(paragraphs) or None
     if paragraphs:
         remarks = take_remarks(paragraphs)
 
