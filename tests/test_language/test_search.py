@@ -5,6 +5,7 @@ from planitor.language.search import (
     get_wordbase,
     get_token_lemmas,
     lemmatize_query,
+    parse_lemmas,
 )
 
 
@@ -94,3 +95,30 @@ def test_get_lemmas_large_sentence():
         "6",
         "Austurstræti",
     ]
+
+
+def test_parse_lemmas():
+    assert (
+        list(
+            parse_lemmas(
+                "Hopp rafskútuleiga,.\n"
+                "US200204.\n"
+                "Eyþór Máni Steinarsson og Ægir Þorsteinsson frá Hopp segja frá "
+                "reynslunni af starfinu og tölfræði um notkun flotans.\n"
+            )
+        )
+    ) == [
+        "hopp",
+        "raf-skútu-leiga",
+        "US200204",
+        "Eyþór Máni Steinarsson",
+        "Ægir Þorsteinsson",
+        "hopp",
+        "segja",
+        "reynsla",
+        "starf",
+        "tölfræði",
+        "notkun",
+        "floti",
+    ]
+

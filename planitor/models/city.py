@@ -17,7 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
-from sqlalchemy_utils import CompositeArray, CompositeType
+from sqlalchemy_utils import CompositeArray, CompositeType, TSVectorType
 
 from ..utils.kennitala import Kennitala
 from ..database import Base
@@ -392,6 +392,7 @@ class Minute(Base):
     inquiry = Column(String)
     remarks = Column(String)
     lemmas = Column(String)
+    search_vector = Column(TSVectorType(regconfig="pg_catalog.simple"))
     subcategory = Column(String)
     participants = Column(String)
     entrants_and_leavers = Column(ARRAY(String))
@@ -414,9 +415,7 @@ class Minute(Base):
     )
 
     __table_args__ = (
-        Index(
-            "ix_lemmas_tsv", func.to_tsvector("simple", lemmas), postgresql_using="gin"
-        ),
+        Index("ix_search_vector_tsv", search_vector, postgresql_using="gin"),
     )
 
     def assign_entity_mentions(self, mentions):

@@ -14,7 +14,7 @@ This module helps find lemmas suitable for fulltext indexing.
 """
 
 import re
-from typing import List, Generator, Optional, Set
+from typing import List, Iterable, Optional, Set
 
 from reynir.bintokenizer import tokenize, PersonName
 from tokenizer import TOK
@@ -67,7 +67,15 @@ def get_lemma_terminals(terminals, ignore=None) -> List[str]:
     for text, lemma, category, variants, index in terminals:
         if text in ignore:
             continue
-        if category not in ("no", "so", "gata", "person", "talameðbókstaf", "tala"):
+        if category not in (
+            "no",
+            "so",
+            "gata",
+            "person",
+            "talameðbókstaf",
+            "tala",
+            "sameind",  # case serials are marked as sameind sometimes
+        ):
             continue
         if text.lower() in stopwords:
             continue
@@ -75,13 +83,14 @@ def get_lemma_terminals(terminals, ignore=None) -> List[str]:
     return lemmas
 
 
-def parse_lemmas(text, ignore=None) -> Generator[str, None, None]:
+def parse_lemmas(text: str, ignore=None) -> Iterable[str]:
     """If Greynir cannot parse we drop down to the less clever tokenizer which is inflection
     and case aware, but will give us multiple meanings for words like "svala" and "á".
     """
     if ignore is None:
         ignore = []
-    for sentence in greynir.parse(text)["sentences"]:
+    sentences = greynir.parse(text)["sentences"]
+    for sentence in sentences:
         terminals = sentence.terminals
         if terminals is None:
             for token in tokenize(sentence.tidy_text):
@@ -98,7 +107,7 @@ def get_wordbase(word) -> Optional[str]:
         return wordbase
 
 
-def with_wordbases(lemmas) -> Generator[str, None, None]:
+def with_wordbases(lemmas) -> Iterable[str]:
     """ If word is a compound word, Greynir adds a dash. In this case, yield the base of
     the word like "skemmdir" in "raka-skemmdir", along with the compound word without
     the dash.
@@ -112,7 +121,7 @@ def with_wordbases(lemmas) -> Generator[str, None, None]:
             yield lemma
 
 
-def get_lemmas(text, ignore=None) -> Generator[str, None, None]:
+def get_lemmas(text, ignore=None) -> Iterable[str]:
     if ignore is None:
         ignore = []
     yield from with_wordbases(parse_lemmas(text, ignore))

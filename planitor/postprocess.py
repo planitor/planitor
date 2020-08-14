@@ -1,6 +1,7 @@
 import re
 from typing import List
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from . import dramatiq, greynir
 from .attachments import update_pdf_attachment
@@ -141,26 +142,20 @@ def update_minute_with_response_items(
         db.commit()
 
 
+def _update_minute_search_vector(minute, db):
+    minute.search_vector = func.to_tsvector("simple", " ".join(get_minute_lemmas(minute)))
+    db.add(minute)
+
+
 @dramatiq.actor
-def update_minute_with_lemmas(minute_id: int, force: bool = False, db: Session = None):
-    def inner(db):
+def update_minute_search_vector(minute_id: int, force: bool = False):
+    with db_context() as db:
         minute = db.query(Minute).get(minute_id)
         if minute is None:
             return
-        if not minute.lemmas or force:
-            lemmas = get_minute_lemmas(minute)
-            minute.lemmas = ", ".join(lemmas)
-            assert isinstance(minute.lemmas, str)
-            db.add(minute)
+        if not minute.search_vector or force:
+            _update_minute_search_vector(minute, db)
             db.commit()
-            return lemmas
-
-    if db is not None:
-        lemmas = inner(db)
-    else:
-        with db_context() as db:
-            lemmas = inner(db)
-    return lemmas
 
 
 def update_minute_with_attachments(db, minute, attachments_items):
@@ -190,7 +185,7 @@ def process_minute(db: Session, items: dict, meeting: Meeting):
     update_minute_with_entity_mentions.send(minute.id)
 
     # Populate the lemma column with lemmas from Greynir and/or tokenizer
-    update_minute_with_lemmas.send(minute.id)
+    update_minute_search_vector.send(minute.id)
 
     # Add attachment
     update_minute_with_attachments(db, minute, attachment_items)
