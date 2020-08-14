@@ -143,7 +143,8 @@ def update_minute_with_response_items(
 
 
 def _update_minute_search_vector(minute, db):
-    minute.search_vector = func.to_tsvector("simple", " ".join(get_minute_lemmas(minute)))
+    lemmas = get_minute_lemmas(minute)
+    minute.search_vector = func.to_tsvector("simple", " ".join(lemmas))
     db.add(minute)
 
 

@@ -21,7 +21,10 @@ def get_minute_lemmas(minute) -> List[str]:
     text = get_minute_document(minute)
     for replace in REPLACE:
         text = text.replace(*replace)
-    _lemmas += [minute.case.address, minute.case.serial]
-    _lemmas += [e.entity.name for e in (minute.case.entities or [])]
     _lemmas += list(search.get_lemmas(text=text, ignore=IGNORE))
+    if minute.case.address:
+        _lemmas.append(minute.case.address)
+    if minute.case.serial:
+        _lemmas.append(minute.case.serial)
+    _lemmas += [e.entity.name for e in (minute.case.entities or [])]
     return _lemmas
