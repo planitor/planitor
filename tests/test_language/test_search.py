@@ -1,9 +1,11 @@
+from reynir.bindb import BIN_Db
 from reynir.bintokenizer import tokenize
 
 from planitor.language.search import (
     get_lemmas,
-    get_wordbase,
     get_token_lemmas,
+    get_wordbase,
+    get_wordforms,
     lemmatize_query,
     parse_lemmas,
 )
@@ -121,3 +123,15 @@ def test_parse_lemmas():
         "notkun",
         "floti",
     ]
+
+
+def test_wordforms_verb():
+    # Missing verb forms
+    with BIN_Db.get_db() as bindb:
+        assert get_wordforms(bindb, "reyna") == {"reyna"}
+
+
+def test_wordforms_noun():
+    # Missing indefinite and plural variations
+    with BIN_Db.get_db() as bindb:
+        assert get_wordforms(bindb, "kjallari") == {"kjallara", "kjallari"}

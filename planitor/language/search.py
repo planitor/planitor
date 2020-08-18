@@ -17,6 +17,7 @@ import re
 from typing import List, Iterable, Optional, Set
 
 from reynir.bintokenizer import PersonName
+from reynir.bindb import BIN_Meaning
 from tokenizer import TOK
 
 from planitor import greynir
@@ -149,13 +150,41 @@ def get_wordforms(bindb, term) -> Set[str]:
 
     _, meanings = bindb.lookup_word(term, auto_uppercase=True)
     for meaning in meanings:
-        for f in (
-            bindb.lookup_nominative,
-            bindb.lookup_accusative,
-            bindb.lookup_dative,
-            bindb.lookup_genitive,
-        ):
-            matches.update(tuple(m.ordmynd.lower() for m in (f(meaning.stofn) or [])))
+        print(
+            _,
+            {
+                "stofn": meaning.stofn,
+                "utg": meaning.utg,
+                "ordfl": meaning.ordfl,
+                "fl": meaning.fl,
+                "ordmynd": meaning.ordmynd,
+                "beyging": meaning.beyging,
+            },
+        )
+
+        def _filter(beyging) -> bool:
+            return True
+
+        results = map(
+            BIN_Meaning._make,
+            bindb._compressed_bin.lookup(meaning.stofn, beyging_func=_filter),
+        )
+        matches.update(tuple(m.ordmynd.lower() for m in results or []))
+
+        """
+        cases = [s.encode("latin-1") for s in ("NF", "ÞF", "ÞGF", "EF")]
+        for singular in (True, False):
+            for indefinite in (True, False):
+                for case in cases:
+                    options = dict(case=case, singular=singular, indefinite=indefinite)
+                    def _filter(beyging) -> bool:
+                        if case not in
+                    results = map(
+                        BIN_Meaning._make,
+                        bindb._compressed_bin.lookup(meaning.stofn, **options),
+                    )
+                    matches.update(tuple(m.ordmynd.lower() for m in results or []))
+        """
 
     return matches
 
