@@ -125,15 +125,18 @@ export const Navigation = () => {
   // When mobile user clicks to expand search, focus the input
   const input = useRef(null);
   useEffect(() => {
-    input.current && input.current.focus();
+    input.current && input.current.value && input.current.focus();
   }, [isSearchExpanded]);
 
   return (
-    <div class="flex items-center align-middle h-12">
+    <div class="flex justify-between items-center align-middle h-12">
       <div
-        class={classNames("sm:order-2 sm:flex-grow text-center sm:px-10", {
-          "flex-grow": isSearchExpanded,
-        })}
+        class={classNames(
+          "sm:order-2 sm:flex-grow text-center sm:px-10 sm:max-w-4xl",
+          {
+            "flex-grow": isSearchExpanded,
+          }
+        )}
       >
         {!isSearchExpanded && (
           <span
@@ -163,7 +166,7 @@ export const Navigation = () => {
               onChange={onChange}
               name="q"
               size="1"
-              class="bg-transparent flex-grow py-2 px-2 text-sm font-thin overflow-hidden"
+              class="bg-transparent flex-grow py-2 px-2 text-sm font-thin overflow-hidden focus:outline-none"
               placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
             />
           </form>

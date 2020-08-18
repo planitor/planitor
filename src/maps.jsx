@@ -58,12 +58,12 @@ export async function getEntityMapOptions(kennitala) {
       annotations: pins,
       region: new mapkit.CoordinateRegion(
         new mapkit.Coordinate(north, west),
-        new mapkit.CoordinateSpan(0.03, 0.04)
+        new mapkit.CoordinateSpan(0.01, 0.01)
       ),
     };
   } else {
-    const latDiff = Math.abs(north - south) * 0.2;
-    const lonDiff = Math.abs(east - west) * 0.2;
+    const latDiff = Math.abs(north - south) * 0.1;
+    const lonDiff = Math.abs(east - west) * 0.1;
     const region = new mapkit.BoundingRegion(
       north + latDiff,
       east + lonDiff,
