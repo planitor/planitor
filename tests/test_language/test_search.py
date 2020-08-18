@@ -121,4 +121,3 @@ def test_parse_lemmas():
         "notkun",
         "floti",
     ]
-

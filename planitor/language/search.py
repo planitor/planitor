@@ -16,11 +16,13 @@ This module helps find lemmas suitable for fulltext indexing.
 import re
 from typing import List, Iterable, Optional, Set
 
-from reynir.bintokenizer import tokenize, PersonName
+from reynir.bintokenizer import PersonName
 from tokenizer import TOK
 
 from planitor import greynir
 from planitor.utils.stopwords import stopwords
+
+from .companies import extract_company_names
 
 
 INDEXABLE_TOKEN_TYPES = frozenset(
@@ -34,6 +36,11 @@ INDEXABLE_TOKEN_TYPES = frozenset(
         TOK.SERIALNUMBER,
         TOK.WORD,
         TOK.YEAR,
+        TOK.DATEREL,
+        TOK.DATEABS,
+        TOK.MOLECULE,
+        TOK.COMPANY,
+        TOK.MEASUREMENT,
     )
 )
 
@@ -41,14 +48,15 @@ INDEXABLE_TOKEN_TYPES = frozenset(
 def get_token_lemmas(token, ignore) -> List[str]:
     if ignore is None:
         ignore = []
-    lemmas = []
     if token.kind not in INDEXABLE_TOKEN_TYPES or token.txt in ignore:
         return []
     if token.kind == TOK.NUMWLETTER:
+        # For tokens like "12a" return both "12a" and "12"
         num, letter = token.val
         return [f"{num}{letter}", str(num)]
-    if token.kind not in (TOK.PERSON, TOK.WORD, TOK.ENTITY):
+    if token.kind not in (TOK.PERSON, TOK.WORD, TOK.ENTITY) or token.val is None:
         return [token.txt]
+    lemmas = []
     for word in token.val:
         if isinstance(word, PersonName):
             lemma = word.name
@@ -56,7 +64,8 @@ def get_token_lemmas(token, ignore) -> List[str]:
             lemma = word.stofn
         if lemma in stopwords:
             return []
-        lemmas.append(lemma)
+        if lemma not in lemmas:
+            lemmas.append(lemma)
     return lemmas
 
 
@@ -74,6 +83,10 @@ def get_lemma_terminals(terminals, ignore=None) -> List[str]:
             "person",
             "talameðbókstaf",
             "tala",
+            "fyrirtæki",
+            "mælieining",
+            "dagsafs",
+            "dagsföst",
             "sameind",  # case serials are marked as sameind sometimes
         ):
             continue
@@ -83,22 +96,26 @@ def get_lemma_terminals(terminals, ignore=None) -> List[str]:
     return lemmas
 
 
-def parse_lemmas(text: str, ignore=None) -> Iterable[str]:
+def parse_lemmas(text: str, ignore=None, max_sent_tokens=40) -> Iterable[str]:
     """If Greynir cannot parse we drop down to the less clever tokenizer which is inflection
     and case aware, but will give us multiple meanings for words like "svala" and "á".
+    ReynirPackage has an extremely high `max_sent_tokens` default at 90. This can easily
+    max out memory of a worker process so we set it much lower.
     """
     if ignore is None:
         ignore = []
-    sentences = greynir.parse(text)["sentences"]
-    for sentence in sentences:
+    job = greynir.parse(text, max_sent_tokens=max_sent_tokens)
+    for sentence in job["sentences"]:
         terminals = sentence.terminals
         if terminals is None:
-            for token in tokenize(sentence.tidy_text):
-                for lemma in set(get_token_lemmas(token, ignore)):
+            for token in sentence.tokens:
+                for lemma in get_token_lemmas(token, ignore):
                     yield lemma
         else:
             for lemma in get_lemma_terminals(terminals, ignore):
                 yield lemma
+    for lemma in extract_company_names(text, sentences=job["sentences"]).keys():
+        yield lemma
 
 
 def get_wordbase(word) -> Optional[str]:
@@ -128,7 +145,7 @@ def get_lemmas(text, ignore=None) -> Iterable[str]:
 
 
 def get_wordforms(bindb, term) -> Set[str]:
-    matches = set()
+    matches = {term}
 
     _, meanings = bindb.lookup_word(term, auto_uppercase=True)
     for meaning in meanings:

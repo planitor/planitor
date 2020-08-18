@@ -25,4 +25,10 @@ def test_get_minute_lemmas(monkeypatch):
             yield fragment
 
     monkeypatch.setattr(search, "get_lemmas", mock_get_lemmas)
-    assert get_minute_lemmas(minute) == ["bar", "foo", "Málinu", "er", "vísað."]
+    assert get_minute_lemmas(minute) == [
+        "Málinu",
+        "er",
+        "vísað.",
+        "bar",
+        "foo",
+    ]

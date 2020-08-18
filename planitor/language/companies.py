@@ -1,5 +1,7 @@
 import re
-from typing import Dict
+from typing import Dict, Iterable
+
+from reynir.reynir import _Sentence
 
 from planitor import greynir
 
@@ -60,7 +62,7 @@ def titleize(left, right):
     return " ".join(parts)
 
 
-def extract_company_names(text) -> Dict:
+def extract_company_names(text, sentences: Iterable[_Sentence] = None) -> Dict:
     """ Get company names with preserved plurality and in nominative form. The
     strategy is multipart:
 
@@ -90,7 +92,10 @@ def extract_company_names(text) -> Dict:
     if not parse_icelandic_companies(text):
         return matched_names
 
-    for sentence in greynir.parse(text)["sentences"]:
+    if sentences is None:
+        sentences = greynir.parse(text)["sentences"]
+
+    for sentence in sentences:
 
         if not sentence.terminal_nodes:
             continue

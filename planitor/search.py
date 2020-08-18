@@ -168,7 +168,6 @@ class MinuteResults:
         return func.websearch_to_tsquery("simple", lemmatize_query(self.search_query))
 
     def get_query_and_count(self):
-        tsvector = func.to_tsvector("simple", Minute.lemmas)
         tsquery = self.get_tsquery()
 
         # Only take first three suggestions
@@ -176,9 +175,9 @@ class MinuteResults:
             address["hnitnum"] for address in iceaddr_suggest(self.search_query)[:3]
         ]
 
-        filters = tsvector.op("@@")(tsquery)
+        filters = [Minute.search_vector.op("@@")(tsquery)]
         if hnitnums:
-            filters = filters | Case.address_id.in_(hnitnums)
+            filters.append(Case.address_id.in_(hnitnums))
         order_bys = [Meeting.start.desc()]
         if hnitnums:
             order_bys.insert(0, Case.address_id.in_(hnitnums))
@@ -196,12 +195,12 @@ class MinuteResults:
                     .contains_eager(Council.municipality),
                     contains_eager(Minute.case),
                 )
-                .filter(filters)
+                .filter(*filters)
                 .order_by(
                     *order_bys
                 )  # Relavance ranking is `func.ts_rank(tsvector, tsquery)`
             ),
-            (self.db.query(func.count(Minute.id)).join(Case).filter(filters)),
+            (self.db.query(func.count(Minute.id)).join(Case).filter(*filters)),
         )
 
     def get_highlight_terms(self) -> Set[str]:
