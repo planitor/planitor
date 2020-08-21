@@ -160,6 +160,8 @@ class Address(Base):
     vidsk = Column(String)
 
     def __str__(self):
+        if self.heiti_nf is None:
+            return "<Unknown>"
         address = self.heiti_nf
         if self.husnr:
             address = f"{address} {self.husnr}{self.bokst}"

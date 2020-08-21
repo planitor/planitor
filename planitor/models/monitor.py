@@ -2,14 +2,15 @@ import enum
 from collections import namedtuple
 
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     Enum,
     ForeignKey,
     Integer,
     String,
-    func,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.orm import relationship
 
@@ -25,6 +26,7 @@ class SubscriptionTypeEnum(enum.Enum):
     entity = EnumValue("kennitala", "Kennitala")
     radius = EnumValue("radius", "Radíus")
     district = EnumValue("hverfi", "Hverfi")
+    search = EnumValue("leit", "Leit")
 
 
 class Subscription(Base):
@@ -33,14 +35,19 @@ class Subscription(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
+    active = Column(Boolean, default=True, nullable=False)
 
     type = Column(Enum(SubscriptionTypeEnum), nullable=False)
+
+    search_query = Column(String)
+    search_lemmas = Column(String)
 
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User")
 
     address_hnitnum = Column(Integer, ForeignKey("addresses.hnitnum"), nullable=True)
     address = relationship("Address")
+    radius = Column(Integer)
 
     geoname_osm_id = Column(Integer, ForeignKey("geonames.osm_id"), nullable=True)
     geoname = relationship("Geoname")

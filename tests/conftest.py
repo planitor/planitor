@@ -82,6 +82,14 @@ def minute_fixture(db, case, meeting):
     return minute
 
 
+@pytest.fixture(scope="function", name="user")
+def user_fixture(db, case, meeting):
+    from planitor.models import User
+
+    user = _c(db, User(email="foo@bar.com"))
+    return user
+
+
 @pytest.fixture(scope="function", name="attachment")
 def attachment_fixture(db, minute):
     from planitor.models import Attachment
@@ -95,7 +103,7 @@ def company_fixture(db):
     from planitor.crud import get_or_create_entity
     from planitor.utils.kennitala import Kennitala
 
-    entity, created = get_or_create_entity(
+    entity, _ = get_or_create_entity(
         db, kennitala=Kennitala("5012131870"), name="Veitur ohf.", address=None
     )
     db.commit()

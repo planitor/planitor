@@ -18,6 +18,7 @@ You will need Python Poetry, Yarn and Postgres.
 createuser planitor
 createdb -O planitor planitor
 createdb -O planitor planitor_test
+psql planitor_test -c "CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;"
 ```
 
 Configure .env in the project root
