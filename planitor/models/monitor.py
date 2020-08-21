@@ -36,6 +36,7 @@ class Subscription(Base):
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
     active = Column(Boolean, default=True, nullable=False)
+    immediate = Column(Boolean, default=True, nullable=False)
 
     type = Column(Enum(SubscriptionTypeEnum), nullable=False)
 
@@ -85,6 +86,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
+    sent = Column(Boolean, nullable=False)
 
     subscription_id = Column(Integer, ForeignKey("subscriptions.id"))
     subscription = relationship("Subscription")

@@ -13,6 +13,6 @@ from .city import (  # noqa
     update_case_address,
 )
 
-from .monitor import get_or_create_search_subscription  # noqa
+from .monitor import get_or_create_search_subscription, create_item  # noqa
 
 from .accounts import user  # noqa

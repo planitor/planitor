@@ -3,7 +3,7 @@ from typing import Tuple
 from sqlalchemy.orm import Session
 
 from planitor.language.search import lemmatize_query
-from planitor.models import Subscription, SubscriptionTypeEnum, User
+from planitor.models import Subscription, SubscriptionTypeEnum, User, Minute, Item
 
 
 def get_or_create_search_subscription(
@@ -27,3 +27,9 @@ def get_or_create_search_subscription(
         db.add(subscription)
 
     return subscription, created
+
+
+def create_item(db: Session, subscription: Subscription, minute: Minute) -> Item:
+    item = Item(subscription=subscription, minute=minute)
+    db.add(item)
+    return item
