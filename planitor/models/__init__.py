@@ -22,6 +22,6 @@ from .city import (  # noqa
 
 from .accounts import User  # noqa
 
-from .monitor import Subscription, Letter, Item, SubscriptionTypeEnum  # noqa
+from .monitor import Subscription, Letter, Delivery, SubscriptionTypeEnum  # noqa
 
 _all = locals().values()

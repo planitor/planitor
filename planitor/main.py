@@ -5,9 +5,10 @@ from starlette.requests import Request
 from starlette.routing import WebSocketRoute
 from starlette.staticfiles import StaticFiles
 
+from planitor.templates import templates
+
 from . import config
 from .endpoints import router
-from .endpoints.templates import templates
 
 
 if config("DEBUG", cast=bool, default=False):

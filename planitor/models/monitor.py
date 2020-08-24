@@ -1,5 +1,6 @@
 import enum
 from collections import namedtuple
+from reynir import NounPhrase
 
 from sqlalchemy import (
     Boolean,
@@ -59,6 +60,22 @@ class Subscription(Base):
     entity_kennitala = Column(String, ForeignKey("entities.kennitala"), nullable=True)
     entity = relationship("Entity")
 
+    def get_string(self, case="nominative"):
+        if self.type == SubscriptionTypeEnum.case:
+            nl = "málsnúmeri {}".format(self.case.serial)
+        elif self.type == SubscriptionTypeEnum.address:
+            nl = str(self.address)
+        elif self.type == SubscriptionTypeEnum.entity:
+            nl = self.entity.name
+        elif self.type == SubscriptionTypeEnum.radius:
+            nl = NounPhrase(str(self.address))
+            return "{nl:þgf} með {radius}m radíus".format(nl=nl, radius=self.radius)
+        elif self.type == SubscriptionTypeEnum.search:
+            nl = "leitinni '{}'".format(self.search_query)
+        else:
+            raise NotImplementedError
+        return "{0:þgf}".format(NounPhrase(nl))
+
 
 class Letter(Base):
     """ This is kind of a log of emails sent. We don’t want to atomically detect
@@ -80,13 +97,13 @@ class Letter(Base):
     user = relationship("User")
 
 
-class Item(Base):
+class Delivery(Base):
 
-    __tablename__ = "items"
+    __tablename__ = "deliveries"
 
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
-    sent = Column(Boolean, nullable=False)
+    sent = Column(Boolean, default=False, nullable=False)
 
     subscription_id = Column(Integer, ForeignKey("subscriptions.id"))
     subscription = relationship("Subscription")
@@ -95,3 +112,8 @@ class Item(Base):
     minute = relationship("Minute")
 
     __table_args__ = (UniqueConstraint("subscription_id", "minute_id"),)
+
+    @property
+    def _jinja_groupby(self):
+        meeting = self.minute.meeting
+        return (meeting.start, meeting)

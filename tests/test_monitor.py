@@ -1,9 +1,19 @@
+from planitor.models.city import Minute
 from sqlalchemy import func
+from sqlalchemy.orm.session import Session
 
 from planitor import monitor
-from planitor.models import Subscription, SubscriptionTypeEnum, Address, CaseEntity
-from planitor.minutes import get_minute_lemmas
 from planitor.crud import get_or_create_search_subscription
+from planitor.minutes import get_minute_lemmas
+from planitor.models import (
+    Address,
+    CaseEntity,
+    Delivery,
+    Subscription,
+    SubscriptionTypeEnum,
+    User,
+)
+from planitor.monitor import get_weekly_subscribers
 
 
 def test_match_minute_case(db, minute, case, user):
@@ -74,7 +84,7 @@ def test_match_minute_search_no_match(db, minute, user):
     minute.headline = "Klæða gips á hús"
     lemmas = get_minute_lemmas(minute)
     minute.search_vector = func.to_tsvector("simple", " ".join(lemmas))
-    subscription, _ = get_or_create_search_subscription(db, user, "álplata")
+    get_or_create_search_subscription(db, user, "álplata")
     db.commit()
     assert list(monitor.match_minute(db, minute)) == []
 
@@ -86,3 +96,26 @@ def test_match_minute_search(db, minute, user):
     subscription, _ = get_or_create_search_subscription(db, user, "álplata")
     db.commit()
     assert list(monitor.match_minute(db, minute)) == [subscription]
+
+
+def test_get_weekly_subscribers(db: Session, user, case, meeting, minute, subscription):
+    # User has one subscription/delivery, User 2 has two subscriptions/deliveries
+    user_2 = User(email="foo")
+    subscription_2 = Subscription(user=user_2, case=case, type=SubscriptionTypeEnum.case)
+    delivery_1 = Delivery(minute=minute, subscription=subscription)
+    delivery_2a = Delivery(minute=minute, subscription=subscription_2)
+    delivery_2b = Delivery(
+        minute=Minute(case=case, meeting=meeting), subscription=subscription_2
+    )
+    db.add_all([user_2, delivery_1, subscription_2, delivery_2a, delivery_2b])
+    db.commit()
+
+    results = []
+    for _user, _deliveries in get_weekly_subscribers(db):
+        results.append((_user, tuple(_deliveries)))
+
+    assert results == [
+        (user, (delivery_1,)),
+        (user_2, (delivery_2a, delivery_2b)),
+        #
+    ]

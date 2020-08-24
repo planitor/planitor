@@ -108,3 +108,13 @@ def company_fixture(db):
     )
     db.commit()
     return entity
+
+
+@pytest.fixture(scope="function", name="subscription")
+def subscription_fixture(db, user, case):
+    from planitor.models import Subscription, SubscriptionTypeEnum
+
+    subscription = _c(
+        db, Subscription(case=case, user=user, type=SubscriptionTypeEnum.case)
+    )
+    return subscription

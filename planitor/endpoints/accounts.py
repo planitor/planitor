@@ -1,23 +1,23 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from planitor.database import get_db
-from planitor.security import (
-    get_current_user,
-    get_current_active_user,
-    generate_password_reset_token,
-    verify_password_reset_token,
-    get_login_response,
-    COOKIE_NAME,
-)
-from planitor.models import User as DBUser
-from planitor.schemas import User, Token, Msg
-from planitor.utils.passwords import get_password_hash
 from planitor import crud
+from planitor.database import get_db
+from planitor.models import User as DBUser
+from planitor.schemas import Msg, Token, User
+from planitor.security import (
+    COOKIE_NAME,
+    generate_password_reset_token,
+    get_current_active_user,
+    get_current_user,
+    get_login_response,
+    verify_password_reset_token,
+)
+from planitor.templates import templates
+from planitor.utils.passwords import get_password_hash
 
 from .mail import send_reset_password_email
-from .templates import templates
 
 router = APIRouter()
 
@@ -35,6 +35,17 @@ def read_user_me(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     return current_user
+
+
+@router.get("/stillingar")
+def get_account(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_active_user),
+):
+    return templates.TemplateResponse(
+        "account.html", {"request": request, "user": current_user}
+    )
 
 
 @router.get("/logout")
