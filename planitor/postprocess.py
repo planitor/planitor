@@ -12,7 +12,6 @@ from .crud import (
     get_or_create_entity,
     get_or_create_attachment,
     lookup_icelandic_company_in_entities,
-    create_item,
 )
 from .database import db_context
 from .language.companies import extract_company_names
@@ -195,7 +194,7 @@ def process_minute(db: Session, items: dict, meeting: Meeting):
         [
             # Populate the lemma column with lemmas from Greynir and/or tokenizer
             update_minute_search_vector.message(minute.id),
-            # And then see
+            # ... then match and notify potential subscribers
             notify_subscribers.message_with_options(args=(minute.id,), pipe_ignore=True),
         ]
     )

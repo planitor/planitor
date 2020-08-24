@@ -210,7 +210,7 @@ class MinuteResults:
         cleans up a lot of things, removes negated terms, lowercases and more. """
 
         index_terms = get_terms_from_query(
-            self.db.query(func.querytree(self.get_tsquery())).scalar()
+            self.db.query(func.querytree(get_tsquery(self.search_query))).scalar()
         )
         highlight_terms = set()
         with BIN_Db.get_db() as bindb:
