@@ -85,7 +85,8 @@ def match_minute(db: Session, minute: Minute) -> Iterator[Subscription]:
 
 def send_immediate_email(email_to: str, delivery: Delivery) -> None:
     return send_email(
-        email_to,
+        # email_to,
+        "gudmundur@planitor.io",
         str(delivery.minute.case.address or delivery.minute.headline),
         "subscription_immediate.html",
         {"delivery": delivery},

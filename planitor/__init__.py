@@ -25,7 +25,7 @@ if not DEBUG and SENTRY_DSN:
     )
 
 
-if not DEBUG and config("REDIS_URL", default=False):
+if config("REDIS_URL", default=False):
     broker = RedisBroker(url=config("REDIS_URL"))
     result_backend = RedisBackend(url=config("REDIS_URL"))
     broker.add_middleware(Results(backend=result_backend))

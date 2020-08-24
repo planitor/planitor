@@ -26,7 +26,6 @@ class SubscriptionTypeEnum(enum.Enum):
     street = EnumValue("gata", "Stræti")
     entity = EnumValue("kennitala", "Kennitala")
     radius = EnumValue("radius", "Radíus")
-    district = EnumValue("hverfi", "Hverfi")
     search = EnumValue("leit", "Leit")
 
 

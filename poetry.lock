@@ -684,10 +684,10 @@ description = "Like `diff` but for PostgreSQL schemas"
 name = "migra"
 optional = false
 python-versions = "*"
-version = "1.0.1596263757"
+version = "1.0.1597915807"
 
 [package.dependencies]
-schemainspect = ">=0.1.1596263228"
+schemainspect = ">=0.1.1597727684"
 six = "*"
 sqlbag = "*"
 
@@ -1191,7 +1191,7 @@ description = "Schema inspection for PostgreSQL (and possibly others)"
 name = "schemainspect"
 optional = false
 python-versions = "*"
-version = "0.1.1596263228"
+version = "0.1.1597727684"
 
 [package.dependencies]
 six = "*"
@@ -1605,7 +1605,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "3ec47e1b5a0b20b587c7fc0f8030f21fc1963fc4fead1d29d0008233627b0ebb"
+content-hash = "b06810ad847020946d05159721a6e2162e56104f6c69261b242bfa22e4ca4ff2"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1982,8 +1982,8 @@ mccabe = [
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
 ]
 migra = [
-    {file = "migra-1.0.1596263757-py2.py3-none-any.whl", hash = "sha256:55953234d792b1e4f8e74920736a8b9b6bf2d86aa32f86e3abf1efaf080bc3da"},
-    {file = "migra-1.0.1596263757.tar.gz", hash = "sha256:2ce0f795bd706bfdf06a53fc70d3ea23f7fb1017e2ce48aed12ae46100f145f3"},
+    {file = "migra-1.0.1597915807-py2.py3-none-any.whl", hash = "sha256:f79056aa8546ebfe0e9f5c1ee7d01c86c84a828a538fb08925ec8355c1a52d7f"},
+    {file = "migra-1.0.1597915807.tar.gz", hash = "sha256:7ffa93773127d139daa34893b163e8d06650843b1e29200a07cb4793f74b74ae"},
 ]
 more-itertools = [
     {file = "more-itertools-8.2.0.tar.gz", hash = "sha256:b1ddb932186d8a6ac451e1d95844b382f55e12686d51ca0c68b6f61f2ab7a507"},
@@ -2235,8 +2235,8 @@ s3transfer = [
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
 ]
 schemainspect = [
-    {file = "schemainspect-0.1.1596263228-py2.py3-none-any.whl", hash = "sha256:5fcf8d8af83ac631d14967d367f9d9c0a2b508a737e17def588912d25af80295"},
-    {file = "schemainspect-0.1.1596263228.tar.gz", hash = "sha256:e4402cc1f690d793bd146a716a937ea957895752bca05730ed9cb2b5d83374fd"},
+    {file = "schemainspect-0.1.1597727684-py2.py3-none-any.whl", hash = "sha256:2754340f70e60e99901746582ab3711e0db7d5900a4c8d5b13bfef16166005f6"},
+    {file = "schemainspect-0.1.1597727684.tar.gz", hash = "sha256:8c5c93a43ad58d290a69db9bd447a5c6f6423530ab8bd47ea7bf7611b2735c51"},
 ]
 scrapy = [
     {file = "Scrapy-2.1.0-py2.py3-none-any.whl", hash = "sha256:883ab2dcb6cafb22c7448616baeb5b4d7bedef57ca6a9a5f4e902cb1d6e7aeca"},
