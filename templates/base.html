@@ -73,9 +73,9 @@
     <script>window.HMR_WEBSOCKET_URL = 'ws://{{ request.url.hostname }}:8080';</script>
     <script type="module" src="http://{{ request.url.hostname }}:8080/_dist_/index.js"></script>
     {% else -%}
-    <script src="{{ url_for('build', path='/bundle.js') }}"></script>
-    <script src="{{ url_for('build', path='/0.bundle.js') }}"></script>
-    <script src="{{ url_for('build', path='/1.bundle.js') }}"></script>
+    <script src="{{ url_for('build', path='/bundle.js') }}?_cache"></script>
+    <script src="{{ url_for('build', path='/0.bundle.js') }}?_cache"></script>
+    <script src="{{ url_for('build', path='/1.bundle.js') }}?_cache"></script>
     {% endif -%}
     {# fathom analytics #}
     <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>
