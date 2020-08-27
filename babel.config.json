@@ -1,3 +1,15 @@
 {
-  "extends": "@snowpack/app-scripts-preact/babel.config.json"
+  "extends": "@snowpack/app-scripts-preact/babel.config.json",
+  "presets": [
+    [
+      "@babel/preset-react",
+      {
+        "pragma": "h",
+        "pragmaFrag": "Fragment",
+        "targets": {
+          "esmodules": true
+        }
+      }
+    ]
+  ]
 }
