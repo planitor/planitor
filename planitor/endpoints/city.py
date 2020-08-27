@@ -441,3 +441,21 @@ def get_minute_by_id(
             minute_id=hashids.encode(minute.id),
         )
     )
+
+
+@router.get("/cases/{id}")
+def get_case_by_id(
+    request: Request, id: str, db: Session = Depends(get_db),
+):
+    case = db.query(Case).get(id)
+    if case is None:
+        return HTTPException(404)
+    council = case.council
+    return RedirectResponse(
+        request.url_for(
+            "get_case",
+            muni_slug=council.municipality.slug,
+            council_slug=council.council_type.value.slug,
+            case_id=case.serial,
+        )
+    )

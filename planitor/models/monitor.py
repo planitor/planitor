@@ -38,13 +38,13 @@ class Subscription(Base):
     active = Column(Boolean, default=True, nullable=False)
     immediate = Column(Boolean, default=True, nullable=False)
 
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User")
+
     type = Column(Enum(SubscriptionTypeEnum), nullable=False)
 
     search_query = Column(String)
     search_lemmas = Column(String)
-
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user = relationship("User")
 
     address_hnitnum = Column(Integer, ForeignKey("addresses.hnitnum"), nullable=True)
     address = relationship("Address")

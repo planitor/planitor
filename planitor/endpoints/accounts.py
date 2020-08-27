@@ -29,7 +29,7 @@ def login_page(request: Request, redirect_to: str = ""):
     )
 
 
-@router.get("/me")
+@router.get("/me", response_model=User)
 def read_user_me(
     db: Session = Depends(get_db),
     current_user: DBUser = Depends(get_current_active_user),
@@ -44,7 +44,7 @@ def get_account(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     return templates.TemplateResponse(
-        "account.html", {"request": request, "user": current_user}
+        "account.html", {"request": request, "user": current_user},
     )
 
 
