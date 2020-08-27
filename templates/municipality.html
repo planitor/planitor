@@ -48,7 +48,7 @@
 {% endmacro %}
 
 {% macro filters() %}
-  <div class="my-8 grid grid-cols-2 md:grid-cols-1 col-gap-4 md:my-0">
+  <div class="my-8 grid grid-cols-2 md:grid-cols-1 gap-x-4 md:my-0">
     <div class="mb-4">
       <div class="minilabel mb-2">Embætti</div>
       <ul>
@@ -123,7 +123,7 @@
 {% macro results(meetings) %}
   {% for year, meetings in meetings|groupby('year')|sort(reverse=True) %}
     {% if loop.index != 1 %}
-    <div class="mb-2 mt-4 font-bold text-xl font-semibold">{{ year }}</div>
+    <div class="mb-2 mt-4 text-xl font-semibold">{{ year }}</div>
     {% endif %}
     <div class="mb-4">
     {% for m in meetings -%}
@@ -173,7 +173,7 @@
 
   {{ pagination() }}
 
-  <div class="grid grid-cols-1 md:grid-cols-3 col-gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
     <div class="md:order-last">{{ filters() }}</div>
     <div class="meetings md:col-span-2">
       {{ results(meetings) }}

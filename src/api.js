@@ -51,4 +51,14 @@ export const api = {
   getEntityAddresses(kennitala) {
     return axios.get(`/entities/${kennitala}/addresses`);
   },
+  getSubscriptions() {
+    return axios.get("/me/subscriptions", authHeaders());
+  },
+  updateSubscription(id, active, immediate) {
+    return axios.post(
+      `/me/subscriptions/${id}`,
+      { active: active, immediate: immediate },
+      authHeaders()
+    );
+  },
 };

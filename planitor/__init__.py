@@ -2,6 +2,8 @@ import dramatiq
 import sentry_sdk
 from dramatiq.brokers.redis import RedisBroker
 from dramatiq.brokers.stub import StubBroker
+from dramatiq.results import Results
+from dramatiq.results.backends import RedisBackend
 from hashids import Hashids
 from reynir import Greynir
 from sentry_dramatiq import DramatiqIntegration
@@ -23,8 +25,10 @@ if not DEBUG and SENTRY_DSN:
     )
 
 
-if not DEBUG and config("REDIS_URL", default=False):
+if config("REDIS_URL", default=False):
     broker = RedisBroker(url=config("REDIS_URL"))
+    result_backend = RedisBackend(url=config("REDIS_URL"))
+    broker.add_middleware(Results(backend=result_backend))
 else:
     broker = StubBroker()
 

@@ -1,5 +1,8 @@
 module.exports = {
   plugins: [],
+  future: {
+    removeDeprecatedGapUtilities: true,
+  },
   purge: false, // manually configured in postcss.config.js
   theme: {
     extend: {

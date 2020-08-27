@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% macro render_meeting(meeting) %}
+  <tr>
+    <td class="td" style="background:#27226B;color:white;padding: 10px;">
+      <p style="font-size:12px;font-weight:bold;text-transform:uppercase;margin:0;">{{ meeting.council }}, {{ meeting.council.municipality }}</p>
+      <p style="font-size:16px;margin:0;">Fundur {{ meeting.name }}, {{ human_date(meeting.start) }}</p>
+    </td>
+  </tr>
+{% endmacro %}
+
+{% macro render_subscription(minute, meeting=False) %}
+  {% if meeting -%}
+    {{ render_meeting(minute.meeting) }}
+  {% endif -%}
+  <tr>
+    <td class="td">
+      <p style="font-size:22px;font-weight:bold;margin:8px 0">{{ minute.headline }}</p>
+      <p style="font-size:16px;margin:5px 0">
+        <a href="http://planitor.io/minutes/{{ minute.id }}" style="color:#46BCCC">{{ minute.case.serial }}, {{ minute.case.address }}</a>
+      </p>
+      <p style="line-height:1.2;">{{ minute.inquiry }}</p>
+      <p style="line-height:1.2;">{{ minute.remarks }}</p>
+    </td>
+  </tr>
+{% endmacro %}
+
+{% block inner %}
+<table role="presentation" aria-hidden="true" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width:600px">
+  {% block deliveries %}{% endblock %}
+  <tr>
+    <td class="td" style="padding: 20px 0;">
+      <p style="padding:0;font-size:11px;color:#CCC;">Þessi póstur er sjálfvirkur og var sendur
+      til {{ email_to if email_to else "þín" }} þar sem þú ert notandi af vaktara Planitor.
+      Þú getur haft samband við okkur með því að svara þessum pósti eða senda okkur línu á
+      <a href="mailto:hallo@planitor.io" style="color:#666">hallo@planitor.io</a></p>
+    </td>
+  </tr>
+</table>
+{% endblock inner %}

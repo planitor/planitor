@@ -1,6 +1,7 @@
 import { h, render } from "preact";
 
 import { Navigation } from "./navigation";
+import { Subscriptions } from "./subscriptions";
 import { FollowCase, FollowAddress } from "./follow";
 import { NewPasswordForm } from "./forms/new-password";
 import { openModal } from "./modals";
@@ -26,6 +27,11 @@ if (passwordRecoveryEl) {
 const navigationEl = document.getElementById("navigation");
 if (navigationEl) {
   render(<Navigation />, navigationEl);
+}
+
+const subscriptionsEl = document.getElementById("subscriptions");
+if (subscriptionsEl) {
+  render(<Subscriptions />, subscriptionsEl);
 }
 
 mapkit.addEventListener("configuration-change", function (event) {

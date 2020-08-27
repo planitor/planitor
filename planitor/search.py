@@ -12,6 +12,13 @@ from planitor.language.search import get_wordforms, lemmatize_query
 from planitor.models import Minute, Case, Meeting, Council
 
 
+def get_tsquery(search_query):
+    """ People frequently compose search queries with plural form, for example
+    "bílakjallarar" or use non-nominative inclensions. It’s important to depluralize
+    this. The `parse_lemmas` achieves this for us. """
+    return func.websearch_to_tsquery("simple", lemmatize_query(search_query))
+
+
 def get_terms_from_query(tsquerytree: str):
     """ querytree in Postgres takes a tsquery and strips negated terms and stopwords.
     This returns the terms considered, stripped of the boolean logic tokens. """
@@ -161,14 +168,8 @@ class MinuteResults:
         self.query, count = self.get_query_and_count()
         self.page = Pagination(self.query, count, page or 0)
 
-    def get_tsquery(self):
-        """ People frequently compose search queries with plural form, for example
-        "bílakjallarar" or use non-nominative inclensions. It’s important to depluralize
-        this. The `parse_lemmas` achieves this for us. """
-        return func.websearch_to_tsquery("simple", lemmatize_query(self.search_query))
-
     def get_query_and_count(self):
-        tsquery = self.get_tsquery()
+        tsquery = get_tsquery(self.search_query)
 
         # Only take first three suggestions
         hnitnums = [
@@ -209,7 +210,7 @@ class MinuteResults:
         cleans up a lot of things, removes negated terms, lowercases and more. """
 
         index_terms = get_terms_from_query(
-            self.db.query(func.querytree(self.get_tsquery())).scalar()
+            self.db.query(func.querytree(get_tsquery(self.search_query))).scalar()
         )
         highlight_terms = set()
         with BIN_Db.get_db() as bindb:

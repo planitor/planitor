@@ -1,31 +1,30 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import PlainTextResponse, RedirectResponse
-from sqlalchemy import func, extract, distinct
+from sqlalchemy import distinct, extract, func
 from sqlalchemy.orm import Session
 from starlette.datastructures import Secret
 from starlette.requests import Request
 
 from planitor import config, hashids
+from planitor.crud.follow import get_address_subscription, get_case_subscription
 from planitor.database import get_db
-from planitor.crud.follow import get_case_subscription, get_address_subscription
 from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import (
     Address,
     Case,
     CaseEntity,
+    Council,
+    CouncilTypeEnum,
     Entity,
     Meeting,
     Minute,
     Municipality,
     User,
-    Council,
-    CouncilTypeEnum,
 )
-from planitor.security import get_current_active_user_or_none
 from planitor.search import MinuteResults
-
-from .templates import templates
+from planitor.security import get_current_active_user_or_none
+from planitor.templates import templates
 
 router = APIRouter()
 
@@ -422,4 +421,41 @@ async def get_address(
         return HTTPException(404)
     return templates.TemplateResponse(
         "address.html", {"address": address, "request": request, "user": current_user}
+    )
+
+
+@router.get("/minutes/{id}")
+def get_minute_by_id(
+    request: Request, id: str, db: Session = Depends(get_db),
+):
+    minute = db.query(Minute).get(id)
+    if minute is None:
+        return HTTPException(404)
+    council = minute.meeting.council
+    return RedirectResponse(
+        request.url_for(
+            "get_minute",
+            muni_slug=council.municipality.slug,
+            council_slug=council.council_type.value.slug,
+            case_id=minute.case.serial,
+            minute_id=hashids.encode(minute.id),
+        )
+    )
+
+
+@router.get("/cases/{id}")
+def get_case_by_id(
+    request: Request, id: str, db: Session = Depends(get_db),
+):
+    case = db.query(Case).get(id)
+    if case is None:
+        return HTTPException(404)
+    council = case.council
+    return RedirectResponse(
+        request.url_for(
+            "get_case",
+            muni_slug=council.municipality.slug,
+            council_slug=council.council_type.value.slug,
+            case_id=case.serial,
+        )
     )

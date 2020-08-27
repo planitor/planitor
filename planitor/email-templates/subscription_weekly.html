@@ -1,0 +1,22 @@
+{% extends "subscription_base.html" %}
+
+{% from "subscription_base.html" import render_subscription, render_meeting %}
+
+{% block deliveries %}
+  {% for meeting, deliveries in deliveries|groupby("_jinja_groupby") %}
+    {{ render_meeting(meeting[1]) }}
+    {% for delivery in deliveries %}
+      {{ render_subscription(minute=delivery.minute) }}
+    {% endfor %}
+  {% endfor %}
+  <tr>
+    <td class="td" style="padding-bottom:0; background:#D6F9F5; padding: 10px;">
+      <p style="padding:0;font-size:12px;">
+        Sjálfvirkur vikulegur póstur frá vaktara Planitor, sérsniðin að þínum
+        aðgangi og þeim
+        <a href="https://planitor.io/notendur/stillingar" style="color:#46BCCC">
+        vökturum sem hafa verið gerðir virkir</a>.
+      </p>
+    </td>
+  </tr>
+{% endblock %}

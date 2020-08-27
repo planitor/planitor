@@ -126,7 +126,7 @@
       {% endcall %}
     {% endblock %}
 
-    <div class="grid grid-cols-1 col-gap-8 w-full {{ 'lg:grid-cols-5' if case.get_coordinates() }}">
+    <div class="grid grid-cols-1 gap-x-8 w-full {{ 'lg:grid-cols-5' if case.get_coordinates() }}">
 
       <div class="mb-6 lg:col-span-3">
 
@@ -182,25 +182,22 @@
               style="height: 18rem;"
             >
             </div>
-          {% endif %}
-
-          {% set case_count = (related_cases.count() if related_cases else 0) %}
-
-          {% if case_count %}
             <div class="p-3">
               <div class="flex justify-between items-start">
                 <div>
                   <div class="text-xl font-bold">
                     <a href="{{ url_for("get_address", hnitnum=case.iceaddr.hnitnum) }}" class="underline">{{ case.iceaddr }}</a>
                   </div>
-                  <div class="text-sm font-thin tracking-tight mb-4">
+                  <div class="text-sm font-thin tracking-tight">
                     {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
                   </div>
                 </div>
                 <div class="follow-address" data-state="{{ "following" if address_subscription else "" }}" data-hnitnum="{{ case.iceaddr.hnitnum }}">
                 </div>
               </div>
-              {{ get_cases(related_cases, case_count) }}
+              {% set case_count = (related_cases.count() if related_cases else 0) %}
+              {% if case_count %}
+              <div class="mt-4">{{ get_cases(related_cases, case_count) }}</div>
               <div class="text-xs font-thin tracking-tight mt-4">
                 Landnúmer: {{ case.iceaddr.landnr }}
                 {% if case.iceaddr %}
@@ -213,6 +210,7 @@
                 <br>
                 Hnitnúmer: {{ case.iceaddr.hnitnum }}
               </div>
+              {% endif %}
             </div>
           {% endif %}
 

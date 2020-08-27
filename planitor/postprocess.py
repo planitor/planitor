@@ -2,6 +2,7 @@ import re
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from dramatiq import pipeline
 
 from . import dramatiq, greynir
 from .attachments import update_pdf_attachment
@@ -18,6 +19,7 @@ from .minutes import get_minute_lemmas
 from .models import Meeting, Minute, Response
 from .utils.kennitala import Kennitala
 from .utils.rsk import get_kennitala_from_rsk_search
+from .monitor import notify_subscribers
 
 
 def _get_entity(db: Session, name: str):
@@ -182,14 +184,21 @@ def process_minute(db: Session, items: dict, meeting: Meeting):
     # Update minute with the responses
     update_minute_with_response_items(db, minute, response_items)
 
+    # Add attachment
+    update_minute_with_attachments(db, minute, attachment_items)
+
     # Also associate companies mentioned in the inquiry, such as architects
     update_minute_with_entity_mentions.send(minute.id)
 
-    # Populate the lemma column with lemmas from Greynir and/or tokenizer
-    update_minute_search_vector.send(minute.id)
-
-    # Add attachment
-    update_minute_with_attachments(db, minute, attachment_items)
+    pipe = pipeline(
+        [
+            # Populate the lemma column with lemmas from Greynir and/or tokenizer
+            update_minute_search_vector.message(minute.id),
+            # ... then match and notify potential subscribers
+            notify_subscribers.message_with_options(args=(minute.id,), pipe_ignore=True),
+        ]
+    )
+    pipe.run()
 
     db.add(case)
     db.commit()

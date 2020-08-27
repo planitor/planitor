@@ -2,6 +2,7 @@ import dramatiq
 from .database import db_context
 from .postprocess import update_minute_with_entity_mentions, update_minute_search_vector
 from .attachments import update_pdf_attachment
+from .monitor import notify_subscribers
 
 
 @dramatiq.actor
@@ -15,4 +16,5 @@ __all__ = [
     "update_minute_with_entity_mentions",
     "update_minute_search_vector",
     "update_pdf_attachment",
+    "notify_subscribers",
 ]
