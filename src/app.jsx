@@ -1,11 +1,11 @@
 import { h, render } from "preact";
 
-import { Navigation } from "./navigation";
-import { Subscriptions } from "./subscriptions";
-import { FollowCase, FollowAddress } from "./follow";
-import { NewPasswordForm } from "./forms/new-password";
-import { openModal } from "./modals";
-import { mapkit, getEntityMapOptions } from "./maps";
+import { Navigation } from "./navigation.jsx";
+import { Subscriptions } from "./subscriptions.jsx";
+import { FollowCase, FollowAddress } from "./follow.jsx";
+import { NewPasswordForm } from "./forms/new-password.jsx";
+import { openModal } from "./modals.js";
+import { mapkit, getEntityMapOptions } from "./maps.jsx";
 
 mapkit.init({
   authorizationCallback: (done) => {

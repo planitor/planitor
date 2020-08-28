@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
@@ -36,6 +38,23 @@ async def get_server_error(request: Request):
     return 1 / 0
 
 
+css_path, js_path = [], []
+
+dist_dir = Path(__file__).resolve().parent.parent / "dist"
+
+for path in dist_dir.iterdir():
+    if path.name.endswith(".js") and path.name.startswith("index"):
+        js_path = f"/{path.name}"
+
+for path in dist_dir.iterdir():
+    if path.name.endswith(".css"):
+        css_path = f"/{path.name}"
+
+
+templates.env.globals.update({"css_path": css_path, "js_path": js_path})
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/build", StaticFiles(directory="build"), name="build")
+app.mount("/dist", StaticFiles(directory="dist"), name="dist")
 app.include_router(router)

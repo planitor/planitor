@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "snowpack dev",
-    "build": "snowpack build"
+    "build": "rm dist/* && NODE_ENV=production yarn run rollup -c"
   },
   "browserslist": [
     "last 1 version or > 1%",
@@ -36,20 +36,27 @@
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-react": "^7.10.4",
     "@fullhuman/postcss-purgecss": "^2.3.0",
+    "@rollup/plugin-babel": "^5.2.0",
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
     "@snowpack/app-scripts-preact": "^1.8.5",
-    "@snowpack/plugin-webpack": "^2.0.5",
+    "@snowpack/plugin-postcss": "^1.0.2",
     "cssnano": "^4.1.10",
     "postcss-100vh-fix": "^0.1.1",
     "postcss-cli": "^7.1.1",
     "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.0.5",
-    "snowpack": "^2.9.1",
+    "prettier": "^2.1.1",
+    "rollup": "^2.26.6",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-postcss": "^3.1.6",
+    "rollup-plugin-terser": "^7.0.0",
+    "snowpack": "^2.9.3",
     "tailwindcss": "^1.7.5"
   },
   "dependencies": {
     "axios": "^0.20.0",
     "classnames": "^2.2.6",
     "lazysizes": "^5.2.2",
-    "preact": "^10.4.7"
+    "preact": "^10.4.8"
   }
 }

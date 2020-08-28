@@ -1,26 +1,35 @@
 <!DOCTYPE html>
 <html lang="is">
   <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <title>{% block title %}Planitor{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}"/>
-    <meta property="og:description" content="{% block og_description %}Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi{% endblock %}"/>
-    <meta property="og:type" content="website"/>
-    <meta property="og:url" content="{{ request.url }}"/>
-    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="16x16"/>
-    <link rel="icon" href="{{ url_for('static', path='/favicon-32.png') }}" sizes="32x32"/>
-    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}" />
+    <meta
+      property="og:description"
+      content="{% block og_description %}Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi{% endblock %}"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ request.url }}" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="16x16" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
     {% block og_image -%}
-    <meta property="og:image" content="{{ url_for('static', path='/planitor-2x.png') }}"/>
+    <meta property="og:image" content="{{ url_for('static', path='/planitor-2x.png') }}" />
     {% endblock -%}
     <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+    {% if not DEBUG %}
+    <link href="{{ url_for('dist', path=css_path) }}" rel="stylesheet" />
+    {% endif %}
   </head>
 
   <script>
-  document._user = {{ (user.to_dict() if user else None) | tojson }};
-  document._searchQuery = {{ (q if q is defined else None ) | tojson }}
+    document._user = {{ (user.to_dict() if user else None) | tojson }};
+    document._searchQuery = {{ (q if q is defined else None ) | tojson }}
   </script>
 
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
@@ -29,14 +38,12 @@
     </div>
 
     <div class="flex-grow w-full sheet">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6">
-        {% block body %}{% endblock body %}
-      </div>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">{% block body %}{% endblock body %}</div>
     </div>
 
     <footer class="w-full mt-4">
       <div class="mx-auto max-w-6xl p-4 sm:px-6 mb-4 text-sm sm:text-base">
-        <hr class="mb-4">
+        <hr class="mb-4" />
         <div class="flex">
           <p class="my-1 text-gray-700">
             <a
@@ -46,38 +53,37 @@
             >
               Planitor ehf.
             </a>
-            <br>
-            Mýrargata 26<br>101 Reykjavík
+            <br />
+            Mýrargata 26<br />101 Reykjavík
           </p>
           <div class="flex-grow"></div>
           <p class="my-1 text-powder-darker text-right">
-            <a class="text-powder-darker font-bold" href="https://www.notion.so/planitor/Um-okkur-49e0257450f147a2b006f9881a5723c3" target="_blank">
+            <a
+              class="text-powder-darker font-bold"
+              href="https://www.notion.so/planitor/Um-okkur-49e0257450f147a2b006f9881a5723c3"
+              target="_blank"
+            >
               Um Planitor 👋🏻
             </a>
-            <br>
-            <a href="mailto:hallo@planitor.io">
-              hallo@planitor.io 💬
-            </a>
-            <br>
-            <a href="https://planitor.substack.com/" target="_blank">
-              Fréttabréf 📨
-            </a>
+            <br />
+            <a href="mailto:hallo@planitor.io"> hallo@planitor.io 💬 </a>
+            <br />
+            <a href="https://planitor.substack.com/" target="_blank"> Fréttabréf 📨 </a>
           </p>
         </div>
       </div>
     </footer>
-    {% include "modal.html" -%}
-    {% if DEBUG -%}
-    {# Hot reload script #}
-    {{ hotreload.script(url_for('hot-reload')) | safe }}
-    <script>window.HMR_WEBSOCKET_URL = 'ws://{{ request.url.hostname }}:8080';</script>
+    {% include "modal.html" -%} {% if DEBUG -%} {# Hot reload script #} {{
+    hotreload.script(url_for('hot-reload')) | safe }}
+    <script>
+      window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8080";
+    </script>
     <script type="module" src="http://{{ request.url.hostname }}:8080/_dist_/index.js"></script>
     {% else -%}
-    <script src="{{ url_for('build', path='/bundle.js') }}?_cache"></script>
-    <script src="{{ url_for('build', path='/0.bundle.js') }}?_cache"></script>
-    <script src="{{ url_for('build', path='/1.bundle.js') }}?_cache"></script>
-    {% endif -%}
-    {# fathom analytics #}
+    <script>
+      import("{{ url_for('dist', path=js_path) }}");
+    </script>
+    {% endif -%} {# fathom analytics #}
     <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>
   </body>
 </html>

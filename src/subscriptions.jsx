@@ -1,8 +1,8 @@
 import { h } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 import { api } from "./api";
-import { mapkit } from "./maps";
-import { TrashFill } from "./symbols";
+import { mapkit } from "./maps.jsx";
+import { TrashFill } from "./symbols.jsx";
 
 const Case = ({ serial, id }) => {
   return <a href={`/cases/${id}`}>{serial}</a>;

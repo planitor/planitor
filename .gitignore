@@ -20,5 +20,3 @@ poetry.lock
 .env
 .pytest_cache
 public
-build/_dist_
-build/web_modules
