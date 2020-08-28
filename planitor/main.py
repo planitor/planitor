@@ -55,6 +55,5 @@ templates.env.globals.update({"css_path": css_path, "js_path": js_path})
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/build", StaticFiles(directory="build"), name="build")
 app.mount("/dist", StaticFiles(directory="dist"), name="dist")
 app.include_router(router)
