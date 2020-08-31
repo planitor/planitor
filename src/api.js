@@ -61,4 +61,7 @@ export const api = {
       authHeaders()
     );
   },
+  deleteSubscription(id) {
+    return axios.delete(`/me/subscriptions/${id}`, authHeaders());
+  },
 };

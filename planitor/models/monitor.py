@@ -76,38 +76,22 @@ class Subscription(Base):
         return "{0:þgf}".format(NounPhrase(nl))
 
 
-class Letter(Base):
-    """ This is kind of a log of emails sent. We don’t want to atomically detect
-    items and send them as singular emails, but collate items so that multiple
-    items for a single user are collected into one email.
-
-    Using letters, we can run a cron task every 30 minutes, create a time window
-    from last letter to the present and send those items.
-
-    """
-
-    __tablename__ = "letters"
-
-    id = Column(Integer, primary_key=True, index=True)
-    created = Column(DateTime, server_default=func.now())
-    mail_confirmation = Column(String)
-
-    user_id = Column(Integer, ForeignKey("users.id"))
-    user = relationship("User")
-
-
 class Delivery(Base):
 
     __tablename__ = "deliveries"
 
     id = Column(Integer, primary_key=True, index=True)
     created = Column(DateTime, server_default=func.now())
-    sent = Column(Boolean, default=False, nullable=False)
+    sent = Column(DateTime)
+    mail_confirmation = Column(String)
 
     subscription_id = Column(Integer, ForeignKey("subscriptions.id"))
     subscription = relationship("Subscription")
 
-    minute_id = Column(Integer, ForeignKey("minutes.id"))
+    deleted_subscription_id = Column(Integer)
+    deleted_user_id = Column(Integer)
+
+    minute_id = Column(Integer, ForeignKey("minutes.id"), nullable=False)
     minute = relationship("Minute")
 
     __table_args__ = (UniqueConstraint("subscription_id", "minute_id"),)
@@ -116,3 +100,6 @@ class Delivery(Base):
     def _jinja_groupby(self):
         meeting = self.minute.meeting
         return (meeting.start, meeting)
+
+    def __repr__(self):
+        return f"<Delivery id={self.id}>"

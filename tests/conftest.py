@@ -4,6 +4,7 @@ import asyncio
 
 import sqlalchemy
 import pytest
+from pytest_mock import MockerFixture
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -48,19 +49,32 @@ def client_fixture(app):
     return client
 
 
+@pytest.fixture(scope="function", name="emails_message_send")
+def emails_message_send_fixture(mocker: MockerFixture):
+    return mocker.patch("emails.Message.send")
+
+
 def _c(db, obj):
     db.add(obj)
     db.commit()
     return obj
 
 
+@pytest.fixture(scope="function", name="address")
+def address_fixture(db):
+    from planitor.models import Address
+
+    address = _c(db, Address(hnitnum=1))
+    return address
+
+
 @pytest.fixture(scope="function", name="case")
-def case_fixture(db):
+def case_fixture(db, address):
     from planitor.models import Municipality, Council, Case
 
     muni = _c(db, Municipality(name="Acropolis", slug="acropolis"))
     council = _c(db, Council(name="Building Office", municipality=muni))
-    case = _c(db, Case(council=council))
+    case = _c(db, Case(council=council, iceaddr=address))
     return case
 
 
