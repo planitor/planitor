@@ -13,7 +13,7 @@ from planitor.models import (
     SubscriptionTypeEnum,
     User,
 )
-from planitor.monitor import get_weekly_subscribers
+from planitor.monitor import get_unsent_deliveries, _notify_subscribers, mail
 
 
 def test_match_minute_case(db, minute, case, user):
@@ -98,7 +98,7 @@ def test_match_minute_search(db, minute, user):
     assert list(monitor.match_minute(db, minute)) == [subscription]
 
 
-def test_get_weekly_subscribers(db: Session, user, case, meeting, minute, subscription):
+def test_get_unsent_deliveries(db: Session, user, case, meeting, minute, subscription):
     # User has one subscription/delivery, User 2 has two subscriptions/deliveries
     user_2 = User(email="foo")
     subscription_2 = Subscription(user=user_2, case=case, type=SubscriptionTypeEnum.case)
@@ -111,7 +111,7 @@ def test_get_weekly_subscribers(db: Session, user, case, meeting, minute, subscr
     db.commit()
 
     results = []
-    for _user, _deliveries in get_weekly_subscribers(db):
+    for _user, _deliveries in get_unsent_deliveries(db):
         results.append((_user, tuple(_deliveries)))
 
     assert results == [
@@ -119,3 +119,32 @@ def test_get_weekly_subscribers(db: Session, user, case, meeting, minute, subscr
         (user_2, (delivery_2a, delivery_2b)),
         #
     ]
+
+
+def test_notify_subscribers(
+    db: Session, user, case, minute, subscription, emails_message_send
+):
+    """Test that ensures that users are not notified multiple times for the same
+    minute."""
+
+    # Create another subscription for the same user that captures the same minute
+    subscription_2 = Subscription(
+        user=user, address=case.iceaddr, type=SubscriptionTypeEnum.address
+    )
+    db.add(subscription_2)
+
+    # Create another user and subscription for the same minute
+    user_2 = User(email="user_2@bar.com")
+    subscription_3 = Subscription(
+        user=user_2, address=case.iceaddr, type=SubscriptionTypeEnum.address
+    )
+    db.add(user_2)
+    db.add(subscription_3)
+    db.commit()
+
+    deliveries = list(_notify_subscribers(db, minute))
+    assert emails_message_send.call_count == 2
+    assert {user_2.email, user.email} == {
+        call_args.kwargs["to"] for call_args in emails_message_send.call_args_list
+    }
+    assert len(deliveries) == 3

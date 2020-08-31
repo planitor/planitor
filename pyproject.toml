@@ -36,7 +36,7 @@ reynir = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"
-black = "^19.10b0"
+black = "^20.8b1"
 ipdb = "^0.13.2"
 scrapy = "^2.1.0"
 pytest = "^6.0.1"
@@ -47,10 +47,10 @@ pytest-ipdb = "^0.1-prerelease2"
 migra = "^1.0.1597915807"
 bpython = "^0.19"
 typer = "^0.2.1"
-pytest-mock = "^3.1.1"
 arel = "^0.2.0"
 sqlalchemy-stubs = "^0.3"
 linetimer = "^0.1.4"
+pytest-mock = "^3.3.1"
 
 [tool.poetry.scripts]
 dev-server = "scripts.development:main"

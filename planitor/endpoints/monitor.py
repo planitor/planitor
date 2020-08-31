@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -50,3 +50,27 @@ def update_subscription(
     db.add(subscription)
     db.commit()
     return subscription
+
+
+@router.delete("/me/subscriptions/{id}")
+def delete_subscription(
+    id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user),
+):
+    subscription = db.query(models.Subscription).get(id)
+    if subscription is None or subscription.user != current_user:
+        return HTTPException(404)
+
+    # Set archival values for deliveries and remove subscription foreign key
+    db.query(models.Delivery).filter(models.Delivery.subscription == subscription).update(
+        {
+            models.Delivery.subscription_id: None,
+            models.Delivery.deleted_subscription_id: subscription.id,
+            models.Delivery.deleted_user_id: subscription.user.id,
+        }
+    )
+    db.delete(subscription)
+    db.commit()
+    return Response(None, 204)

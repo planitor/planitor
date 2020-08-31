@@ -39,3 +39,4 @@ def send_email(email_to: str, subject: str, html_template: str, context: dict):
     message.transform()
     response = message.send(to=email_to, render=context, smtp=smtp_options)
     logging.info(f"send email result: {response}")
+    return response
