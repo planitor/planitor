@@ -100,3 +100,6 @@ class Delivery(Base):
     def _jinja_groupby(self):
         meeting = self.minute.meeting
         return (meeting.start, meeting)
+
+    def __repr__(self):
+        return f"<Delivery id={self.id}>"

@@ -13,7 +13,7 @@ from planitor.models import (
     SubscriptionTypeEnum,
     User,
 )
-from planitor.monitor import get_unsent_deliveries, _notify_subscribers, mail
+from planitor.monitor import get_unsent_deliveries, _notify_subscribers
 
 
 def test_match_minute_case(db, minute, case, user):
@@ -24,14 +24,9 @@ def test_match_minute_case(db, minute, case, user):
     assert list(monitor.match_minute(db, minute)) == [subscription]
 
 
-def test_match_minute_address(db, minute, user):
-    address = Address(hnitnum=1)
-    db.add(address)
-    minute.case.iceaddr = address
-    db.add(minute.case)
-    db.commit()
+def test_match_minute_address(db, minute, user, case):
     subscription = Subscription(
-        user=user, address=address, type=SubscriptionTypeEnum.address
+        user=user, address=case.iceaddr, type=SubscriptionTypeEnum.address
     )
     db.add(subscription)
     db.commit()
@@ -46,11 +41,11 @@ LANGAHLID = 64.133129, -21.911580
 def test_match_minute_radius(db, minute, user):
 
     lat, lon = KRAMBUD
-    address_1 = Address(hnitnum=1, lat_wgs84=lat, long_wgs84=lon)
+    address_1 = Address(hnitnum=2, lat_wgs84=lat, long_wgs84=lon)
     db.add(address_1)
 
     lat, lon = LANGAHLID
-    address_2 = Address(hnitnum=2, lat_wgs84=lat, long_wgs84=lon)
+    address_2 = Address(hnitnum=3, lat_wgs84=lat, long_wgs84=lon)
     db.add(address_2)
 
     minute.case.iceaddr = address_2
@@ -112,11 +107,16 @@ def test_get_unsent_deliveries(db: Session, user, case, meeting, minute, subscri
 
     results = []
     for _user, _deliveries in get_unsent_deliveries(db):
-        results.append((_user, tuple(_deliveries)))
+        results.append((_user, set(_deliveries)))
 
     assert results == [
-        (user, (delivery_1,)),
-        (user_2, (delivery_2a, delivery_2b)),
+        (
+            user,
+            {
+                delivery_1,
+            },
+        ),
+        (user_2, {delivery_2a, delivery_2b}),
         #
     ]
 
