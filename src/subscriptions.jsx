@@ -1,32 +1,16 @@
 import { Fragment, h } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 import { api } from "./api";
-import { TrashFill } from "./symbols.jsx";
-
-const Case = ({ serial, id }) => {
-  return <a href={`/cases/${id}`}>{serial}</a>;
-};
-
-const Search = ({ search_query }) => {
-  return <a href={`/leit?q=${search_query}`}>„{search_query}“</a>;
-};
-
-const Address = ({ name, hnitnum, radius }) => {
-  return (
-    <a href={`/hnit/${hnitnum}`}>
-      {name} {radius}
-    </a>
-  );
-};
+import { TrashFill, BadgePlusRadiowavesRight } from "./symbols.jsx";
 
 const SelectWidget = ({ value, onChange, isDisabled, children }) => {
   return (
-    <div class="inline-block relative text-sm sm:text-base">
+    <div class="inline-block relative text-sm lg:text-base">
       <select
         value={value}
         onChange={onChange}
         disabled={isDisabled}
-        class="block appearance-none w-full border border-gray-400 hover:border-gray-500 px-1 sm:px-4 py-1 sm:py-2 pr-8 mr-3 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+        class="block appearance-none w-full border border-gray-400 hover:border-gray-500 px-1 lg:px-4 py-1 lg:py-2 pr-8 mr-3 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
       >
         {children}
       </select>
@@ -39,10 +23,6 @@ const SelectWidget = ({ value, onChange, isDisabled, children }) => {
   );
 };
 
-const Entity = ({ kennitala, name }) => {
-  return <a href={`/f/${kennitala}`}>{name}</a>;
-};
-
 const SubscriptionLoading = () => {
   return (
     <div class="rounded-lg shadow-sm p-4 w-full bg-white mb-4">
@@ -53,6 +33,22 @@ const SubscriptionLoading = () => {
       </div>
     </div>
   );
+};
+
+const Case = ({ serial, id }) => {
+  return <a href={`/cases/${id}`}>{serial}</a>;
+};
+
+const Search = ({ search_query }) => {
+  return <a href={`/leit?q=${search_query}`}>„{search_query}“</a>;
+};
+
+const Address = ({ name, hnitnum, radius, onChangeRadius }) => {
+  return <a href={`/hnit/${hnitnum}`}>{name}</a>;
+};
+
+const Entity = ({ kennitala, name }) => {
+  return <a href={`/f/${kennitala}`}>{name}</a>;
 };
 
 const Subscription = (props) => {
@@ -85,40 +81,63 @@ const Subscription = (props) => {
 
   const onChange = async (event) => {
     const { value } = event.target;
-    const active = value !== "never";
-    const immediate = value === "immediate";
+    const requestData = {
+      active: value !== "never",
+      immediate: value === "immediate",
+      ...data,
+    };
     setLoading(true);
-    const data = await api
-      .updateSubscription(id, active, immediate)
+    const responseData = await api
+      .updateSubscription(id, requestData)
       .then((response) => {
         return response.data;
       });
     setLoading(false);
-    setData(data);
+    setData(responseData);
+  };
+
+  const onChangeRadius = async (event) => {
+    const { value } = event.target;
+    const responseData = await api
+      .updateSubscription(id, { radius: Number(value) })
+      .then((response) => {
+        return response.data;
+      });
+    setLoading(false);
+    setData(responseData);
   };
 
   return (
-    <div class="rounded-lg shadow-sm p-4 w-full bg-white mb-4">
-      <div class="flex flex-row align-middle">
-        <div class="mr-4 flex-grow font-bold py-1 text-sm sm:text-lg whitespace-no-wrap">
-          {subscription.case && <Case {...subscription.case} />}
-          {subscription.search_query && (
-            <Search search_query={subscription.search_query} />
-          )}
-          {subscription.address && (
-            <Address
-              radius={subscription.radius || null}
-              {...subscription.address}
-            />
-          )}
-          {subscription.entity && <Entity {...subscription.entity} />}
+    <div class="sm:rounded-lg sm:shadow-sm pb-2 sm:p-4 w-full sm:bg-white mb-2 sm:mb-4">
+      <div class="flex flex-col md:flex-row align-middle">
+        <div class="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
+          {data.case && <Case {...data.case} />}
+          {data.search_query && <Search search_query={data.search_query} />}
+          {data.address && <Address {...data.address} />}
+          {data.entity && <Entity {...data.entity} />}
         </div>
         <div>
-          <div class="flex justify-between items-center w-full">
+          <div class="flex justify-end sm:justify-between items-center w-full sm:w-auto">
+            {data.address && (
+              <div class="mr-2 sm:mr-4">
+                <SelectWidget
+                  value={data.radius || 0}
+                  onChange={onChangeRadius}
+                  isDisabled={isLoading}
+                >
+                  <Fragment>
+                    <option value={0}>0m</option>
+                    <option value={100}>+ 100m</option>
+                    <option value={300}>+ 300m</option>
+                    <option value={500}>+ 500m</option>
+                  </Fragment>
+                </SelectWidget>
+              </div>
+            )}
             <SelectWidget
-              isDisabled={isLoading}
               value={value}
               onChange={onChange}
+              isDisabled={isLoading}
             >
               <Fragment>
                 <option value="never">Afvirkja</option>
@@ -127,7 +146,7 @@ const Subscription = (props) => {
               </Fragment>
             </SelectWidget>
             <button
-              class="ml-3 sm:ml-6 text-gray-500"
+              class="ml-3 sm:ml-6 text-gray-500 flex-grow sm:flex-grow-0 flex justify-end"
               onClick={(event) => {
                 !isLoading && onDelete(event);
               }}

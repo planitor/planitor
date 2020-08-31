@@ -54,12 +54,8 @@ export const api = {
   getSubscriptions() {
     return axios.get("/me/subscriptions", authHeaders());
   },
-  updateSubscription(id, active, immediate) {
-    return axios.post(
-      `/me/subscriptions/${id}`,
-      { active: active, immediate: immediate },
-      authHeaders()
-    );
+  updateSubscription(id, data) {
+    return axios.post(`/me/subscriptions/${id}`, data, authHeaders());
   },
   deleteSubscription(id) {
     return axios.delete(`/me/subscriptions/${id}`, authHeaders());

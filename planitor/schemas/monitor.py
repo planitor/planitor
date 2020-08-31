@@ -27,8 +27,9 @@ class Address(BaseModel):
 
 
 class SubscriptionForm(BaseModel):
-    active: bool
-    immediate: bool
+    active: Optional[bool] = None
+    immediate: Optional[bool] = None
+    radius: Optional[int] = None
 
 
 class SubscriptionBase(BaseModel):

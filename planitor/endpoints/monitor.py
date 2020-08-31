@@ -45,8 +45,12 @@ def update_subscription(
     subscription = db.query(models.Subscription).get(id)
     if subscription is None or subscription.user != current_user:
         return HTTPException(404)
-    subscription.active = form.active
-    subscription.immediate = form.immediate
+    if form.active is not None:
+        subscription.active = form.active
+    if form.immediate is not None:
+        subscription.immediate = form.immediate
+    if form.radius is not None:
+        subscription.radius = form.radius
     db.add(subscription)
     db.commit()
     return subscription
