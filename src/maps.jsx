@@ -41,10 +41,14 @@ export async function getEntityMapOptions(kennitala) {
 
   // Shift direction variables to the outermost parts of pins to create a boundary region
   for (var address of addresses) {
-    const { lat, lon, label } = address;
+    const { lat, lon, label, status } = address;
+    const [_, __, labelColor] = status;
     pins.push(
       new mapkit.MarkerAnnotation(new mapkit.Coordinate(lat, lon), {
         title: label,
+        color:
+          { green: "#48BB78", yellow: "#F6E05E", red: "#E53E3E" }[labelColor] ||
+          "#718096",
       })
     );
     if (lat > north) north = lat;

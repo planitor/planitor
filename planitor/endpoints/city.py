@@ -342,13 +342,34 @@ async def get_entity_addresses(
     request: Request, kennitala: str, db: Session = Depends(get_db)
 ):
     entity = _get_entity(db, kennitala)
-    cases = db.query(Case.address_id).join(CaseEntity).filter(CaseEntity.entity == entity)
-    addresses = db.query(Address).filter(Address.hnitnum.in_(cases))
+
+    most_recent_addresses = (
+        db.query(Case.address_id, func.max(Case.updated).label("last_updated"))
+        .select_from(Case)
+        .join(CaseEntity)
+        .filter(CaseEntity.entity == entity)
+        .group_by(Case.address_id)
+    )
+    sq = most_recent_addresses.subquery()
+
+    query = (
+        db.query(Address, Case)
+        .select_from(Address)
+        .join(sq, sq.c.address_id == Address.hnitnum)
+        .join(Case, sq.c.last_updated == Case.updated)
+        .join(CaseEntity)
+        .filter(CaseEntity.entity == entity)
+    )
 
     return {
         "addresses": [
-            dict(lat=address.lat_wgs84, lon=address.long_wgs84, label=str(address))
-            for address in addresses
+            dict(
+                lat=address.lat_wgs84,
+                lon=address.long_wgs84,
+                label=str(address),
+                status=case.status,
+            )
+            for address, case in query
         ]
     }
 

@@ -1,22 +1,12 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% from 'symbols/symbols.html' import house_fill, arrow_up_right_circle_fill %} {%
+from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %} {% block body %}
+<div class="my-8 mt-4 sm:mt-8">
+  {% call breadcrumbs() %} {{ breadcrumb(None, "Einstaklingur", dash=False) }} {{ breadcrumb(None,
+  entity.name) }} {% endcall %}
 
-{% from 'symbols/symbols.html' import house_fill, arrow_up_right_circle_fill %}
-{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
-
-
-{% block body %}
-  <div class="my-8 mt-4 sm:mt-8">
-
-    {% call breadcrumbs() %}
-    {{ breadcrumb(None, "Einstaklingur", dash=False) }}
-    {{ breadcrumb(None, entity.name) }}
-    {% endcall %}
-
-    <div class="flex justify-between items-end">
-      <a class="text-xl font-bold block">{{ entity.name }} kt. {{ entity.get_human_kennitala() }}</a>
-    </div>
+  <div class="flex justify-between items-end">
+    <a class="text-xl font-bold block">{{ entity.name }} kt. {{ entity.get_human_kennitala() }}</a>
   </div>
-  <div class="">
-    Hér koma svo allskonar mál tengd einstaklingnum
-  </div>
+</div>
+<div class="">Hér koma svo allskonar mál tengd einstaklingnum</div>
 {% endblock body %}
