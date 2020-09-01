@@ -42,7 +42,7 @@ export async function getEntityMapOptions(kennitala) {
   // Shift direction variables to the outermost parts of pins to create a boundary region
   for (var address of addresses) {
     const { lat, lon, label, status } = address;
-    const [_, __, labelColor] = status;
+    const labelColor = status ? status[2] : null;
     pins.push(
       new mapkit.MarkerAnnotation(new mapkit.Coordinate(lat, lon), {
         title: label,
