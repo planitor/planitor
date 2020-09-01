@@ -35,7 +35,7 @@ oauth2_auth = OAuth2PasswordBearer(
 
 
 async def auth(request: Request) -> Optional[str]:
-    """ On POST/PUT/DELETE do not use the cookie backend since we don’t have any XSS or
+    """On POST/PUT/DELETE do not use the cookie backend since we don’t have any XSS or
     CSRF protection. For endpoints that modify state we want tokens that are stored by
     the planitor client itself.
 
@@ -53,7 +53,12 @@ def get_login_response(user: User, response: Response) -> dict:
     """ set-cookie but also return oauth2 compatible login response """
     token = create_access_token({"user_id": user.id})
     response.set_cookie(
-        COOKIE_NAME, token, path="/", secure=(ENV == "production"), httponly=True
+        COOKIE_NAME,
+        token,
+        path="/",
+        secure=(ENV == "production"),
+        httponly=True,
+        expires=60 * 60 * 24 * 365,  # Far future expiry
     )
     return {
         "access_token": token,
@@ -104,8 +109,7 @@ def get_current_active_superuser(
 def get_current_active_user_or_none(
     db: Session = Depends(get_db), token: str = Security(auth)
 ):
-    """ HTML GET endpoints need this to render user/no-user versions of the same view.
-    """
+    """HTML GET endpoints need this to render user/no-user versions of the same view."""
     try:
         payload = jwt.decode(token, config("SECRET_KEY"), algorithms=[ALGORITHM])
     except PyJWTError:
