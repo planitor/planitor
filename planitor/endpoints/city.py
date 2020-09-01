@@ -173,7 +173,10 @@ async def get_meeting(
 
 @router.get("/s/{muni_slug}/{council_slug}")
 async def get_council(
-    request: Request, muni_slug: str, council_slug: str, db: Session = Depends(get_db),
+    request: Request,
+    muni_slug: str,
+    council_slug: str,
+    db: Session = Depends(get_db),
 ):
     return None
 
@@ -360,6 +363,12 @@ async def get_company(
     current_user: User = Depends(get_current_active_user_or_none),
 ):
     entity = _get_entity(db, kennitala, slug)
+
+    if current_user is None:
+        return templates.TemplateResponse(
+            "company_paywall.html", {"request": request, "entity": entity}
+        )
+
     if slug is None:
         return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
 
@@ -426,7 +435,9 @@ async def get_address(
 
 @router.get("/minutes/{id}")
 def get_minute_by_id(
-    request: Request, id: str, db: Session = Depends(get_db),
+    request: Request,
+    id: str,
+    db: Session = Depends(get_db),
 ):
     minute = db.query(Minute).get(id)
     if minute is None:
@@ -445,7 +456,9 @@ def get_minute_by_id(
 
 @router.get("/cases/{id}")
 def get_case_by_id(
-    request: Request, id: str, db: Session = Depends(get_db),
+    request: Request,
+    id: str,
+    db: Session = Depends(get_db),
 ):
     case = db.query(Case).get(id)
     if case is None:
