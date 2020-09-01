@@ -4,7 +4,7 @@
 
 {% macro pagination() %}
   <ul class="my-6 flex justify-between">
-  {% if paging.has_previous %}
+    {% if paging.has_previous %}
     <li>
       <a
         class="text-midnight font-semibold"
@@ -17,16 +17,17 @@
             'get_municipality',
             muni_slug=municipality.slug,
           )
-        }}?page={{ paging.bookmark_previous }}{{ ("&year={}".format(year) if year else '')|safe }}">
+        }}?page={{ paging.bookmark_previous }}{{ ('&year={}'.format(year) if year else '')|safe }}"
+      >
         ← Fyrri síða
       </a>
     </li>
-  {% else %}
+    {% else %}
     <li>
       <span class="text-gray-900 opacity-25">← Fyrri síða</span>
     </li>
-  {% endif %}
-  {% if paging.has_next %}
+    {% endif %}
+    {% if paging.has_next %}
     <li>
       <a
         class="text-midnight font-semibold"
@@ -43,7 +44,7 @@
         Næsta síða →
       </a>
     </li>
-  {% endif %}
+    {% endif %}
   </ul>
 {% endmacro %}
 
@@ -57,7 +58,7 @@
             Öll
           </a>
         </li>
-      {% for _council in councils %}
+        {% for _council in councils %}
         <li>
           <a
             class="text-sm leading-relaxed {{ 'font-bold' if _council == council }}"
@@ -73,7 +74,7 @@
             {{ _council.council_type.value.label }}
           </a>
         </li>
-      {% endfor %}
+        {% endfor %}
       </ul>
     </div>
     <div class="mb-4">
@@ -95,7 +96,7 @@
             Öll{{- "" -}}
           </a>{{- ", " }}
         </li>
-      {% for _year in years %}
+        {% for _year in years %}
         <li class="inline">
           <a
             class="text-sm leading-relaxed {{ 'font-bold' if _year == year }}"
@@ -114,7 +115,7 @@
             {{ _year -}}
           </a>{{ ", " if not loop.last -}}
         </li>
-      {% endfor %}
+        {% endfor %}
       </ul>
     </div>
   </div>
@@ -160,6 +161,35 @@
   {% endfor %}
 {% endmacro %}
 
+{% macro ad() %}
+  <div class="p-2 bg-midnight shadow-lg rounded-lg flex relative md:my-8 lg:mt-16">
+    <div class="sm:w-1/2 md:w-2/3 text-white p-3">
+      <div class="font-black text-3xl">
+        <span class="text-powder">Nýtt →</span>
+        Vaktarinn
+      </div>
+      <div class="text-sm">
+        <p class="mb-2">
+          Planitor sendir þér tilkynningar um mál sem varða þína hagsmuni. Vaktaðu heimilisföng,
+          leitarorð, málsnúmer, fyrirtæki eða ákveðin svæði. Veldu á milli vikulegs yfirlits í
+          tölvupósti eða að fá tilkynningu um leið og fundargerð er gerð opinber á vef
+          Reykjavíkurborgar*.
+        </p>
+        <p class="mb-2 font-bold">
+          Vaktarinn er í boði gegn mánaðargjaldi. Hafðu samband við
+          <a href="mailto:hallo@planitor.io" class="text-powder">hallo@planitor.io</a>.
+        </p>
+      </div>
+      <div class="text-xs opacity-50">* Fleiri sveitarfélög bætast við á næstunni</div>
+    </div>
+    <div class="w-1/3 hidden sm:block"></div>
+    <img
+      src="{{ url_for('static', path='/ads/vaktarinn.png') }}"
+      class="absolute sm:w-1/2 md:w-1/3 bottom-0 right-0 hidden sm:block"
+    >
+  </div>
+{% endmacro %}
+
 {% block title %}{{ "{} í ".format(council.name) if council else "Fundargerðir, " }}{{ municipality.name }} — {{ super() }}{% endblock %}
 {% block og_title %}{{ "{} í ".format(council.name) if council else "Fundargerðir, " }}{{ municipality.name }} — {{ super() }}{% endblock %}
 
@@ -174,7 +204,14 @@
   {{ pagination() }}
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
-    <div class="md:order-last">{{ filters() }}</div>
+    <div class="md:col-span-3 mb-6">
+      {{ ad() }}
+    </div>
+    <div class="md:order-last ">
+      <div>
+        {{ filters() }}
+      </div>
+    </div>
     <div class="meetings md:col-span-2">
       {{ results(meetings) }}
     </div>
