@@ -84,7 +84,6 @@ const Subscription = (props) => {
     const requestData = {
       active: value !== "never",
       immediate: value === "immediate",
-      ...data,
     };
     setLoading(true);
     const responseData = await api
