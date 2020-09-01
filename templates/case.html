@@ -182,11 +182,14 @@
               style="height: 18rem;"
             >
             </div>
+            {% if case.iceaddr %}
             <div class="p-3">
               <div class="flex justify-between items-start">
                 <div>
                   <div class="text-xl font-bold">
-                    <a href="{{ url_for("get_address", hnitnum=case.iceaddr.hnitnum) }}" class="underline">{{ case.iceaddr }}</a>
+                    <a href="{{ url_for("get_address", hnitnum=case.iceaddr.hnitnum) }}" class="underline">
+                      {{ case.iceaddr }}
+                    </a>
                   </div>
                   <div class="text-sm font-thin tracking-tight">
                     {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
@@ -211,6 +214,7 @@
                 Hnitnúmer: {{ case.iceaddr.hnitnum }}
               </div>
               {% endif %}
+            {% endif %}
             </div>
           {% endif %}
 
