@@ -1,0 +1,2 @@
+templates/**/*.html
+planitor/email-templates/*.html

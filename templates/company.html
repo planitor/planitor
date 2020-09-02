@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
 {% from 'symbols/symbols.html' import house_fill, arrow_up_right_circle_fill %}
-{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}
+{% from 'includes/cases.html' import case_table %}
 
 {% block title %}{{ entity.name }} — {{ super() }}{% endblock %}
 {% block og_title %}{{ entity.name }} — {{ super() }}{% endblock %}
 
 {% block body %}
-  <div class="my-8 mt-4 sm:mt-8">
 
+  <div class="my-8 mt-4 sm:mt-8">
     {% call breadcrumbs() %}
     {{ breadcrumb(None, "Fyrirtæki", dash=False) }}
     {{ breadcrumb(None, entity.name) }}
     {% endcall %}
-
     <div class="flex justify-between items-center">
       <div>
         <div class="text-xl font-bold">{{ entity.name }}</div>
@@ -23,7 +23,6 @@
         RSK.is <span class="sf-symbol">{{ arrow_up_right_circle_fill(class="") }}</span>
       </a>
     </div>
-
   </div>
 
   <div class="flex flex-col">
@@ -31,47 +30,7 @@
       <div class="entity-map shadow-lg rounded-md overflow-hidden bg-white w-full" data-kennitala="{{ entity.kennitala }}"></div>
     </div>
     <div class="">
-      <table class="table-auto min-w-full max-w-full">
-        {% for group in cases|groupby(2)|sort(attribute=0, reverse=True) %} {# because 2 is the tuple index #}
-        <thead>
-          <tr><td colspan=4 class="py-4 md:p-4 text-center font-bold">{{ group.grouper|int }}</td></tr>
-          <tr>
-            <th class="px-0 md:px-4 py-2 minilabel text-left">Mál</th>
-            <th class="px-0 md:px-4 py-2 minilabel text-left hidden sm:table-cell"></th>
-            <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for case, applicant, year, minute_count in group.list %}
-          {% set url = url_for('get_case',
-            muni_slug=case.council.municipality.slug,
-            council_slug=case.council.council_type.value.slug,
-            case_id=case.serial) %}
-          <tr class="{{ 'md:bg-white' if loop.index % 2 != 0 }} leading-relaxed">
-            <td class="md:border pr-2 md:px-4 py-2">
-              <a class="font-bold block" href="{{ url }}">{{ case.headline }}</a>
-              {% if case.address %}
-              <div class="text-xs text-black text-opacity-50">{{ case.address }}</div>
-              {% endif %}
-            </td>
-            <td class="md:border pr-2 md:px-4 py-2 hidden sm:table-cell">
-              <a href="{{ url }}" class="underline whitespace-no-wrap block">
-                {{ case.serial -}}
-                {{ " ({})".format(minute_count) if minute_count > 1 else "" -}}
-              </a>
-              <div class="hidden md:block text-xs text-black text-opacity-50">{{ case.council }}, {{ case.council.municipality }}</div>
-            </td>
-            <td class="md:border px-0 md:px-4 py-2 text-right">
-              <div class="pill pill-big whitespace-no-wrap truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold block"  style="max-width: 128px">
-                {{ case.status.value.label if case.status else "Annað" }}
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        {% endfor %}
-        </tbody>
-      </table>
-
+      {{ case_table(request, cases) }}
     </div>
   </div>
 

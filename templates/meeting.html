@@ -13,7 +13,7 @@
 
   {% call breadcrumbs() %}
   {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-  {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
+  {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
   {{ breadcrumb(None, "Nr. {}".format(meeting.name)) }}
   {% endcall %}
 

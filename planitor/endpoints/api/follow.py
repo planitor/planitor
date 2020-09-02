@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from planitor.database import get_db
@@ -11,10 +11,10 @@ from planitor.crud.follow import (
     delete_address_subscription,
 )
 
-router = APIRouter()
+from . import router
 
 
-@router.post("/cases/{case_id}")
+@router.post("/follow/cases/{case_id}")
 async def follow_case(
     case_id: int,
     db: Session = Depends(get_db),
@@ -27,7 +27,7 @@ async def follow_case(
     return {}
 
 
-@router.delete("/cases/{case_id}")
+@router.delete("/follow/cases/{case_id}")
 async def unfollow_case(
     case_id: int,
     db: Session = Depends(get_db),
@@ -40,7 +40,7 @@ async def unfollow_case(
     return {}
 
 
-@router.post("/addresses/{hnitnum}")
+@router.post("/follow/addresses/{hnitnum}")
 async def follow_address(
     hnitnum: int,
     db: Session = Depends(get_db),
@@ -53,7 +53,7 @@ async def follow_address(
     return {}
 
 
-@router.delete("/addresses/{hnitnum}")
+@router.delete("/follow/addresses/{hnitnum}")
 async def unfollow_address(
     hnitnum: int,
     db: Session = Depends(get_db),

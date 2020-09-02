@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import Depends, Request, Response
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -7,11 +7,12 @@ from planitor.database import get_db
 from planitor import models
 from planitor.schemas.monitor import Subscription, SubscriptionForm
 from planitor.security import get_current_active_user
+from planitor.crud import delete_subscription as crud_delete_subscription
 
-router = APIRouter()
+from . import router
 
 
-@router.get("/me/subscriptions", response_model=List[Subscription])
+@router.get("/subscriptions", response_model=List[Subscription])
 def get_subscriptions(
     request: Request,
     db: Session = Depends(get_db),
@@ -29,12 +30,12 @@ def get_subscriptions(
     return subscriptions
 
 
-@router.post("/me/subscriptions", response_model=Subscription)
+@router.post("/subscriptions", response_model=Subscription)
 def create_subscription():
     return None
 
 
-@router.post("/me/subscriptions/{id}", response_model=Subscription)
+@router.post("/subscriptions/{id}", response_model=Subscription)
 def update_subscription(
     id: int,
     request: Request,
@@ -56,7 +57,7 @@ def update_subscription(
     return subscription
 
 
-@router.delete("/me/subscriptions/{id}")
+@router.delete("/subscriptions/{id}")
 def delete_subscription(
     id: int,
     request: Request,
@@ -66,15 +67,5 @@ def delete_subscription(
     subscription = db.query(models.Subscription).get(id)
     if subscription is None or subscription.user != current_user:
         return HTTPException(404)
-
-    # Set archival values for deliveries and remove subscription foreign key
-    db.query(models.Delivery).filter(models.Delivery.subscription == subscription).update(
-        {
-            models.Delivery.subscription_id: None,
-            models.Delivery.deleted_subscription_id: subscription.id,
-            models.Delivery.deleted_user_id: subscription.user.id,
-        }
-    )
-    db.delete(subscription)
-    db.commit()
+    crud_delete_subscription(db, subscription)
     return Response(None, 204)

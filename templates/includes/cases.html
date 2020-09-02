@@ -1,0 +1,46 @@
+{% macro case_row(request, index, case, year, minute_count) %}
+  {% set url = request.url_for('get_case',
+    muni_slug=case.council.municipality.slug,
+    council_slug=case.council.council_type.value.slug,
+    case_id=case.serial) %}
+  <tr class="{{ 'md:bg-white' if index % 2 != 0 }} leading-relaxed">
+    <td class="md:border pr-2 md:px-4 py-2">
+      <a class="font-bold block" href="{{ url }}">{{ case.headline }}</a>
+      {% if case.address %}
+      <div class="text-xs text-black text-opacity-50">{{ case.address }}</div>
+      {% endif %}
+    </td>
+    <td class="md:border pr-2 md:px-4 py-2 hidden sm:table-cell">
+      <a href="{{ url }}" class="underline whitespace-no-wrap block">
+        {{ case.serial -}}
+        {{ " ({})".format(minute_count) if minute_count > 1 else "" -}}
+      </a>
+      <div class="hidden md:block text-xs text-black text-opacity-50">{{ case.council }}, {{ case.council.municipality }}</div>
+    </td>
+    <td class="md:border px-0 md:px-4 py-2 text-right">
+      <div class="pill pill-big whitespace-no-wrap truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold block"  style="max-width: 128px">
+        {{ case.status.value.label if case.status else "Annað" }}
+      </div>
+    </td>
+  </tr>
+{% endmacro %}
+
+{% macro case_table(request, cases) %}
+  <table class="table-auto min-w-full max-w-full">
+    {% for year, cases in cases|groupby(1)|sort(attribute=0, reverse=True) %} {# because 1 is the tuple index #}
+    <thead>
+      <tr><td colspan=4 class="py-4 sm:pt-8 md:pt-12 font-bold">{{ year|int }}</td></tr>
+      <tr>
+        <th class="px-0 md:px-4 py-2 minilabel text-left">Mál</th>
+        <th class="px-0 md:px-4 py-2 minilabel text-left hidden sm:table-cell"></th>
+        <th class="px-0 md:px-4 py-2 minilabel text-right">Staða</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for case, year, minute_count in cases %}
+      {{ case_row(request, loop.index, case, year, minute_count) }}
+      {% endfor %}
+    </tbody>
+    {% endfor %}
+  </table>
+{% endmacro %}

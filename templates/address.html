@@ -1,25 +1,57 @@
 {% extends "base.html" %}
 
-{% from 'symbols/symbols.html' import house_fill, arrow_up_right_circle_fill %}
-{% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% block title %}{{ address }} — {{ super() }}{% endblock %}
+{% block og_title %}{{ address }} — {{ super() }}{% endblock %}
 
+{% from 'symbols/symbols.html' import arrow_up_right_circle_fill %}
+{% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}
+{% from 'includes/cases.html' import case_table %}
 
 {% block body %}
-  <div class="my-8 mt-4 sm:mt-8">
 
+  <div class="my-8 mt-4 sm:mt-8">
     {% call breadcrumbs() %}
     {{ breadcrumb(None, "Hnitnúmer", dash=False) }}
     {{ breadcrumb(None, address) }}
     {% endcall %}
-
     <div class="flex justify-between items-end">
-      <a class="text-xl font-bold block">{{ address }}</a>
+      <div>
+        <div class="text-xl font-bold">{{ address }}</div>
+        <div>{{ address.postnr }}, {{ address.stadur_nf }}</div>
+      </div>
       <a class="btn block" href="https://skra.is/leit-i-fasteignaskra?streetname={{ address.landnr }}&pos=fp-advanced-search">
         Skrá.is <span class="sf-symbol">{{ arrow_up_right_circle_fill(class="") }}</span>
       </a>
     </div>
   </div>
-  <div class="">
-    Hér koma mál tengd hnitnúmeri (heimilisfangi)
+
+  {% block inner %}
+
+  <div class="flex flex-col">
+    <div class="mb-4">
+      <div
+        class="nearby-map shadow-lg rounded-md overflow-hidden bg-white w-full"
+        data-hnitnum="{{ address.hnitnum }}"
+        data-radius="{{ request.query_params.get('radius', radius) }}"
+        data-days="{{ request.query_params.get('days', days) }}"
+      ></div>
+    </div>
+    <div>
+      <div class="tabs flex flex-row my-2 md:mb-6 lg:mb-8 justify-center text-center w-full text-gray-400 text-sm sm:text-base lg:text-lg">
+        <div class="border-b-2 flex-grow hidden md:flex"></div>
+        <button class="py-4 px-6 sm:px-8 border-b-2 font-bold selected" data-target="content-1">{{ address }}</button>
+        <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-2">Nálæg mál ({{ nearby_cases|length }})</button>
+        <div class="border-b-2 flex-grow"></div>
+      </div>
+      <div id="content-1" class="tabPage block">
+      {{ case_table(request, cases) }}
+      </div>
+      <div id="content-2" class="tabPage hidden">
+      {{ case_table(request, nearby_cases) }}
+      </div>
+    </div>
   </div>
+
+  {% endblock %}
+
 {% endblock body %}
