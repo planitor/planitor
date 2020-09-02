@@ -15,4 +15,6 @@ from .city import (  # noqa
 
 from .monitor import get_or_create_search_subscription, create_delivery  # noqa
 
+from .follow import delete_subscription  # noqa
+
 from .accounts import user  # noqa

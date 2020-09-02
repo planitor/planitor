@@ -33,31 +33,32 @@ export const api = {
     return axios.get("/notendur/logout");
   },
   followCase(id) {
-    return axios.post(`/subscriptions/cases/${id}`, null, authHeaders());
+    return axios.post(`/api/follow/cases/${id}`, null, authHeaders());
   },
   unfollowCase(id) {
-    return axios.delete(`/subscriptions/cases/${id}`, authHeaders());
+    return axios.delete(`/api/follow/cases/${id}`, authHeaders());
   },
   followAddress(hnitnum) {
-    return axios.post(
-      `/subscriptions/addresses/${hnitnum}`,
-      null,
-      authHeaders()
-    );
+    return axios.post(`/api/follow/addresses/${hnitnum}`, null, authHeaders());
   },
   unfollowAddress(hnitnum) {
-    return axios.delete(`/subscriptions/addresses/${hnitnum}`, authHeaders());
+    return axios.delete(`/api/follow/addresses/${hnitnum}`, authHeaders());
   },
   getEntityAddresses(kennitala) {
-    return axios.get(`/entities/${kennitala}/addresses`);
+    return axios.get(`/api/entities/${kennitala}/addresses`);
+  },
+  getNearbyAddresses(hnitnum, radius, days) {
+    return axios.get(
+      `/api/addresses/${hnitnum}/addresses?radius=${radius}&days=${days}`
+    );
   },
   getSubscriptions() {
-    return axios.get("/me/subscriptions", authHeaders());
+    return axios.get("/api/subscriptions", authHeaders());
   },
   updateSubscription(id, data) {
-    return axios.post(`/me/subscriptions/${id}`, data, authHeaders());
+    return axios.post(`/api/subscriptions/${id}`, data, authHeaders());
   },
   deleteSubscription(id) {
-    return axios.delete(`/me/subscriptions/${id}`, authHeaders());
+    return axios.delete(`/api/subscriptions/${id}`, authHeaders());
   },
 };

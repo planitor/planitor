@@ -5,7 +5,7 @@ import { Subscriptions } from "./subscriptions.jsx";
 import { FollowCase, FollowAddress } from "./follow.jsx";
 import { NewPasswordForm } from "./forms/new-password.jsx";
 import { openModal } from "./modals.js";
-import { mapkit, getEntityMapOptions } from "./maps.jsx";
+import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps.jsx";
 
 mapkit.init({
   authorizationCallback: (done) => {
@@ -38,6 +38,12 @@ mapkit.addEventListener("configuration-change", function (event) {
   if (event.status === "Initialized") {
     [...document.querySelectorAll(".entity-map")].forEach(async (el) => {
       const options = await getEntityMapOptions(el.dataset.kennitala);
+      console.log(el, options);
+      if (options) new mapkit.Map(el, options);
+    });
+    [...document.querySelectorAll(".nearby-map")].forEach(async (el) => {
+      const options = await getNearbyMapOptions(el.dataset);
+      console.log(el, options);
       if (options) new mapkit.Map(el, options);
     });
   }
@@ -64,4 +70,22 @@ mapkit.addEventListener("configuration-change", function (event) {
     />,
     button
   );
+});
+
+[...document.querySelectorAll(".tabs")].forEach((tabsEl) => {
+  const pageEls = tabsEl.parentElement.querySelectorAll(".tabPage");
+  const tabEls = tabsEl.querySelectorAll("button");
+  [...tabEls].forEach((tabEl) => {
+    const targetPageEl = document.getElementById(tabEl.dataset.target);
+    tabEl.addEventListener("click", (event) => {
+      pageEls.forEach((pageEl) => {
+        pageEl.classList.add("hidden");
+      });
+      tabEls.forEach((el) => {
+        el.classList.remove("selected");
+      });
+      tabEl.classList.add("selected");
+      targetPageEl.classList.remove("hidden");
+    });
+  });
 });

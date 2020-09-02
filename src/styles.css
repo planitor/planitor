@@ -186,18 +186,26 @@ form input.error {
   display: inline;
 }
 
-.entity-map {
+.entity-map,
+.nearby-map {
   height: 240px;
 }
 
 @screen sm {
-  .entity-map {
+  .entity-map,
+  .nearby-map {
     height: 360px;
   }
 }
 
 @screen lg {
-  .entity-map {
+  .entity-map,
+  .nearby-map {
     height: 480px;
+    @apply max-w-screen-lg m-auto;
   }
+}
+
+.tabs .selected {
+  @apply text-midnight border-midnight;
 }

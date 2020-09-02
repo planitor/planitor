@@ -41,7 +41,7 @@
 {% block breadcrumbs %}
   {% call breadcrumbs() %}
     {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-    {{ breadcrumb(url_for('get_council', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
+    {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
     {{ breadcrumb(url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial), case.serial) }}
     {{ breadcrumb(None, minute.serial, mobile_collapse=True) }}
   {% endcall %}

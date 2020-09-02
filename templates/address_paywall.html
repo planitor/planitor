@@ -1,4 +1,4 @@
-{% extends "company.html" %}
+{% extends "address.html" %}
 
 {% block inner %}
 
@@ -15,19 +15,19 @@
         </g>
       </svg>
     </div>
-    <div class="text-center text-2xl sm:text-3xl md:text-4xl font-black">Fyrirtækjasíður Planitor</div>
+    <div class="text-center text-2xl sm:text-3xl md:text-4xl font-black">Svæðisyfirlit Planitor</div>
     <div class="text-center text-sm sm:text-base">
       <p class="mb-4">
-        Áskrifendur hafa aðgang að samantekt um umfang fyrirtækja og stofnana. Þar má meðal annars finna
-        upplýsingar um aðkomu að verkefnum, yfirlitskort og yfirlit yfir stöðu mála aftur til ársins 2010.
+        Áskrifendur hafa aðgang að samantekt mála fyrir heimilisfang ásamt korti með
+        yfirlitsstöðu mála á tilteknu svæði.
       </p>
       <p class="mb-2 font-bold">
-        Vaktarinn er í boði gegn mánaðargjaldi. Hafðu samband við
+        Hafðu samband við
         <a href="mailto:hallo@planitor.io" class="text-powder">hallo@planitor.io</a>.
       </p>
     </div>
   </div>
-  <div><img src="{{ url_for('static', path='/paywall-entities.png') }}" class="max-w-full" /></div>
+  <div><img src="{{ url_for('static', path='/paywall-address.png') }}" class="max-w-full" /></div>
 </div>
 
 {% endblock inner %}

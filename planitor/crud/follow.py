@@ -1,6 +1,26 @@
 from sqlalchemy.orm import Session
 
-from planitor.models import User, Case, Subscription, SubscriptionTypeEnum, Address
+from planitor.models import (
+    User,
+    Case,
+    Subscription,
+    SubscriptionTypeEnum,
+    Address,
+    Delivery,
+)
+
+
+def delete_subscription(db: Session, subscription: Subscription) -> None:
+    # Set archival values for deliveries and remove subscription foreign key
+    db.query(Delivery).filter(Delivery.subscription == subscription).update(
+        {
+            Delivery.subscription_id: None,
+            Delivery.deleted_subscription_id: subscription.id,
+            Delivery.deleted_user_id: subscription.user.id,
+        }
+    )
+    db.delete(subscription)
+    db.commit()
 
 
 def get_case_subscription(db: Session, user: User, case: Case):
@@ -42,8 +62,7 @@ def delete_case_subscription(db: Session, user: User, case: Case):
     subscription = get_case_subscription(db, user, case)
     if subscription is None:
         return None
-    db.delete(subscription)
-    db.commit()
+    delete_subscription(db, subscription)
 
 
 def create_address_subscription(db: Session, user: User, address: Address):
@@ -61,5 +80,4 @@ def delete_address_subscription(db: Session, user: User, address: Address):
     subscription = get_address_subscription(db, user, address)
     if subscription is None:
         return None
-    db.delete(subscription)
-    db.commit()
+    delete_subscription(db, subscription)

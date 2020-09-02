@@ -1,14 +1,14 @@
+import datetime as dt
+
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import PlainTextResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy import distinct, extract, func
 from sqlalchemy.orm import Session
-from starlette.datastructures import Secret
 from starlette.requests import Request
 
-from planitor import config, hashids
+from planitor import hashids
 from planitor.crud.follow import get_address_subscription, get_case_subscription
 from planitor.database import get_db
-from planitor.mapkit import get_token as mapkit_get_token
 from planitor.meetings import MeetingView
 from planitor.models import (
     Address,
@@ -16,7 +16,6 @@ from planitor.models import (
     CaseEntity,
     Council,
     CouncilTypeEnum,
-    Entity,
     Meeting,
     Minute,
     Municipality,
@@ -25,6 +24,8 @@ from planitor.models import (
 from planitor.search import MinuteResults
 from planitor.security import get_current_active_user_or_none
 from planitor.templates import templates
+
+from .utils import _get_entity
 
 router = APIRouter()
 
@@ -169,16 +170,6 @@ async def get_meeting(
             "user": current_user,
         },
     )
-
-
-@router.get("/s/{muni_slug}/{council_slug}")
-async def get_council(
-    request: Request,
-    muni_slug: str,
-    council_slug: str,
-    db: Session = Depends(get_db),
-):
-    return None
 
 
 @router.get("/s/{muni_slug}/{council_slug}/nr/{case_id}")
@@ -330,48 +321,86 @@ def get_minute(
     )
 
 
-def _get_entity(db: Session, kennitala: str, slug: str = None) -> Entity:
-    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
-    if entity is None or (slug is not None and entity.slug != slug):
-        raise HTTPException(status_code=404, detail="Kennitala fannst ekki")
-    return entity
-
-
-@router.get("/entities/{kennitala}/addresses")
-async def get_entity_addresses(
-    request: Request, kennitala: str, db: Session = Depends(get_db)
+@router.get("/heimilisfang/{hnitnum}")
+async def get_address(
+    request: Request,
+    hnitnum: int,
+    db: Session = Depends(get_db),
+    radius: int = 300,
+    days: int = 365,
+    current_user: User = Depends(get_current_active_user_or_none),
 ):
-    entity = _get_entity(db, kennitala)
 
-    most_recent_addresses = (
-        db.query(Case.address_id, func.max(Case.updated).label("last_updated"))
-        .select_from(Case)
-        .join(CaseEntity)
-        .filter(CaseEntity.entity == entity)
-        .group_by(Case.address_id)
-    )
-    sq = most_recent_addresses.subquery()
+    address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
+    if address is None:
+        return HTTPException(404)
 
-    query = (
-        db.query(Address, Case)
-        .select_from(Address)
-        .join(sq, sq.c.address_id == Address.hnitnum)
-        .join(Case, sq.c.last_updated == Case.updated)
-        .join(CaseEntity)
-        .filter(CaseEntity.entity == entity)
-    )
+    if current_user is None:
+        return templates.TemplateResponse(
+            "address_paywall.html", {"request": request, "address": address}
+        )
 
-    return {
-        "addresses": [
-            dict(
-                lat=address.lat_wgs84,
-                lon=address.long_wgs84,
-                label=str(address),
-                status=case.status,
+    def get_query(filters):
+        sq = (
+            db.query(Case.id, func.count(Minute.id).label("minute_count"))
+            .join(Address)
+            .join(Minute, Case.id == Minute.case_id)
+            .filter(*filters)
+            .group_by(Case.id)
+            .subquery()
+        )
+
+        return (
+            db.query(
+                Case,
+                extract("year", Case.updated),
+                sq.c.minute_count,
             )
-            for address, case in query
-        ]
-    }
+            .select_from(Case)
+            .outerjoin(Address)
+            .filter(*filters)
+            .join(sq, sq.c.id == Case.id)
+            .order_by(Case.updated.desc())
+        )
+
+    cases = get_query((Address.hnitnum == hnitnum,))
+
+    if days < 1:
+        days = 1
+    if days > 365:
+        days = 365
+
+    if radius < 1:
+        radius = 1
+    if radius > 1000:
+        radius = 1000
+
+    dt_days_ago = dt.datetime.utcnow() - dt.timedelta(days=days)
+
+    nearby_cases = get_query(
+        (
+            func.earth_distance(
+                func.ll_to_earth(address.lat_wgs84, address.long_wgs84),
+                func.ll_to_earth(Address.lat_wgs84, Address.long_wgs84),
+            )
+            < radius,
+            Case.updated > dt_days_ago,
+            Address.hnitnum != hnitnum,
+        )
+    )
+
+    return templates.TemplateResponse(
+        "address.html",
+        {
+            "address": address,
+            "cases": cases.all(),
+            "nearby_cases": nearby_cases.limit(100).all(),
+            "request": request,
+            "user": current_user,
+            "radius": radius,
+            "days": days,
+        },
+    )
 
 
 @router.get("/f/{kennitala}")
@@ -405,7 +434,6 @@ async def get_company(
     cases = (
         db.query(
             Case,
-            CaseEntity.applicant,
             extract("year", Case.updated),
             sq_count.c.minute_count,
         )
@@ -432,26 +460,6 @@ async def get_person(
     current_user: User = Depends(get_current_active_user_or_none),
 ):
     return await get_company(request, kennitala, slug, db, current_user)
-
-
-@router.get("/mapkit-token")
-async def mapkit_token(request: Request):
-    return PlainTextResponse(mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret)))
-
-
-@router.get("/hnit/{hnitnum}")
-async def get_address(
-    request: Request,
-    hnitnum: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user_or_none),
-):
-    address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
-    if address is None:
-        return HTTPException(404)
-    return templates.TemplateResponse(
-        "address.html", {"address": address, "request": request, "user": current_user}
-    )
 
 
 @router.get("/minutes/{id}")
