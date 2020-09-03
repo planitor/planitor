@@ -201,6 +201,7 @@
               {% set case_count = (related_cases.count() if related_cases else 0) %}
               {% if case_count %}
               <div class="mt-4">{{ get_cases(related_cases, case_count) }}</div>
+              {% endif %}
               <div class="text-xs font-thin tracking-tight mt-4">
                 Landnúmer: {{ case.iceaddr.landnr }}
                 {% if case.iceaddr %}
@@ -213,7 +214,6 @@
                 <br>
                 Hnitnúmer: {{ case.iceaddr.hnitnum }}
               </div>
-              {% endif %}
             {% endif %}
             </div>
           {% endif %}

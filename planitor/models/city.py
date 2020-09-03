@@ -164,7 +164,9 @@ class Address(Base):
         if self.heiti_nf is None:
             return "<Unknown>"
         address = self.heiti_nf
-        if self.husnr:
+        if self.vidsk:
+            address = f"{address} {self.vidsk}"
+        elif self.husnr:
             address = f"{address} {self.husnr}{self.bokst}"
         return address
 
@@ -345,7 +347,7 @@ class Case(Base):
 
 
 class EntityMention(object):
-    """ Used to mark parsed company names inside the inquiry text property. Very
+    """Used to mark parsed company names inside the inquiry text property. Very
     expensive to calculate on the fly, so we store it here.
 
     """
@@ -432,8 +434,7 @@ class Minute(Base):
                 self.entity_mentions.append((kennitala, start, end))
 
     def get_inquiry_mention_tokens(self):
-        """ Use `entity_mentions` to mark linkable locations in the `inquiry` text
-        """
+        """Use `entity_mentions` to mark linkable locations in the `inquiry` text"""
         s = self.inquiry
         if self.entity_mentions is None:
             entity_mentions = []
