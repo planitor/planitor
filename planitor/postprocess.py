@@ -41,7 +41,7 @@ def _get_entity(db: Session, name: str):
 
 def update_minute_with_entity_relations(db: Session, minute: Minute, entity_items: list):
     """Here we have kennitala and name, whereas in `update_minute_with_entity_mentions`
-    we only have the names. """
+    we only have the names."""
 
     case = minute.case
 
@@ -147,6 +147,7 @@ def update_minute_with_response_items(
 def _update_minute_search_vector(minute, db):
     lemmas = get_minute_lemmas(minute)
     minute.search_vector = func.to_tsvector("simple", " ".join(lemmas))
+    minute.lemmas = ", ".join(lemmas)
     db.add(minute)
 
 

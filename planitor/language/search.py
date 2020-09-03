@@ -84,6 +84,7 @@ def get_lemma_terminals(terminals, ignore=None) -> List[str]:
             "talameðbókstaf",
             "tala",
             "fyrirtæki",
+            "sérnafn",
             "mælieining",
             "dagsafs",
             "dagsföst",
@@ -125,7 +126,7 @@ def get_wordbase(word) -> Optional[str]:
 
 
 def with_wordbases(lemmas) -> Iterable[str]:
-    """ If word is a compound word, Greynir adds a dash. In this case, yield the base of
+    """If word is a compound word, Greynir adds a dash. In this case, yield the base of
     the word like "skemmdir" in "raka-skemmdir", along with the compound word without
     the dash.
     """
@@ -161,7 +162,7 @@ def get_wordforms(bindb, term) -> Set[str]:
 
 
 def lemmatize_query(search_query) -> str:
-    """ We need to alter the query to get around a few limitations of the Postgres simple
+    """We need to alter the query to get around a few limitations of the Postgres simple
     dictionary and the way things are indexed. Read the inline comments for a step by
     step explanation.
 

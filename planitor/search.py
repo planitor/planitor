@@ -4,7 +4,7 @@ from typing import Set, Generator
 
 from jinja2 import Markup
 from reynir.bindb import BIN_Db
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, contains_eager
 from iceaddr import iceaddr_suggest
 
@@ -13,15 +13,15 @@ from planitor.models import Minute, Case, Meeting, Council
 
 
 def get_tsquery(search_query):
-    """ People frequently compose search queries with plural form, for example
+    """People frequently compose search queries with plural form, for example
     "bílakjallarar" or use non-nominative inclensions. It’s important to depluralize
-    this. The `parse_lemmas` achieves this for us. """
+    this. The `parse_lemmas` achieves this for us."""
     return func.websearch_to_tsquery("simple", lemmatize_query(search_query))
 
 
 def get_terms_from_query(tsquerytree: str):
-    """ querytree in Postgres takes a tsquery and strips negated terms and stopwords.
-    This returns the terms considered, stripped of the boolean logic tokens. """
+    """querytree in Postgres takes a tsquery and strips negated terms and stopwords.
+    This returns the terms considered, stripped of the boolean logic tokens."""
 
     # split on <->, | and & characters
     quoted_terms = re.split(r" <\d+> | <-> | \| | & ", tsquerytree)
@@ -37,7 +37,7 @@ HIGHLIGHT_RANGE = 30
 def iter_preview_fragments(
     document: str, highlight_terms: Set[str], max_fragments: int = 3
 ) -> Generator[Markup, None, None]:
-    """ Find segments within a document where instances of terms appear. Used to display
+    """Find segments within a document where instances of terms appear. Used to display
     segments of meeting minutes in search results (like google does where matched search
     terms) are bolded. Uses Jinja Markup and adds the <em> tag around matched terms.
     Also add ellipses.
@@ -127,7 +127,7 @@ class Pagination:
         self.query = query.offset(self.PER_PAGE * (number - 1)).limit(self.PER_PAGE)
 
     def get_page_segments(self):
-        """ Always show first three pages and last three pages.
+        """Always show first three pages and last three pages.
         This is to render something like this: 1, 2, 3 ... 65 _66_ 67 ... 111, 112, 113
         """
         head = self.pages[0 : min(self.NAV_SEGMENT_SIZE, len(self.pages))]
@@ -149,7 +149,7 @@ class Pagination:
 
 
 class MinuteResults:
-    """ Queries are human formed strings. Before we hand off to Postgres
+    """Queries are human formed strings. Before we hand off to Postgres
     websearch_to_tsquery we lemmatize each word as people frequently search for things
     like "Brautarholti" og "bílakjallarar" which is not the nominative inflection and
     not singular. In the index we lemmatize so let’s try to use lemmas when searching.
@@ -176,12 +176,13 @@ class MinuteResults:
             address["hnitnum"] for address in iceaddr_suggest(self.search_query)[:3]
         ]
 
-        filters = [Minute.search_vector.op("@@")(tsquery)]
+        filter_ = Minute.search_vector.op("@@")(tsquery)
         if hnitnums:
-            filters.append(Case.address_id.in_(hnitnums))
+            filter_ = or_(filter_, Case.address_id.in_(hnitnums))
         order_bys = [Meeting.start.desc()]
         if hnitnums:
-            order_bys.insert(0, Case.address_id.in_(hnitnums))
+            # order_bys.insert(0, Case.address_id.in_(hnitnums))
+            pass
 
         return (
             (
@@ -196,18 +197,18 @@ class MinuteResults:
                     .contains_eager(Council.municipality),
                     contains_eager(Minute.case),
                 )
-                .filter(*filters)
+                .filter(filter_)
                 .order_by(
                     *order_bys
                 )  # Relavance ranking is `func.ts_rank(tsvector, tsquery)`
             ),
-            (self.db.query(func.count(Minute.id)).join(Case).filter(*filters)),
+            (self.db.query(func.count(Minute.id)).join(Case).filter(filter_)),
         )
 
     def get_highlight_terms(self) -> Set[str]:
-        """ Return the query and ask Postgres what terms were indexed in the query,
+        """Return the query and ask Postgres what terms were indexed in the query,
         which will be used for highlighting. We ask the Postgres querytree because it
-        cleans up a lot of things, removes negated terms, lowercases and more. """
+        cleans up a lot of things, removes negated terms, lowercases and more."""
 
         index_terms = get_terms_from_query(
             self.db.query(func.querytree(get_tsquery(self.search_query))).scalar()

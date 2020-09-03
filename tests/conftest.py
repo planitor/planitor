@@ -64,7 +64,30 @@ def _c(db, obj):
 def address_fixture(db):
     from planitor.models import Address
 
-    address = _c(db, Address(hnitnum=1))
+    address = _c(
+        db,
+        Address(
+            bokst="R",
+            byggd=1,
+            heiti_nf="Laugavegur",
+            heiti_tgf="Laugavegi",
+            hnitnum=10018261,
+            husnr=151,
+            landnr=102866,
+            lat_wgs84=64.1432378243864,
+            long_wgs84=-21.9093419518678,
+            lysing="Hlíðar",
+            postnr=105,
+            serheiti="",
+            stadur_nf="Reykjavík",
+            stadur_tgf="Reykjavík",
+            svaedi_nf="Höfuðborgarsvæðið",
+            svaedi_tgf="Höfuðborgarsvæðinu",
+            svfnr=0,
+            tegund="Þéttbýli",
+            vidsk="151-155",
+        ),
+    )
     return address
 
 
