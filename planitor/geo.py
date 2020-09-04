@@ -1,6 +1,8 @@
+from typing import Tuple, List, Optional
 import re
 
-import iceaddr
+from iceaddr.addresses import _run_addr_query, _capitalize_first_char
+from iceaddr.postcodes import postcodes_for_placename
 
 
 def get_housenumber(string):
@@ -13,7 +15,10 @@ def get_housenumber(string):
     return int(match.group(1)), match.group(2)
 
 
-def get_address_lookup_params(address):
+def get_address_lookup_params(address) -> Tuple[str, Optional[int], Optional[str]]:
+
+    if "/" in address:
+        address, _ = address.split("/", 1)
 
     # Fix broken HTML in Reykjavík Lotus Notes
     if '">' in address:
@@ -36,6 +41,7 @@ def get_address_lookup_params(address):
     match = re.search(r" (\d[\w-]*)$", address)
     if match:
         number, letter = get_housenumber(match.group(1))
+        number = int(number)
     else:
         number, letter = (None, None)
 
@@ -45,16 +51,57 @@ def get_address_lookup_params(address):
     except ValueError:
         pass
 
-    return address, number, letter
+    return address, number, letter or None
 
 
-def lookup_address(address, number, letter, placename):
-    match = iceaddr.iceaddr_lookup(
-        address, number=number, letter=letter, placename=placename
+def iceaddr_lookup(
+    street_name, number=None, letter=None, postcode=None, placename=None, limit=50
+) -> List[dict]:
+    """ Look up all addresses matching criterion """
+    street_name = _capitalize_first_char(street_name.strip())
+
+    pc = [postcode] if postcode else []
+
+    # Look up postcodes for placename if no postcode is provided
+    if placename and not postcode:
+        pc = postcodes_for_placename(placename.strip())
+
+    query = "SELECT * FROM stadfong WHERE"
+    name_fields = ["heiti_nf=?", "heiti_tgf=?"]
+    if not number:
+        # Add lookup for churches and places of interest like Harpa
+        name_fields.append("serheiti=?")
+    query += "({})".format(" OR ".join(name_fields))
+    args = [street_name] * len(name_fields)
+
+    if number:
+        query += " AND (husnr=? OR substr(vidsk, 0, instr(vidsk, '-')) = ?)"
+        args.extend((number, str(number)))
+        if letter:
+            query += " AND bokst LIKE ? COLLATE NOCASE"
+            args.append(letter)
+    else:
+        query += " AND (serheiti != '' OR (husnr is null AND vidsk = ''))"
+
+    if pc:
+        qp = " OR ".join([" postnr=?" for p in pc])
+        args.extend(pc)
+        query += " AND (%s) " % qp
+
+    # Ordering by postcode may in fact be a reasonable proxy
+    # for delivering by order of match likelihood since the
+    # lowest postcodes are generally more densely populated
+    query += " ORDER BY vidsk != '', postnr ASC, husnr ASC, bokst ASC LIMIT ?"
+    args.append(limit)
+
+    return _run_addr_query(query, args)
+
+
+def lookup_address(
+    address: str, number: Optional[int], letter: Optional[str], placename: str
+) -> Optional[dict]:
+    match = iceaddr_lookup(
+        address, number=number, letter=letter, placename=placename, limit=1
     )
     if match:
         return match[0]
-    else:
-        match = iceaddr.iceaddr_suggest(f"{address}, {placename}")
-        if match:
-            return match[0]
