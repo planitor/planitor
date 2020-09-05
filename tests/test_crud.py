@@ -16,7 +16,7 @@ def test_lookup_in_entities(db):
     assert lookup_icelandic_company_in_entities(db, name).first() == entity
 
 
-def tests_geo(db, case):
+def test_geo(db, case):
     geoname = Geoname(osm_id=1, name="Barmahlíð", city="Reykjavík")
     db.add(geoname)
     db.commit()

@@ -170,13 +170,17 @@ class Address(Base):
             address = f"{address} {self.husnr}{self.bokst}"
         return address
 
-    def __str__(self):
+    @property
+    def name(self):
         if self.serheiti:
             address = self.serheiti
             if self.address:
-                address = f"{address} ({self.address})"
+                address = f"{self.serheiti} ({self.address})"
             return address
-        return self.address or "<Unknown>"
+        return self.address
+
+    def __str__(self):
+        return self.name or "<Unknown>"
 
     def get_coordinates(self):
         return self.lat_wgs84, self.long_wgs84

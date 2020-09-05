@@ -20,7 +20,7 @@ class Entity(BaseModel):
 
 class Address(BaseModel):
     hnitnum: int
-    name: str
+    name: str = "<Unknown>"
 
     class Config:
         orm_mode = True
