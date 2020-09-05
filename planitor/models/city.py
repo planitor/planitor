@@ -160,9 +160,9 @@ class Address(Base):
     vidsk = Column(String)
 
     @property
-    def name(self):
+    def address(self):
         if self.heiti_nf is None:
-            return "<Unknown>"
+            return None
         address = self.heiti_nf
         if self.vidsk:
             address = f"{address} {self.vidsk}"
@@ -171,7 +171,12 @@ class Address(Base):
         return address
 
     def __str__(self):
-        return self.name
+        if self.serheiti:
+            address = self.serheiti
+            if self.address:
+                address = f"{address} ({self.address})"
+            return address
+        return self.address or "<Unknown>"
 
     def get_coordinates(self):
         return self.lat_wgs84, self.long_wgs84

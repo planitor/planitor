@@ -195,30 +195,33 @@ ADDRESS_KEYS = [
 ]
 
 
-def get_or_create_address(db, iceaddr_match):
+def get_or_create_address(db: Session, iceaddr_match) -> Tuple[Address, bool]:
     address = db.query(Address).get(iceaddr_match["hnitnum"])
+    created = False
     if address is None:
         address = Address(**{k: v for k, v in iceaddr_match.items() if k in ADDRESS_KEYS})
         db.add(address)
-        db.commit()
-    return address
+        created = True
+    return address, created
 
 
-def get_geoname_and_housenumber(db, street, number, letter, city):
+def get_geoname_and_housenumber(
+    db: Session, street: str, number, letter, city
+) -> Tuple[Optional[Geoname], Optional[Housenumber]]:
 
-    street = (
+    street_db = (
         db.query(Geoname)
         .filter_by(name=street, city=city)
         .order_by(Geoname.importance)
         .first()
     )
 
-    if street is None:
+    if street_db is None:
         return None, None
 
     housenumber = (
         db.query(Housenumber)
-        .filter(Housenumber.street == street)
+        .filter(Housenumber.street == street_db)
         .filter(
             (Housenumber.housenumber == f"{number}{letter}")
             | (Housenumber.housenumber == str(number))
@@ -226,11 +229,11 @@ def get_geoname_and_housenumber(db, street, number, letter, city):
         .first()
     )
 
-    return street, housenumber
+    return street_db, housenumber
 
 
-def update_case_address(db, case):
-    """ Update the iceaddr, geoname and housenumber attributes. There is significant
+def update_case_address(db: Session, case: Case) -> None:
+    """Update the iceaddr, geoname and housenumber attributes. There is significant
     overlaps between iceaddr and geoname functionality but good to have both.
 
     """
@@ -239,7 +242,8 @@ def update_case_address(db, case):
 
     iceaddr_match = lookup_address(street, number, letter, city)
     if iceaddr_match:
-        address = get_or_create_address(db, iceaddr_match)
+        address, _ = get_or_create_address(db, iceaddr_match)
+        db.commit()
         case.iceaddr = address
 
     geoname, housenumber = get_geoname_and_housenumber(db, street, number, letter, city)
@@ -249,8 +253,8 @@ def update_case_address(db, case):
     db.commit()
 
 
-def update_case_status(db, case):
-    """ Query minutes in chronological meeting order, the last minute status will
+def update_case_status(db: Session, case: Case):
+    """Query minutes in chronological meeting order, the last minute status will
     become the case status.
 
     """
@@ -272,7 +276,8 @@ def update_case_status(db, case):
 def lookup_icelandic_company_in_entities(db, name):
     name = clean_company_name(name).lower()
     return db.query(Entity).filter(
-        Entity.entity_type == EntityTypeEnum.company, func.lower(Entity.name) == name,
+        Entity.entity_type == EntityTypeEnum.company,
+        func.lower(Entity.name) == name,
     )
 
 
@@ -280,7 +285,7 @@ MAX_LEVENSHTEIN_DISTANCE = 5
 
 
 def levenshtein_company_lookup(db, name, max_distance=MAX_LEVENSHTEIN_DISTANCE):
-    """ As described above, we may encounter similar looking inflections of company
+    """As described above, we may encounter similar looking inflections of company
     names. Instead of tokenizing and lemming words (which we could ...) we just use a
     simple Levenshtein distance calculation. This will also be useful for search.
 
