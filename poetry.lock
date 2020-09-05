@@ -486,13 +486,13 @@ description = ""
 name = "iceaddr"
 optional = false
 python-versions = "*"
-version = "0.4.0"
+version = "0.5.0"
 
 [package.extras]
-dev = ["pytest", "humanize"]
+dev = ["pytest", "humanize", "fiona"]
 
 [package.source]
-reference = "bcecad3e475cc5fe35b66a88a0b861d5a70e6cd2"
+reference = "6c060b18432f7ca12e30af965cae8b9c6ad1b135"
 type = "git"
 url = "https://github.com/jokull/iceaddr.git"
 [[package]]
@@ -1627,7 +1627,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "e112876b3b39f869804f14c2192dda114e81908a17fefa5009e8f433e16ae695"
+content-hash = "ba2e9f4b11abb74ce95573d92f1103c99578fe2f834a760fb3fac3bbdb57078c"
 lock-version = "1.1"
 python-versions = "^3.7"
 

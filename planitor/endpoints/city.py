@@ -321,7 +321,7 @@ def get_minute(
     )
 
 
-@router.get("/heimilisfang/{hnitnum}")
+@router.get("/heimilisfong/{hnitnum}")
 async def get_address(
     request: Request,
     hnitnum: int,

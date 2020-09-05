@@ -1,7 +1,7 @@
 from typing import Tuple, List, Optional
 import re
 
-from iceaddr.addresses import _run_addr_query, _capitalize_first_char
+from iceaddr.addresses import _run_addr_query, _cap_first
 from iceaddr.postcodes import postcodes_for_placename
 
 
@@ -58,7 +58,7 @@ def iceaddr_lookup(
     street_name, number=None, letter=None, postcode=None, placename=None, limit=50
 ) -> List[dict]:
     """ Look up all addresses matching criterion """
-    street_name = _capitalize_first_char(street_name.strip())
+    street_name = _cap_first(street_name.strip())
 
     pc = [postcode] if postcode else []
 
@@ -81,6 +81,8 @@ def iceaddr_lookup(
             query += " AND bokst LIKE ? COLLATE NOCASE"
             args.append(letter)
     else:
+        # If looking for streets only, and not place of interest, ensure
+        # there are not filled husnr
         query += " AND (serheiti != '' OR (husnr is null AND vidsk = ''))"
 
     if pc:

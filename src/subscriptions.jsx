@@ -44,7 +44,7 @@ const Search = ({ search_query }) => {
 };
 
 const Address = ({ name, hnitnum, radius, onChangeRadius }) => {
-  return <a href={`/hnit/${hnitnum}`}>{name}</a>;
+  return <a href={`/heimilisfong/${hnitnum}`}>{name}</a>;
 };
 
 const Entity = ({ kennitala, name }) => {

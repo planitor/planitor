@@ -25,7 +25,7 @@ fastapi = "^0.61.0"
 psycopg2 = "^2.8.5"
 redis = "^3.5.3"
 dramatiq = "^1.9.0"
-iceaddr = { git = "https://github.com/jokull/iceaddr.git" }
+iceaddr = {git = "https://github.com/jokull/iceaddr.git", rev = "master"}
 tokenizer = "^2.0.6"
 sentry-dramatiq = "^0.3.2"
 html5lib = "^1.1"
