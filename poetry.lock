@@ -492,7 +492,7 @@ version = "0.5.0"
 dev = ["pytest", "humanize", "fiona"]
 
 [package.source]
-reference = "6c060b18432f7ca12e30af965cae8b9c6ad1b135"
+reference = "f490eabd00567e9a41bd4b95839c6da796c0a0a1"
 type = "git"
 url = "https://github.com/jokull/iceaddr.git"
 [[package]]
@@ -1627,7 +1627,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "ba2e9f4b11abb74ce95573d92f1103c99578fe2f834a760fb3fac3bbdb57078c"
+content-hash = "d6c618bd03a8de145c4195fd4b19909aaa574ed60c9d82245648878d7e4fa532"
 lock-version = "1.1"
 python-versions = "^3.7"
 

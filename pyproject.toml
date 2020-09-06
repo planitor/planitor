@@ -25,7 +25,6 @@ fastapi = "^0.61.0"
 psycopg2 = "^2.8.5"
 redis = "^3.5.3"
 dramatiq = "^1.9.0"
-iceaddr = {git = "https://github.com/jokull/iceaddr.git", rev = "master"}
 tokenizer = "^2.0.6"
 sentry-dramatiq = "^0.3.2"
 html5lib = "^1.1"
@@ -33,6 +32,7 @@ migra = "^1.0.1592301305"
 boto3 = "^1.14.17"
 imgix = "^3.2.1"
 reynir = "^2.5.0"
+iceaddr = {git = "https://github.com/jokull/iceaddr.git", rev = "f490eab"}
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"

@@ -1,8 +1,8 @@
-from typing import Tuple, List, Optional
+from typing import Tuple, Optional
 import re
 
-from iceaddr.addresses import _run_addr_query, _cap_first
-from iceaddr.postcodes import postcodes_for_placename
+from iceaddr import iceaddr_lookup
+from iceaddr.addresses import _cap_first
 
 
 def get_housenumber(string):
@@ -54,56 +54,17 @@ def get_address_lookup_params(address) -> Tuple[str, Optional[int], Optional[str
     return address, number, letter or None
 
 
-def iceaddr_lookup(
-    street_name, number=None, letter=None, postcode=None, placename=None, limit=50
-) -> List[dict]:
-    """ Look up all addresses matching criterion """
-    street_name = _cap_first(street_name.strip())
-
-    pc = [postcode] if postcode else []
-
-    # Look up postcodes for placename if no postcode is provided
-    if placename and not postcode:
-        pc = postcodes_for_placename(placename.strip())
-
-    query = "SELECT * FROM stadfong WHERE"
-    name_fields = ["heiti_nf=?", "heiti_tgf=?"]
-    if not number:
-        # Add lookup for churches and places of interest like Harpa
-        name_fields.append("serheiti=?")
-    query += "({})".format(" OR ".join(name_fields))
-    args = [street_name] * len(name_fields)
-
-    if number:
-        query += " AND (husnr=? OR substr(vidsk, 0, instr(vidsk, '-')) = ?)"
-        args.extend((number, str(number)))
-        if letter:
-            query += " AND bokst LIKE ? COLLATE NOCASE"
-            args.append(letter)
-    else:
-        # If looking for streets only, and not place of interest, ensure
-        # there are not filled husnr
-        query += " AND (serheiti != '' OR (husnr is null AND vidsk = ''))"
-
-    if pc:
-        qp = " OR ".join([" postnr=?" for p in pc])
-        args.extend(pc)
-        query += " AND (%s) " % qp
-
-    # Ordering by postcode may in fact be a reasonable proxy
-    # for delivering by order of match likelihood since the
-    # lowest postcodes are generally more densely populated
-    query += " ORDER BY vidsk != '', postnr ASC, husnr ASC, bokst ASC LIMIT ?"
-    args.append(limit)
-
-    return _run_addr_query(query, args)
-
-
 def lookup_address(
     address: str, number: Optional[int], letter: Optional[str], placename: str
 ) -> Optional[dict]:
+    address = _cap_first(address.strip())
     match = iceaddr_lookup(
         address, number=number, letter=letter, placename=placename, limit=1
     )
     if match:
+        addr = match[0]
+        if number is None and addr["husnr"] and addr["serheiti"] != address:
+            # Do not match street name lookups without number unless the match was
+            # because of a serheiti lookup like "Harpa"
+            return None
         return match[0]
