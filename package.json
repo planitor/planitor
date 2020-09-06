@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "snowpack dev",
-    "build": "rm dist/* && NODE_ENV=production yarn run rollup -c"
+    "build": "rm -rf dist && mkdir dist && NODE_ENV=production yarn run rollup -c"
   },
   "browserslist": [
     "last 1 version or > 1%",
