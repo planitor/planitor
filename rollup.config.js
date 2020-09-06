@@ -32,8 +32,8 @@ export default {
     resolve({ browser: true }),
     commonjs(),
     replace({
-      __version__: process.env.VERSION,
-      __sentryDsn__: process.env.SENTRY_DSN,
+      __version__: JSON.stringify(process.env.VERSION),
+      __sentryDsn__: JSON.stringify(process.env.SENTRY_DSN),
     }),
   ],
 };
