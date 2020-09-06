@@ -16,6 +16,7 @@ from jwt.exceptions import InvalidTokenError, PyJWTError
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
+from sentry_sdk import configure_scope, capture_exception
 
 from planitor import config, crud, ENV
 from planitor.database import get_db
@@ -87,7 +88,13 @@ def get_current_user(db: Session = Depends(get_db), token: str = Security(auth))
     user = crud.user.get(db, id=payload["user_id"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+    with configure_scope() as scope:
+        scope.user = {"id": user.id, "email": user.email}
+        try:
+            yield user
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
 def get_current_active_user(current_user: User = Security(get_current_user)):

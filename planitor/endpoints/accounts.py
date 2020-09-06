@@ -37,6 +37,14 @@ def read_user_me(
     return current_user
 
 
+@router.get("/me/_error", response_model=User)
+def get_user_error(
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_active_user),
+):
+    1 / 0
+
+
 @router.get("/stillingar")
 def get_account(
     request: Request,
@@ -44,7 +52,8 @@ def get_account(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     return templates.TemplateResponse(
-        "account.html", {"request": request, "user": current_user},
+        "account.html",
+        {"request": request, "user": current_user},
     )
 
 
@@ -86,7 +95,8 @@ def recover_password(request: Request, email: str, db: Session = Depends(get_db)
 
     if not user:
         raise HTTPException(
-            status_code=404, detail="Netfang fannst ekki.",
+            status_code=404,
+            detail="Netfang fannst ekki.",
         )
     password_reset_token = generate_password_reset_token(email=email).decode()
     reset_url = request.url_for("reset_password")
@@ -115,7 +125,8 @@ def reset_password(
     user = crud.user.get_by_email(db, email=email)
     if not user:
         raise HTTPException(
-            status_code=404, detail="Netfang fannst ekki.",
+            status_code=404,
+            detail="Netfang fannst ekki.",
         )
     elif not crud.user.is_active(user):
         raise HTTPException(
