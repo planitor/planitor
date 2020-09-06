@@ -38,12 +38,10 @@ mapkit.addEventListener("configuration-change", function (event) {
   if (event.status === "Initialized") {
     [...document.querySelectorAll(".entity-map")].forEach(async (el) => {
       const options = await getEntityMapOptions(el.dataset.kennitala);
-      console.log(el, options);
       if (options) new mapkit.Map(el, options);
     });
     [...document.querySelectorAll(".nearby-map")].forEach(async (el) => {
       const options = await getNearbyMapOptions(el.dataset);
-      console.log(el, options);
       if (options) new mapkit.Map(el, options);
     });
   }
