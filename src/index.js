@@ -5,7 +5,6 @@ if (typeof __sentryDsn__ !== "undefined") {
     dsn: __sentryDsn__,
     release: __version__ || null,
   });
-  unhandledException();
 }
 
 import "lazysizes";
