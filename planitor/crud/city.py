@@ -2,7 +2,7 @@ from typing import Tuple, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from iceaddr import iceaddr_suggest
+from iceaddr import iceaddr_suggest, iceaddr_lookup
 from iceaddr.addresses import _run_addr_query
 
 from planitor.cases import get_case_status_from_remarks
@@ -207,9 +207,7 @@ def get_address(hnitnum: int) -> Optional[Address]:
 
 
 def init_address(address):
-    return Address(
-        **{k: v for k, v in address.items() if k not in ("x_isn93", "y_isn93")}
-    )
+    return Address(**{k: v for k, v in address.items() if k in ADDRESS_KEYS})
 
 
 def get_and_init_address(hnitnum: int) -> Optional[Address]:
@@ -228,7 +226,11 @@ def search_addresses(q):
     q = Address(heiti_nf=street, husnr=number, bokst=letter or "").address
     if placename:
         q = f"{q}, {placename}"
-    return [init_address(m) for m in iceaddr_suggest(q, limit=200)]
+    matches = iceaddr_suggest(q, limit=200)
+    lookup_match = iceaddr_lookup(q)
+    if lookup_match and lookup_match[0] not in matches:
+        matches.insert(1, lookup_match[0])
+    return [init_address(m) for m in matches]
 
 
 def get_or_create_address(
