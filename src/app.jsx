@@ -62,7 +62,7 @@ mapkit.addEventListener("configuration-change", function (event) {
 
 [...document.querySelectorAll(".follow-address")].forEach((button) => {
   render(
-    <FollowAddress id={button.dataset.hnitnum} state={button.dataset.state} />,
+    <FollowAddress id={button.dataset.id} state={button.dataset.state} />,
     button
   );
 });

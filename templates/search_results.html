@@ -14,13 +14,38 @@
     {{ breadcrumb(None, q) }}
     {% endcall %}
 
+    {% if iceaddr_matches %}
+      <div class="mb-6 text-sm">
+      {% for placename, addresses in iceaddr_matches|groupby("stadur_nf") %}
+        <div class="mb-2">
+          <div class="inline font-bold">{{ placename }}:</div>
+          <ul class="inline">
+          {% for address in addresses %}
+            <li class="inline">
+              <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-midnight">
+                {% if loop.previtem and loop.previtem.heiti_nf == address.heiti_nf -%}
+                {{ address.vidsk if ('-' in address.vidsk) else "{}{}".format(address.husnr, address.bokst) -}}
+                {% else -%}
+                {{ address -}}
+                {% endif -%}
+                {{ "," if not loop.last }}
+              </a>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+
     <div class="flex justify-between items-end mb-4">
       <span class="font-bold">{{ results.page.count if results else 0 }} leitarniðurstöður</span>
     </div>
 
     <div class="results">
+
     {% if results == None %}
-      <h5 class="font-medium text-xs text-gray-700">Engar niðurstöður fundust</h5>
+      <h5 class="font-medium text-xs text-gray-700">Engar bókanir fundust</h5>
     {% else %}
       {% for minute, previews in results %}
       <a

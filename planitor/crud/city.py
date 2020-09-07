@@ -2,6 +2,8 @@ from typing import Tuple, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from iceaddr import iceaddr_suggest
+from iceaddr.addresses import _run_addr_query
 
 from planitor.cases import get_case_status_from_remarks
 from planitor.language.companies import clean_company_name
@@ -195,7 +197,44 @@ ADDRESS_KEYS = [
 ]
 
 
-def get_or_create_address(db: Session, iceaddr_match) -> Tuple[Address, bool]:
+def get_address(hnitnum: int) -> Optional[Address]:
+    iceaddr_matches = _run_addr_query(
+        "SELECT * FROM stadfong WHERE hnitnum=?;", (hnitnum,)
+    )
+    if not iceaddr_matches:
+        return None
+    return iceaddr_matches[0]
+
+
+def init_address(address):
+    return Address(
+        **{k: v for k, v in address.items() if k not in ("x_isn93", "y_isn93")}
+    )
+
+
+def get_and_init_address(hnitnum: int) -> Optional[Address]:
+    address = get_address(hnitnum)
+    if address is None:
+        return None
+    return init_address(address)
+
+
+def search_addresses(q):
+    if ", " in q:
+        q, placename = q.split(", ", 1)
+    else:
+        placename = None
+    street, number, letter = get_address_lookup_params(q)
+    q = Address(heiti_nf=street, husnr=number, bokst=letter or "").address
+    if placename:
+        q = f"{q}, {placename}"
+    return [init_address(m) for m in iceaddr_suggest(q, limit=200)]
+
+
+def get_or_create_address(
+    db: Session,
+    iceaddr_match: dict,
+) -> Tuple[Address, bool]:
     address = db.query(Address).get(iceaddr_match["hnitnum"])
     created = False
     if address is None:

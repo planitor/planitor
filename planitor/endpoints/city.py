@@ -7,10 +7,11 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request
 
 from planitor import hashids
+from planitor.crud.city import get_and_init_address, search_addresses
 from planitor.crud.follow import (
     get_address_subscription,
-    get_entity_subscription,
     get_case_subscription,
+    get_entity_subscription,
 )
 from planitor.database import get_db
 from planitor.meetings import MeetingView
@@ -47,9 +48,17 @@ async def get_search(
     else:
         results = None
 
+    iceaddr_matches = search_addresses(q)
+
     return templates.TemplateResponse(
         "search_results.html",
-        {"request": request, "q": q, "user": current_user, "results": results},
+        {
+            "request": request,
+            "q": q,
+            "user": current_user,
+            "results": results,
+            "iceaddr_matches": iceaddr_matches,
+        },
     )
 
 
@@ -335,9 +344,14 @@ async def get_address(
     current_user: User = Depends(get_current_active_user_or_none),
 ):
 
-    address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
-    if address is None:
+    address = get_and_init_address(hnitnum)
+    if not address:
         return HTTPException(404)
+
+    _db_address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
+
+    if _db_address is not None:
+        address = _db_address
 
     if current_user is None:
         return templates.TemplateResponse(

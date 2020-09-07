@@ -1,11 +1,12 @@
-from fastapi import Depends, Request, HTTPException
+import datetime as dt
+
+from fastapi import Depends, HTTPException, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-import datetime as dt
-
-from planitor.models import Address, Case, CaseEntity
+from planitor.crud.city import get_and_init_address
 from planitor.database import get_db
+from planitor.models import Address, Case, CaseEntity
 
 from ..utils import _get_entity
 from . import router
@@ -19,9 +20,14 @@ async def get_nearby_case_addresses(
     days: int = 30,
     db: Session = Depends(get_db),
 ):
-    address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
-    if address is None:
+    address = get_and_init_address(hnitnum)
+    if not address:
         return HTTPException(404)
+
+    _db_address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
+
+    if _db_address is not None:
+        address = _db_address
 
     if days < 1:
         days = 1
