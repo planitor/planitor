@@ -78,7 +78,6 @@ async def follow_address(
     address = db.query(Address).get(hnitnum)
     if address is None:
         address = get_and_init_address(hnitnum)
-        print(hnitnum, address)
         if address is None:
             raise HTTPException(404)
         db.add(address)

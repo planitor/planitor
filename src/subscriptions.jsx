@@ -2,6 +2,7 @@ import { Fragment, h } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 import { api } from "./api";
 import { TrashFill, BadgePlusRadiowavesRight } from "./symbols.jsx";
+import { groupBy, forEach, sortBy } from "lodash";
 
 const SelectWidget = ({ value, onChange, isDisabled, children }) => {
   return (
@@ -107,7 +108,7 @@ const Subscription = (props) => {
   };
 
   return (
-    <div class="sm:rounded-lg sm:shadow-sm pb-2 sm:p-4 w-full sm:bg-white mb-2 sm:mb-4">
+    <div class="pb-2 sm:p-4 w-full">
       <div class="flex flex-col md:flex-row align-middle">
         <div class="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
           {data.case && <Case {...data.case} />}
@@ -159,6 +160,19 @@ const Subscription = (props) => {
   );
 };
 
+const Group = ({ type, subs }) => {
+  return (
+    <div class="mb-4 sm:mb-8">
+      <div class="mb-4 uppercase font-light tracking-wider text-xs">{type}</div>
+      <div class="sm:rounded-lg sm:shadow-sm pb-2 sm:p-1 w-full sm:bg-white">
+        {subs.map((sub) => {
+          return <Subscription key={sub.id} subscription={sub} />;
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const Subscriptions = () => {
   const [subs, setSubs] = useState([]);
   useEffect(async () => {
@@ -176,10 +190,27 @@ export const Subscriptions = () => {
       </div>
     );
   }
+
+  let types = {};
+
+  let groups = Object.entries(
+    groupBy(subs, (sub) => {
+      types[sub.type[0]] = sub.type;
+      return sub.type[0];
+    })
+  );
+
+  groups.sort(([key, value]) => {
+    return key;
+  });
+
+  console.log(groups);
+
   return (
     <div>
-      {subs.map((sub) => {
-        return <Subscription key={sub.id} subscription={sub} />;
+      {groups.map(([type, subs]) => {
+        console.log(type, types);
+        return <Group subs={subs} type={types[type][1]} />;
       })}
     </div>
   );

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from pydantic import BaseModel
 
 
@@ -43,7 +43,8 @@ class SubscriptionBase(BaseModel):
 
 
 class Subscription(SubscriptionBase):
-    id: int = None
+    id: int
+    type: Any
 
     class Config:
         orm_mode = True
