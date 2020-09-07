@@ -27,6 +27,7 @@ EMAIL_RESET_TOKEN_EXPIRE_HOURS = config(
 )
 ALGORITHM = "HS256"
 COOKIE_NAME = "_planitor_auth"
+TOKEN_EXPIRY = 60 * 60 * 24 * 365  # Far future expiry
 access_token_jwt_subject = "access"
 
 cookie_auth = APIKeyCookie(name=COOKIE_NAME, auto_error=False)
@@ -59,7 +60,7 @@ def get_login_response(user: User, response: Response) -> dict:
         path="/",
         secure=(ENV == "production"),
         httponly=True,
-        expires=60 * 60 * 24 * 365,  # Far future expiry
+        expires=TOKEN_EXPIRY,
     )
     return {
         "access_token": token,
@@ -67,12 +68,9 @@ def get_login_response(user: User, response: Response) -> dict:
     }
 
 
-def create_access_token(data: dict, expires_delta: dt.timedelta = None) -> str:
+def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    if expires_delta:
-        expire = dt.datetime.utcnow() + expires_delta
-    else:
-        expire = dt.datetime.utcnow() + dt.timedelta(hours=24)
+    expire = dt.datetime.utcnow() + dt.timedelta(seconds=TOKEN_EXPIRY)
     to_encode.update({"exp": expire, "sub": access_token_jwt_subject})
     encoded_jwt = jwt.encode(to_encode, config("SECRET_KEY"), algorithm=ALGORITHM)
     return encoded_jwt.decode("utf-8")
