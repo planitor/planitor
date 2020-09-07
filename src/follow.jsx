@@ -9,15 +9,12 @@ const Button = (props) => {
   const { loading, onClick, hover, setHover, following, defaultLabel } = props;
   return (
     <button
-      class={classNames(
-        "px-4 py-2 border rounded-lg font-bold sm:inline block mx-auto",
-        {
-          "text-gray-500 border-gray-500": loading,
-          "bg-midnight text-white": following && !loading,
-          "text-midnight": !following && !loading,
-          "border-midnight": !loading,
-        }
-      )}
+      class={classNames("btn sm:inline block mx-auto", {
+        "text-gray-500 border-gray-500": loading,
+        "bg-midnight text-white": following && !loading,
+        "text-midnight": !following && !loading,
+        "border-midnight": !loading,
+      })}
       onClick={onClick}
       onMouseOver={(event) => {
         setHover(true);
@@ -53,8 +50,81 @@ const Banner = (props) => {
   );
 };
 
+const Follow = (props) => {
+  const { id, state, defaultLabel, unfollowApi, followApi } = props;
+  const [hover, setHover] = useState(false);
+  const [following, setFollowing] = useState(state === "following");
+  const [form, setForm] = useState({ isLoading: false, error: null });
+  const onClick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (form.isLoading) return;
+    const toggle = () => {
+      setForm({ isLoading: true, error: null });
+      (following ? unfollowApi(id) : followApi(id))
+        .then((response) => {
+          setFollowing(!following);
+          setHover(false);
+          setForm({ isLoading: false, error: null });
+        })
+        .catch(function (error) {
+          setForm({ isLoading: false, error: error });
+        });
+    };
+    if (document._user === null) {
+      const [el, closeModal] = openModal();
+      render(<Banner />, el);
+    } else {
+      toggle();
+    }
+  };
+  return (
+    <Button
+      loading={form.isLoading}
+      following={following}
+      hover={hover}
+      setHover={setHover}
+      onClick={onClick}
+      defaultLabel={defaultLabel || null}
+    />
+  );
+};
+
 export const FollowCase = (props) => {
-  const { id, state, defaultLabel } = props;
+  return (
+    <Follow
+      unfollowApi={api.unfollowCase}
+      followApi={api.followCase}
+      {...props}
+    />
+  );
+};
+
+export const FollowAddress = (props) => {
+  return (
+    <Follow
+      unfollowApi={api.unfollowAddress}
+      followApi={api.followAddress}
+      {...props}
+    />
+  );
+};
+
+export const FollowEntity = (props) => {
+  return (
+    <Follow
+      unfollowApi={api.unfollowEntity}
+      followApi={api.followEntity}
+      {...props}
+    />
+  );
+};
+
+/*
+
+
+const FollowCase = (props) => {
+  const { id, state, defaultLabel, unfollowApi, followApi } = props;
   const [hover, setHover] = useState(false);
   const [following, setFollowing] = useState(state === "following");
   const [form, setForm] = useState({ isLoading: false, error: null });
@@ -131,3 +201,5 @@ export const FollowAddress = (props) => {
     />
   );
 };
+
+*/

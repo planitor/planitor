@@ -7,20 +7,8 @@ from planitor.models import (
     SubscriptionTypeEnum,
     Address,
     Delivery,
+    Entity,
 )
-
-
-def delete_subscription(db: Session, subscription: Subscription) -> None:
-    # Set archival values for deliveries and remove subscription foreign key
-    db.query(Delivery).filter(Delivery.subscription == subscription).update(
-        {
-            Delivery.subscription_id: None,
-            Delivery.deleted_subscription_id: subscription.id,
-            Delivery.deleted_user_id: subscription.user.id,
-        }
-    )
-    db.delete(subscription)
-    db.commit()
 
 
 def get_case_subscription(db: Session, user: User, case: Case):
@@ -49,6 +37,19 @@ def get_address_subscription(db: Session, user: User, address: Address):
     return subscription
 
 
+def get_entity_subscription(db: Session, user: User, entity: Entity):
+    subscription = (
+        db.query(Subscription)
+        .filter(
+            Subscription.entity == entity,
+            Subscription.user == user,
+            Subscription.type == SubscriptionTypeEnum.entity,
+        )
+        .first()
+    )
+    return subscription
+
+
 def create_case_subscription(db: Session, user: User, case: Case):
     subscription = get_case_subscription(db, user, case)
     if subscription is None:
@@ -58,11 +59,15 @@ def create_case_subscription(db: Session, user: User, case: Case):
     return subscription
 
 
-def delete_case_subscription(db: Session, user: User, case: Case):
-    subscription = get_case_subscription(db, user, case)
+def create_entity_subscription(db: Session, user: User, entity: Entity):
+    subscription = get_entity_subscription(db, user, entity)
     if subscription is None:
-        return None
-    delete_subscription(db, subscription)
+        subscription = Subscription(
+            entity=entity, user=user, type=SubscriptionTypeEnum.entity
+        )
+        db.add(subscription)
+        db.commit()
+    return subscription
 
 
 def create_address_subscription(db: Session, user: User, address: Address):
@@ -74,6 +79,33 @@ def create_address_subscription(db: Session, user: User, address: Address):
         db.add(subscription)
         db.commit()
     return subscription
+
+
+def delete_subscription(db: Session, subscription: Subscription) -> None:
+    # Set archival values for deliveries and remove subscription foreign key
+    db.query(Delivery).filter(Delivery.subscription == subscription).update(
+        {
+            Delivery.subscription_id: None,
+            Delivery.deleted_subscription_id: subscription.id,
+            Delivery.deleted_user_id: subscription.user.id,
+        }
+    )
+    db.delete(subscription)
+    db.commit()
+
+
+def delete_case_subscription(db: Session, user: User, case: Case):
+    subscription = get_case_subscription(db, user, case)
+    if subscription is None:
+        return None
+    delete_subscription(db, subscription)
+
+
+def delete_entity_subscription(db: Session, user: User, entity: Entity):
+    subscription = get_entity_subscription(db, user, entity)
+    if subscription is None:
+        return None
+    delete_subscription(db, subscription)
 
 
 def delete_address_subscription(db: Session, user: User, address: Address):

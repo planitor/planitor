@@ -7,7 +7,11 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request
 
 from planitor import hashids
-from planitor.crud.follow import get_address_subscription, get_case_subscription
+from planitor.crud.follow import (
+    get_address_subscription,
+    get_entity_subscription,
+    get_case_subscription,
+)
 from planitor.database import get_db
 from planitor.meetings import MeetingView
 from planitor.models import (
@@ -389,6 +393,8 @@ async def get_address(
         )
     )
 
+    subscription = get_address_subscription(db, current_user, address)
+
     return templates.TemplateResponse(
         "address.html",
         {
@@ -399,6 +405,7 @@ async def get_address(
             "user": current_user,
             "radius": radius,
             "days": days,
+            "subscription": subscription,
         },
     )
 
@@ -444,9 +451,17 @@ async def get_company(
         .order_by(Case.updated.desc())
     )
 
+    subscription = get_entity_subscription(db, current_user, entity)
+
     return templates.TemplateResponse(
         "company.html",
-        {"entity": entity, "cases": cases, "request": request, "user": current_user},
+        {
+            "entity": entity,
+            "cases": cases,
+            "request": request,
+            "user": current_user,
+            "subscription": subscription,
+        },
     )
 
 

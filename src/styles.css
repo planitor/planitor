@@ -19,7 +19,11 @@ td {
 }
 
 .btn {
-  @apply rounded-md shadow-lg bg-midnight px-4 py-2 font-bold text-white;
+  @apply rounded-lg shadow-lg border-midnight border bg-midnight px-4 py-2 font-bold text-white;
+}
+
+.btn-secondary {
+  @apply text-midnight bg-transparent shadow-none;
 }
 
 .btn-disabled {
@@ -37,8 +41,7 @@ td {
 
 .btn .sf-symbol {
   position: relative;
-  top: -4px;
-  vertical-align: middle;
+  top: -1px;
   margin-left: 5px;
 }
 

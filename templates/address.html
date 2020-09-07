@@ -3,7 +3,7 @@
 {% block title %}{{ address }} — {{ super() }}{% endblock %}
 {% block og_title %}{{ address }} — {{ super() }}{% endblock %}
 
-{% from 'symbols/symbols.html' import arrow_up_right_circle_fill %}
+{% from 'symbols/symbols.html' import arrow_up_right %}
 {% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}
 {% from 'includes/cases.html' import case_table %}
 
@@ -14,14 +14,18 @@
     {{ breadcrumb(None, "Hnitnúmer", dash=False) }}
     {{ breadcrumb(None, address) }}
     {% endcall %}
-    <div class="flex justify-between items-end">
+    <div class="flex items-start justify-between">
       <div>
         <div class="text-xl font-bold">{{ address }}</div>
         <div>{{ address.postnr }}, {{ address.stadur_nf }}</div>
       </div>
-      <a class="btn block" href="https://skra.is/leit-i-fasteignaskra?streetname={{ address.landnr }}&pos=fp-advanced-search">
-        Skrá.is <span class="sf-symbol">{{ arrow_up_right_circle_fill(class="") }}</span>
-      </a>
+      <div class="flex flex-col sm:flex-row items-end sm:items-center">
+        <a class="block mt-2 sm:mt-0 sm:mr-6 order-last sm:order-none font-bold" href="https://skra.is/leit-i-fasteignaskra?streetname={{ address.landnr }}&pos=fp-advanced-search">
+          Skrá.is <span class="sf-symbol">{{ arrow_up_right(class="h-2") }}</span>
+        </a>
+        <div class="follow-address" data-state="{{ 'following' if subscription }}" data-id="{{ address.hnitnum }}">
+        </div>
+      </div>
     </div>
   </div>
 

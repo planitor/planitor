@@ -195,7 +195,7 @@
                     {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
                   </div>
                 </div>
-                <div class="follow-address" data-state="{{ "following" if address_subscription else "" }}" data-hnitnum="{{ case.iceaddr.hnitnum }}">
+                <div class="follow-address" data-state="{{ "following" if address_subscription else "" }}" data-id="{{ case.iceaddr.hnitnum }}">
                 </div>
               </div>
               {% set case_count = (related_cases.count() if related_cases else 0) %}

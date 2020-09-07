@@ -38,6 +38,12 @@ export const api = {
   unfollowCase(id) {
     return axios.delete(`/api/follow/cases/${id}`, authHeaders());
   },
+  followEntity(id) {
+    return axios.post(`/api/follow/entities/${id}`, null, authHeaders());
+  },
+  unfollowEntity(id) {
+    return axios.delete(`/api/follow/entities/${id}`, authHeaders());
+  },
   followAddress(hnitnum) {
     return axios.post(`/api/follow/addresses/${hnitnum}`, null, authHeaders());
   },

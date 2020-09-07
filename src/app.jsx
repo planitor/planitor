@@ -2,7 +2,7 @@ import { h, render } from "preact";
 
 import { Navigation } from "./navigation.jsx";
 import { Subscriptions } from "./subscriptions.jsx";
-import { FollowCase, FollowAddress } from "./follow.jsx";
+import { FollowCase, FollowAddress, FollowEntity } from "./follow.jsx";
 import { NewPasswordForm } from "./forms/new-password.jsx";
 import { openModal } from "./modals.js";
 import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps.jsx";
@@ -62,10 +62,14 @@ mapkit.addEventListener("configuration-change", function (event) {
 
 [...document.querySelectorAll(".follow-address")].forEach((button) => {
   render(
-    <FollowAddress
-      hnitnum={button.dataset.hnitnum}
-      state={button.dataset.state}
-    />,
+    <FollowAddress id={button.dataset.hnitnum} state={button.dataset.state} />,
+    button
+  );
+});
+
+[...document.querySelectorAll(".follow-entity")].forEach((button) => {
+  render(
+    <FollowEntity id={button.dataset.kennitala} state={button.dataset.state} />,
     button
   );
 });

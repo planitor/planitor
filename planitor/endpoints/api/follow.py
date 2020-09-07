@@ -2,11 +2,13 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from planitor.database import get_db
-from planitor.models import Case, User, Address
+from planitor.models import Case, User, Address, Entity
 from planitor.security import get_current_active_user
 from planitor.crud.follow import (
     create_case_subscription,
     delete_case_subscription,
+    create_entity_subscription,
+    delete_entity_subscription,
     create_address_subscription,
     delete_address_subscription,
 )
@@ -37,6 +39,32 @@ async def unfollow_case(
     if case is None:
         return HTTPException(404)
     delete_case_subscription(db, current_user, case)
+    return {}
+
+
+@router.post("/follow/entities/{kennitala}")
+async def follow_entity(
+    kennitala: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    entity = db.query(Entity).get(kennitala)
+    if entity is None:
+        return HTTPException(404)
+    create_entity_subscription(db, current_user, entity)
+    return {}
+
+
+@router.delete("/follow/entities/{kennitala}")
+async def unfollow_entity(
+    kennitala: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    entity = db.query(Entity).get(kennitala)
+    if entity is None:
+        return HTTPException(404)
+    delete_entity_subscription(db, current_user, entity)
     return {}
 
 
