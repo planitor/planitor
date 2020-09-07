@@ -22,7 +22,7 @@ async def get_nearby_case_addresses(
 ):
     address = get_and_init_address(hnitnum)
     if not address:
-        return HTTPException(404)
+        raise HTTPException(404)
 
     _db_address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
 

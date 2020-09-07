@@ -2,6 +2,7 @@ import { h, render } from "preact";
 
 import { Navigation } from "./navigation.jsx";
 import { Subscriptions } from "./subscriptions.jsx";
+import { Login } from "./accounts.jsx";
 import { FollowCase, FollowAddress, FollowEntity } from "./follow.jsx";
 import { NewPasswordForm } from "./forms/new-password.jsx";
 import { openModal } from "./modals.js";
@@ -22,6 +23,15 @@ const passwordRecoveryEl = document.getElementById("password-recovery");
 if (passwordRecoveryEl) {
   const [el, closeModal] = openModal();
   render(<NewPasswordForm token={passwordRecoveryEl.dataset.token} />, el);
+}
+
+const loginEl = document.getElementById("login");
+if (loginEl) {
+  const [el, closeModal] = openModal();
+  const onSuccess = () => {
+    window.location.pathname = loginEl.dataset.redirectTo || "/";
+  };
+  render(<Login onSuccess={onSuccess} />, el);
 }
 
 const navigationEl = document.getElementById("navigation");

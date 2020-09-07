@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Síða fannst ekki (404) — {{ super() }}{% endblock %}
+
+{% block body %}
+
+  <div class="my-8 mt-4 sm:mt-8 text-center">
+    <div class="my-10 font-bold text-4xl">Síða fannst ekki</div>
+    {% if detail %}
+    <div>{{ detail }}</div>
+    {% endif %}
+  </div>
+
+{% endblock body %}

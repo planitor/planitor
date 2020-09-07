@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Villa — {{ super() }}{% endblock %}
+
+{% block body %}
+
+  <div class="my-8 mt-4 sm:mt-8 text-center">
+    <div class="my-10 font-bold text-4xl">Villa á vefþjóni</div>
+    {% if detail %}
+    <div>{{ detail }}</div>
+    {% else %}
+    <div>Vinsamlegast hafðu samband2</div>
+    {% endif %}
+  </div>
+
+{% endblock body %}

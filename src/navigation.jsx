@@ -12,7 +12,7 @@ const LogoutButton = (props) => {
     event.preventDefault();
     api.logout().then((response) => {
       localStorage.removeItem("token");
-      location.reload();
+      window.location.pathname = "/";
     });
   };
   return (

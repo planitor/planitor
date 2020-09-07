@@ -346,7 +346,7 @@ async def get_address(
 
     address = get_and_init_address(hnitnum)
     if not address:
-        return HTTPException(404)
+        raise HTTPException(404)
 
     _db_address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
 
@@ -499,7 +499,7 @@ def get_minute_by_id(
 ):
     minute = db.query(Minute).get(id)
     if minute is None:
-        return HTTPException(404)
+        raise HTTPException(404)
     council = minute.meeting.council
     return RedirectResponse(
         request.url_for(
@@ -520,7 +520,7 @@ def get_case_by_id(
 ):
     case = db.query(Case).get(id)
     if case is None:
-        return HTTPException(404)
+        raise HTTPException(404)
     council = case.council
     return RedirectResponse(
         request.url_for(

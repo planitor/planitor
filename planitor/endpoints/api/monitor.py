@@ -45,7 +45,7 @@ def update_subscription(
 ):
     subscription = db.query(models.Subscription).get(id)
     if subscription is None or subscription.user != current_user:
-        return HTTPException(404)
+        raise HTTPException(404)
     if form.active is not None:
         subscription.active = form.active
     if form.immediate is not None:
@@ -66,6 +66,6 @@ def delete_subscription(
 ):
     subscription = db.query(models.Subscription).get(id)
     if subscription is None or subscription.user != current_user:
-        return HTTPException(404)
+        raise HTTPException(404)
     crud_delete_subscription(db, subscription)
     return Response(None, 204)
