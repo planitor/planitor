@@ -3,6 +3,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import register_composites
+from sentry_sdk import capture_exception
 
 from scrapy.exceptions import DropItem
 from scrapy.utils.project import get_project_settings
@@ -14,7 +15,7 @@ from planitor.crud import (
     get_or_create_council,
     get_or_create_meeting,
 )
-from planitor.postprocess import process_minute
+from planitor.postprocess import process_minutes
 
 
 def get_connection_string():
@@ -71,18 +72,15 @@ class DatabasePipeline(object):
         else:
             # If all scraped minute serials are already in database, assume already
             # scraped
-            minutes_scraped = {
-                m.serial for m in self.db.query(Minute).filter_by(meeting_id=meeting.id)
-            }
-            if minutes_scraped == {m["serial"] for m in item["minutes"]}:
-                raise DropItem("Already processed meeting {}".format(meeting.url))
+            if self.db.query(Minute).filter(Minute.meeting == meeting).count():
+                try:
+                    raise DropItem("Already processed this meeting")
+                except DropItem as e:
+                    capture_exception(e)
+                    raise e
 
         self.db.commit()
 
-        for data in item["minutes"]:
-            if data is not None:
-                process_minute(self.db, data, meeting)
-
-        self.db.commit()
+        process_minutes(self.db, item["minutes"], meeting)
 
         return item

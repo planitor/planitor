@@ -2,27 +2,45 @@
 
 {% macro render_meeting(meeting) %}
   <tr>
-    <td class="td" style="background:#27226B;color:white;padding: 10px;">
-      <p style="font-size:12px;font-weight:bold;text-transform:uppercase;margin:0;">{{ meeting.council }}, {{ meeting.council.municipality }}</p>
-      <p style="font-size:16px;margin:0;">Fundur {{ meeting.name }}, {{ human_date(meeting.start) }}</p>
+    <td class="td" style="background:#27226B;color:white;padding:10px;line-height:1.2em;">
+      <p style="font-size:12px;text-transform:uppercase;margin:0;">{{ meeting.council }}, {{ meeting.council.municipality }}</p>
+      <p style="font-size:16px;font-weight:bold;margin:0;">
+        <a href="https://www.planitor.io/meetings/{{ meeting.id }}" style="color:white;">
+          Fundur {{ meeting.name }}, {{ human_date(meeting.start) }}
+        </a>
+      </p>
     </td>
   </tr>
 {% endmacro %}
 
-{% macro render_subscription(minute, meeting=False) %}
-  {% if meeting -%}
-    {{ render_meeting(minute.meeting) }}
-  {% endif -%}
+{% macro render_minute(minute, deliveries) %}
   <tr>
-    <td class="td">
-      <p style="font-size:22px;font-weight:bold;margin:8px 0">{{ minute.headline }}</p>
-      <p style="font-size:16px;margin:5px 0">
-        <a href="http://planitor.io/minutes/{{ minute.id }}" style="color:#46BCCC">{{ minute.case.serial }}, {{ minute.case.address }}</a>
+    <td class="td" style="padding-bottom:0;padding-top:15px;">
+      <p style="font-size:22px;font-weight:bold;margin:8px 0">
+        <a href="http://planitor.io/minutes/{{ minute.id }}" style="color:#111">{{ minute.headline }}</a>
       </p>
-      <p style="line-height:1.2;">{{ minute.inquiry }}</p>
-      <p style="line-height:1.2;">{{ minute.remarks }}</p>
+      <p style="font-size:14px;margin:5px 0; color:#666;">
+        <span style="font-weight: bold;">{{ minute.case.address }}</span>
+        <br>{{ minute.case.serial }}
+      </p>
+      <p style="line-height:1.2; font-size:15px; white-space: pre-wrap;">{{ minute.inquiry }}</p>
+      <p style="line-height:1.2; font-size:15px; white-space: pre-wrap;">{{ minute.remarks }}</p>
     </td>
   </tr>
+  <tr>
+    <td class="td" style="padding: 10px 0; border-top:0.5px solid #888;">
+      <p style="padding:0;font-size:12px;line-height:1.1em;margin:0;">
+        Vöktun:
+        {% for delivery in deliveries %}
+          <a href="https://www.planitor.io/notendur/stillingar" style="color:#333;font-weight:bold;">{{ delivery.subscription.get_string() -}}</a>
+          {%- if not loop.last %}
+            {%- if loop.revindex == 2 %} og {% else %}, {% endif %}
+          {%- endif %}
+        {% endfor %}
+      </p>
+    </td>
+  </tr>
+  <tr><td class="td"></td></tr>
 {% endmacro %}
 
 {% block inner %}

@@ -1,8 +1,10 @@
 import re
-from typing import List
+from typing import List, Iterable
+
+from dramatiq import group, pipeline
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from dramatiq import pipeline
+from sentry_sdk import capture_exception
 
 from . import dramatiq, greynir
 from .attachments import update_pdf_attachment
@@ -16,10 +18,11 @@ from .crud import (
 from .database import db_context
 from .language.companies import extract_company_names
 from .minutes import get_minute_lemmas
+from .monitor import send_meeting_emails
 from .models import Meeting, Minute, Response
 from .utils.kennitala import Kennitala
 from .utils.rsk import get_kennitala_from_rsk_search
-from .monitor import notify_subscribers
+from .monitor import create_deliveries
 
 
 def _get_entity(db: Session, name: str):
@@ -158,24 +161,29 @@ def update_minute_search_vector(minute_id: int, force: bool = False):
         if minute is None:
             return
         if not minute.search_vector or force:
-            _update_minute_search_vector(minute, db)
+            try:
+                _update_minute_search_vector(minute, db)
+            except Exception as e:
+                capture_exception(e)
             db.commit()
 
 
-def update_minute_with_attachments(db, minute, attachments_items):
+def update_minute_with_attachments(
+    db: Session, minute: Minute, attachments_items: List[dict]
+):
     for items in attachments_items:
         attachment, _ = get_or_create_attachment(db, minute, **items)
         db.commit()
         update_pdf_attachment.send(attachment.id)
 
 
-def process_minute(db: Session, items: dict, meeting: Meeting):
+def process_minute(db: Session, item: dict, meeting: Meeting):
 
-    entity_items = items.pop("entities", [])
-    response_items = items.pop("responses", [])
-    attachment_items = items.pop("attachments", [])
+    entity_items = item.pop("entities", [])
+    response_items = item.pop("responses", [])
+    attachment_items = item.pop("attachments", [])
 
-    minute = create_minute(db, meeting, **items)
+    minute = create_minute(db, meeting, **item)
     db.commit()
     case = minute.case
 
@@ -188,18 +196,41 @@ def process_minute(db: Session, items: dict, meeting: Meeting):
     # Add attachment
     update_minute_with_attachments(db, minute, attachment_items)
 
-    # Also associate companies mentioned in the inquiry, such as architects
-    update_minute_with_entity_mentions.send(minute.id)
+    assert minute.id
 
-    pipe = pipeline(
-        [
-            # Populate the lemma column with lemmas from Greynir and/or tokenizer
-            update_minute_search_vector.message(minute.id),
-            # ... then match and notify potential subscribers
-            notify_subscribers.message_with_options(args=(minute.id,), pipe_ignore=True),
-        ]
-    )
-    pipe.run()
+    # Return messages that can be pipelined and processed before we send notification
+    messages = [
+        # Also associate companies mentioned in the inquiry, such as architects
+        update_minute_with_entity_mentions.message_with_options(
+            args=(minute.id,), pipe_ignore=True
+        ),
+        # Populate the lemma column with lemmas from Greynir and/or tokenizer
+        update_minute_search_vector.message_with_options(
+            args=(minute.id,), pipe_ignore=True
+        ),
+        # ... run matches
+        create_deliveries.message_with_options(args=(minute.id,), pipe_ignore=True),
+    ]
 
     db.add(case)
     db.commit()
+
+    return messages
+
+
+def process_minutes(db: Session, items: Iterable[dict], meeting: Meeting) -> None:
+
+    pipes = []
+
+    for data in items:
+        if data is not None:
+            messages = process_minute(db, data, meeting)
+            pipe = pipeline(messages)
+            pipes.append(pipe)
+
+    if not pipes:
+        return
+
+    g = group(pipes)
+    g.add_completion_callback(send_meeting_emails.message())
+    g.run()

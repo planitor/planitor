@@ -33,3 +33,12 @@ def create_delivery(db: Session, subscription: Subscription, minute: Minute) -> 
     delivery = Delivery(subscription=subscription, minute=minute)
     db.add(delivery)
     return delivery
+
+
+def get_delivery(db: Session, subscription: Subscription, minute: Minute) -> Delivery:
+    delivery = (
+        db.query(Delivery)
+        .filter(Delivery.subscription == subscription, Delivery.minute == minute)
+        .first()
+    )
+    return delivery

@@ -20,11 +20,15 @@ from itertools import groupby
 import dramatiq
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
+from sentry_sdk import capture_exception
 
-from planitor.crud import create_delivery
+from planitor.crud import create_delivery, get_delivery
 from planitor.database import db_context
 from planitor import mail
 from planitor.models import Address, Case, Delivery, Meeting, Minute, Subscription, User
+
+
+MinuteDeliveries = Iterable[Tuple[Minute, Iterable[Delivery]]]
 
 
 def match_minute(db: Session, minute: Minute) -> Iterator[Subscription]:
@@ -83,34 +87,28 @@ def match_minute(db: Session, minute: Minute) -> Iterator[Subscription]:
     yield from query
 
 
-def get_unsent_deliveries(db) -> Iterable[Tuple[User, Iterable[Delivery]]]:
-    deliveries = (
+def get_unsent_query(db: Session, immediate: bool):
+    return (
         db.query(Delivery)
         .join(Subscription)
-        .join(User)
-        .join(Minute)
-        .join(Meeting)
-        .filter(Delivery.sent == None, Subscription.active == True)  # noqa
-        .order_by(Subscription.user_id, Meeting.start)
-    )
-    return groupby(deliveries, key=lambda delivery: delivery.subscription.user)
-
-
-def send_immediate_email(email_to: str, delivery: Delivery) -> None:
-    return mail.send_email(
-        email_to,
-        str(delivery.minute.case.address or delivery.minute.headline),
-        "subscription_immediate.html",
-        {"delivery": delivery},
+        .join(Minute, Delivery.minute_id == Minute.id)
+        .join(Meeting, Minute.meeting_id == Meeting.id)
+        .join(Case, Minute.case_id == Case.id)
+        .filter(
+            Delivery.sent == None,  # noqa
+            Subscription.active == True,
+            Subscription.immediate == immediate,
+        )
+        .order_by(Subscription.user_id, Meeting.id, Delivery.minute_id)
     )
 
 
-def send_weekly_email(email_to: str, deliveries: Iterable[Delivery]) -> None:
-    return mail.send_email(
-        email_to,
-        "Vikuleg samantekt",
-        "subscription_weekly.html",
-        {"deliveries": deliveries},
+def get_unsent_deliveries(
+    db, immediate: bool
+) -> Iterable[Tuple[User, Iterable[Delivery]]]:
+    return groupby(
+        get_unsent_query(db, immediate=immediate),
+        key=lambda delivery: delivery.subscription.user,
     )
 
 
@@ -122,42 +120,123 @@ s.{immediate=false} d.none > d{sent=null} > d{sent=now()}
 """
 
 
-def _notify_subscribers(db, minute):
-    _sent = set()
+def _create_deliveries(db: Session, minute: Minute) -> Iterable[Delivery]:
     for subscription in match_minute(db, minute):
         # This result-set could be [sub{u=1}, sub{u=1}, sub{u=2}]. The user probably does
         # not want multiple emails for the same minute because multiple subscribers
         # matched it. Therefore we create deliveries but only deliver the first one.
+        if get_delivery(db, subscription, minute):
+            # Cannot recreate this subscription/minute combo because of unique constraint
+            # - but this state should not be reached unless a worker fails and is retrying
+            continue
         delivery = create_delivery(db, subscription, minute)
-        if subscription.immediate:
-            delivery.sent = func.now()
-            if subscription.user.email not in _sent:
-                smtp_response = send_immediate_email(subscription.user.email, delivery)
-                delivery.mail_confirmation = str(smtp_response)
-            _sent.add(subscription.user.email)
-        db.commit()
         yield delivery
 
 
 @dramatiq.actor
-def notify_subscribers(minute_id: int):
+def create_deliveries(minute_id: int):
     with db_context() as db:
-        minute = db.query(Minute).get(minute_id)
-        for _ in _notify_subscribers(db, minute):
-            pass
+        try:
+            minute = db.query(Minute).get(minute_id)
+            assert minute
+            for delivery in _create_deliveries(db, minute):
+                db.commit()
+        except Exception as e:
+            capture_exception(e)
+            raise
 
 
-def _notify_weekly_subscribers(db):
-    for user, deliveries in get_unsent_deliveries(db):
+def iter_user_meeting_deliveries(
+    db: Session,
+) -> Iterable[Tuple[User, Meeting, MinuteDeliveries]]:
+    for user, deliveries in get_unsent_deliveries(db, immediate=True):
         deliveries = list(deliveries)
-        smtp_response = send_weekly_email(user.email, deliveries)
-        for delivery in deliveries:
-            delivery.sent = func.now()
-            delivery.mail_confirmation = str(smtp_response)
-            db.add(delivery)
+        for meeting, deliveries in groupby(deliveries, key=lambda d: d.minute.meeting):
+            deliveries = list(deliveries)
+            yield user, meeting, [
+                (minute, list(_deliveries))
+                for minute, _deliveries in groupby(deliveries, lambda d: d.minute)
+            ]
+
+
+def send_meeting_email(user: User, meeting: Meeting, minute_deliveries: MinuteDeliveries):
+    return mail.send_email(
+        user.email,
+        str(meeting),
+        "subscription_meeting.html",
+        {"minute_deliveries": minute_deliveries, "meeting": meeting},
+    )
+
+
+def _send_meeting_emails(db: Session):
+    for user, meeting, minute_deliveries in iter_user_meeting_deliveries(db):
+        try:
+            smtp_response = send_meeting_email(user, meeting, minute_deliveries)
+        except Exception as e:
+            capture_exception(e)
+            continue
+        for _, deliveries in minute_deliveries:
+            for delivery in deliveries:
+                delivery.sent = func.now()
+                delivery.mail_confirmation = str(smtp_response)
+                db.add(delivery)
         db.commit()
 
 
-def notify_weekly_subscribers():
+@dramatiq.actor
+def send_meeting_emails():
+    """As you can see in `scrape.pipelines` both `update_minute_search_vector`
+    and `create_deliveries` for each minute are strung into one big pipeline,
+    then appended with this task in order to only send one email to each user
+    for all their subscriptions per meeting."""
     with db_context() as db:
-        _notify_weekly_subscribers(db)
+        _send_meeting_emails(db)
+
+
+def send_weekly_email(
+    user: User, meeting_minute_deliveries: Iterable[Tuple[Meeting, MinuteDeliveries]]
+):
+    return mail.send_email(
+        user.email,
+        "Vikuleg samantekt",
+        "subscription_weekly.html",
+        {"meeting_minute_deliveries": meeting_minute_deliveries},
+    )
+
+
+def iter_user_weekly_deliveries(
+    db: Session,
+) -> Iterable[Tuple[User, Iterable[Tuple[Meeting, MinuteDeliveries]]]]:
+    for user, deliveries in get_unsent_deliveries(db, immediate=False):
+        deliveries = list(deliveries)
+        meeting_minute_deliveries = []
+        for meeting, deliveries in groupby(deliveries, key=lambda d: d.minute.meeting):
+            deliveries = list(deliveries)
+            minute_deliveries = [
+                (minute, list(deliveries))
+                for minute, deliveries in groupby(deliveries, lambda d: d.minute)
+            ]
+            meeting_minute_deliveries.append((meeting, minute_deliveries))
+        yield user, meeting_minute_deliveries
+
+
+def _send_weekly_emails(db: Session):
+    for user, meeting_minute_deliveries in iter_user_weekly_deliveries(db):
+        try:
+            smtp_response = send_weekly_email(user, meeting_minute_deliveries)
+        except Exception as e:
+            capture_exception(e)
+            continue
+        for _, minute_deliveries in meeting_minute_deliveries:
+            for _, deliveries in minute_deliveries:
+                for delivery in deliveries:
+                    delivery.sent = func.now()
+                    delivery.mail_confirmation = str(smtp_response)
+                    db.add(delivery)
+        db.commit()
+
+
+@dramatiq.actor
+def send_weekly_emails():
+    with db_context() as db:
+        _send_weekly_emails(db)

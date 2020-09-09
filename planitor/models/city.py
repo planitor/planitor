@@ -268,6 +268,12 @@ class Meeting(Base):
 
     minutes = relationship("Minute")
 
+    def __str__(self):
+        return f"{self.council.name} {self.name}"
+
+    def __repr__(self):
+        return f"<Meeting id={self.id} name={self.name}>"
+
 
 class PDFAttachment(Base):
     __tablename__ = "pdf_attachments"
@@ -434,6 +440,9 @@ class Minute(Base):
     __table_args__ = (
         Index("ix_search_vector_tsv", search_vector, postgresql_using="gin"),
     )
+
+    def __repr__(self):
+        return f"<Minute id={self.id} serial={self.serial}>"
 
     def assign_entity_mentions(self, mentions):
         self.entity_mentions = []

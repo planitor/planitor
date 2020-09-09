@@ -19,3 +19,6 @@ class User(Base):
             "full_name": self.full_name,
             "email": self.email,
         }
+
+    def __str__(self):
+        return f"<User {self.email}>"

@@ -75,6 +75,9 @@ class Subscription(Base):
             raise NotImplementedError
         return "{0:þgf}".format(NounPhrase(nl))
 
+    def __str__(self):
+        return self.get_string()
+
 
 class Delivery(Base):
 

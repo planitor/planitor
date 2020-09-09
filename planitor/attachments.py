@@ -1,7 +1,7 @@
 import re
-
 from contextlib import contextmanager
 from io import BytesIO
+from typing import Generator
 from urllib.request import urlopen
 
 import boto3
@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from . import ENV, config
 from .database import db_context
 from .models import Attachment, PDFAttachment
-
 
 pdf_page_pattern = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE | re.DOTALL)
 
@@ -36,13 +35,13 @@ def get_pdf_page_count(byte_string: bytes) -> int:
 
 
 @contextmanager
-def get_url_bytestring(url: str) -> bytes:
+def get_url_bytestring(url: str):
     with urlopen(url) as resource:
         yield resource.read()
 
 
 def _update_pdf_attachment(attachment: Attachment, db: Session) -> None:
-    """ Have a cleaner version of this function for when calling directly, debugging,
+    """Have a cleaner version of this function for when calling directly, debugging,
     testing etc.
     """
     if attachment.type != "application/pdf":

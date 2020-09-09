@@ -3,10 +3,10 @@
 {% from "subscription_base.html" import render_subscription, render_meeting %}
 
 {% block deliveries %}
-  {% for meeting, deliveries in deliveries|groupby("_jinja_groupby") %}
-    {{ render_meeting(meeting[1]) }}
-    {% for delivery in deliveries %}
-      {{ render_subscription(minute=delivery.minute) }}
+  {% for meeting, minute_deliveries in meeting_minute_deliveries %}
+    {{ render_meeting(meeting) }}
+    {% for minute, deliveries in minute_deliveries %}
+      {{ render_minute(minute=minute, deliveries=deliveries) }}
     {% endfor %}
   {% endfor %}
   <tr>

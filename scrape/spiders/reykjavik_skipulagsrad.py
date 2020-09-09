@@ -176,9 +176,9 @@ def take_remarks(paragraphs: List[List[str]]):
 
 
 def get_address(headline):
-    """ In skipulagsráð address is not a field per se, but is often used in the headline.
+    """In skipulagsráð address is not a field per se, but is often used in the headline.
     Attempt to extract it to create a clean address string (which will be parsed again)
-    in the postprocessing pipeline. """
+    in the postprocessing pipeline."""
 
     street, number, letter = get_address_lookup_params(headline)
     iceaddr = lookup_address(street, number, letter, "Reykjavík")
@@ -192,7 +192,7 @@ def get_address(headline):
 
 
 def process_first_paragraph(paragraph):
-    """ Corrects for instances where the title is crudely formatted like this:
+    """Corrects for instances where the title is crudely formatted like this:
 
     > Umhverfis- og skipulagssvið,&nbsp;
     > ellefu mánaða uppgjör&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;Mál nr. US200038
@@ -223,7 +223,7 @@ def process_first_paragraph(paragraph):
 
 
 def parse_minute_el(index: int, el: scrapy.selector.unified.Selector):
-    """ From a high level the structure is like this
+    """From a high level the structure is like this
 
     **********************************************************************
 
