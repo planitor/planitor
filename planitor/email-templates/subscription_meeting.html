@@ -1,0 +1,10 @@
+{% extends "subscription_base.html" %}
+
+{% from "subscription_base.html" import render_minute, render_meeting %}
+
+{% block deliveries %}
+  {{ render_meeting(meeting) }}
+  {% for minute, deliveries in minute_deliveries %}
+    {{ render_minute(minute=minute, deliveries=deliveries) }}
+  {% endfor %}
+{% endblock %}

@@ -3,7 +3,9 @@ import sentry_sdk
 from dramatiq.brokers.redis import RedisBroker
 from dramatiq.brokers.stub import StubBroker
 from dramatiq.results import Results
-from dramatiq.results.backends import RedisBackend
+from dramatiq.middleware import GroupCallbacks
+from dramatiq.results.backends import RedisBackend, StubBackend
+from dramatiq.rate_limits.backends.redis import RedisBackend as RateLimiterRedisBackend
 from hashids import Hashids
 from reynir import Greynir
 from sentry_dramatiq import DramatiqIntegration
@@ -21,15 +23,22 @@ SENTRY_DSN = config("SENTRY_DSN", cast=Secret)
 
 if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(
-        str(SENTRY_DSN), integrations=[SqlalchemyIntegration(), DramatiqIntegration()]
+        str(SENTRY_DSN),
+        integrations=[SqlalchemyIntegration(), DramatiqIntegration()],
+        release=config("RENDER_GIT_COMMIT", default=None),
     )
 
 
 if config("REDIS_URL", default=False):
     broker = RedisBroker(url=config("REDIS_URL"))
-    result_backend = RedisBackend(url=config("REDIS_URL"))
-    broker.add_middleware(Results(backend=result_backend))
+    broker.add_middleware(Results(backend=RedisBackend(url=config("REDIS_URL"))))
+    broker.add_middleware(
+        GroupCallbacks(
+            rate_limiter_backend=RateLimiterRedisBackend(url=config("REDIS_URL"))
+        )
+    )
 else:
+    backend = StubBackend()
     broker = StubBroker()
 
 dramatiq.set_broker(broker)

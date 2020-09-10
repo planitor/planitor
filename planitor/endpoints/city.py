@@ -512,6 +512,26 @@ def get_minute_by_id(
     )
 
 
+@router.get("/meetings/{id}")
+def get_meetings_by_id(
+    request: Request,
+    id: str,
+    db: Session = Depends(get_db),
+):
+    meeting = db.query(Meeting).get(id)
+    if meeting is None:
+        raise HTTPException(404)
+    council = meeting.council
+    return RedirectResponse(
+        request.url_for(
+            "get_meeting",
+            muni_slug=council.municipality.slug,
+            council_slug=council.council_type.value.slug,
+            meeting_id=hashids.encode(meeting.id),
+        )
+    )
+
+
 @router.get("/cases/{id}")
 def get_case_by_id(
     request: Request,
