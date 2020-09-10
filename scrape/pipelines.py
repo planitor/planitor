@@ -70,14 +70,9 @@ class DatabasePipeline(object):
             meeting.attendant_names = get_names(meeting.description)
             meeting.start = item["start"]
         else:
-            # If all scraped minute serials are already in database, assume already
-            # scraped
+            # If meeting already has at least one minute, assume meeting already scraped
             if self.db.query(Minute).filter(Minute.meeting == meeting).count():
-                try:
-                    raise DropItem("Already processed this meeting")
-                except DropItem as e:
-                    capture_exception(e)
-                    raise e
+                return None
 
         self.db.commit()
 
