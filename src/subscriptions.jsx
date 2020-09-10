@@ -127,6 +127,7 @@ const Subscription = (props) => {
                 >
                   <Fragment>
                     <option value={0}>0m</option>
+                    <option value={50}>+ 50m</option>
                     <option value={100}>+ 100m</option>
                     <option value={300}>+ 300m</option>
                     <option value={500}>+ 500m</option>
