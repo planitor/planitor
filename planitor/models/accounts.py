@@ -20,5 +20,5 @@ class User(Base):
             "email": self.email,
         }
 
-    def __str__(self):
+    def __repr__(self):
         return f"<User {self.email}>"
