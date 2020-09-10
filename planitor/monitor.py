@@ -12,6 +12,12 @@ together into a weekly friday combined email.
 
 https://dramatiq.io/cookbook.html#composition
 
+Immediate deliveries are not immediate in the sense that as soon as we process a minute
+we send an email, but that as soon as Planitor picks up a new meeting, we process the
+minutes, run the matcher to see who is interested in what minutes, then compile emails
+per meeting with all the notes, along with minute-footers explaining which subscriptions
+had picked up the note, so the user can tweak their monitoring.
+
 """
 
 from typing import Iterable, Iterator, Tuple
@@ -110,14 +116,6 @@ def get_unsent_deliveries(
         get_unsent_query(db, immediate=immediate),
         key=lambda delivery: delivery.subscription.user,
     )
-
-
-"""
-
-s.{immediate=true} d.none > d{sent=now()}
-s.{immediate=false} d.none > d{sent=null} > d{sent=now()}
-
-"""
 
 
 def _create_deliveries(db: Session, minute: Minute) -> Iterable[Delivery]:
