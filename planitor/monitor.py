@@ -33,7 +33,6 @@ from planitor.crud import create_delivery, get_delivery
 from planitor.database import db_context
 from planitor import mail
 from planitor.models import Address, Case, Delivery, Meeting, Minute, Subscription, User
-from planitor.models.monitor import SubscriptionCouncil
 
 
 MinuteDeliveries = Iterable[Tuple[Minute, Iterable[Delivery]]]

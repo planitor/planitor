@@ -25,7 +25,6 @@ def sync(DB_URL: str = "postgresql://planitor:@localhost/planitor"):
         from planitor.models import _all  # noqa, needed to register models
         from sqlalchemy_utils import register_composites
 
-        engine.execute("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;")
         engine.execute("CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;")
         engine.execute(
             "CREATE TYPE entity_mention_type AS "

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List
 import datetime as dt
 
 from fastapi import Depends, HTTPException, Request

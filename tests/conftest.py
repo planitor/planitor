@@ -1,7 +1,6 @@
 import datetime as dt
 import os
 import asyncio
-from planitor.models.city import CouncilTypeEnum
 
 import sqlalchemy
 import pytest
@@ -31,6 +30,7 @@ def db_fixture(engine):
     from planitor.database import SessionLocal, engine, Base
     from planitor import models  # noqa
 
+    assert "planitor_test" in str(engine.url)
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(engine)
     db = SessionLocal()
@@ -102,7 +102,7 @@ def municipality_fixture(db):
 
 @pytest.fixture(scope="function", name="case")
 def case_fixture(db, address, municipality):
-    from planitor.models import Council, Case
+    from planitor.models import Council, Case, CouncilTypeEnum
 
     council = _c(
         db,

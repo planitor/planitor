@@ -33,21 +33,6 @@ class SubscriptionTypeEnum(enum.Enum):
     search = EnumValue("leit", "Leit")
 
 
-class SubscriptionCouncil(Base):
-    """Users can choose to pick which council meetings the subscription should monitor, if
-    not all. The default state should be to have all councils, and that should be true
-    if no rows are found. This means a new subscription starts with zero rows here
-    and if the user de-selects a council, we create rows for all the remaining councils.
-    """
-
-    __tablename__ = "subscription_councils"
-
-    subscription_id = Column(Integer, ForeignKey("subscriptions.id"), primary_key=True)
-    subscription = relationship("Subscription")
-    council_id = Column(Integer, ForeignKey("councils.id"), primary_key=True)
-    council = relationship("Council")
-
-
 class Subscription(Base):
 
     __tablename__ = "subscriptions"
