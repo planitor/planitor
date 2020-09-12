@@ -258,7 +258,7 @@ class Council(Base):
     municipality_id = Column(Integer, ForeignKey(Municipality.id), nullable=True)
     municipality = relationship(Municipality)
 
-    council_type = Column(Enum(CouncilTypeEnum))
+    council_type = Column(Enum(CouncilTypeEnum), nullable=False)
 
     def __str__(self):
         return self.name

@@ -71,9 +71,16 @@ const Entity = ({ kennitala, name }) => {
 const SelectCouncils = ({ councils, onChangeCouncils }) => {
   const onClick = (_name, _selected) => {
     onChangeCouncils(
-      councils.map(({ name, selected }) => {
-        return { name: name, selected: _name === name ? _selected : selected };
-      })
+      councils
+        .map(({ name, selected }) => {
+          return {
+            name: name,
+            selected: _name === name ? _selected : selected,
+          };
+        })
+        .filter(({ selected }) => {
+          return selected;
+        })
     );
   };
 
@@ -179,7 +186,7 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
   const onChangeCouncils = async (councils) => {
     setLoading(true);
     const responseData = await api
-      .updateSubscription(id, { councils: councils })
+      .updateSubscription(id, { council_types: councils })
       .then((response) => {
         return response.data;
       });

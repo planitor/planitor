@@ -100,9 +100,9 @@ class Subscription(Base):
         return self.get_string()
 
     def get_municipality(self):
-        if self.case:
+        if self.case and self.type == SubscriptionTypeEnum.case:
             return self.case.council.municipality
-        if self.address:
+        if self.address and self.type == SubscriptionTypeEnum.address:
             return self.address.municipality
 
 

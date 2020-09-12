@@ -13,7 +13,7 @@ from planitor.schemas.city import Council
 from planitor.schemas.monitor import (
     Subscription,
     SubscriptionForm,
-    SubscriptionCouncilForm,
+    SubscriptionCouncilTypeForm,
 )
 from planitor.security import get_current_active_user
 
@@ -43,36 +43,34 @@ def create_subscription():
     return None
 
 
-def set_subscription_councils(
-    db: Session,
+def set_subscription_council_types(
     subscription: models.Subscription,
-    councils: List[SubscriptionCouncilForm],
+    council_types: List[SubscriptionCouncilTypeForm],
 ) -> None:
     """If all councils selected, whether within municipality or the available council
     types, turn field into None, which is the default state. If no councils selected,
     deactivate subscription, but let `councils` field keep the presumable last remaining
-    council type, so that when reactivated, that is the selected council.
-    """
+    council type, so that when reactivated, that is the selected council."""
 
-    if councils == []:
+    if council_types == []:
         subscription.active = False
         return
 
     # Turn form into dict with named keys, for easier access
-    _councils = {c.name: c.selected for c in councils}
+    _types = {c.name for c in council_types}
 
     municipality = subscription.get_municipality()
+
     if municipality:
-        all_selected = set(_councils.keys()) == {
-            c.council_type.name for c in municipality.councils
-        }
+        _municipality_councils = {c.council_type.name for c in municipality.councils}
+        all_selected = _municipality_councils.issubset(_types)
         if all_selected:
-            subscription.councils = None
+            subscription.council_types = None
             return
 
-    subscription.councils = [getattr(CouncilTypeEnum, key) for key in _councils.keys()]
-    if set(subscription.councils) == set(CouncilTypeEnum):
-        subscription.councils = None
+    subscription.council_types = [getattr(CouncilTypeEnum, key) for key in _types]
+    if set(subscription.council_types) == set(CouncilTypeEnum):
+        subscription.council_types = None
 
 
 @router.post("/subscriptions/{id}", response_model=Subscription)
@@ -92,8 +90,8 @@ def update_subscription(
         subscription.immediate = form.immediate
     if form.radius is not None:
         subscription.radius = form.radius
-    if form.councils is not None:
-        set_subscription_councils(db, subscription, form.councils)
+    if form.council_types is not None:
+        set_subscription_council_types(subscription, form.council_types)
     db.add(subscription)
     db.commit()
     return subscription

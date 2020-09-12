@@ -32,8 +32,7 @@ class Address(BaseModel):
         orm_mode = True
 
 
-class SubscriptionCouncilForm(BaseModel):
-    selected: bool
+class SubscriptionCouncilTypeForm(BaseModel):
     name: str
 
 
@@ -41,7 +40,7 @@ class SubscriptionForm(BaseModel):
     active: Optional[bool] = None
     immediate: Optional[bool] = None
     radius: Optional[int] = None
-    councils: Optional[List[SubscriptionCouncilForm]] = None
+    council_types: Optional[List[SubscriptionCouncilTypeForm]] = None
 
 
 class SubscriptionBase(BaseModel):
