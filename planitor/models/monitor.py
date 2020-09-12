@@ -14,8 +14,12 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import ARRAY
 
 from ..database import Base
+
+from .city import CouncilTypeEnum
+
 
 EnumValue = namedtuple("EnumValue", ("slug", "label"))
 
@@ -27,6 +31,21 @@ class SubscriptionTypeEnum(enum.Enum):
     entity = EnumValue("kennitala", "Kennitala")
     radius = EnumValue("radius", "Radíus")
     search = EnumValue("leit", "Leit")
+
+
+class SubscriptionCouncil(Base):
+    """Users can choose to pick which council meetings the subscription should monitor, if
+    not all. The default state should be to have all councils, and that should be true
+    if no rows are found. This means a new subscription starts with zero rows here
+    and if the user de-selects a council, we create rows for all the remaining councils.
+    """
+
+    __tablename__ = "subscription_councils"
+
+    subscription_id = Column(Integer, ForeignKey("subscriptions.id"), primary_key=True)
+    subscription = relationship("Subscription")
+    council_id = Column(Integer, ForeignKey("councils.id"), primary_key=True)
+    council = relationship("Council")
 
 
 class Subscription(Base):
@@ -59,6 +78,8 @@ class Subscription(Base):
     entity_kennitala = Column(String, ForeignKey("entities.kennitala"), nullable=True)
     entity = relationship("Entity")
 
+    council_types = Column(ARRAY(Enum(CouncilTypeEnum)))
+
     def get_string(self, case="nominative"):
         if self.type == SubscriptionTypeEnum.case:
             nl = "málsnúmeri {}".format(self.case.serial)
@@ -77,6 +98,12 @@ class Subscription(Base):
 
     def __str__(self):
         return self.get_string()
+
+    def get_municipality(self):
+        if self.case:
+            return self.case.council.municipality
+        if self.address:
+            return self.address.municipality
 
 
 class Delivery(Base):

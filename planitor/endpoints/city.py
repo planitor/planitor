@@ -7,12 +7,7 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request
 
 from planitor import hashids
-from planitor.crud.city import get_and_init_address, search_addresses
-from planitor.crud.follow import (
-    get_address_subscription,
-    get_case_subscription,
-    get_entity_subscription,
-)
+from planitor import crud
 from planitor.database import get_db
 from planitor.meetings import MeetingView
 from planitor.models import (
@@ -48,7 +43,7 @@ async def get_search(
     else:
         results = None
 
-    iceaddr_matches = search_addresses(q)
+    iceaddr_matches = crud.search_addresses(q)
 
     return templates.TemplateResponse(
         "search_results.html",
@@ -222,9 +217,9 @@ async def get_case(
     else:
         related_cases = []
 
-    subscription = get_case_subscription(db, current_user, case)
+    subscription = crud.get_case_subscription(db, current_user, case)
 
-    address_subscription = get_address_subscription(db, current_user, case.iceaddr)
+    address_subscription = crud.get_address_subscription(db, current_user, case.iceaddr)
 
     return templates.TemplateResponse(
         "case.html",
@@ -297,7 +292,7 @@ def get_minute(
         .first()
     )
 
-    subscription = get_case_subscription(db, current_user, minute.case)
+    subscription = crud.get_case_subscription(db, current_user, minute.case)
 
     case = minute.case
     if case.iceaddr is not None:
@@ -310,7 +305,7 @@ def get_minute(
     else:
         related_cases = []
 
-    address_subscription = get_address_subscription(db, current_user, case.iceaddr)
+    address_subscription = crud.get_address_subscription(db, current_user, case.iceaddr)
 
     return templates.TemplateResponse(
         "minute.html",
@@ -344,7 +339,7 @@ async def get_address(
     current_user: User = Depends(get_current_active_user_or_none),
 ):
 
-    address = get_and_init_address(hnitnum)
+    address = crud.get_and_init_address(hnitnum)
     if not address:
         raise HTTPException(404)
 
@@ -407,7 +402,7 @@ async def get_address(
         )
     )
 
-    subscription = get_address_subscription(db, current_user, address)
+    subscription = crud.get_address_subscription(db, current_user, address)
 
     return templates.TemplateResponse(
         "address.html",
@@ -465,7 +460,7 @@ async def get_company(
         .order_by(Case.updated.desc())
     )
 
-    subscription = get_entity_subscription(db, current_user, entity)
+    subscription = crud.get_entity_subscription(db, current_user, entity)
 
     return templates.TemplateResponse(
         "company.html",

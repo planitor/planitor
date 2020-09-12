@@ -26,12 +26,14 @@ from itertools import groupby
 import dramatiq
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.expression import any_
 from sentry_sdk import capture_exception
 
 from planitor.crud import create_delivery, get_delivery
 from planitor.database import db_context
 from planitor import mail
 from planitor.models import Address, Case, Delivery, Meeting, Minute, Subscription, User
+from planitor.models.monitor import SubscriptionCouncil
 
 
 MinuteDeliveries = Iterable[Tuple[Minute, Iterable[Delivery]]]
@@ -87,6 +89,13 @@ def match_minute(db: Session, minute: Minute) -> Iterator[Subscription]:
         .outerjoin(Case)
         .outerjoin(Address, Address.hnitnum == Subscription.address_hnitnum)
         .filter(Subscription.active == True)  # noqa
+        # No `subscription_councils` means it should match all of them, the UI masks this
+        # by rendering checked checkboxes for all options - when one is unchecked the
+        # other rows will appear.
+        .filter(
+            (minute.meeting.council_type == any_(Subscription.council_types))
+            | (Subscription.council_types == None)
+        )
         .filter(filters)
     )
 

@@ -1,15 +1,40 @@
+from typing import List, Tuple, Dict
 import datetime as dt
 
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from planitor.schemas import city as schemas
 from planitor.crud.city import get_and_init_address
 from planitor.database import get_db
-from planitor.models import Address, Case, CaseEntity
+from planitor.models import (
+    Address,
+    Case,
+    CaseEntity,
+    Municipality,
+    Council,
+    CouncilTypeEnum,
+)
 
 from ..utils import _get_entity
 from . import router
+
+
+@router.get("/municipalities", response_model=List[schemas.Municipality])
+def get_municipalities(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    return db.query(Municipality).outerjoin(Council).all()
+
+
+@router.get("/council-types", response_model=List[CouncilTypeEnum])
+def get_council_types(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    return list(CouncilTypeEnum)
 
 
 @router.get("/addresses/{hnitnum}/addresses")

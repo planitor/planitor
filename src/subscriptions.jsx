@@ -1,8 +1,8 @@
 import { Fragment, h } from "preact";
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import { api } from "./api";
-import { TrashFill, BadgePlusRadiowavesRight } from "./symbols.jsx";
-import { groupBy, forEach, sortBy } from "lodash";
+import { TrashFill } from "./symbols.jsx";
+import { groupBy, keyBy } from "lodash";
 
 const SelectWidget = ({ value, onChange, isDisabled, children }) => {
   return (
@@ -36,7 +36,13 @@ const SubscriptionLoading = () => {
   );
 };
 
-const Case = ({ serial, id }) => {
+const Case = ({ serial, id, council }) => {
+  return (
+    <a href={`/cases/${id}`} class="block">
+      <div>{serial}</div>
+      <div class="font-normal text-gray-700 text-xs">{council.name}</div>
+    </a>
+  );
   return <a href={`/cases/${id}`}>{serial}</a>;
 };
 
@@ -44,20 +50,110 @@ const Search = ({ search_query }) => {
   return <a href={`/leit?q=${search_query}`}>„{search_query}“</a>;
 };
 
-const Address = ({ name, hnitnum, radius, onChangeRadius }) => {
-  return <a href={`/heimilisfong/${hnitnum}`}>{name}</a>;
+const Address = ({ name, hnitnum, stadur_nf }) => {
+  return (
+    <a href={`/heimilisfong/${hnitnum}`} class="block">
+      <div>{name}</div>
+      <div class="font-normal text-gray-700 text-xs">{stadur_nf}</div>
+    </a>
+  );
 };
 
 const Entity = ({ kennitala, name }) => {
-  return <a href={`/f/${kennitala}`}>{name}</a>;
+  return (
+    <a href={`/f/${kennitala}`} class="block">
+      <div>{name}</div>
+      <div class="font-normal text-gray-700 text-xs">kt. {kennitala}</div>
+    </a>
+  );
 };
 
-const Subscription = (props) => {
-  const { subscription } = props;
+const SelectCouncils = ({ councils, onChangeCouncils }) => {
+  const onClick = (_name, _selected) => {
+    onChangeCouncils(
+      councils.map(({ name, selected }) => {
+        return { name: name, selected: _name === name ? _selected : selected };
+      })
+    );
+  };
 
+  return (
+    <div class="">
+      {councils.map(({ label, name, selected }) => {
+        return (
+          <div
+            class="text-xs"
+            onClick={(event) => {
+              onClick(name, !selected);
+            }}
+          >
+            <div class={selected && "font-bold"}>{label}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const getCouncils = (subscription, councilTypes, municipalities) => {
+  /* A subscription usually monitors across all council types. The user
+     can narrow it down to a few types of councils. Furthermore, to make
+     the UX better, the actual council names are displayed if the
+     subscription type is bound to an area (therefore bound to a municipality).
+  */
+
+  let councils = [];
+
+  const muniById = keyBy(municipalities, (m) => {
+    return m.id;
+  });
+
+  const subCouncilTypesByName = keyBy(subscription.council_types, (c) => {
+    const [_, __, name] = c;
+    return name;
+  });
+
+  for (const councilType of councilTypes) {
+    const [enumSlug, enumLabel, enumName] = councilType;
+    const selected =
+      !!subCouncilTypesByName[enumName] || subscription.council_types === null;
+
+    let municipality;
+    if (subscription.case)
+      municipality = muniById[subscription.case.council.municipality.id];
+    if (subscription.address)
+      municipality = muniById[subscription.address.municipality.id];
+    let label = enumLabel;
+    if (municipality) {
+      // For cases and addresses we can use the slightly more specific
+      // name of the council for this municipality - so instead of a generic
+      // "Skipulagsráð" we can have "Skipulags- og samgönguráð" if that’s the
+      // name in the relavant municipality. Note that not all monitored
+      // entities are bound to municipalities, hence the if/else above for
+      // case/address subscriptions.
+      for (const council of municipality.councils) {
+        const [_, __, municipalityCouncilType] = council.council_type;
+        if (municipalityCouncilType === enumName) {
+          label = council.name;
+        }
+      }
+    }
+    councils.push({
+      selected: selected,
+      name: enumName,
+      label: label,
+    });
+  }
+
+  return councils;
+};
+
+const Subscription = ({ subscription, municipalities, councilTypes }) => {
   const [isLoading, setLoading] = useState(false);
   const [isDeleted, setDeleted] = useState(false);
   const [data, setData] = useState(subscription);
+
+  if (isDeleted) return null;
 
   const { id, active, immediate } = data;
   let value = immediate ? "immediate" : "weekly";
@@ -66,7 +162,7 @@ const Subscription = (props) => {
     value = "never";
   }
 
-  if (isDeleted) return null;
+  const councils = getCouncils(data, councilTypes, municipalities);
 
   const onDelete = async (event) => {
     const isConfirmed = confirm(
@@ -80,7 +176,18 @@ const Subscription = (props) => {
     setDeleted(true);
   };
 
-  const onChange = async (event) => {
+  const onChangeCouncils = async (councils) => {
+    setLoading(true);
+    const responseData = await api
+      .updateSubscription(id, { councils: councils })
+      .then((response) => {
+        return response.data;
+      });
+    setLoading(false);
+    setData(responseData);
+  };
+
+  const onChangeDelivery = async (event) => {
     const { value } = event.target;
     const requestData = {
       active: value !== "never",
@@ -108,7 +215,7 @@ const Subscription = (props) => {
   };
 
   return (
-    <div class="pb-2 sm:p-4 w-full">
+    <div class="pb-2 mb-2 sm:mb-0 sm:p-4 w-full">
       <div class="flex flex-col md:flex-row align-middle">
         <div class="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
           {data.case && <Case {...data.case} />}
@@ -118,6 +225,10 @@ const Subscription = (props) => {
         </div>
         <div>
           <div class="flex justify-end sm:justify-between items-center w-full sm:w-auto">
+            <SelectCouncils
+              councils={councils}
+              onChangeCouncils={onChangeCouncils}
+            />
             {data.address && (
               <div class="mr-2 sm:mr-4">
                 <SelectWidget
@@ -137,7 +248,7 @@ const Subscription = (props) => {
             )}
             <SelectWidget
               value={value}
-              onChange={onChange}
+              onChange={onChangeDelivery}
               isDisabled={isLoading}
             >
               <Fragment>
@@ -161,13 +272,15 @@ const Subscription = (props) => {
   );
 };
 
-const Group = ({ type, subs }) => {
+const Group = ({ type, subscriptions, ...props }) => {
   return (
     <div class="mb-4 sm:mb-8">
-      <div class="mb-4 uppercase font-light tracking-wider text-xs">{type}</div>
+      <div class="mb-4 sm:px-5 uppercase font-light tracking-wider text-xs">
+        {type}
+      </div>
       <div class="sm:rounded-lg sm:shadow-sm pb-2 sm:p-1 w-full sm:bg-white">
-        {subs.map((sub) => {
-          return <Subscription key={sub.id} subscription={sub} />;
+        {subscriptions.map((sub) => {
+          return <Subscription key={sub.id} subscription={sub} {...props} />;
         })}
       </div>
     </div>
@@ -175,14 +288,32 @@ const Group = ({ type, subs }) => {
 };
 
 export const Subscriptions = () => {
-  const [subs, setSubs] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [councilTypes, setCouncilTypes] = useState([]);
+  const [municipalities, setMunicipalities] = useState([]);
+
   useEffect(async () => {
-    const subs = await api.getSubscriptions().then((response) => {
-      return response.data;
-    });
-    setSubs(subs);
+    // Municipalities objects are needed to render all municipality options
+    // in address subscription widgets, specifically where the user can pick
+    // and choose the councils being monitored
+    const responses = await Promise.all([
+      api.getSubscriptions(),
+      api.getCouncilTypes(),
+      api.getMunicipalities(),
+    ]).then(
+      ([
+        subscriptionResponse,
+        councilTypesResponse,
+        municipalitiesResponse,
+      ]) => {
+        setSubscriptions(subscriptionResponse.data);
+        setCouncilTypes(councilTypesResponse.data);
+        setMunicipalities(municipalitiesResponse.data);
+      }
+    );
   }, []);
-  if (!subs.length) {
+
+  if (!subscriptions.length) {
     return (
       <div>
         <SubscriptionLoading />
@@ -195,23 +326,27 @@ export const Subscriptions = () => {
   let types = {};
 
   let groups = Object.entries(
-    groupBy(subs, (sub) => {
-      types[sub.type[0]] = sub.type;
-      return sub.type[0];
+    groupBy(subscriptions, (subscription) => {
+      types[subscription.type[0]] = subscription.type;
+      return subscription.type[0];
     })
   );
 
-  groups.sort(([key, value]) => {
+  groups.sort(([key, _]) => {
     return key;
   });
 
-  console.log(groups);
-
   return (
     <div>
-      {groups.map(([type, subs]) => {
-        console.log(type, types);
-        return <Group subs={subs} type={types[type][1]} />;
+      {groups.map(([type, subscriptions]) => {
+        return (
+          <Group
+            subscriptions={subscriptions}
+            councilTypes={councilTypes}
+            municipalities={municipalities}
+            type={types[type][1]}
+          />
+        );
       })}
     </div>
   );

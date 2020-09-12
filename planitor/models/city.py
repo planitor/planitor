@@ -22,28 +22,37 @@ from sqlalchemy_utils import CompositeArray, CompositeType, TSVectorType
 from ..utils.kennitala import Kennitala
 from ..database import Base
 
-EnumValue = namedtuple("EnumValue", ("slug", "label"))
+# It would be cleaner to not include the `name` in the namedtuple but on the client
+# side pydantic has only serialized the enum value so we don't have the enum identifier
+# which is the name. It's only incidental that the slug value is sometimes the same
+# as the name, look at `EntityTypeEnum` to see slugs not matching names. This is why
+# we added the name attribute to the namedtuple.
 
+EnumValue = namedtuple("EnumValue", ("slug", "label", "name"))
 ColorEnumValue = namedtuple("ColorEnumValue", ("slug", "label", "color"))
 
 
 class CouncilTypeEnum(enum.Enum):
-    byggingarfulltrui = EnumValue("byggingarfulltrui", "Byggingarfulltrúi")
-    skipulagsfulltrui = EnumValue("skipulagsfulltrui", "Skipulagsfulltrúi")
-    skipulagsrad = EnumValue("skipulagsrad", "Skipulagsráð")
-    borgarrad = EnumValue("borgarrad", "Borgarráð")
-    borgarstjorn = EnumValue("borgarstjorn", "Borgarstjórn")
+    byggingarfulltrui = EnumValue(
+        "byggingarfulltrui", "Byggingarfulltrúi", "byggingarfulltrui"
+    )
+    skipulagsfulltrui = EnumValue(
+        "skipulagsfulltrui", "Skipulagsfulltrúi", "skipulagsfulltrui"
+    )
+    skipulagsrad = EnumValue("skipulagsrad", "Skipulagsráð", "skipulagsrad")
+    borgarrad = EnumValue("borgarrad", "Borgarráð", "borgarrad")
+    borgarstjorn = EnumValue("borgarstjorn", "Borgarstjórn", "borgarstjorn")
 
 
 class PlanTypeEnum(enum.Enum):
-    deiliskipulag = EnumValue("deiliskipulag", "Deiliskipulag")
-    adalskipulag = EnumValue("adalskipulag", "Aðalskipulag")
-    svaedisskipulag = EnumValue("svaedisskipulag", "Svæðisskipulag")
+    deiliskipulag = EnumValue("deiliskipulag", "Deiliskipulag", "deiliskipulag")
+    adalskipulag = EnumValue("adalskipulag", "Aðalskipulag", "adalskipulag")
+    svaedisskipulag = EnumValue("svaedisskipulag", "Svæðisskipulag", "svaedisskipulag")
 
 
 class EntityTypeEnum(enum.Enum):
-    person = EnumValue("persona", "Persóna")
-    company = EnumValue("fyrirtaeki", "Fyrirtæki")
+    person = EnumValue("persona", "Persóna", "person")
+    company = EnumValue("fyrirtaeki", "Fyrirtæki", "company")
 
 
 class CaseStatusEnum(enum.Enum):
@@ -155,9 +164,11 @@ class Address(Base):
     stadur_tgf = Column(String)
     svaedi_nf = Column(String)
     svaedi_tgf = Column(String)
-    svfnr = Column(Integer)
+    svfnr = Column(Integer, ForeignKey("municipalities.id"))
     tegund = Column(String)
     vidsk = Column(String)
+
+    municipality = relationship("Municipality")
 
     @property
     def address(self):
@@ -216,6 +227,8 @@ class Municipality(Base):
     geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
 
+    councils = relationship("Council")
+
     def __str__(self):
         return self.name
 
@@ -230,8 +243,8 @@ class Plan(Base):
     parent_id = Column(Integer, ForeignKey("plans.id"), nullable=True)
     parent = relationship("Plan", remote_side=[id])
 
-    minicipality_id = Column(Integer, ForeignKey(Municipality.id))
-    minicipality = relationship(Municipality)
+    municipality_id = Column(Integer, ForeignKey(Municipality.id))
+    municipality = relationship(Municipality)
 
 
 class Council(Base):
