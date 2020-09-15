@@ -1,7 +1,9 @@
-import { Fragment, h } from "preact";
+import { Fragment, h, render } from "preact";
 import { useState, useEffect } from "preact/hooks";
+
+import { openModal } from "./modals";
 import { api } from "./api";
-import { TrashFill } from "./symbols.jsx";
+import { Ellipsis, TrashFill } from "./symbols.jsx";
 import { groupBy, keyBy } from "lodash";
 
 const SelectWidget = ({ value, onChange, isDisabled, children }) => {
@@ -43,7 +45,6 @@ const Case = ({ serial, id, council }) => {
       <div class="font-normal text-gray-700 text-xs">{council.name}</div>
     </a>
   );
-  return <a href={`/cases/${id}`}>{serial}</a>;
 };
 
 const Search = ({ search_query }) => {
@@ -68,7 +69,7 @@ const Entity = ({ kennitala, name }) => {
   );
 };
 
-const SelectCouncils = ({ councils, onChangeCouncils }) => {
+const SelectCouncils = ({ councils, isDisabled, onChangeCouncils }) => {
   const onClick = (_name, _selected) => {
     onChangeCouncils(
       councils
@@ -85,17 +86,22 @@ const SelectCouncils = ({ councils, onChangeCouncils }) => {
   };
 
   return (
-    <div class="">
+    <div>
       {councils.map(({ label, name, selected }) => {
         return (
-          <div
-            class="text-xs"
+          <label
+            class="flex items-center text-left"
             onClick={(event) => {
               onClick(name, !selected);
             }}
           >
-            <div class={selected && "font-bold"}>{label}</div>
-          </div>
+            <input
+              type="checkbox"
+              disabled={isDisabled}
+              checked={selected && "checked"}
+            />
+            <div class="flex-grow ml-2">{label}</div>
+          </label>
         );
       })}
     </div>
@@ -131,6 +137,7 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
     if (subscription.address)
       municipality = muniById[subscription.address.municipality.id];
     let label = enumLabel;
+
     if (municipality) {
       // For cases and addresses we can use the slightly more specific
       // name of the council for this municipality - so instead of a generic
@@ -141,35 +148,51 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
       for (const council of municipality.councils) {
         const [_, __, municipalityCouncilType] = council.council_type;
         if (municipalityCouncilType === enumName) {
-          label = council.name;
+          councils.push({
+            selected: selected,
+            name: enumName,
+            label: council.name,
+          });
         }
       }
+    } else {
+      councils.push({
+        selected: selected,
+        name: enumName,
+        label: label,
+      });
     }
-    councils.push({
-      selected: selected,
-      name: enumName,
-      label: label,
-    });
   }
 
   return councils;
 };
 
-const Subscription = ({ subscription, municipalities, councilTypes }) => {
+const Settings = ({
+  parentData,
+  setParentData,
+  setDeleted,
+  councilTypes,
+  municipalities,
+  closeModal,
+}) => {
+  const [data, setChildData] = useState(parentData);
   const [isLoading, setLoading] = useState(false);
-  const [isDeleted, setDeleted] = useState(false);
-  const [data, setData] = useState(subscription);
-
-  if (isDeleted) return null;
-
-  const { id, active, immediate } = data;
-  let value = immediate ? "immediate" : "weekly";
-
-  if (!active) {
-    value = "never";
-  }
 
   const councils = getCouncils(data, councilTypes, municipalities);
+
+  const setData = (data) => {
+    // A dirty way to connect two Preact trees together, this one is inside a modal window
+    // so not inside the component tree and a part of another `render` call.
+    setChildData(data);
+    setParentData(data);
+  };
+
+  const { id, active, immediate } = data;
+  let delivery = immediate ? "immediate" : "weekly";
+
+  if (!active) {
+    delivery = "never";
+  }
 
   const onDelete = async (event) => {
     const isConfirmed = confirm(
@@ -181,6 +204,7 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
       return response.data;
     });
     setDeleted(true);
+    closeModal();
   };
 
   const onChangeCouncils = async (councils) => {
@@ -222,8 +246,86 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
   };
 
   return (
+    <div class="">
+      {data.address && (
+        <div class="flex items-center py-4 sm:py-6 border-b border-gray-300">
+          <div class="flex-grow font-bold">Radíus</div>
+          <SelectWidget
+            value={data.radius || 0}
+            onChange={onChangeRadius}
+            isDisabled={isLoading}
+          >
+            <Fragment>
+              <option value={0}>0m</option>
+              <option value={50}>+ 50m</option>
+              <option value={100}>+ 100m</option>
+              <option value={300}>+ 300m</option>
+              <option value={500}>+ 500m</option>
+            </Fragment>
+          </SelectWidget>
+        </div>
+      )}
+      <div class="flex items-center py-4 sm:py-6 border-b border-gray-300">
+        <div class="flex-grow font-bold">Afhending</div>
+        <SelectWidget
+          value={delivery}
+          onChange={onChangeDelivery}
+          isDisabled={isLoading}
+        >
+          <Fragment>
+            <option value="never">Afvirkja</option>
+            <option value="immediate">Strax</option>
+            <option value="weekly">Vikuleg</option>
+          </Fragment>
+        </SelectWidget>
+      </div>
+      <div class="py-4 items-center sm:py-6 border-b border-gray-300">
+        <div class="font-bold mb-1">Fundargerðir</div>
+        <SelectCouncils
+          councils={councils}
+          isDisabled={isLoading}
+          onChangeCouncils={onChangeCouncils}
+        />
+      </div>
+      <div class="py-4 sm:py-6 text-center">
+        <button
+          class="text-red-700 font-bold"
+          onClick={(event) => {
+            !isLoading && onDelete(event);
+          }}
+        >
+          Eyða
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const Subscription = ({ subscription, municipalities, councilTypes }) => {
+  const [isDeleted, setDeleted] = useState(false);
+  const [data, setData] = useState(subscription);
+
+  if (isDeleted) return null;
+
+  const openSettings = (event) => {
+    event.stopPropagation();
+    const [modalRender, closeModal] = openModal();
+
+    modalRender(
+      <Settings
+        parentData={data}
+        setParentData={setData}
+        setDeleted={setDeleted}
+        councilTypes={councilTypes}
+        municipalities={municipalities}
+        closeModal={closeModal}
+      />
+    );
+  };
+
+  return (
     <div class="pb-2 mb-2 sm:mb-0 sm:p-4 w-full">
-      <div class="flex flex-col md:flex-row align-middle">
+      <div class="flex align-middle">
         <div class="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
           {data.case && <Case {...data.case} />}
           {data.search_query && <Search search_query={data.search_query} />}
@@ -231,48 +333,9 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
           {data.entity && <Entity {...data.entity} />}
         </div>
         <div>
-          <div class="flex justify-end sm:justify-between items-center w-full sm:w-auto">
-            <SelectCouncils
-              councils={councils}
-              onChangeCouncils={onChangeCouncils}
-            />
-            {data.address && (
-              <div class="mr-2 sm:mr-4">
-                <SelectWidget
-                  value={data.radius || 0}
-                  onChange={onChangeRadius}
-                  isDisabled={isLoading}
-                >
-                  <Fragment>
-                    <option value={0}>0m</option>
-                    <option value={50}>+ 50m</option>
-                    <option value={100}>+ 100m</option>
-                    <option value={300}>+ 300m</option>
-                    <option value={500}>+ 500m</option>
-                  </Fragment>
-                </SelectWidget>
-              </div>
-            )}
-            <SelectWidget
-              value={value}
-              onChange={onChangeDelivery}
-              isDisabled={isLoading}
-            >
-              <Fragment>
-                <option value="never">Afvirkja</option>
-                <option value="immediate">Strax</option>
-                <option value="weekly">Vikuleg</option>
-              </Fragment>
-            </SelectWidget>
-            <button
-              class="ml-3 sm:ml-6 text-gray-500 flex-grow sm:flex-grow-0 flex justify-end"
-              onClick={(event) => {
-                !isLoading && onDelete(event);
-              }}
-            >
-              <TrashFill />
-            </button>
-          </div>
+          <button onClick={openSettings}>
+            <Ellipsis />
+          </button>
         </div>
       </div>
     </div>
