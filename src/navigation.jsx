@@ -32,12 +32,12 @@ const LoginButton = (props) => {
   const onClick = (event) => {
     event.stopPropagation();
     event.preventDefault();
-    const [el, closeModal] = openModal();
+    const [modalRender, closeModal] = openModal();
     const onSuccess = () => {
       onLogin();
       closeModal();
     };
-    render(<Login onSuccess={onSuccess} />, el);
+    modalRender(<Login onSuccess={onSuccess} />);
   };
 
   return (

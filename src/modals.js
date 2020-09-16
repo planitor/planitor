@@ -30,8 +30,7 @@ export const openModal = () => {
   // if we render multiple times, Preact wants us to use a reference
   // to the same element, returned from `render`
   const modalRender = (component) => {
-    console.log(component, innerEl, innerEl.firstChild);
-    console.log(render(component, innerEl, innerEl.firstChild));
+    render(component, innerEl, innerEl.firstChild);
   };
 
   return [modalRender, cleanup]; // the section that can be taken over by Preact

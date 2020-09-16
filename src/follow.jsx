@@ -72,8 +72,8 @@ const Follow = (props) => {
         });
     };
     if (document._user === null) {
-      const [el, closeModal] = openModal();
-      render(<Banner />, el);
+      const [modalRender, _] = openModal();
+      modalRender(<Banner />);
     } else {
       toggle();
     }
@@ -119,87 +119,3 @@ export const FollowEntity = (props) => {
     />
   );
 };
-
-/*
-
-
-const FollowCase = (props) => {
-  const { id, state, defaultLabel, unfollowApi, followApi } = props;
-  const [hover, setHover] = useState(false);
-  const [following, setFollowing] = useState(state === "following");
-  const [form, setForm] = useState({ isLoading: false, error: null });
-  const onClick = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (form.isLoading) return;
-    const toggle = () => {
-      setForm({ isLoading: true, error: null });
-      (following ? api.unfollowCase(id) : api.followCase(id))
-        .then((response) => {
-          setFollowing(!following);
-          setHover(false);
-          setForm({ isLoading: false, error: null });
-        })
-        .catch(function (error) {
-          setForm({ isLoading: false, error: error });
-        });
-    };
-    if (document._user === null) {
-      const [el, closeModal] = openModal();
-      render(<Banner />, el);
-    } else {
-      toggle();
-    }
-  };
-  return (
-    <Button
-      loading={form.isLoading}
-      following={following}
-      hover={hover}
-      setHover={setHover}
-      onClick={onClick}
-      defaultLabel={defaultLabel}
-    />
-  );
-};
-
-export const FollowAddress = (props) => {
-  const { hnitnum, state } = props;
-  const [hover, setHover] = useState(false);
-  const [following, setFollowing] = useState(state === "following");
-  const [form, setForm] = useState({ isLoading: false, error: null });
-  const onClick = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (form.isLoading) return;
-    const toggle = () => {
-      setForm({ isLoading: true, error: null });
-      (following ? api.unfollowAddress(hnitnum) : api.followAddress(hnitnum))
-        .then((response) => {
-          setFollowing(!following);
-          setHover(false);
-          setForm({ isLoading: false, error: null });
-        })
-        .catch(function (error) {
-          setForm({ isLoading: false, error: error });
-        });
-    };
-    if (document._user === null) {
-      const [el, closeModal] = openModal();
-      render(<Banner />, el);
-    } else {
-      toggle();
-    }
-  };
-  return (
-    <Button
-      loading={form.isLoading}
-      following={following}
-      hover={hover}
-      setHover={setHover}
-      onClick={onClick}
-    />
-  );
-};
-
-*/
