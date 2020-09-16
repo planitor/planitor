@@ -14,6 +14,7 @@ from .city import (  # noqa
     update_case_status,
     update_case_address,
     search_addresses,
+    search_entities,
     get_and_init_address,
 )
 

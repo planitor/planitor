@@ -1,12 +1,16 @@
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from iceaddr import iceaddr_suggest, iceaddr_lookup
-from iceaddr.addresses import _run_addr_query
 
+from iceaddr import iceaddr_lookup, iceaddr_suggest
+from iceaddr.addresses import _run_addr_query
 from planitor.cases import get_case_status_from_remarks
-from planitor.language.companies import clean_company_name
+from planitor.geo import get_address_lookup_params, lookup_address
+from planitor.language.companies import (
+    clean_company_name,
+    yield_entity_name_search_tokens,
+)
 from planitor.models import (
     Address,
     Attachment,
@@ -16,15 +20,14 @@ from planitor.models import (
     CouncilTypeEnum,
     Entity,
     EntityTypeEnum,
-    Meeting,
     Geoname,
     Housenumber,
+    Meeting,
     Minute,
     Municipality,
 )
-from planitor.geo import get_address_lookup_params, lookup_address
 from planitor.utils.kennitala import Kennitala
-from planitor.utils.text import slugify, fold
+from planitor.utils.text import fold, slugify
 
 MUNICIPALITIES_OSM_IDS = {
     # These are `name`, `osm_id` tuples
@@ -90,6 +93,9 @@ def get_or_create_entity(
             slug=slugify(name),
             entity_type=entity_type,
             birthday=kennitala.get_birth_date(),
+            search_vector=func.to_tsvector(
+                "simple", " ".join(yield_entity_name_search_tokens(name))
+            ),
         )
         db.add(entity)
         created = True
@@ -231,6 +237,15 @@ def search_addresses(q):
     if lookup_match and lookup_match[0] not in matches:
         matches.insert(1, lookup_match[0])
     return [init_address(m) for m in matches]
+
+
+def search_entities(db: Session, q: str):
+    tsquery = func.websearch_to_tsquery("simple", q)
+    return (
+        db.query(Entity)
+        .filter(Entity.search_vector.op("@@")(tsquery))
+        .order_by(func.ts_rank(Entity.search_vector, tsquery))
+    )
 
 
 def get_or_create_address(

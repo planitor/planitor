@@ -1,9 +1,30 @@
 import re
 from typing import Dict, Iterable
 
+import tokenizer
 from reynir.reynir import _Sentence
 
 from planitor import greynir
+
+INDEXABLE_TOKEN_TYPES = frozenset(
+    (
+        tokenizer.TOK.ENTITY,
+        tokenizer.TOK.HASHTAG,
+        tokenizer.TOK.NUMBER,
+        tokenizer.TOK.NUMWLETTER,
+        tokenizer.TOK.ORDINAL,
+        tokenizer.TOK.PERSON,
+        tokenizer.TOK.SERIALNUMBER,
+        tokenizer.TOK.WORD,
+        tokenizer.TOK.YEAR,
+        tokenizer.TOK.DATEREL,
+        tokenizer.TOK.DATEABS,
+        tokenizer.TOK.MOLECULE,
+        tokenizer.TOK.COMPANY,
+        tokenizer.TOK.MEASUREMENT,
+    )
+)
+
 
 COMPANY_SUFFIXES = (
     "ehf.",
@@ -32,7 +53,7 @@ def clean_company_name(name):
 
 
 def parse_icelandic_companies(text) -> Dict:
-    """ This is only a regex so it does not tokenize. When company names are in
+    """This is only a regex so it does not tokenize. When company names are in
     different inflections, these are of course also not normalized to nefnifall. It
     does not pick company names with more than 3 word segments (see regex).
 
@@ -63,7 +84,7 @@ def titleize(left, right):
 
 
 def extract_company_names(text, sentences: Iterable[_Sentence] = None) -> Dict:
-    """ Get company names with preserved plurality and in nominative form. The
+    """Get company names with preserved plurality and in nominative form. The
     strategy is multipart:
 
     1.  First match companies named after their owner. This is done because they are
@@ -167,3 +188,26 @@ def extract_company_names(text, sentences: Iterable[_Sentence] = None) -> Dict:
                         break
 
     return matched_names
+
+
+def yield_entity_name_search_tokens(name):
+    for token in tokenizer.tokenize(name):
+        if token.kind not in INDEXABLE_TOKEN_TYPES:
+            continue
+
+        terms = set((token.txt,))
+        if not token.val:
+            terms.add(
+                token.txt.replace(".", "").replace("  ", " ")
+            )  # Turn H.Ú.N. into HÚN
+            terms.add(
+                token.txt.replace(".", " ").replace("  ", " ")
+            )  # Turn H.Ú.N. into H Ú N
+            terms.add(
+                token.txt.replace("-", " ").replace("  ", " ")
+            )  # Turn KB-fasteignir int KB fasteignir
+            terms.add(
+                token.txt.replace("-", "").replace("  ", " ")
+            )  # Turn Átt-kaup Áttkaup
+        for term in terms:
+            yield term

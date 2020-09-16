@@ -22,27 +22,7 @@ from tokenizer import TOK
 from planitor import greynir
 from planitor.utils.stopwords import stopwords
 
-from .companies import extract_company_names
-
-
-INDEXABLE_TOKEN_TYPES = frozenset(
-    (
-        TOK.ENTITY,
-        TOK.HASHTAG,
-        TOK.NUMBER,
-        TOK.NUMWLETTER,
-        TOK.ORDINAL,
-        TOK.PERSON,
-        TOK.SERIALNUMBER,
-        TOK.WORD,
-        TOK.YEAR,
-        TOK.DATEREL,
-        TOK.DATEABS,
-        TOK.MOLECULE,
-        TOK.COMPANY,
-        TOK.MEASUREMENT,
-    )
-)
+from .companies import extract_company_names, INDEXABLE_TOKEN_TYPES
 
 
 def get_token_lemmas(token, ignore) -> List[str]:

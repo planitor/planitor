@@ -213,6 +213,12 @@ class Entity(Base):
     geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id), nullable=True)
     geoname = relationship(Geoname)
 
+    search_vector = Column(TSVectorType(regconfig="pg_catalog.simple"))
+
+    __table_args__ = (
+        Index("ix_entity_search_vector_tsv", search_vector, postgresql_using="gin"),
+    )
+
     def get_human_kennitala(self):
         return "{}-{}".format(self.kennitala[:6], self.kennitala[6:])
 

@@ -5,11 +5,11 @@ from typing import Set, Generator
 from jinja2 import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func, or_
-from sqlalchemy.orm import Session, contains_eager
+from sqlalchemy.orm import Session, contains_eager, joinedload
 from iceaddr import iceaddr_suggest
 
 from planitor.language.search import get_wordforms, lemmatize_query
-from planitor.models import Minute, Case, Meeting, Council
+from planitor.models import Minute, Case, Meeting, Council, CaseEntity, Entity
 
 
 def get_tsquery(search_query):
@@ -180,9 +180,6 @@ class MinuteResults:
         if hnitnums:
             filter_ = or_(filter_, Case.address_id.in_(hnitnums))
         order_bys = [Meeting.start.desc()]
-        if hnitnums:
-            # order_bys.insert(0, Case.address_id.in_(hnitnums))
-            pass
 
         return (
             (
@@ -196,6 +193,9 @@ class MinuteResults:
                     .contains_eager(Meeting.council)
                     .contains_eager(Council.municipality),
                     contains_eager(Minute.case),
+                    joinedload(Minute.case, innerjoin=True)
+                    .joinedload(Case.entities, innerjoin=False)
+                    .joinedload(CaseEntity.entity, innerjoin=True),
                 )
                 .filter(filter_)
                 .order_by(
@@ -221,7 +221,7 @@ class MinuteResults:
 
     def get_document(self, minute: Minute) -> str:
         parts = [minute.inquiry, minute.remarks]
-        # parts += [ec.entity.name for ec in (minute.case.entities or [])]
+        parts += [f"\n{ec.entity.name}" for ec in (minute.case.entities or [])]
         return "\n".join(part for part in parts if part)
 
     def __iter__(self):

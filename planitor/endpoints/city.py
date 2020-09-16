@@ -44,6 +44,7 @@ async def get_search(
         results = None
 
     iceaddr_matches = crud.search_addresses(q)
+    entity_matches = crud.search_entities(db, q)
 
     return templates.TemplateResponse(
         "search_results.html",
@@ -53,6 +54,7 @@ async def get_search(
             "user": current_user,
             "results": results,
             "iceaddr_matches": iceaddr_matches,
+            "entity_matches": entity_matches,
         },
     )
 

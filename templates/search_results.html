@@ -38,6 +38,22 @@
       </div>
     {% endif %}
 
+    {% if entity_matches.count() %}
+      <div class="mb-6 text-sm">
+        <div class="inline font-bold">Fyrirtæki:</div>
+        <ul class="inline">
+          {% for entity in entity_matches %}
+          <li class="inline">
+            <a href="{{ url_for('get_company', kennitala=entity.kennitala) }}" class="text-midnight">
+              {{ entity.name -}}
+              {{ "," if not loop.last }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     <div class="flex justify-between items-end mb-4">
       <span class="font-bold">{{ results.page.count if results else 0 }} leitarniðurstöður</span>
     </div>
@@ -57,21 +73,20 @@
         class="mb-6 flex flex-col sm:flex-row"
       >
         <div class="address pr-4 sm:flex-shrink-0 sm:flex-grow-0 overflow-hidden">
-          <h4 class="sm:text-lg inline sm:block">{{ minute.case.address }}<span class="sm:hidden">,</span></h4>
+          <h4 class="sm:text-lg inline sm:block">{{ minute.case.serial }}<span class="sm:hidden">,</span></h4>
+          {% if minute.case.address %}
           <h5 class="text-gray-700 mb-1 inline sm:block">
-            {{ minute.case.serial }}
+            {{ minute.case.address }}
           </h5>
+          {% endif %}
           <p class="text-xs text-gray-600 hidden sm:block">
             {{ minute.meeting.council.municipality.name }},
             {{ minute.meeting.council.name }}
           </p>
         </div>
         <div class="flex-grow">
-          <h4 class="font-semibold text-midnight flex">
-            <div class="sm:text-lg flex-grow">
-              <div class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold align-middle ml-2 float-right">
-                {{ minute.status.value.label if minute.status else "Annað" }}
-              </div>
+          <h4 class="font-semibold text-midnight">
+            <div class="sm:text-lg">
               {{ minute.headline }}
             </div>
           </h4>
@@ -79,6 +94,11 @@
             {{ (" "|safe).join(previews).replace("… …", " … ") }}
           </p>
           <p class="text-xs text-gray-700">
+            {% if minute.status %}
+            <span class="text-{{ minute.status.value.color if minute.status else 'gray' }}-700 font-bold">
+              {{ minute.status.value.label -}}
+            </span>,
+            {% endif %}
             {{ human_date(minute.meeting.start) }}
           </p>
         </div>
