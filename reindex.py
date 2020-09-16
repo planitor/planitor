@@ -2,7 +2,7 @@ import typer
 
 from planitor.actors import update_minute_with_lemmas
 from planitor.database import db_context
-from planitor.models import Minute, Meeting
+from planitor.models import Meeting, Minute
 
 
 def main(last: int = 0, force: bool = False, worker: bool = False):
@@ -30,7 +30,9 @@ def main(last: int = 0, force: bool = False, worker: bool = False):
                 print("^C")
                 break
             print(
-                "Indexing Minute:{} → {}".format(minute.id, ", ".join(list(lemmas)[:10]))
+                "Indexing Minute:{} → {}".format(
+                    minute.id, ", ".join(list(lemmas)[:10])
+                )
             )
 
 

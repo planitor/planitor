@@ -1,7 +1,7 @@
 import csv
 import sqlite3
-from urllib.request import urlopen
 from io import TextIOWrapper
+from urllib.request import urlopen
 
 DBNAME = "logbylaskra.db"
 

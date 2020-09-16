@@ -3,8 +3,8 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from planitor.models import User
-from planitor.utils.passwords import verify_password, get_password_hash
 from planitor.schemas import UserCreate, UserUpdate
+from planitor.utils.passwords import get_password_hash, verify_password
 
 from .base import CRUDBase
 

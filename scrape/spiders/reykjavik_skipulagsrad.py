@@ -1,12 +1,12 @@
-from typing import List
-import json
 import datetime as dt
+import json
 import re
+from typing import List
 
-from bs4 import BeautifulSoup as bs
 import scrapy
+from bs4 import BeautifulSoup as bs
 
-from planitor.geo import lookup_address, get_address_lookup_params
+from planitor.geo import get_address_lookup_params, lookup_address
 
 
 def parse_entities(string: str) -> dict:
@@ -396,7 +396,9 @@ class ReykjavikSkipulagsradSpider(scrapy.Spider):
             r"(\n)+", "\n", description
         )  # normalize multiple \n to a single linebreak
 
-        minutes = [m for m in get_minutes(response) if m]  # filter out unparsable minutes
+        minutes = [
+            m for m in get_minutes(response) if m
+        ]  # filter out unparsable minutes
 
         yield {
             "url": response.url,

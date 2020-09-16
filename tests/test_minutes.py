@@ -1,5 +1,5 @@
-from planitor.models import Minute, Case, CaseEntity, Entity, Response
-from planitor.minutes import get_minute_lemmas, get_minute_document, search
+from planitor.minutes import get_minute_document, get_minute_lemmas, search
+from planitor.models import Case, CaseEntity, Entity, Minute, Response
 
 
 def test_get_minute_document(minute):

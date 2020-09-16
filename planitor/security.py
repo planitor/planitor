@@ -9,16 +9,16 @@ cookies as valid credentials.
 import datetime as dt
 from typing import Optional
 
+import jwt
 from fastapi import Depends, HTTPException, Response, Security
 from fastapi.security import APIKeyCookie, OAuth2PasswordBearer
-import jwt
 from jwt.exceptions import InvalidTokenError, PyJWTError
+from sentry_sdk import capture_exception, configure_scope
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
-from sentry_sdk import configure_scope, capture_exception
 
-from planitor import config, crud, ENV
+from planitor import ENV, config, crud
 from planitor.database import get_db
 from planitor.models.accounts import User
 

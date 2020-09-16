@@ -1,5 +1,6 @@
 from jinja2 import Markup
-from planitor.search import iter_preview_fragments, get_terms_from_query
+
+from planitor.search import get_terms_from_query, iter_preview_fragments
 
 LONG_WORD = "s" * 51
 LONG_SENTENCE = " ".join(["s" * 5] * 10)
@@ -27,7 +28,9 @@ def test_iter_preview_fragments_cancels_cursor_move_at_long_words():
 
 
 def test_iter_preview_fragments_stops_cursor_at_word_breaks():
-    assert list(iter_preview_fragments(f"{LONG_SENTENCE} B {LONG_SENTENCE}", {"b"})) == [
+    assert list(
+        iter_preview_fragments(f"{LONG_SENTENCE} B {LONG_SENTENCE}", {"b"})
+    ) == [
         Markup(
             "…sssss sssss sssss sssss sssss <strong>B</strong> "
             "sssss sssss sssss sssss sssss…"

@@ -17,13 +17,15 @@ from migra import Migration
 
 
 def sync(DB_URL: str = "postgresql://planitor:@localhost/planitor"):
-    from sqlbag import S, temporary_database as temporary_db
+    from sqlbag import S
+    from sqlbag import temporary_database as temporary_db
 
     with temporary_db() as TEMP_DB_URL:
         os.environ["DATABASE_URL"] = TEMP_DB_URL
-        from planitor.database import engine, Base
-        from planitor.models import _all  # noqa, needed to register models
         from sqlalchemy_utils import register_composites
+
+        from planitor.database import Base, engine
+        from planitor.models import _all  # noqa, needed to register models
 
         engine.execute("CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;")
         engine.execute(

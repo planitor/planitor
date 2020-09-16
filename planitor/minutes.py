@@ -4,7 +4,6 @@ from planitor.models import Address, Minute
 
 from .language import search
 
-
 IGNORE = ("dags.", "kr.", "nr.")
 REPLACE = (("Málinu vísað", "Málinu er vísað"),)
 

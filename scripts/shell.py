@@ -1,7 +1,8 @@
 from pprint import pprint
+
 import bpython
 
-from planitor import models, greynir
+from planitor import greynir, models
 from planitor.database import db_context
 
 

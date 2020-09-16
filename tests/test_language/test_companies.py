@@ -1,8 +1,8 @@
 from planitor.language.companies import (
-    parse_icelandic_companies,
-    extract_company_names,
-    titleize,
     clean_company_name,
+    extract_company_names,
+    parse_icelandic_companies,
+    titleize,
 )
 
 

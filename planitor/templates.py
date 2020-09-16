@@ -5,7 +5,7 @@ import imgix
 from jinja2 import Markup
 from starlette.templating import Jinja2Templates
 
-from planitor import hashids, config
+from planitor import config, hashids
 from planitor.utils.timeago import timeago
 
 

@@ -1,6 +1,6 @@
 """Icelandic national registry codes made easy"""
-import re
 import random
+import re
 from datetime import date, timedelta
 
 __author__ = "Jakub Owczarski"

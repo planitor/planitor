@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
-from planitor.mail import get_html
 
 from planitor.database import get_db
+from planitor.mail import get_html
 from planitor.monitor import iter_user_meeting_deliveries, iter_user_weekly_deliveries
 
 router = APIRouter()

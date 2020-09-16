@@ -6,18 +6,18 @@ from planitor.crud import get_or_create_search_subscription
 from planitor.minutes import get_minute_lemmas
 from planitor.models import (
     Address,
-    Council,
     Case,
     CaseEntity,
+    Council,
+    CouncilTypeEnum,
     Delivery,
+    Minute,
     Subscription,
     SubscriptionTypeEnum,
     User,
-    CouncilTypeEnum,
-    Minute,
 )
 from planitor.models.monitor import SubscriptionCouncil
-from planitor.monitor import get_unsent_deliveries, _create_deliveries
+from planitor.monitor import _create_deliveries, get_unsent_deliveries
 
 
 def test_match_minute_case(db, minute, case, user):
@@ -100,7 +100,9 @@ def test_match_minute_search(db, minute, user):
 def test_get_unsent_deliveries(db: Session, user, case, meeting, minute, subscription):
     # User has one subscription/delivery, User 2 has two subscriptions/deliveries
     user_2 = User(email="foo")
-    subscription_2 = Subscription(user=user_2, case=case, type=SubscriptionTypeEnum.case)
+    subscription_2 = Subscription(
+        user=user_2, case=case, type=SubscriptionTypeEnum.case
+    )
     delivery_1 = Delivery(minute=minute, subscription=subscription)
     delivery_2a = Delivery(minute=minute, subscription=subscription_2)
     delivery_2b = Delivery(

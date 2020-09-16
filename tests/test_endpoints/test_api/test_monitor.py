@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
+
+from planitor.endpoints.api.monitor import set_subscription_council_types
 from planitor.models import (
     Council,
-    Subscription,
-    SubscriptionTypeEnum,
     CouncilTypeEnum,
     Municipality,
+    Subscription,
+    SubscriptionTypeEnum,
 )
-from planitor.endpoints.api.monitor import set_subscription_council_types
 from planitor.schemas.monitor import SubscriptionCouncilTypeForm
 
 

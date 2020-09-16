@@ -53,13 +53,25 @@ def timeago(time=False):
     if day_diff == 1:
         return "Í gær"
     if day_diff < 7:
-        return formatter(int(day_diff), "Fyrir {} degi síðan", "Fyrir {} dögum síðan",)
+        return formatter(
+            int(day_diff),
+            "Fyrir {} degi síðan",
+            "Fyrir {} dögum síðan",
+        )
     if day_diff < 31:
         return formatter(
-            int(day_diff / 7), "Fyrir {} viku síðan", "Fyrir {} vikum síðan",
+            int(day_diff / 7),
+            "Fyrir {} viku síðan",
+            "Fyrir {} vikum síðan",
         )
     if day_diff < 365:
         return formatter(
-            int(day_diff / 30), "Fyrir {} mánuði síðan", "Fyrir {} mánuðum síðan",
+            int(day_diff / 30),
+            "Fyrir {} mánuði síðan",
+            "Fyrir {} mánuðum síðan",
         )
-    return formatter(int(day_diff / 365), "Fyrir {} ári síðan", "Fyrir {} árum síðan",)
+    return formatter(
+        int(day_diff / 365),
+        "Fyrir {} ári síðan",
+        "Fyrir {} árum síðan",
+    )

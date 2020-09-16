@@ -1,4 +1,5 @@
 import time
+
 import requests
 
 RSK_DOMAIN = "https://www.rsk.is"
@@ -7,7 +8,7 @@ MAX_RETRIES = 3
 
 
 def get_kennitala_from_rsk_search(name, max_retries=MAX_RETRIES):
-    """ The RSK search either displays results, or if there is only one result you are
+    """The RSK search either displays results, or if there is only one result you are
     redirected directly to the company page. We can use the Location header to pick up
     the kennitala.
 
