@@ -1,4 +1,3 @@
-from planitor.models.city import Minute
 from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
@@ -7,13 +6,18 @@ from planitor.crud import get_or_create_search_subscription
 from planitor.minutes import get_minute_lemmas
 from planitor.models import (
     Address,
+    Council,
+    Case,
     CaseEntity,
     Delivery,
     Subscription,
     SubscriptionTypeEnum,
     User,
+    CouncilTypeEnum,
+    Minute,
 )
-from planitor.monitor import get_unsent_deliveries, _notify_subscribers
+from planitor.models.monitor import SubscriptionCouncil
+from planitor.monitor import get_unsent_deliveries, _create_deliveries
 
 
 def test_match_minute_case(db, minute, case, user):
@@ -106,7 +110,7 @@ def test_get_unsent_deliveries(db: Session, user, case, meeting, minute, subscri
     db.commit()
 
     results = []
-    for _user, _deliveries in get_unsent_deliveries(db):
+    for _user, _deliveries in get_unsent_deliveries(db, immediate=True):
         results.append((_user, set(_deliveries)))
 
     assert results == [
@@ -121,7 +125,7 @@ def test_get_unsent_deliveries(db: Session, user, case, meeting, minute, subscri
     ]
 
 
-def test_notify_subscribers(
+def test_create_deliveries(
     db: Session, user, case, minute, subscription, emails_message_send
 ):
     """Test that ensures that users are not notified multiple times for the same
@@ -142,9 +146,45 @@ def test_notify_subscribers(
     db.add(subscription_3)
     db.commit()
 
-    deliveries = list(_notify_subscribers(db, minute))
+    deliveries = list(_create_deliveries(db, minute))
     assert emails_message_send.call_count == 2
     assert {user_2.email, user.email} == {
         call_args.kwargs["to"] for call_args in emails_message_send.call_args_list
     }
     assert len(deliveries) == 3
+
+
+def test_match_minute_matches_with_council_subscriptions_set(
+    db: Session,
+    user: User,
+    case: Case,
+    minute: Minute,
+):
+    """"""
+    council_2 = Council(
+        name="Council of Flutes",
+        municipality=case.council.municipality,
+        council_type=CouncilTypeEnum.skipulagsrad,
+    )
+    db.add(council_2)
+    db.commit()
+    subscription_council = SubscriptionCouncil(council_id=council_2.id)
+    subscription = Subscription(
+        user=user,
+        address=case.iceaddr,
+        type=SubscriptionTypeEnum.address,
+        councils=[subscription_council],
+    )
+    db.add(subscription)
+    db.commit()
+    assert list(monitor.match_minute(db, minute)) == []
+
+    db.delete(subscription_council)
+    db.add(subscription)
+    db.commit()
+    assert list(monitor.match_minute(db, minute)) == [subscription]
+
+    subscription.councils = [SubscriptionCouncil(council_id=minute.meeting.council.id)]
+    db.add(subscription)
+    db.commit()
+    assert list(monitor.match_minute(db, minute)) == [subscription]

@@ -30,6 +30,7 @@ def db_fixture(engine):
     from planitor.database import SessionLocal, engine, Base
     from planitor import models  # noqa
 
+    assert "planitor_test" in str(engine.url)
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(engine)
     db = SessionLocal()
@@ -61,7 +62,7 @@ def _c(db, obj):
 
 
 @pytest.fixture(scope="function", name="address")
-def address_fixture(db):
+def address_fixture(db, municipality):
     from planitor.models import Address
 
     address = _c(
@@ -91,12 +92,26 @@ def address_fixture(db):
     return address
 
 
-@pytest.fixture(scope="function", name="case")
-def case_fixture(db, address):
-    from planitor.models import Municipality, Council, Case
+@pytest.fixture(scope="function", name="municipality")
+def municipality_fixture(db):
+    from planitor.models import Municipality
 
-    muni = _c(db, Municipality(name="Acropolis", slug="acropolis"))
-    council = _c(db, Council(name="Building Office", municipality=muni))
+    municipality = _c(db, Municipality(id=0, name="Reykjavík", slug="reykjavik"))
+    return municipality
+
+
+@pytest.fixture(scope="function", name="case")
+def case_fixture(db, address, municipality):
+    from planitor.models import Council, Case, CouncilTypeEnum
+
+    council = _c(
+        db,
+        Council(
+            name="Building Office",
+            municipality=municipality,
+            council_type=CouncilTypeEnum.byggingarfulltrui,
+        ),
+    )
     case = _c(db, Case(council=council, iceaddr=address))
     return case
 

@@ -1,10 +1,14 @@
-from typing import Optional, Any
+from typing import Optional, Any, List
 from pydantic import BaseModel
+
+from planitor.models import CouncilTypeEnum, SubscriptionTypeEnum
+from .city import Council, Municipality
 
 
 class Case(BaseModel):
     id: int
     serial: str
+    council: Optional[Council]
 
     class Config:
         orm_mode = True
@@ -20,16 +24,23 @@ class Entity(BaseModel):
 
 class Address(BaseModel):
     hnitnum: int
-    name: str = "<Unknown>"
+    name: str
+    stadur_nf: str
+    municipality: Municipality
 
     class Config:
         orm_mode = True
+
+
+class SubscriptionCouncilTypeForm(BaseModel):
+    name: str
 
 
 class SubscriptionForm(BaseModel):
     active: Optional[bool] = None
     immediate: Optional[bool] = None
     radius: Optional[int] = None
+    council_types: Optional[List[SubscriptionCouncilTypeForm]] = None
 
 
 class SubscriptionBase(BaseModel):
@@ -40,11 +51,12 @@ class SubscriptionBase(BaseModel):
     address: Optional[Address] = None
     radius: Optional[int] = None
     entity: Optional[Entity] = None
+    council_types: Optional[List[CouncilTypeEnum]] = None
 
 
 class Subscription(SubscriptionBase):
     id: int
-    type: Any
+    type: SubscriptionTypeEnum
 
     class Config:
         orm_mode = True

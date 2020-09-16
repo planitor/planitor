@@ -21,17 +21,17 @@ mapkit.init({
 
 const passwordRecoveryEl = document.getElementById("password-recovery");
 if (passwordRecoveryEl) {
-  const [el, closeModal] = openModal();
-  render(<NewPasswordForm token={passwordRecoveryEl.dataset.token} />, el);
+  const [modalRender, closeModal] = openModal();
+  modalRender(<NewPasswordForm token={passwordRecoveryEl.dataset.token} />);
 }
 
 const loginEl = document.getElementById("login");
 if (loginEl) {
-  const [el, closeModal] = openModal();
+  const [modalRender, closeModal] = openModal();
   const onSuccess = () => {
     window.location.pathname = loginEl.dataset.redirectTo || "/";
   };
-  render(<Login onSuccess={onSuccess} />, el);
+  modalRender(<Login onSuccess={onSuccess} />);
 }
 
 const navigationEl = document.getElementById("navigation");

@@ -14,8 +14,12 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import ARRAY
 
 from ..database import Base
+
+from .city import CouncilTypeEnum
+
 
 EnumValue = namedtuple("EnumValue", ("slug", "label"))
 
@@ -59,6 +63,8 @@ class Subscription(Base):
     entity_kennitala = Column(String, ForeignKey("entities.kennitala"), nullable=True)
     entity = relationship("Entity")
 
+    council_types = Column(ARRAY(Enum(CouncilTypeEnum)))
+
     def get_string(self, case="nominative"):
         if self.type == SubscriptionTypeEnum.case:
             nl = "málsnúmeri {}".format(self.case.serial)
@@ -77,6 +83,12 @@ class Subscription(Base):
 
     def __str__(self):
         return self.get_string()
+
+    def get_municipality(self):
+        if self.case and self.type == SubscriptionTypeEnum.case:
+            return self.case.council.municipality
+        if self.address and self.type == SubscriptionTypeEnum.address:
+            return self.address.municipality
 
 
 class Delivery(Base):

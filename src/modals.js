@@ -1,3 +1,5 @@
+import { render, h } from "preact";
+
 export const openModal = () => {
   /* Handle opening and closing the modal window, return the el where Preact
   can inject a login form or whatever.
@@ -5,9 +7,12 @@ export const openModal = () => {
    */
 
   const modalEl = document.getElementById("modal");
+  const innerEl = modalEl.querySelector(".form");
+
   modalEl.classList.remove("hidden");
   const cleanup = () => {
     modalEl.classList.add("hidden");
+    innerEl.innerHTML = "<div></div>";
   };
   window.addEventListener("click", (event) => {
     // `Element.closest` traverses parents to find matching selector
@@ -22,5 +27,11 @@ export const openModal = () => {
     });
   });
 
-  return [modalEl.querySelector(".form"), cleanup]; // the section that can be taken over by Preact
+  // if we render multiple times, Preact wants us to use a reference
+  // to the same element, returned from `render`
+  const modalRender = (component) => {
+    render(component, innerEl, innerEl.firstChild);
+  };
+
+  return [modalRender, cleanup]; // the section that can be taken over by Preact
 };

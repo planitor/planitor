@@ -58,6 +58,12 @@ export const api = {
       `/api/addresses/${hnitnum}/addresses?radius=${radius}&days=${days}`
     );
   },
+  getCouncilTypes() {
+    return axios.get("/api/council-types", authHeaders());
+  },
+  getMunicipalities() {
+    return axios.get("/api/municipalities", authHeaders());
+  },
   getSubscriptions() {
     return axios.get("/api/subscriptions", authHeaders());
   },
