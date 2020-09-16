@@ -158,10 +158,6 @@ nav .search input::placeholder {
   margin-right: 6px;
 }
 
-.entities svg .fill {
-  fill: #2b6cb0;
-}
-
 form input.error {
   @apply border-red-700;
 }

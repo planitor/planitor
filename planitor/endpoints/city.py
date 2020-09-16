@@ -430,13 +430,13 @@ async def get_company(
 ):
     entity = _get_entity(db, kennitala, slug)
 
+    if slug is None:
+        return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
+
     if current_user is None:
         return templates.TemplateResponse(
             "company_paywall.html", {"request": request, "entity": entity}
         )
-
-    if slug is None:
-        return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
 
     sq_count = (
         db.query(Case.id, func.count(Minute.id).label("minute_count"))

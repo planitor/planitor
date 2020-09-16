@@ -30,6 +30,8 @@
     </div>
   </div>
 
+  {% block inner %}
+
   <div class="flex flex-col">
     <div class="mb-4">
       <div class="entity-map shadow-lg rounded-md overflow-hidden bg-white w-full" data-kennitala="{{ entity.kennitala }}"></div>
@@ -38,5 +40,7 @@
       {{ case_table(request, cases) }}
     </div>
   </div>
+
+  {% endblock %}
 
 {% endblock body %}
