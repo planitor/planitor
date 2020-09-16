@@ -2,10 +2,10 @@ import dramatiq
 import sentry_sdk
 from dramatiq.brokers.redis import RedisBroker
 from dramatiq.brokers.stub import StubBroker
-from dramatiq.results import Results
 from dramatiq.middleware import GroupCallbacks
-from dramatiq.results.backends import RedisBackend, StubBackend
 from dramatiq.rate_limits.backends.redis import RedisBackend as RateLimiterRedisBackend
+from dramatiq.results import Results
+from dramatiq.results.backends import RedisBackend, StubBackend
 from hashids import Hashids
 from reynir import Greynir
 from sentry_dramatiq import DramatiqIntegration

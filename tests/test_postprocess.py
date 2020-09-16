@@ -1,5 +1,4 @@
 from planitor.models import Entity
-
 from planitor.postprocess import _update_minute_with_entity_mentions
 
 

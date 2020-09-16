@@ -1,11 +1,10 @@
 import re
-from typing import Optional
 from collections import defaultdict
+from typing import Optional
 
-from tokenizer import tokenize, TOK, split_into_sentences
+from tokenizer import TOK, split_into_sentences, tokenize
 
-from planitor.models import Minute, Meeting, CaseStatusEnum
-
+from planitor.models import CaseStatusEnum, Meeting, Minute
 
 # Catches "umhverfis-og skipulagsráð" which should be "umhverfis- og skipulagsráð"
 COMPOUND_ENTITY_DASH_TYPO = re.compile(r"(?:([^\ ])(?:\ ?-\ ?og))")
@@ -69,7 +68,7 @@ PATTERNS = {
 
 
 def clean_sentence(text: str) -> str:
-    """ This is written to clean up and consolidate as many remarks as possible.
+    """This is written to clean up and consolidate as many remarks as possible.
     They are hand written and when initially analyzing it was very useful to count
     instances of certain sentence structures. Therefore date tokens are being
     removed and such.
@@ -77,7 +76,9 @@ def clean_sentence(text: str) -> str:
     """
 
     text = text.lower()
-    text = re.sub(COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text)
+    text = re.sub(
+        COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text
+    )
 
     def tokens(text):
         for token in tokenize(text):
@@ -101,7 +102,7 @@ def get_case_status_from_remarks(remarks) -> Optional[CaseStatusEnum]:
 
 
 def _print_statistics(db) -> None:
-    """ Usage
+    """Usage
 
     >>> from planitor.cases import _print_statistics
     >>> from planitor.database import get_db

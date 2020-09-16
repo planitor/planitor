@@ -1,7 +1,7 @@
-import pytest
+from contextlib import contextmanager
 from io import BytesIO
 
-from contextlib import contextmanager
+import pytest
 
 from planitor import attachments
 from planitor.models import PDFAttachment

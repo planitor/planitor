@@ -1,13 +1,12 @@
+import asyncio
 import datetime as dt
 import os
-import asyncio
 
-import sqlalchemy
 import pytest
-from pytest_mock import MockerFixture
-
+import sqlalchemy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pytest_mock import MockerFixture
 
 os.environ["DATABASE_URL"] = "postgresql://planitor:@localhost/planitor_test"
 
@@ -27,8 +26,8 @@ def engine_fixture() -> sqlalchemy.engine.Engine:
 @pytest.fixture(scope="function", name="db")
 def db_fixture(engine):
 
-    from planitor.database import SessionLocal, engine, Base
     from planitor import models  # noqa
+    from planitor.database import Base, SessionLocal, engine
 
     assert "planitor_test" in str(engine.url)
     Base.metadata.drop_all(bind=engine)
@@ -102,7 +101,7 @@ def municipality_fixture(db):
 
 @pytest.fixture(scope="function", name="case")
 def case_fixture(db, address, municipality):
-    from planitor.models import Council, Case, CouncilTypeEnum
+    from planitor.models import Case, Council, CouncilTypeEnum
 
     council = _c(
         db,

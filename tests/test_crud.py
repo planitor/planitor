@@ -1,10 +1,10 @@
-from planitor.models import Housenumber, Geoname
-from planitor.utils.kennitala import Kennitala
 from planitor.crud import (
     get_or_create_entity,
     lookup_icelandic_company_in_entities,
     update_case_address,
 )
+from planitor.models import Geoname, Housenumber
+from planitor.utils.kennitala import Kennitala
 
 
 def test_lookup_in_entities(db):

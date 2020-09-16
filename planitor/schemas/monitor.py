@@ -1,7 +1,9 @@
-from typing import Optional, Any, List
+from typing import Any, List, Optional
+
 from pydantic import BaseModel
 
 from planitor.models import CouncilTypeEnum, SubscriptionTypeEnum
+
 from .city import Council, Municipality
 
 

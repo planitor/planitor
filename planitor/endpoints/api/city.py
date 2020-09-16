@@ -1,21 +1,21 @@
-from typing import List
 import datetime as dt
+from typing import List
 
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from planitor.schemas import city as schemas
 from planitor.crud.city import get_and_init_address
 from planitor.database import get_db
 from planitor.models import (
     Address,
     Case,
     CaseEntity,
-    Municipality,
     Council,
     CouncilTypeEnum,
+    Municipality,
 )
+from planitor.schemas import city as schemas
 
 from ..utils import _get_entity
 from . import router

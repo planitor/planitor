@@ -1,7 +1,7 @@
 import enum
 from collections import namedtuple
-from reynir import NounPhrase
 
+from reynir import NounPhrase
 from sqlalchemy import (
     Boolean,
     Column,
@@ -17,9 +17,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import ARRAY
 
 from ..database import Base
-
 from .city import CouncilTypeEnum
-
 
 EnumValue = namedtuple("EnumValue", ("slug", "label"))
 

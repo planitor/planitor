@@ -1,5 +1,5 @@
-from planitor.geo import lookup_address, get_address_lookup_params
 from planitor.crud.city import get_or_create_address
+from planitor.geo import get_address_lookup_params, lookup_address
 from planitor.models import Address, Case
 
 

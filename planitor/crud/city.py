@@ -1,10 +1,10 @@
 from typing import Optional, Tuple
 
+from iceaddr import iceaddr_lookup, iceaddr_suggest
+from iceaddr.addresses import _run_addr_query
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from iceaddr import iceaddr_lookup, iceaddr_suggest
-from iceaddr.addresses import _run_addr_query
 from planitor.cases import get_case_status_from_remarks
 from planitor.geo import get_address_lookup_params, lookup_address
 from planitor.language.companies import (
@@ -46,7 +46,9 @@ def get_or_create_municipality(db, slug) -> Tuple[Attachment, bool]:
     return muni, created
 
 
-def get_or_create_council(db, municipality, slug, label=None) -> Tuple[Attachment, bool]:
+def get_or_create_council(
+    db, municipality, slug, label=None
+) -> Tuple[Attachment, bool]:
     council_type = getattr(CouncilTypeEnum, slug)
     created = False
     council = (
@@ -255,7 +257,9 @@ def get_or_create_address(
     address = db.query(Address).get(iceaddr_match["hnitnum"])
     created = False
     if address is None:
-        address = Address(**{k: v for k, v in iceaddr_match.items() if k in ADDRESS_KEYS})
+        address = Address(
+            **{k: v for k, v in iceaddr_match.items() if k in ADDRESS_KEYS}
+        )
         db.add(address)
         created = True
     return address, created

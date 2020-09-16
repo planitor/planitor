@@ -1,13 +1,4 @@
-from .accounts import (
-    User,
-    UserUpdate,
-    UserCreate,
-    UserBase,
-    Token,
-    TokenPayload,
-    Msg,
-)
-
+from .accounts import Msg, Token, TokenPayload, User, UserBase, UserCreate, UserUpdate
 from .monitor import Subscription
 
 __all__ = [

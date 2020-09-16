@@ -1,5 +1,3 @@
-from planitor.models.city import CouncilTypeEnum
-from planitor.models.monitor import SubscriptionTypeEnum
 from typing import List
 
 from fastapi import Depends, Request, Response
@@ -9,11 +7,13 @@ from sqlalchemy.orm import Session
 from planitor import models
 from planitor.crud import monitor as crud
 from planitor.database import get_db
+from planitor.models.city import CouncilTypeEnum
+from planitor.models.monitor import SubscriptionTypeEnum
 from planitor.schemas.city import Council
 from planitor.schemas.monitor import (
     Subscription,
-    SubscriptionForm,
     SubscriptionCouncilTypeForm,
+    SubscriptionForm,
 )
 from planitor.security import get_current_active_user
 

@@ -14,7 +14,7 @@ This module helps find lemmas suitable for fulltext indexing.
 """
 
 import re
-from typing import List, Iterable, Optional, Set
+from typing import Iterable, List, Optional, Set
 
 from reynir.bintokenizer import PersonName
 from tokenizer import TOK
@@ -22,7 +22,7 @@ from tokenizer import TOK
 from planitor import greynir
 from planitor.utils.stopwords import stopwords
 
-from .companies import extract_company_names, INDEXABLE_TOKEN_TYPES
+from .companies import INDEXABLE_TOKEN_TYPES, extract_company_names
 
 
 def get_token_lemmas(token, ignore) -> List[str]:

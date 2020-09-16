@@ -6,8 +6,7 @@ from sqlalchemy import distinct, extract, func
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 
-from planitor import hashids
-from planitor import crud
+from planitor import crud, hashids
 from planitor.database import get_db
 from planitor.meetings import MeetingView
 from planitor.models import (

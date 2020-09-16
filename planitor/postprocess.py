@@ -1,28 +1,27 @@
 import re
-from typing import List, Iterable
+from typing import Iterable, List
 
 from dramatiq import group, pipeline
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from sentry_sdk import capture_exception
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from . import dramatiq, greynir
 from .attachments import update_pdf_attachment
 from .crud import (
     create_minute,
+    get_or_create_attachment,
     get_or_create_case_entity,
     get_or_create_entity,
-    get_or_create_attachment,
     lookup_icelandic_company_in_entities,
 )
 from .database import db_context
 from .language.companies import extract_company_names
 from .minutes import get_minute_lemmas
-from .monitor import send_meeting_emails
 from .models import Meeting, Minute, Response
+from .monitor import create_deliveries, send_meeting_emails
 from .utils.kennitala import Kennitala
 from .utils.rsk import get_kennitala_from_rsk_search
-from .monitor import create_deliveries
 
 
 def _get_entity(db: Session, name: str):
@@ -42,7 +41,9 @@ def _get_entity(db: Session, name: str):
         return entity
 
 
-def update_minute_with_entity_relations(db: Session, minute: Minute, entity_items: list):
+def update_minute_with_entity_relations(
+    db: Session, minute: Minute, entity_items: list
+):
     """Here we have kennitala and name, whereas in `update_minute_with_entity_mentions`
     we only have the names."""
 
@@ -141,7 +142,9 @@ def update_minute_with_response_items(
     db: Session, minute: Minute, response_items: List[List[str]]
 ) -> None:
     for i, (headline, contents) in enumerate(response_items):
-        response = Response(order=i, headline=headline, contents=contents, minute=minute)
+        response = Response(
+            order=i, headline=headline, contents=contents, minute=minute
+        )
         response.subjects = get_subjects(response.headline)
         db.add(response)
         db.commit()

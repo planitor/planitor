@@ -1,20 +1,19 @@
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.exception_handlers import http_exception_handler
 from fastapi.exceptions import HTTPException
 from fastapi.responses import RedirectResponse
-from fastapi.exception_handlers import http_exception_handler
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.requests import Request
 from starlette.routing import WebSocketRoute
 from starlette.staticfiles import StaticFiles
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from planitor.templates import templates
 
 from . import config
 from .endpoints import router
-
 
 if config("DEBUG", cast=bool, default=False):
     import arel

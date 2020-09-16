@@ -20,20 +20,19 @@ had picked up the note, so the user can tweak their monitoring.
 
 """
 
-from typing import Iterable, Iterator, Tuple
 from itertools import groupby
+from typing import Iterable, Iterator, Tuple
 
 import dramatiq
+from sentry_sdk import capture_exception
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import any_
-from sentry_sdk import capture_exception
 
+from planitor import mail
 from planitor.crud import create_delivery, get_delivery
 from planitor.database import db_context
-from planitor import mail
 from planitor.models import Address, Case, Delivery, Meeting, Minute, Subscription, User
-
 
 MinuteDeliveries = Iterable[Tuple[Minute, Iterable[Delivery]]]
 
@@ -165,7 +164,9 @@ def iter_user_meeting_deliveries(
             ]
 
 
-def send_meeting_email(user: User, meeting: Meeting, minute_deliveries: MinuteDeliveries):
+def send_meeting_email(
+    user: User, meeting: Meeting, minute_deliveries: MinuteDeliveries
+):
     return mail.send_email(
         user.email,
         str(meeting),

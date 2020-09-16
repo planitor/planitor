@@ -1,13 +1,12 @@
 import logging
 from pathlib import Path
-from jinja2 import FileSystemLoader, Environment
 
 import emails
 from emails.template import JinjaTemplate
+from jinja2 import Environment, FileSystemLoader
 
-from planitor.templates import human_date, timeago
 from planitor import config
-
+from planitor.templates import human_date, timeago
 
 password_reset_jwt_subject = "preset"
 

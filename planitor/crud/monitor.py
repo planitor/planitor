@@ -2,18 +2,17 @@ from typing import Tuple
 
 from sqlalchemy.orm import Session
 
+from planitor.language.search import lemmatize_query
 from planitor.models import (
-    User,
+    Address,
     Case,
+    Delivery,
+    Entity,
+    Minute,
     Subscription,
     SubscriptionTypeEnum,
-    Address,
-    Delivery,
-    Minute,
-    Entity,
+    User,
 )
-
-from planitor.language.search import lemmatize_query
 
 
 def get_or_create_search_subscription(
@@ -39,7 +38,9 @@ def get_or_create_search_subscription(
     return subscription, created
 
 
-def create_delivery(db: Session, subscription: Subscription, minute: Minute) -> Delivery:
+def create_delivery(
+    db: Session, subscription: Subscription, minute: Minute
+) -> Delivery:
     delivery = Delivery(subscription=subscription, minute=minute)
     db.add(delivery)
     return delivery
@@ -96,7 +97,9 @@ def get_entity_subscription(db: Session, user: User, entity: Entity):
 def create_case_subscription(db: Session, user: User, case: Case):
     subscription = get_case_subscription(db, user, case)
     if subscription is None:
-        subscription = Subscription(case=case, user=user, type=SubscriptionTypeEnum.case)
+        subscription = Subscription(
+            case=case, user=user, type=SubscriptionTypeEnum.case
+        )
         db.add(subscription)
         db.commit()
     return subscription

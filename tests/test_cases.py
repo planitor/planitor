@@ -1,4 +1,4 @@
-from planitor.cases import get_case_status_from_remarks, CaseStatusEnum
+from planitor.cases import CaseStatusEnum, get_case_status_from_remarks
 
 
 def test_get_case_status_from_remarks():

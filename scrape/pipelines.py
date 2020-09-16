@@ -1,20 +1,19 @@
 import os
 
+from scrapy.exceptions import DropItem
+from scrapy.utils.project import get_project_settings
+from sentry_sdk import capture_exception
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import register_composites
-from sentry_sdk import capture_exception
-
-from scrapy.exceptions import DropItem
-from scrapy.utils.project import get_project_settings
 
 from planitor import greynir
-from planitor.models import Minute
 from planitor.crud import (
-    get_or_create_municipality,
     get_or_create_council,
     get_or_create_meeting,
+    get_or_create_municipality,
 )
+from planitor.models import Minute
 from planitor.postprocess import process_minutes
 
 

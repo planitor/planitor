@@ -1,9 +1,9 @@
-from .city import (  # noqa
+from .accounts import User  # noqa
+from .city import (
     Address,
     Attachment,
-    PDFAttachment,
     Case,
-    CaseEntity,
+    CaseEntity,  # noqa
     CaseStatusEnum,
     Council,
     CouncilTypeEnum,
@@ -15,13 +15,11 @@ from .city import (  # noqa
     Meeting,
     Minute,
     Municipality,
+    PDFAttachment,
     Plan,
     PlanTypeEnum,
     Response,
 )
-
-from .accounts import User  # noqa
-
-from .monitor import Subscription, Delivery, SubscriptionTypeEnum  # noqa
+from .monitor import Delivery, Subscription, SubscriptionTypeEnum  # noqa
 
 _all = locals().values()

@@ -1,15 +1,15 @@
-import re
 import math
-from typing import Set, Generator
+import re
+from typing import Generator, Set
 
+from iceaddr import iceaddr_suggest
 from jinja2 import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, contains_eager, joinedload
-from iceaddr import iceaddr_suggest
 
 from planitor.language.search import get_wordforms, lemmatize_query
-from planitor.models import Minute, Case, Meeting, Council, CaseEntity, Entity
+from planitor.models import Case, CaseEntity, Council, Entity, Meeting, Minute
 
 
 def get_tsquery(search_query):
@@ -111,7 +111,9 @@ def iter_preview_fragments(
         if pend != len(document):
             after = Markup(f"{after.rstrip()}…")
 
-        yield (before + Markup(f"<strong>{document[start:end]}</strong>") + after).strip()
+        yield (
+            before + Markup(f"<strong>{document[start:end]}</strong>") + after
+        ).strip()
 
 
 class Pagination:
@@ -123,7 +125,9 @@ class Pagination:
         self.count = count_query.scalar()
         self.number = number if number > 0 else 1
         self.total_pages = int(math.ceil(self.count / self.PER_PAGE))
-        self.pages = list(range(1, self.total_pages + 1))  # 1-based indexing of all pages
+        self.pages = list(
+            range(1, self.total_pages + 1)
+        )  # 1-based indexing of all pages
         self.query = query.offset(self.PER_PAGE * (number - 1)).limit(self.PER_PAGE)
 
     def get_page_segments(self):

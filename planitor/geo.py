@@ -1,5 +1,5 @@
-from typing import Tuple, Optional
 import re
+from typing import Optional, Tuple
 
 from iceaddr import iceaddr_lookup
 from iceaddr.addresses import _cap_first

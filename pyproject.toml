@@ -51,6 +51,7 @@ arel = "^0.2.0"
 sqlalchemy-stubs = "^0.3"
 linetimer = "^0.1.4"
 pytest-mock = "^3.3.1"
+isort = "^5.5.2"
 
 [tool.poetry.scripts]
 dev-server = "scripts.development:main"

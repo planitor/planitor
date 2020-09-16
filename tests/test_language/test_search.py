@@ -2,8 +2,8 @@ from reynir.bintokenizer import tokenize
 
 from planitor.language.search import (
     get_lemmas,
-    get_wordbase,
     get_token_lemmas,
+    get_wordbase,
     lemmatize_query,
     parse_lemmas,
 )

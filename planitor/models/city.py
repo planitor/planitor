@@ -16,11 +16,11 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import ARRAY, BIGINT, TEXT, NUMERIC
+from sqlalchemy.types import ARRAY, BIGINT, NUMERIC, TEXT
 from sqlalchemy_utils import CompositeArray, CompositeType, TSVectorType
 
-from ..utils.kennitala import Kennitala
 from ..database import Base
+from ..utils.kennitala import Kennitala
 
 # It would be cleaner to not include the `name` in the namedtuple but on the client
 # side pydantic has only serialized the enum value so we don't have the enum identifier
@@ -74,7 +74,9 @@ class CaseStatusEnum(enum.Enum):
         "yellow",
     )
     directed_to_mayor = ColorEnumValue(
-        "visad-til-skrifstofu-borgarstjora", "Vísað til skrifstofu borgarstjóra", "yellow"
+        "visad-til-skrifstofu-borgarstjora",
+        "Vísað til skrifstofu borgarstjóra",
+        "yellow",
     )
     directed_to_borgarrad = ColorEnumValue(
         "visad-til-borgarrads", "Vísað til borgarráðs", "yellow"

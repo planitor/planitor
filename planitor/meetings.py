@@ -1,11 +1,11 @@
-from sqlalchemy import func
 from sqlakeyset import get_page
+from sqlalchemy import func
 
-from .models import CaseStatusEnum, Minute, Meeting, Council
+from .models import CaseStatusEnum, Council, Meeting, Minute
 
 
 class MeetingWrap:
-    """ Thin wrapper around Meeting objects. Attribute are passed to the `_meeting`
+    """Thin wrapper around Meeting objects. Attribute are passed to the `_meeting`
     object so that it acts like the wrapped object with the `counts` attribute added.
 
     """
@@ -49,7 +49,7 @@ ENUMS = list(CaseStatusEnum) + [NoneEnum()]
 
 
 class MeetingView:
-    """ Wraps a meeting query that number of each type of minute. This is useful to
+    """Wraps a meeting query that number of each type of minute. This is useful to
     display an stream of meetings in a card or table layout with useful metadata.
     Queries are constructed by iterating through an enum, applying an outerjoin
     subquery with a count for each enum value. The query results are wrapped in

@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from planitor.database import get_db
-from planitor.models import Case, User, Address, Entity
-from planitor.security import get_current_active_user
 from planitor import crud
+from planitor.database import get_db
+from planitor.models import Address, Case, Entity, User
+from planitor.security import get_current_active_user
 
 from . import router
 

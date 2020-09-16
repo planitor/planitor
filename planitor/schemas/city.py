@@ -1,4 +1,5 @@
-from typing import List, Any
+from typing import Any, List
+
 from pydantic import BaseModel
 
 from planitor.models import CouncilTypeEnum
