@@ -118,15 +118,6 @@ export async function getNearbyMapOptions({ hnitnum, radius, days }) {
         }),
       }
     );
-    const center = new mapkit.Coordinate(
-      region.center.latitude,
-      region.center.longitude
-    );
-    pins.push(
-      new mapkit.MarkerAnnotation(center, {
-        title: plan.plan.heiti,
-      })
-    );
     overlays.push(polygonOverlay);
   }
   return { annotations: pins, region: region, overlays: overlays };
