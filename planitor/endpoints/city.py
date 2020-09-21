@@ -5,6 +5,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy import distinct, extract, func
 from sqlalchemy.orm import Session
 from starlette.requests import Request
+import skipulagsstofnun
 
 from planitor import crud, hashids
 from planitor.database import get_db
@@ -405,6 +406,12 @@ async def get_address(
 
     subscription = crud.get_address_subscription(db, current_user, address)
 
+    polygon, plan = None, None
+    if address:
+        polygon, plan = skipulagsstofnun.plans.get_plan(
+            address.lat_wgs84, address.long_wgs84
+        )
+
     return templates.TemplateResponse(
         "address.html",
         {
@@ -416,6 +423,8 @@ async def get_address(
             "radius": radius,
             "days": days,
             "subscription": subscription,
+            "polygon": polygon,
+            "plan": plan,
         },
     )
 
