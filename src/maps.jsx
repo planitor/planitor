@@ -105,7 +105,7 @@ export async function getNearbyMapOptions({ hnitnum, radius, days }) {
     )
   );
   const overlays = [];
-  if (typeof plan !== "null") {
+  if (plan !== null) {
     const polygonOverlay = new mapkit.PolygonOverlay(
       plan.polygon.map(([x, y]) => {
         return new mapkit.Coordinate(x, y);
