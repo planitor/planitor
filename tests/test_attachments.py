@@ -28,7 +28,7 @@ def test_update_pdf_attachment(db, attachment, mock_get_url_bytestring, mocker):
     upload = mocker.patch("planitor.attachments.upload")
     attachments._update_pdf_attachment(attachment, db)
     assert upload.assert_called_once
-    byte_string, key = upload.call_args.args
+    byte_string, key = upload.call_args[0]
     assert isinstance(byte_string, BytesIO)
     assert byte_string.closed
     assert key == "development/attachments/1.pdf"

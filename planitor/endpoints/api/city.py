@@ -4,6 +4,7 @@ from typing import List
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+import skipulagsstofnun
 
 from planitor.crud.city import get_and_init_address
 from planitor.database import get_db
@@ -91,7 +92,12 @@ async def get_nearby_case_addresses(
         .order_by(sq.c.updated.desc())
     )
 
+    polygon, plan = skipulagsstofnun.plans.get_plan(address.lat_wgs84, address.long_wgs84)
+    if polygon is not None:
+        polygon = list(polygon.exterior.coords)
+
     return {
+        "plan": {"plan": plan, "polygon": polygon} if plan is not None else None,
         "address": dict(
             lat=address.lat_wgs84,
             lon=address.long_wgs84,
