@@ -537,6 +537,7 @@ dev = ["pytest", "humanize", "fiona"]
 reference = "f490eabd00567e9a41bd4b95839c6da796c0a0a1"
 type = "git"
 url = "https://github.com/jokull/iceaddr.git"
+
 [[package]]
 category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -1502,16 +1503,12 @@ full = ["aiofiles", "graphene", "itsdangerous", "jinja2", "python-multipart", "p
 
 [[package]]
 category = "main"
-description = ""
+description = "A tokenizer for Icelandic text"
 name = "tokenizer"
 optional = false
 python-versions = "*"
-version = "2.3.0"
+version = "2.3.1"
 
-[package.source]
-reference = "fb623945e9bd77abf53b5eb3fbc6a01625ea398e"
-type = "git"
-url = "https://github.com/jokull/Tokenizer.git"
 [[package]]
 category = "dev"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -1704,7 +1701,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "b22327a0210f806935dfbb2843f2295adc96009c6388be7b4d465008761426d6"
+content-hash = "9f8b799ccbb367b5af1627df5b3b7b6d4fcee1ab8f337f223ce6fee9c0f53137"
 lock-version = "1.1"
 python-versions = "^3.7"
 
@@ -2462,7 +2459,10 @@ starlette = [
     {file = "starlette-0.13.6-py3-none-any.whl", hash = "sha256:bd2ffe5e37fb75d014728511f8e68ebf2c80b0fa3d04ca1479f4dc752ae31ac9"},
     {file = "starlette-0.13.6.tar.gz", hash = "sha256:ebe8ee08d9be96a3c9f31b2cb2a24dbdf845247b745664bd8a3f9bd0c977fdbc"},
 ]
-tokenizer = []
+tokenizer = [
+    {file = "tokenizer-2.3.1-py2.py3-none-any.whl", hash = "sha256:290a39d2cef1b1bd436079c0da975309d8555bc41af6afaf944496ffe2f419ee"},
+    {file = "tokenizer-2.3.1.tar.gz", hash = "sha256:ccad126f982411e3e1fe41461c033c009cf12338e6e40df767f070f39fdaeab9"},
+]
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
     {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
