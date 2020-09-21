@@ -27,7 +27,6 @@ import dramatiq
 from sentry_sdk import capture_exception
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.expression import any_
 
 from planitor import mail
 from planitor.crud import create_delivery, get_delivery
@@ -87,12 +86,12 @@ def match_minute(db: Session, minute: Minute) -> Iterator[Subscription]:
         .outerjoin(Case)
         .outerjoin(Address, Address.hnitnum == Subscription.address_hnitnum)
         .filter(Subscription.active == True)  # noqa
-        # No `subscription_councils` means it should match all of them, the UI masks this
-        # by rendering checked checkboxes for all options - when one is unchecked the
-        # other rows will appear.
+        # No `subscription_councils` means it should match all of them, the UI masks
+        # this by rendering checked checkboxes for all options - when one is unchecked
+        # the other rows will appear.
         .filter(
-            (minute.meeting.council_type == any_(Subscription.council_types))
-            | (Subscription.council_types == None)
+            (Subscription.council_types == None)
+            | Subscription.council_types.any(minute.meeting.council.council_type.name)
         )
         .filter(filters)
     )
@@ -127,12 +126,13 @@ def get_unsent_deliveries(
 
 def _create_deliveries(db: Session, minute: Minute) -> Iterable[Delivery]:
     for subscription in match_minute(db, minute):
-        # This result-set could be [sub{u=1}, sub{u=1}, sub{u=2}]. The user probably does
-        # not want multiple emails for the same minute because multiple subscribers
-        # matched it. Therefore we create deliveries but only deliver the first one.
+        """This result-set could be [sub{u=1}, sub{u=1}, sub{u=2}]. The user probably does
+        not want multiple emails for the same minute because multiple subscribers
+        matched it. Therefore we create deliveries but only deliver the first one."""
         if get_delivery(db, subscription, minute):
-            # Cannot recreate this subscription/minute combo because of unique constraint
-            # - but this state should not be reached unless a worker fails and is retrying
+            """Cannot recreate this subscription/minute combo because of unique constraint
+            - but this state should not be reached unless a worker fails and is retrying
+            """
             continue
         delivery = create_delivery(db, subscription, minute)
         yield delivery
@@ -164,9 +164,7 @@ def iter_user_meeting_deliveries(
             ]
 
 
-def send_meeting_email(
-    user: User, meeting: Meeting, minute_deliveries: MinuteDeliveries
-):
+def send_meeting_email(user: User, meeting: Meeting, minute_deliveries: MinuteDeliveries):
     return mail.send_email(
         user.email,
         str(meeting),
