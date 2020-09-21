@@ -16,7 +16,6 @@ from planitor.models import (
     SubscriptionTypeEnum,
     User,
 )
-from planitor.models.monitor import SubscriptionCouncil
 from planitor.monitor import _create_deliveries, get_unsent_deliveries
 
 
@@ -170,23 +169,23 @@ def test_match_minute_matches_with_council_subscriptions_set(
     )
     db.add(council_2)
     db.commit()
-    subscription_council = SubscriptionCouncil(council_id=council_2.id)
     subscription = Subscription(
         user=user,
         address=case.iceaddr,
         type=SubscriptionTypeEnum.address,
-        councils=[subscription_council],
+        council_types=[CouncilTypeEnum.skipulagsrad],
     )
     db.add(subscription)
     db.commit()
+    assert minute.meeting.council.council_type == CouncilTypeEnum.byggingarfulltrui
     assert list(monitor.match_minute(db, minute)) == []
 
-    db.delete(subscription_council)
+    subscription.council_types = [CouncilTypeEnum.byggingarfulltrui]
     db.add(subscription)
     db.commit()
     assert list(monitor.match_minute(db, minute)) == [subscription]
 
-    subscription.councils = [SubscriptionCouncil(council_id=minute.meeting.council.id)]
+    subscription.council_types = None
     db.add(subscription)
     db.commit()
     assert list(monitor.match_minute(db, minute)) == [subscription]
