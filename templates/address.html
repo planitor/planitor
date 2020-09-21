@@ -20,9 +20,16 @@
         <div>{{ address.postnr }}, {{ address.stadur_nf }}</div>
       </div>
       <div class="flex flex-col sm:flex-row items-end sm:items-center">
-        <a class="block mt-2 sm:mt-0 sm:mr-6 order-last sm:order-none font-bold" href="https://skra.is/leit-i-fasteignaskra?streetname={{ address.landnr }}&pos=fp-advanced-search">
-          Skrá.is <span class="sf-symbol">{{ arrow_up_right(class="h-2") }}</span>
-        </a>
+        <div class="order-last sm:order-none font-bold flex flex-col sm:flex-row items-end">
+          {% if plan -%}
+          <a class="block mt-2 sm:mt-0 sm:mr-6" target="_blank" href="http://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ plan.skipnr }}">
+            Deiliskipulag <span class="sf-symbol">{{ arrow_up_right(class="h-1") }}</span>
+          </a>
+          {% endif -%}
+          <a class="block mt-2 sm:mt-0 sm:mr-6" target="_blank" href="https://skra.is/leit-i-fasteignaskra?streetname={{ address.landnr }}&pos=fp-advanced-search">
+            Skrá.is <span class="sf-symbol">{{ arrow_up_right(class="h-1") }}</span>
+          </a>
+        </div>
         <div class="follow-address" data-state="{{ 'following' if subscription }}" data-id="{{ address.hnitnum }}">
         </div>
       </div>
@@ -45,7 +52,7 @@
         <div class="border-b-2 flex-grow hidden md:flex"></div>
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold selected" data-target="content-1">{{ address }}</button>
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-2">Nálæg mál ({{ nearby_cases|length }})</button>
-        <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-3">{{ plan.heiti if plan else "Skipulag" }}</button>
+        {# <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-3">{{ plan.heiti if plan else "Skipulag" }}</button> #}
         <div class="border-b-2 flex-grow"></div>
       </div>
       <div id="content-1" class="tabPage block">
@@ -54,6 +61,7 @@
       <div id="content-2" class="tabPage hidden">
       {{ case_table(request, nearby_cases) }}
       </div>
+      {#
       <div id="content-3" class="tabPage hidden">
         {% if plan %}
         <div>
@@ -64,7 +72,7 @@
         <table class="table-auto">
           {% for key, value in plan.items() %}
           <tr>
-            <td>{{ key }}</td>
+            <td class="font-bold">{{ key }}</td>
             <td>{{ value or "" }}</td>
           </tr>
           {% endfor %}
@@ -73,6 +81,7 @@
         Ekkert deiliskipulag fannst
         {% endif %}
       </div>
+      #}
     </div>
   </div>
 

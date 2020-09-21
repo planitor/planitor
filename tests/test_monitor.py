@@ -99,9 +99,7 @@ def test_match_minute_search(db, minute, user):
 def test_get_unsent_deliveries(db: Session, user, case, meeting, minute, subscription):
     # User has one subscription/delivery, User 2 has two subscriptions/deliveries
     user_2 = User(email="foo")
-    subscription_2 = Subscription(
-        user=user_2, case=case, type=SubscriptionTypeEnum.case
-    )
+    subscription_2 = Subscription(user=user_2, case=case, type=SubscriptionTypeEnum.case)
     delivery_1 = Delivery(minute=minute, subscription=subscription)
     delivery_2a = Delivery(minute=minute, subscription=subscription_2)
     delivery_2b = Delivery(

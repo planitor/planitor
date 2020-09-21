@@ -87,7 +87,7 @@ export async function getEntityMapOptions(kennitala) {
 }
 
 export async function getNearbyMapOptions({ hnitnum, radius, days }) {
-  const { address, addresses } = await api
+  const { address, addresses, plan } = await api
     .getNearbyAddresses(hnitnum, radius, days)
     .then((response) => {
       return response.data;
@@ -104,5 +104,30 @@ export async function getNearbyMapOptions({ hnitnum, radius, days }) {
       }
     )
   );
-  return { annotations: pins, region: region };
+  const overlays = [];
+  if (typeof plan !== "null") {
+    const polygonOverlay = new mapkit.PolygonOverlay(
+      plan.polygon.map(([x, y]) => {
+        return new mapkit.Coordinate(x, y);
+      }),
+      {
+        style: new mapkit.Style({
+          strokeOpacity: 0.2,
+          lineWidth: 2,
+          lineJoin: "round",
+        }),
+      }
+    );
+    const center = new mapkit.Coordinate(
+      region.center.latitude,
+      region.center.longitude
+    );
+    pins.push(
+      new mapkit.MarkerAnnotation(center, {
+        title: plan.plan.heiti,
+      })
+    );
+    overlays.push(polygonOverlay);
+  }
+  return { annotations: pins, region: region, overlays: overlays };
 }
