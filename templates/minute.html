@@ -84,9 +84,9 @@
             {{ token.replace('\n\n', '<br />')|safe }}
           {% else -%}
             {% if kennitala.is_person() -%}
-              <a class="text-blue-900 underline" href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+              <a class="text-planitor-darkBlue underline" href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
             {% else -%}
-              <a class="text-blue-900 underline" href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+              <a class="text-planitor-darkBlue underline" href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
             {% endif -%}
           {% endif -%}
         {% endfor -%}
@@ -137,7 +137,7 @@
     {% for attachment in minute.attachments %}
       <li class="text-gray-800">
         <div>
-          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
+          <a class="hover:underline text-planitor-blue" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
           <span class="text-gray-400 ml-2">
             {{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}
           </span>

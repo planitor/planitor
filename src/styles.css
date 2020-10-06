@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Work Sans", sans-serif;
 }
 
 svg {
@@ -19,11 +19,11 @@ td {
 }
 
 .btn {
-  @apply rounded-lg shadow-lg border-midnight border bg-midnight px-4 py-2 font-bold text-white;
+  @apply rounded-lg shadow-lg border-planitor-darkBlue border bg-planitor-darkBlue px-4 py-2 font-bold text-white;
 }
 
 .btn-secondary {
-  @apply text-midnight bg-transparent shadow-none;
+  @apply text-planitor-darkBlue bg-transparent shadow-none;
 }
 
 .btn-disabled {
@@ -206,5 +206,5 @@ form input.error {
 }
 
 .tabs .selected {
-  @apply text-midnight border-midnight;
+  @apply text-planitor-blue border-planitor-blue;
 }

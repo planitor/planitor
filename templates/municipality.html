@@ -7,7 +7,7 @@
     {% if paging.has_previous %}
     <li>
       <a
-        class="text-midnight font-semibold"
+        class="text-planitor-blue font-semibold"
         href="{{-
           url_for(
             'get_municipality',
@@ -30,7 +30,7 @@
     {% if paging.has_next %}
     <li>
       <a
-        class="text-midnight font-semibold"
+        class="text-planitor-blue font-semibold"
         href="{{-
           url_for(
             'get_municipality',
@@ -162,10 +162,10 @@
 {% endmacro %}
 
 {% macro ad() %}
-  <div class="p-2 bg-midnight shadow-lg rounded-lg flex relative md:my-8 lg:mt-16">
-    <div class="sm:w-1/2 md:w-2/3 text-white p-3">
-      <div class="font-black text-3xl">
-        <span class="text-powder">Nýtt →</span>
+  <div class="p-2 bg-planitor-gray shadow-lg rounded-lg flex relative md:my-8 lg:mt-16">
+    <div class="sm:w-1/2 md:w-2/3 text-planitor-gold p-3">
+      <div class="font-semibold text-3xl">
+        <span>Nýtt »</span>
         Vaktarinn
       </div>
       <div class="text-sm">
@@ -177,7 +177,7 @@
         </p>
         <p class="mb-2 font-bold">
           Vaktarinn er í boði gegn mánaðargjaldi. Hafðu samband við
-          <a href="mailto:hallo@planitor.io" class="text-powder">hallo@planitor.io</a>.
+          <a href="mailto:hallo@planitor.io" class="underline">hallo@planitor.io</a>.
         </p>
       </div>
       <div class="text-xs opacity-50">* Fleiri sveitarfélög bætast við á næstunni</div>

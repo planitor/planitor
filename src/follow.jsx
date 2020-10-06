@@ -11,9 +11,9 @@ const Button = (props) => {
     <button
       class={classNames("btn sm:inline block mx-auto", {
         "text-gray-500 border-gray-500": loading,
-        "bg-midnight text-white": following && !loading,
-        "text-midnight": !following && !loading,
-        "border-midnight": !loading,
+        "bg-planitor-blue text-white": following && !loading,
+        "text-planitor-blue": !following && !loading,
+        "border-planitor-blue": !loading,
       })}
       onClick={onClick}
       onMouseOver={(event) => {
@@ -37,7 +37,7 @@ const Button = (props) => {
 const Banner = (props) => {
   const Link = () => {
     return (
-      <a class="text-midnight underline" href="mailto:hallo@planitor.io">
+      <a class="text-planitor-blue underline" href="mailto:hallo@planitor.io">
         hallo@planitor.io
       </a>
     );
