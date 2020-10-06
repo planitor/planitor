@@ -19,11 +19,11 @@ td {
 }
 
 .btn {
-  @apply rounded-lg shadow-lg border-planitor-blue border bg-planitor-blue px-4 py-2 font-bold text-white;
+  @apply rounded-lg shadow-lg border-planitor-darkBlue border bg-planitor-darkBlue px-4 py-2 font-bold text-white;
 }
 
 .btn-secondary {
-  @apply text-planitor-blue bg-transparent shadow-none;
+  @apply text-planitor-darkBlue bg-transparent shadow-none;
 }
 
 .btn-disabled {

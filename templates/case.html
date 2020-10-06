@@ -28,7 +28,7 @@
         <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
                     if e.entity_type.name == 'company' else
                     url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}"
-          class="text-blue-700 font-semibold font-sm truncate"
+          class="text-planitor-darkBlue font-semibold font-sm truncate"
         >
         {{ entity_label(e) }}
         </a>

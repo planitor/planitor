@@ -84,9 +84,9 @@
             {{ token.replace('\n\n', '<br />')|safe }}
           {% else -%}
             {% if kennitala.is_person() -%}
-              <a class="text-blue-900 underline" href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+              <a class="text-planitor-darkBlue underline" href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
             {% else -%}
-              <a class="text-blue-900 underline" href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+              <a class="text-planitor-darkBlue underline" href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
             {% endif -%}
           {% endif -%}
         {% endfor -%}
