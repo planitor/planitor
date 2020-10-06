@@ -22,7 +22,7 @@
           <ul class="inline">
           {% for address in addresses %}
             <li class="inline">
-              <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-midnight">
+              <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-planitor-blue">
                 {% if loop.previtem and loop.previtem.heiti_nf == address.heiti_nf -%}
                 {{ address.vidsk if ('-' in address.vidsk) else "{}{}".format(address.husnr, address.bokst) -}}
                 {% else -%}
@@ -44,7 +44,7 @@
         <ul class="inline">
           {% for entity in entity_matches %}
           <li class="inline">
-            <a href="{{ url_for('get_company', kennitala=entity.kennitala) }}" class="text-midnight">
+            <a href="{{ url_for('get_company', kennitala=entity.kennitala) }}" class="text-planitor-blue">
               {{ entity.name -}}
               {{ "," if not loop.last }}
             </a>
@@ -85,7 +85,7 @@
           </p>
         </div>
         <div class="flex-grow">
-          <h4 class="font-semibold text-midnight">
+          <h4 class="font-semibold text-planitor-blue">
             <div class="sm:text-lg">
               {{ minute.headline }}
             </div>
@@ -110,7 +110,7 @@
     {% macro page(number) %}
     <div class="mr-3">
       {% if number == results.page.number %}
-      <span class="font-bold text-midnight">{{ number }}</span>
+      <span class="font-bold text-planitor-blue">{{ number }}</span>
       {% else %}
       <a class="text-gray-600 hover:underline" href="{{ url_for('get_search') }}?q={{ q }}&page={{ number }}">
         {{ number }}
@@ -139,7 +139,7 @@
       <div>
         {% if results.page.has_next %}
         <a
-          class="text-midnight font-semibold"
+          class="text-planitor-blue font-semibold"
           href="{{ url_for('get_search') }}?q={{ q }}&page={{ results.page.number + 1 }}"
         >
           Næsta síða →

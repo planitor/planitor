@@ -11,11 +11,9 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.url }}" />
-    <link rel="icon" href="{{ url_for('static', path='/favicon-16.png') }}" sizes="16x16" />
-    <link rel="icon" href="{{ url_for('static', path='/favicon-32.png') }}" sizes="32x32" />
-    <link rel="icon" href="{{ url_for('static', path='/favicon-192.png') }}" sizes="192x192" />
+    <link rel="icon" href="{{ url_for('static', path='/favicon.svg') }}" />
     <style>
-      @import url("https://rsms.me/inter/inter.css");
+      @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
     </style>
     {% block og_image -%}
     <meta property="og:image" content="{{ url_for('static', path='/planitor-2x.png') }}" />
@@ -32,7 +30,7 @@
   </script>
 
   <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
-    <div class="bg-midnight w-full text-white">
+    <div class="bg-planitor-blue w-full text-white">
       <nav id="navigation" class="px-4 py-2 sm:px-6 max-w-6xl mx-auto"></nav>
     </div>
 

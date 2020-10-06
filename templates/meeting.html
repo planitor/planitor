@@ -56,7 +56,7 @@
                   muni_slug=minute.case.council.municipality.slug,
                   council_slug=minute.case.council.council_type.value.slug,
                   case_id=minute.case.serial,
-                  minute_id=h.encode(minute.id)) }}" class="text-midnight hover:underline">
+                  minute_id=h.encode(minute.id)) }}" class="text-planitor-blue hover:underline">
 
                 <span class="font-bold">{{ minute.serial }}</span>
                 {{- ": {}".format(minute.case.address) if minute.case.address else "" }}

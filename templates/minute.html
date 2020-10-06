@@ -137,7 +137,7 @@
     {% for attachment in minute.attachments %}
       <li class="text-gray-800">
         <div>
-          <a class="hover:underline text-midnight" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
+          <a class="hover:underline text-planitor-blue" target="_blank" href="{{ attachment.url }}">{{ attachment.label }}</a>
           <span class="text-gray-400 ml-2">
             {{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}
           </span>
