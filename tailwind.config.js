@@ -8,10 +8,10 @@ module.exports = {
     extend: {
       colors: {
         powder: {
-          default: "#AAE0E3",
-          light: "#D6F9F5",
-          dark: "#8ADAE4",
-          darker: "#46BCCC",
+          default: "#E7EAF9",
+          light: "#F3F5FB",
+          dark: "#CED5F2",
+          darker: "#B8BFDA",
         },
         planitor: {
           blue: "#002EC2",
@@ -19,6 +19,7 @@ module.exports = {
           gold: "#755600",
           red: "#A33417",
           gray: "#dddedd",
+          green: "#0c7556",
         },
       },
     },

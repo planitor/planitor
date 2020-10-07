@@ -32,11 +32,11 @@ td {
 }
 
 .btn-primary {
-  @apply btn bg-green-600 border-green-600 text-white;
+  @apply btn bg-planitor-green border-planitor-green text-white;
 }
 
 .btn-primary:hover {
-  @apply bg-green-500 border-green-500;
+  @apply text-opacity-75;
 }
 
 .btn .sf-symbol {
@@ -60,7 +60,7 @@ td {
 }
 
 .pill {
-  @apply inline-block bg-gray-200 rounded-lg px-1 py-0 text-xs text-gray-700 leading-tight;
+  @apply inline-block bg-gray-800 bg-opacity-50 rounded-lg px-1 py-0 text-xs text-white text-opacity-75 leading-tight;
   border: 1px solid transparent;
   border-width: 0 1px 1px 0;
 }
@@ -82,19 +82,19 @@ td {
 }
 
 .pill-blue {
-  @apply bg-blue-200 text-blue-800 shadow-sm;
+  @apply bg-blue-800 shadow-sm;
 }
 
 .pill-red {
-  @apply bg-red-200 text-red-800 shadow-sm;
+  @apply bg-planitor-red shadow-sm;
 }
 
 .pill-yellow {
-  @apply bg-yellow-200 text-yellow-800 shadow-sm;
+  @apply bg-planitor-gold shadow-sm;
 }
 
 .pill-green {
-  @apply bg-green-200 text-green-800 shadow-sm;
+  @apply bg-planitor-green shadow-sm;
 }
 
 .highlight-blue {
@@ -102,15 +102,15 @@ td {
 }
 
 .highlight-red {
-  @apply text-red-600;
+  @apply text-planitor-red;
 }
 
 .highlight-yellow {
-  @apply text-yellow-600;
+  @apply text-planitor-gold;
 }
 
 .highlight-green {
-  @apply text-green-600;
+  @apply text-planitor-green;
 }
 
 .modal .backdrop {

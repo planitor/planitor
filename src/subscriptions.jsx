@@ -289,7 +289,7 @@ const Settings = ({
       </div>
       <div class="py-4 sm:py-6 text-center">
         <button
-          class="text-red-700 font-bold"
+          class="text-planitor-red font-bold"
           onClick={(event) => {
             !isLoading && onDelete(event);
           }}
