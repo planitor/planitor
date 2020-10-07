@@ -135,12 +135,6 @@ td {
   }
 }
 
-nav .logo svg {
-  width: 2rem;
-  height: 2rem;
-  display: inline;
-}
-
 nav .search svg .fill {
   fill: rgba(255, 255, 255, 0.6);
 }
