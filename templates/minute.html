@@ -2,7 +2,7 @@
 
 {% macro meeting_card() %}
   {% set meeting_url = url_for('get_meeting', muni_slug = municipality.slug, council_slug = council.council_type.value.slug, meeting_id = h.encode(meeting.id)) %}
-  <div class="rounded-md p-4 bg-powder-light text-powder-darker">
+  <div class="rounded-md p-4 bg-planitor-gold bg-opacity-25 text-planitor-gold">
     <div class="flex justify-between items-start mb-2">
       <div>
         <div class="text-lg font-extrabold">
