@@ -68,8 +68,8 @@ function getMarkersForAddresses(addresses) {
       new mapkit.MarkerAnnotation(new mapkit.Coordinate(lat, lon), {
         title: label,
         color:
-          { green: "#48BB78", yellow: "#F6E05E", red: "#E53E3E" }[labelColor] ||
-          "#718096",
+          { green: "#0c7556", yellow: "#755600", red: "#A33417" }[labelColor] ||
+          "#0D2475",
       })
     );
   }
