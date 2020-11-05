@@ -351,7 +351,8 @@ https://reykjavik.is/fundargerdir?field_rad_nefnd_tid=924
 
 URL = (
     "https://reykjavik.is/views/ajax?field_rad_nefnd_tid={}"
-    "&view_name=fundargerdir&view_display_id=block_1"
+    "&view_base_path=fundargerdir-umhverfis-og-skipulagsrads"
+    "&view_name=fundargerdir&view_display_id=block_19"
 )
 
 
@@ -374,8 +375,9 @@ class ReykjavikSkipulagsradSpider(scrapy.Spider):
         for el in soup.select(".filter-bl-item"):
             isodate, _ = el.select_one(".date-display-single").get("content").split("T")
             date = dt.date.fromisoformat(isodate)
-            href = el.select_one("a").get("href")
-            yield response.follow(href, self.parse_meeting, cb_kwargs={"start": date})
+            if date.year > 2017:
+                href = el.select_one("a").get("href")
+                yield response.follow(href, self.parse_meeting, cb_kwargs={"start": date})
 
         if count == 20:
             # Keep paginating if we have full pages
@@ -396,9 +398,7 @@ class ReykjavikSkipulagsradSpider(scrapy.Spider):
             r"(\n)+", "\n", description
         )  # normalize multiple \n to a single linebreak
 
-        minutes = [
-            m for m in get_minutes(response) if m
-        ]  # filter out unparsable minutes
+        minutes = [m for m in get_minutes(response) if m]  # filter out unparsable minutes
 
         yield {
             "url": response.url,
