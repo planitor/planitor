@@ -66,7 +66,9 @@ class DatabasePipeline(object):
         if created:
             meeting.url = item["url"]
             meeting.description = item["description"]
-            meeting.attendant_names = get_names(meeting.description)
+            meeting.attendant_names = item.get("attendant_names") or get_names(
+                meeting.description
+            )
             meeting.start = item["start"]
         else:
             # If meeting already has at least one minute, assume meeting already scraped

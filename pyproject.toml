@@ -32,6 +32,7 @@ reynir = "^2.5.0"
 iceaddr = {git = "https://github.com/jokull/iceaddr.git", rev = "f490eab"}
 skipulagsstofnun = "^0.1.4"
 tokenizer = "^2.3.1"
+Scrapy = "^2.4.1"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.13.0"
