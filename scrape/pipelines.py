@@ -2,7 +2,6 @@ import os
 
 from scrapy.exceptions import DropItem
 from scrapy.utils.project import get_project_settings
-from sentry_sdk import capture_exception
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import register_composites
@@ -52,11 +51,19 @@ class DatabasePipeline(object):
         muni, created = get_or_create_municipality(self.db, spider.municipality_slug)
         if created:
             self.db.commit()  # Do this so that municipality has an id
+
+        if "council_type_slug" in item:
+            slug = item["council_type_slug"]
+        else:
+            slug = getattr(spider, "council_type_slug")
+
+        label = getattr(spider, "council_label", None)
+
         council, created = get_or_create_council(
             self.db,
             muni,
-            spider.council_type_slug,
-            label=getattr(spider, "council_label", None),
+            slug=slug,
+            label=label,
         )
         if created:
             self.db.commit()

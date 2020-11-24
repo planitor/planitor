@@ -60,9 +60,13 @@ td {
 }
 
 .pill {
-  @apply inline-block bg-gray-800 bg-opacity-50 rounded-lg px-1 py-0 text-xs text-white text-opacity-75 leading-tight;
+  @apply bg-gray-800 bg-opacity-50 rounded-lg px-1 py-0 text-xs text-white leading-tight;
   border: 1px solid transparent;
   border-width: 0 1px 1px 0;
+}
+
+td > .pill {
+  @apply inline-block; /* This is to enable overflow ellipsis on mobile */
 }
 
 /*

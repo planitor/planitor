@@ -116,12 +116,10 @@ def case_fixture(db, address, municipality):
 
 
 @pytest.fixture(scope="function", name="meeting")
-def meeting_fixture(db, case):
+def meeting_fixture(db, case, council):
     from planitor.models import Meeting
 
-    meeting = _c(
-        db, Meeting(council=case.council, name="1", start=dt.datetime(2000, 1, 1))
-    )
+    meeting = _c(db, Meeting(council=council, name="1", start=dt.datetime(2000, 1, 1)))
     return meeting
 
 

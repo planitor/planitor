@@ -1,7 +1,9 @@
+from typing import List
 import re
 import datetime as dt
 import scrapy
 from scrapy.http import Response
+from requests.utils import requote_uri
 
 from planitor.geo import get_address_lookup_params, lookup_address
 
@@ -20,9 +22,16 @@ data = {
     "__VIEWSTATEGENERATOR": "662119E5",
     "__EVENTVALIDATION": "1zsB4OvMJoIhgD/cSvlNmbp6TTTpzUmgTXXOxg9UW7uHAdJh+DV8K5IorGmPyggyUAtgJlsxSXm5RxysoSUFtOb+nyi+zN7YbB0g+2D8HkWGTAcwFZX9qUmBocCoR7PYSVjOIt5H2VBtKfnEkRNBztLMqBcVSfbywYT/Kw02uhtqj0o/coi1pp+n6BVtvO1YwAzU7cSJwIjZGRXxoQCiyElvUWCWFlCMRRyn68+HbUrVdVSftgUg131+yc6Et7G/Cf7WGakrqutx5tgkYbgy3lkZTrdIAxmoAT/+l4H+pAbfIP1sWwIPjxhh5oSnIk5Lz56A8GHCRykSwRrwZ1oT7jX0pnTosOjw2E7J1t3JWWAcRbPdx5R3r0jG4hyRMkhkwpi3QhfQLz4Ct0QYH/asmF4Y4pEEqE+SOivWLf3ZpOsDEyj3PgY0QDHyr6YUZJFJwjD2qE9bZdRHSfCWvAsS/ziCS8r6saZPFVYTLZH8M49/PtksnU/UZRxmSKsT5QqA1Zu9VfbU4yH/Goj0hWNiTOKMzauuGdfgItq17t/aebIVYyUbbqdAZZxhx08Ddl1Kv8RTW3+M81ZxSmnPEKZamvqSq5uck6dXMrwC8ldkr7OxkU+Dd9dCEdxUhpuyH5+pK0bQfeCYoNTKANjq6PGSpw==",
     "txtNumber": "",
-    "comCommittee": "Afgrei\xF0slufundur skipulags- og byggingarfulltr\xFAa",
     "txtText": "",
     "CommitButton": "Hefja leit",
+}
+
+
+council_form_values = {
+    "Afgrei\xF0slufundur skipulags- og byggingarfulltr\xFAa": "byggingarfulltrui",
+    "Skipulags- og byggingarráð": "skipulagsrad",
+    "Bæjarráð": "borgarrad",
+    "Bæjarstjórn": "borgarstjorn",
 }
 
 
@@ -42,57 +51,111 @@ def get_address(address):
         return address
 
 
+def take_responses(paragraphs: List[str]):
+
+    indexes = []
+    pattern = (
+        r"(?:Áheyrnarfulltrúi|Fulltrúar|Fulltrúi) .+ (?:leggur|leggja) "
+        r"fram svohljóðandi (?:gagn)?bókun:"
+    )
+    for i, segment in enumerate(paragraphs):
+        if re.match(pattern, segment):
+            indexes.append(i)
+
+    for i in indexes:
+        yield paragraphs[i : i + 2]
+
+    for i in indexes[::-1]:
+        paragraphs.pop(i + 1)
+        paragraphs.pop(i)
+
+
 def get_minutes(response):
-    for serial, row in enumerate(
-        response.css("#table2>tbody>tr:nth-child(8) table.bodyclass table.bodyclass")
-    ):
+    subcategory = None
+    for el in response.css("#table2>tbody>tr:nth-child(8) table.bodyclass tr"):
+        if el.css("td.underline"):
+            subcategory = el.css("td::text").get()
+        row = el.css("table.bodyclass")
+        if not row:
+            continue
         header = row.css("tr.plainrow ::text")[1].get().strip()
         case_serial, headline = header.split(" - ", 1)
-        _, case_serial = case_serial.split(". ")
+        serial, case_serial = case_serial.split(". ")
         if ", " in headline:
             address, _ = headline.split(", ", 1)
             case_address = get_address(address)
         else:
             address = None
             case_address = None
-        paragraphs = row.css("tr:nth-child(2) ::text")[1:-1].getall()
-        remarks = paragraphs.pop(len(paragraphs) - 1).strip()
-        inquiry = "\n".join(p.strip() for p in paragraphs)
+        paragraphs = row.css("tr:nth-child(2) td ::text").getall()
+        attachments = []
+        for el in row.css("a"):
+            # attachment URL’s are obfuscated for some reason, with whitespace characters
+            url = "".join(el.css("::attr(href)").re(r"\S"))
+            url = url.replace("&amp;", "&")
+            attachments.append(
+                {
+                    "type": "application/pdf",
+                    "url": requote_uri(url),
+                    "length": 0,
+                    "label": el.css("::text").get(),
+                }
+            )
+
+        remarks, inquiry, responses = None, None, []
+        if paragraphs:
+            responses = list(take_responses(paragraphs))
+            remarks = "\n".join(p.strip() for p in paragraphs)
         yield {
             "case_serial": case_serial,
             "case_address": case_address,
-            "address": address if case_address else None,
             "headline": headline,
             "inquiry": inquiry or None,
             "remarks": remarks,
-            "serial": f"{serial + 1}. fundarliður",
+            "serial": serial,
+            "subcategory": subcategory,
+            "attachments": attachments,
+            "responses": responses,
         }
 
 
-def get_index_request(year: int):
-    formdata = dict(txtDateFrom=f"1.1.{year}", txtDateTo=f"31.12.{year}", **data)
+def get_index_request(year: int, council_form_value: str):
+    formdata = dict(
+        txtDateFrom=f"1.1.{year}",
+        txtDateTo=f"31.12.{year}",
+        comCommittee=council_form_value,
+        **data,
+    )
     return scrapy.FormRequest(
-        url=INDEX_URL, headers=headers, formdata=formdata, cb_kwargs={"year": year}
+        url=INDEX_URL,
+        headers=headers,
+        formdata=formdata,
+        cb_kwargs={"year": year, "council_form_value": council_form_value},
     )
 
 
-class HfjByggingarfulltruiSpider(scrapy.Spider):
-    municipality_slug = "hfj"
-    council_type_slug = "byggingarfulltrui"
-
-    name = "{}_{}".format(municipality_slug, council_type_slug)
+class HafnarfjordurSpider(scrapy.Spider):
+    name = "hafnarfjordur"
+    municipality_slug = name
 
     def start_requests(self):
-        return [get_index_request(dt.date.today().year)]
+        for council_form_value in council_form_values:
+            yield get_index_request(dt.date.today().year, council_form_value)
 
-    def parse(self, response: Response, year: int):
+    def parse(self, response: Response, year: int, council_form_value: str):
         meeting_links = response.css("#l_Content table td a")
+        council_type_slug = council_form_values[council_form_value]
         for el in meeting_links:
-            yield response.follow(el, callback=self.parse_meeting)
+            yield response.follow(
+                el,
+                callback=self.parse_meeting,
+                cb_kwargs={"council_type_slug": council_type_slug},
+            )
         if meeting_links:
-            yield response.follow(get_index_request(year - 1))
+            request = get_index_request(year - 1, council_form_value)
+            yield request
 
-    def parse_meeting(self, response: Response):
+    def parse_meeting(self, response: Response, council_type_slug: str):
         title, name = (
             response.css("#table2>tbody>tr:nth-child(1) td ::text")
             .getall()[0]
@@ -106,7 +169,7 @@ class HfjByggingarfulltruiSpider(scrapy.Spider):
         date, month, year, hour, minute = [int(i) for i in re.findall(r"\d+", timing)]
         start = dt.datetime(year, month, date, hour, minute)
 
-        minutes = list(get_minutes(response))
+        minutes = [m for m in get_minutes(response)]
 
         attendant_names = [
             i.strip(" ,").split("\xa0")[0]
@@ -119,13 +182,12 @@ class HfjByggingarfulltruiSpider(scrapy.Spider):
             response.css("#table2>tbody>tr:nth-child(5) td ::text").getall()
         )
 
-        print(
-            {
-                "url": response.url,
-                "name": name,
-                "start": start,
-                "description": description,
-                "attendant_names": attendant_names,
-                "minute": minutes,
-            }
-        )
+        return {
+            "url": response.url,
+            "name": name,
+            "start": start,
+            "description": description,
+            "attendant_names": attendant_names,
+            "minutes": minutes,
+            "council_type_slug": council_type_slug,
+        }

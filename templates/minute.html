@@ -21,11 +21,11 @@
 {% extends "case.html" %}
 
 {% block title -%}
-  {{ minute.headline }} / {{ case.council.name }} — {{ super.super() }}
+  {{ minute.headline }} — {{ super.super() }}
 {%- endblock %}
 
 {% block og_title -%}
-  {{ minute.headline }} / {{ case.council.name }} — {{ super.super() }}
+  {{ minute.headline }} — {{ super.super() }}
 {%- endblock %}
 
 {% block og_image -%}
@@ -36,13 +36,10 @@
   {% endif %}
 {% endblock %}
 
-{% set council_slug = council.council_type.value.slug %}
-
 {% block breadcrumbs %}
   {% call breadcrumbs() %}
     {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-    {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
-    {{ breadcrumb(url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=case.serial), case.serial) }}
+    {{ breadcrumb(url_for('get_case', muni_slug=municipality.slug, case_id=case.serial), case.serial) }}
     {{ breadcrumb(None, minute.serial, mobile_collapse=True) }}
   {% endcall %}
 {% endblock %}
@@ -55,7 +52,6 @@
       class="bg-gray-200 rounded-md text-gray-900 p-2 px-2 md:px-4"
       href="{{ url_for('get_minute',
       muni_slug=municipality.slug,
-      council_slug=council_slug,
       case_id=previous_minute.case.serial,
       minute_id=h.encode(previous_minute.id)) }}"
     >‹ {{ previous_minute.serial }}</a>
@@ -68,7 +64,6 @@
       class="bg-gray-200 rounded-md text-gray-900 p-2 px-2 md:px-4"
       href="{{ url_for('get_minute',
         muni_slug=municipality.slug,
-        council_slug=council_slug,
         case_id=next_minute.case.serial,
         minute_id=h.encode(next_minute.id)) }}"
       >{{ next_minute.serial }} ›
@@ -76,6 +71,7 @@
     {% endif %}
   </div>
   <div class="p-4 bg-white rounded-md shadow-lg">
+    {% if minute.inquiry %}
     <div>
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
       <div>
@@ -92,6 +88,7 @@
         {% endfor -%}
       </div>
     </div>
+    {% endif %}
     {% if minute.remarks %}
     <div class="mt-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>

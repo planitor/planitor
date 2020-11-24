@@ -133,7 +133,7 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
 
     let municipality;
     if (subscription.case)
-      municipality = muniById[subscription.case.council.municipality.id];
+      municipality = muniById[subscription.case.municipality.id];
     if (subscription.address)
       municipality = muniById[subscription.address.municipality.id];
     let label = enumLabel;

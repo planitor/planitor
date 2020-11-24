@@ -25,7 +25,7 @@ def test_geo(db, case):
     db.commit()
 
     case.address = "Barmahlíð 44"
-    case.council.municipality.name = "Reykjavík"
+    case.municipality.name = "Reykjavík"
     update_case_address(db, case)
     assert case.iceaddr
     assert case.iceaddr.heiti_nf == "Barmahlíð"

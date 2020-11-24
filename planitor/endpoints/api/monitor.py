@@ -8,8 +8,6 @@ from planitor import models
 from planitor.crud import monitor as crud
 from planitor.database import get_db
 from planitor.models.city import CouncilTypeEnum
-from planitor.models.monitor import SubscriptionTypeEnum
-from planitor.schemas.city import Council
 from planitor.schemas.monitor import (
     Subscription,
     SubscriptionCouncilTypeForm,
