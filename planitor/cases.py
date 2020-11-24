@@ -55,6 +55,7 @@ PATTERNS = {
         r"vísað til umhverfis- og skipulagssvið",
         r"vísað til umsagnar umhverfis- og skipulagssviðs",
         r"vísað til meðferðar umhverfis- og skipulagssvið",
+        r"vísar því til vinnslu í umhverfis- og skipulagsþjónustu",
     ),
     CaseStatusEnum.directed_to_skipulagsfulltrui: (
         r"vísað til umsagnar skipulagsfulltrúa",
