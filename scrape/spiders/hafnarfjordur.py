@@ -151,9 +151,12 @@ class HafnarfjordurSpider(scrapy.Spider):
                 callback=self.parse_meeting,
                 cb_kwargs={"council_type_slug": council_type_slug},
             )
+        """
+        # Add this back if you want to scrape the whole history ... removing after initial import
         if meeting_links:
             request = get_index_request(year - 1, council_form_value)
             yield request
+        """
 
     def parse_meeting(self, response: Response, council_type_slug: str):
         title, name = (
