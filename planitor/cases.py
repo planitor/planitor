@@ -18,13 +18,28 @@ PATTERNS = {
         r"^jákvætt\.",
         r"^jákvætt með vísan til umsagnar",
         r"^samþykkt að falla frá kynningu",
+        r"^tekið er jákvætt",
+        r"^skipulags- og byggingarráð heimilar",
+        r"^skipulags- og byggingarráð samþykkir",
+        r"fulltrúi veitir umbeðið leyfi",
+        r"fulltrúi samþykkir sameiningu",
+        r"fulltrúi samþykkir erindið í samræmi",
+        r"samþykkir samhljóða afgreiðslu",
     ),
     CaseStatusEnum.denied: (
         r"^neikvætt\.",
         r"^samþykkt með.+að synja",
         r"^neikvætt með vísan",
+        r"^tekið er neikvætt",
         r"^synjað\.",
         r"^nei\.",
+        r"^erindinu synjað",
+    ),
+    CaseStatusEnum.delayed: (
+        r"^frestað\.",
+        r"^frestað gögn ófullnægjandi",
+        r"^erindi frestað\.",
+        r"afgreiðslu erindis er frestað",
     ),
     CaseStatusEnum.dismissed: (r"^vísað frá með atkvæðum",),
     CaseStatusEnum.directed_to_mayor: (
@@ -36,16 +51,20 @@ PATTERNS = {
         r"vísað til umsagnar deildarstjóra aðalskipulags\.",
     ),
     CaseStatusEnum.directed_to_skipulagssvid: (
+        r"felur umhverfis- og skipulagssviði",
         r"vísað til umhverfis- og skipulagssvið",
         r"vísað til umsagnar umhverfis- og skipulagssviðs",
         r"vísað til meðferðar umhverfis- og skipulagssvið",
     ),
     CaseStatusEnum.directed_to_skipulagsfulltrui: (
         r"vísað til umsagnar skipulagsfulltrúa",
+        r"^skipulagsfulltrúa falið",
     ),
     CaseStatusEnum.directed_to_skipulagsrad: (
         r"vísað til umhverfis- og skipulagsráðs",
         r"vísað til skipulags- og samgönguráðs",
+        r"skipulagsfulltrúi vísar erindinu til skipulags- og byggingarráðs",
+        r"vísað í skipulags- og byggingarráð",
     ),
     CaseStatusEnum.assigned_project_manager: (
         r"vísað til umsagnar verkefnisstjóra\.",
@@ -62,8 +81,8 @@ PATTERNS = {
         r"^samþykkt að grenndarkynna",
         r"^grenndarkynning samþykkt",
         r"málinu vísað til skipulagsfulltrúa í grenndarkynningu\.",
+        r"^skipulagsfulltrúi samþykkir að erindið verði grenndarkynnt",
     ),
-    CaseStatusEnum.delayed: (r"^frestað\.",),
 }
 
 
@@ -76,9 +95,7 @@ def clean_sentence(text: str) -> str:
     """
 
     text = text.lower()
-    text = re.sub(
-        COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text
-    )
+    text = re.sub(COMPOUND_ENTITY_DASH_TYPO, lambda m: "{}- og".format(m.group(1)), text)
 
     def tokens(text):
         for token in tokenize(text):

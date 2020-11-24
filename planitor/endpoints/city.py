@@ -88,7 +88,11 @@ async def get_municipality(
     if council_slug is not None:
         if council_slug not in council_slugs:
             raise HTTPException(status_code=404, detail="Sveitarfélag fannst ekki")
-        council = db.query(Council).filter(Council.council_type == council_slug).first()
+        council = (
+            db.query(Council)
+            .filter(Council.council_type == council_slug, Council.municipality == muni)
+            .first()
+        )
         if council is None:
             return RedirectResponse(
                 request.url_for("get_municipality", muni_slug=muni.slug)
@@ -97,10 +101,11 @@ async def get_municipality(
         council = None
 
     filters = []
+
+    filters.append(Council.municipality_id == muni.id)
+
     if council is not None:
         filters.append(Meeting.council == council)
-    else:
-        filters.append(Council.municipality_id == muni.id)
 
     years = (
         db.query(distinct(extract("year", Meeting.start)))
@@ -183,20 +188,25 @@ async def get_meeting(
 
 
 @router.get("/s/{muni_slug}/{council_slug}/nr/{case_id}")
-async def get_case(
+async def get_case_legacy_redirect(
     request: Request,
     muni_slug: str,
     council_slug: str,
+    case_id: str,
+):
+    return RedirectResponse(f"/s/{muni_slug}/nr/{case_id}")
+
+
+@router.get("/s/{muni_slug}/nr/{case_id}")
+async def get_case(
+    request: Request,
+    muni_slug: str,
     case_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
     case = db.query(Case).filter(Case.serial == case_id).first()
-    if (
-        case is None
-        or case.council.council_type.value.slug != council_slug
-        or case.council.municipality.slug != muni_slug
-    ):
+    if case is None or case.municipality.slug != muni_slug:
         raise HTTPException(status_code=404, detail="Verk fannst ekki")
 
     minutes = (
@@ -226,9 +236,8 @@ async def get_case(
     return templates.TemplateResponse(
         "case.html",
         {
-            "municipality": case.council.municipality,
+            "municipality": case.municipality,
             "case": case,
-            "council": case.council,
             "minutes": minutes,
             "request": request,
             "user": current_user,
@@ -241,10 +250,20 @@ async def get_case(
 
 
 @router.get("/s/{muni_slug}/{council_slug}/nr/{case_id}/{minute_id}")
-def get_minute(
+def get_minute_legacy_redirect(
     request: Request,
     muni_slug: str,
     council_slug: str,
+    case_id: str,
+    minute_id: str,
+):
+    return RedirectResponse(f"/s/{muni_slug}/nr/{case_id}/{minute_id}")
+
+
+@router.get("/s/{muni_slug}/nr/{case_id}/{minute_id}")
+def get_minute(
+    request: Request,
+    muni_slug: str,
     case_id: str,
     minute_id: str,
     db: Session = Depends(get_db),
@@ -256,8 +275,7 @@ def get_minute(
     if (
         minute is None
         or minute.case.serial != case_id
-        or minute.case.council.council_type.value.slug != council_slug
-        or minute.case.council.municipality.slug != muni_slug
+        or minute.case.municipality.slug != muni_slug
     ):
         raise HTTPException(status_code=404, detail="Bókun fannst ekki")
     sq_count = (
@@ -546,12 +564,10 @@ def get_case_by_id(
     case = db.query(Case).get(id)
     if case is None:
         raise HTTPException(404)
-    council = case.council
     return RedirectResponse(
         request.url_for(
             "get_case",
-            muni_slug=council.municipality.slug,
-            council_slug=council.council_type.value.slug,
+            muni_slug=case.municipality.slug,
             case_id=case.serial,
         )
     )

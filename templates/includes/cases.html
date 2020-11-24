@@ -1,7 +1,6 @@
 {% macro case_row(request, index, case, year, minute_count) %}
   {% set url = request.url_for('get_case',
-    muni_slug=case.council.municipality.slug,
-    council_slug=case.council.council_type.value.slug,
+    muni_slug=case.municipality.slug,
     case_id=case.serial) %}
   <tr class="{{ 'md:bg-white' if index % 2 != 0 }} leading-relaxed">
     <td class="md:border pr-2 md:px-4 py-2">
@@ -11,11 +10,12 @@
       {% endif %}
     </td>
     <td class="md:border pr-2 md:px-4 py-2 hidden sm:table-cell">
-      <a href="{{ url }}" class="underline whitespace-no-wrap block">
-        {{ case.serial -}}
-        {{ " ({})".format(minute_count) if minute_count > 1 else "" -}}
-      </a>
-      <div class="hidden md:block text-xs text-black text-opacity-50">{{ case.council }}, {{ case.council.municipality }}</div>
+      <div class="whitespace-no-wrap block">
+        <a href="{{ url }}" class="underline">
+          {{ case.serial -}}
+        </a>{{ " ({})".format(minute_count) if minute_count > 1 else "" -}}
+      </div>
+      <div class="hidden md:block text-xs text-black text-opacity-50">{{ case.municipality }}</div>
     </td>
     <td class="md:border px-0 md:px-4 py-2 text-right">
       <div class="pill pill-big whitespace-no-wrap truncate pill-{{ case.status.value.color if case.status else 'none' }} font-bold block"  style="max-width: 128px">

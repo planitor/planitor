@@ -31,8 +31,7 @@
     {% for status, count in status_counts if count %}
       <div class="mb-1">
         <div class="pill pill-big mr-2 inline align-middle whitespace-no-wrap truncate pill-{{ status.value.color if status else 'none' }} font-bold">
-          {{ count }}
-        </div>
+          {{ count }}</div>
         <span class="text-sm">{{ status.value.label if status else "Annað" }}</span>
       </div>
     {% endfor %}
@@ -53,27 +52,26 @@
           <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
             <td class="md:border px-0 md:px-4 py-2">
               <a href="{{ url_for('get_minute',
-                  muni_slug=minute.case.council.municipality.slug,
-                  council_slug=minute.case.council.council_type.value.slug,
+                  muni_slug=minute.case.municipality.slug,
                   case_id=minute.case.serial,
                   minute_id=h.encode(minute.id)) }}" class="text-planitor-darkBlue hover:underline">
 
                 <span class="font-bold">{{ minute.serial }}</span>
-                {{- ": {}".format(minute.case.address) if minute.case.address else "" }}
-
+                {{- ": {}".format(minute.case.address or minute.headline) }}
               </a>
+              {% if minute.case.address %}
               <div class="text-sm">{{ minute.headline }}</div>
+              {% endif %}
             </td>
             <td class="md:border px-0 md:px-4 py-2 hidden md:table-cell">
-              <a href="{{ url_for('get_case', muni_slug=municipality.slug, council_slug=council_slug, case_id=minute.case.serial) }}" class="underline whitespace-no-wrap">
+              <a href="{{ url_for('get_case', muni_slug=municipality.slug, case_id=minute.case.serial) }}" class="underline whitespace-no-wrap">
                 {{ minute.case.serial -}}
                 {{ " ({})".format(case_count) if case_count > 1 else "" -}}
               </a>
             </td>
             <td class="md:border px-0 md:px-4 py-2 text-right">
               <div style="max-width: 128px;" class="pill pill-big whitespace-no-wrap truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
-                {{ minute.status.value.label if minute.status else "Annað" }}
-              </div>
+                {{ minute.status.value.label if minute.status else "Annað" }}</div>
             </td>
           </tr>
         {% endfor %}

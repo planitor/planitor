@@ -2,8 +2,6 @@
 
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 
-{% set council_slug = council.council_type.value.slug %}
-
 {% macro entity_label(entity) %}
   <span class="sf-symbol">
     {% if entity.entity_type.name == "company" %}
@@ -45,37 +43,40 @@
   <table class="table-auto min-w-full max-w-full">
     <thead>
       <tr>
-        <th class="px-0 md:px-3 py-2 minilabel text-left">Bókun</th>
         <th class="px-0 md:px-3 py-2 minilabel text-left">Fundur</th>
-        <th class="px-0 md:px-3 py-2 minilabel text-right">Staða</th>
+        <th class="px-0 md:px-3 py-2 minilabel text-left">Bókun</th>
       </tr>
     </thead>
     <tbody>
       {% for minute in minutes %}
-      <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }} leading-relaxed">
-        <td class="md:border px-0 md:px-3 lg:px-3 py-2">
-          <a href="{{ url_for('get_minute',
-            muni_slug=minute.case.council.municipality.slug,
-            council_slug=minute.case.council.council_type.value.slug,
-            case_id=minute.case.serial,
-            minute_id=h.encode(minute.id)) }}" class="underline">
-            {{ human_date(minute.meeting.start) -}}</a>
-          <span class="hidden md:inline">
-            -
-            {{ timeago(minute.meeting.start) }}</span>
-        </td>
+      <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }}">
         <td class="md:border px-0 md:px-3 py-2">
-          <a href="{{ url_for('get_meeting',
-            muni_slug=municipality.slug,
-            council_slug=council.council_type.value.slug,
-            meeting_id=h.encode(minute.meeting.id)) }}" class="font-bold text-planitor-blue hover:underline whitespace-no-wrap">
-            Nr.
-            {{ minute.meeting.name }}
-          </a>
+          <div>
+            <a href="{{ url_for('get_meeting',
+              muni_slug=municipality.slug,
+              council_slug=minute.meeting.council.council_type.value.slug,
+              meeting_id=h.encode(minute.meeting.id)) }}" class="text-planitor-blue hover:underline whitespace-no-wrap">
+
+              {{ minute.meeting.council.name }} Nr.
+              {{ minute.meeting.name }}
+            </a>
+          </div>
+          <div class="hidden md:inline text-xs">
+            {{ timeago(minute.meeting.start) }}
+          </div>
         </td>
-        <td class="md:border px-0 md:px-3 py-2 text-right">
-          <div style="max-width: 128px;" class="pill pill-big truncate pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold">
-            {{ minute.status.value.label if minute.status else "Annað" }}
+        <td class="md:border px-0 md:px-3 lg:px-3 py-2">
+          <div>
+            <a href="{{ url_for('get_minute',
+              muni_slug=minute.case.municipality.slug,
+              case_id=minute.case.serial,
+              minute_id=h.encode(minute.id)) }}" class="underline">
+              {{ human_date(minute.meeting.start) -}}</a>
+          </div>
+          <div>
+            <span class="text-{{ minute.status.value.color if minute.status else 'gray' }}-700 text-xs">
+              {{ minute.status.value.label if minute.status else "Annað" -}}
+            </span>
           </div>
         </td>
       </tr>
@@ -91,8 +92,7 @@
       <div class="text-sm">
         <span>
           <a href="{{ url_for('get_case',
-            muni_slug=case.council.municipality.slug,
-            council_slug=case.council.council_type.value.slug,
+            muni_slug=case.municipality.slug,
             case_id=case.serial) }}">
             <span class="underline">{{ case.headline }}</span>
             <span class="text-gray-600 font-thin">{{- case.serial -}}</span>
@@ -120,8 +120,8 @@
   {% endif %}
 {% endmacro %}
 
-{% block title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
-{% block og_title %}Málsferill {{ case.serial }} / {{ case.council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
+{% block title %}Málsferill {{ case.serial }} í {{ municipality.name }} — {{ super() }}{% endblock %}
+{% block og_title %}Málsferill {{ case.serial }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 
 {% block body %}
   <div class="my-8 mt-4 sm:mt-8">
@@ -129,7 +129,6 @@
     {% block breadcrumbs %}
       {% call breadcrumbs() %}
       {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-      {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
       {{ breadcrumb(None, case.serial) }}
       {% endcall %}
     {% endblock %}
@@ -159,9 +158,9 @@
 
         <div class="mb-6">
           Síðast
-          <div class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle shadow-lg">
+          <span class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle shadow-lg">
             {{- case.status.value.label if case.status else "tekið fyrir" -}}
-          </div>
+          </span>
           á fundi
           {{ timeago(last_updated).lower() }}.
         </div>

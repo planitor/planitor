@@ -7,7 +7,6 @@
             class="mb-4 font-bold text-xl block"
             href="{{ url_for('get_case',
             muni_slug=meeting.council.municipality.slug,
-            council_slug=minute.case.council.council_type.value.slug,
             case_id=minute.case.serial) }}"
           >
             {{ minute.case.address }}
@@ -46,7 +45,6 @@
             class="text-blue-700 mb-2"
             href="{{ url_for('get_case',
             muni_slug=meeting.council.municipality.slug,
-            council_slug=minute.case.council.council_type.value.slug,
             case_id=minute.case.serial) }}"
           >
             {{ minute.case.serial }} ({{ case_count }}) →

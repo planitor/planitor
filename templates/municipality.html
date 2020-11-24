@@ -204,11 +204,13 @@
   {{ pagination() }}
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
+  {#
     {% if not current_user and not request.query_params.keys() %}
     <div class="md:col-span-3 mb-6">
       {{ ad() }}
     </div>
     {% endif %}
+  #}
     <div class="md:order-last ">
       <div>
         {{ filters() }}

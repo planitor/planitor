@@ -362,8 +362,8 @@ class Case(Base):
         Address
     )  # not `address` because that column is taken for scraped address
 
-    council_id = Column(Integer, ForeignKey(Council.id))
-    council = relationship(Council)
+    municipality_id = Column(Integer, ForeignKey(Municipality.id), nullable=False)
+    municipality = relationship(Municipality)
 
     # This case could relate to a deiliskipulag
     plan_id = Column(Integer, ForeignKey(Plan.id))
@@ -371,7 +371,7 @@ class Case(Base):
 
     entities = relationship(CaseEntity)
 
-    __table_args__ = (UniqueConstraint("serial", "council_id"),)
+    __table_args__ = (UniqueConstraint("serial", "municipality_id"),)
 
     def get_coordinates(self):
         if self.iceaddr:

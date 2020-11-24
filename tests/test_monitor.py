@@ -132,7 +132,7 @@ def test_match_minute_matches_with_council_subscriptions_set(
 ):
     council_2 = Council(
         name="Council of Flutes",
-        municipality=case.council.municipality,
+        municipality=case.municipality,
         council_type=CouncilTypeEnum.skipulagsrad,
     )
     db.add(council_2)

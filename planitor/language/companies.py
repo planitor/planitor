@@ -52,7 +52,7 @@ def clean_company_name(name):
     return name
 
 
-def parse_icelandic_companies(text) -> Dict:
+def parse_icelandic_companies(text: str) -> Dict:
     """This is only a regex so it does not tokenize. When company names are in
     different inflections, these are of course also not normalized to nefnifall. It
     does not pick company names with more than 3 word segments (see regex).
@@ -83,7 +83,7 @@ def titleize(left, right):
     return " ".join(parts)
 
 
-def extract_company_names(text, sentences: Iterable[_Sentence] = None) -> Dict:
+def extract_company_names(text: str, sentences: Iterable[_Sentence] = None) -> Dict:
     """Get company names with preserved plurality and in nominative form. The
     strategy is multipart:
 

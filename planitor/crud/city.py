@@ -32,6 +32,7 @@ from planitor.utils.text import fold, slugify
 MUNICIPALITIES_OSM_IDS = {
     # These are `name`, `osm_id` tuples
     "reykjavik": ("Reykjavík", "2580605"),
+    "hafnarfjordur": ("Hafnarfjörður", "2582273"),
 }
 
 
@@ -47,7 +48,7 @@ def get_or_create_municipality(db, slug) -> Tuple[Attachment, bool]:
 
 
 def get_or_create_council(
-    db, municipality, slug, label=None
+    db, municipality, slug: str, label: str = None
 ) -> Tuple[Attachment, bool]:
     council_type = getattr(CouncilTypeEnum, slug)
     created = False
@@ -60,7 +61,7 @@ def get_or_create_council(
         council = Council(
             council_type=council_type,
             municipality=municipality,
-            name=label or council_type.value["label"],
+            name=label or council_type.value.label,
         )
         db.add(council)
         created = True
@@ -104,11 +105,11 @@ def get_or_create_entity(
     return entity, created
 
 
-def get_or_create_case(db, serial, council) -> Tuple[Attachment, bool]:
-    case = db.query(Case).filter_by(serial=serial, council=council).first()
+def get_or_create_case(db, serial: str, municipality: Municipality) -> Tuple[Case, bool]:
+    case = db.query(Case).filter_by(serial=serial, municipality=municipality).first()
     created = False
     if case is None:
-        case = Case(serial=serial, council=council)
+        case = Case(serial=serial, municipality=municipality)
         db.add(case)
         created = True
     return case, created
@@ -116,7 +117,7 @@ def get_or_create_case(db, serial, council) -> Tuple[Attachment, bool]:
 
 def get_or_create_case_entity(
     db: Session, case: Case, entity: Entity, applicant: bool
-) -> Tuple[Attachment, bool]:
+) -> Tuple[CaseEntity, bool]:
     case_entity = (
         db.query(CaseEntity)
         .filter_by(entity_id=entity.kennitala, case_id=case.id)
@@ -148,12 +149,12 @@ def get_or_create_attachment(db, minute, url, **items) -> Tuple[Attachment, bool
     return attachment, created
 
 
-def create_minute(db, meeting, **items) -> Minute:
+def create_minute(db, meeting: Meeting, **items: dict) -> Minute:
     case_serial = items.pop("case_serial")
     case_address = items.pop("case_address")
     case_stadgreinir = items.pop("case_stadgreinir", None)
 
-    case, case_created = get_or_create_case(db, case_serial, meeting.council)
+    case, case_created = get_or_create_case(db, case_serial, meeting.council.municipality)
     case.address = case_address
     case.stagreinir = case_stadgreinir
 
@@ -257,9 +258,7 @@ def get_or_create_address(
     address = db.query(Address).get(iceaddr_match["hnitnum"])
     created = False
     if address is None:
-        address = Address(
-            **{k: v for k, v in iceaddr_match.items() if k in ADDRESS_KEYS}
-        )
+        address = Address(**{k: v for k, v in iceaddr_match.items() if k in ADDRESS_KEYS})
         db.add(address)
         created = True
     return address, created
@@ -297,7 +296,7 @@ def update_case_address(db: Session, case: Case) -> None:
     overlaps between iceaddr and geoname functionality but good to have both.
 
     """
-    city = case.council.municipality.name
+    city = case.municipality.name
     street, number, letter = get_address_lookup_params(case.address)
 
     iceaddr_match = lookup_address(street, number, letter, city)

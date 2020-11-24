@@ -84,7 +84,7 @@ class Subscription(Base):
 
     def get_municipality(self):
         if self.case and self.type == SubscriptionTypeEnum.case:
-            return self.case.council.municipality
+            return self.case.municipality
         if self.address and self.type == SubscriptionTypeEnum.address:
             return self.address.municipality
 

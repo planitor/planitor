@@ -23,7 +23,7 @@
           {% for address in addresses %}
             <li class="inline">
               <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-planitor-blue">
-                {% if loop.previtem and loop.previtem.heiti_nf == address.heiti_nf -%}
+                {% if loop.previtem and loop.previtem.heiti_nf == address.heiti_nf and address.husnr -%}
                 {{ address.vidsk if ('-' in address.vidsk) else "{}{}".format(address.husnr, address.bokst) -}}
                 {% else -%}
                 {{ address -}}
@@ -66,8 +66,7 @@
       {% for minute, previews in results %}
       <a
         href="{{ url_for('get_minute',
-          muni_slug=minute.case.council.municipality.slug,
-          council_slug=minute.case.council.council_type.value.slug,
+          muni_slug=minute.case.municipality.slug,
           case_id=minute.case.serial,
           minute_id=h.encode(minute.id)) }}"
         class="mb-6 flex flex-col sm:flex-row"
