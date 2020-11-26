@@ -528,7 +528,6 @@ def get_minute_by_id(
         request.url_for(
             "get_minute",
             muni_slug=council.municipality.slug,
-            council_slug=council.council_type.value.slug,
             case_id=minute.case.serial,
             minute_id=hashids.encode(minute.id),
         )

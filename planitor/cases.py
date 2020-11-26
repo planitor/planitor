@@ -23,8 +23,10 @@ PATTERNS = {
         r"^skipulags- og byggingarráð samþykkir",
         r"fulltrúi veitir umbeðið leyfi",
         r"fulltrúi samþykkir sameiningu",
-        r"fulltrúi samþykkir erindið í samræmi",
+        r"fulltrúi samþykkir erindið? í samræmi",
         r"samþykkir samhljóða afgreiðslu",
+        r"^samræmist ákvæðum laga",
+        r"^afgreitt\.",
     ),
     CaseStatusEnum.denied: (
         r"^neikvætt\.",
