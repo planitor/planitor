@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% macro pagination() %}
+  <ul class="my-6 flex justify-between">
+    {% if paging.has_previous %}
+    <li>
+      <a
+        class="text-planitor-blue font-semibold"
+        href="{{ url_for('get_permit_minutes') }}?page={{ paging.bookmark_previous }}">
+        ← Fyrri síða
+      </a>
+    </li>
+    {% else %}
+    <li>
+      <span class="text-gray-900 opacity-25">← Fyrri síða</span>
+    </li>
+    {% endif %}
+    {% if paging.has_next %}
+    <li>
+      <a
+        class="text-planitor-blue font-semibold"
+        href="{{ url_for('get_permit_minutes') }}?page={{ paging.bookmark_next }}">
+        Næsta síða →
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+{% endmacro %}
+
+{% block body %}
+<div class="my-8 mt-4 sm:mt-8">
+
+  {{ pagination() }}
+
+  <table class="table-auto min-w-full">
+    {% for meeting, permit_minutes in permit_minutes | groupby("minute.meeting") %}
+    <tr>
+      <td colspan=99 class="pt-8">
+        <div class="text-lg font-bold">{{ meeting }}, {{ meeting.council.municipality }}</div>
+        <div class="text-sm">{{ human_date(meeting.start) }}</div>
+      </td>
+    </tr>
+    <tr>
+      <th class="text-left">Bókun</th>
+      <th class="text-right">+fm.</th>
+      <th class="text-right">-fm.</th>
+      <th class="text-left">Einingar</th>
+      <th class="text-left">Leyfi</th>
+      <th class="text-left">Bygging</th>
+      <th></th>
+    </tr>
+      {% for pm in permit_minutes %}
+      {% set minute = pm.minute %}
+    <tr class="{{ 'md:bg-gray-200' if loop.index % 2 == 0 }} leading-relaxed">
+      <td>
+        <a href="{{ url_for('get_minute_by_id', id=minute.id) }}" class="text-planitor-blue underline">
+          {{ minute.case.iceaddr or minute.case.address }}
+        </a>
+      </td>
+      <td class="font-mono text-right">
+        {{ "{:.1f}".format(pm.area_added) if pm.area_added else "" }}
+      </td>
+      <td class="font-mono text-right">
+        {{ "{:.1f}".format(pm.area_subtracted) if pm.area_subtracted else "" }}
+      </td>
+      <td>
+        {{ pm.units }}
+      </td>
+      <td>
+        {{ pm.permit_type.value.label if pm.permit_type else "" }}
+      </td>
+      <td>
+        {{ pm.building_type.value.label if pm.building_type else "" }}
+      </td>
+      <td>
+        <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold shadow-lg">
+          {{ minute.status.value.label if minute.status else "Annað" }}
+        </div>
+      </td>
+    </tr>
+      {% endfor %}
+    {% endfor %}
+  </table>
+
+  {{ pagination() }}
+
+</div>
+{% endblock body %}

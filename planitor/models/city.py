@@ -237,6 +237,9 @@ class Meeting(Base):
     def __repr__(self):
         return f"<Meeting id={self.id} name={self.name}>"
 
+    def __lt__(self, other):
+        return self.start < other.start
+
 
 class PDFAttachment(Base):
     __tablename__ = "pdf_attachments"
@@ -459,7 +462,6 @@ class Permit(Base):
     area_subtracted = Column(Integer, nullable=True)
     permit_type = Column(Enum(BuildingTypeEnum), nullable=True)
     building_type = Column(Enum(PermitTypeEnum), nullable=True)
-    keywords = Column(ARRAY(String), nullable=True)
 
     minute_id = Column(Integer, ForeignKey(Minute.id), nullable=False, index=True)
     minute = relationship(Minute)

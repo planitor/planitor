@@ -9,6 +9,7 @@ import skipulagsstofnun
 
 from planitor import crud, hashids
 from planitor.database import get_db
+from planitor.permits import PermitMinuteView
 from planitor.meetings import MeetingView
 from planitor.models import (
     Address,
@@ -616,4 +617,22 @@ def get_case_by_id(
             muni_slug=case.municipality.slug,
             case_id=case.serial,
         )
+    )
+
+
+@router.get("/permits/minutes")
+def get_permit_minutes(
+    request: Request,
+    db: Session = Depends(get_db),
+    per_page: int = 100,
+    page: str = "",
+):
+    permit_minutes = PermitMinuteView(db, page_bookmark=page)
+    return templates.TemplateResponse(
+        "minute_permits.html",
+        {
+            "request": request,
+            "permit_minutes": permit_minutes,
+            "paging": permit_minutes.page.paging,
+        },
     )

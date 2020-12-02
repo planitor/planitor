@@ -1,9 +1,18 @@
+from decimal import Decimal, getcontext as decimal_getcontext
 from typing import Dict, Optional, Tuple, Iterable, Union
 from collections import defaultdict
 
+from sqlakeyset import get_page
 from tokenizer import tokenize, TOK
 
-from planitor.models import Minute, BuildingTypeEnum, PermitTypeEnum
+from planitor.models import (
+    Minute,
+    BuildingTypeEnum,
+    PermitTypeEnum,
+    Meeting,
+    Council,
+    Municipality,
+)
 
 
 PermitType = Union[PermitTypeEnum, BuildingTypeEnum]
@@ -110,17 +119,12 @@ class PermitMinute:
         self.minute = minute
         self.inquiry_tokens = list(tokenize(minute.inquiry)) if minute.inquiry else []
         self.lemmas = self.minute.lemmas.split(", ") if self.minute.lemmas else []
+        self.area_added, self.area_subtracted = self.get_area()
+        self.permit_type = self.get_permit_type()
+        self.building_type = self.get_building_type()
 
-    def get_permit_form_values(self) -> Dict[str, Optional[Union[float, PermitType]]]:
-        area_added, area_subtracted = self.get_area()
-        return {
-            "area_added": area_added,
-            "area_subtraced": area_subtracted,
-            "permit_type": self.get_permit_type(),
-            "building_type": self.get_building_type(),
-        }
-
-    def get_area(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_area(self) -> Tuple[Optional[Decimal], Optional[Decimal]]:
+        decimal_getcontext().prec = 4
         added, subtracted = None, None
         for i, token in enumerate(self.inquiry_tokens):
             if i == len(self.inquiry_tokens) - 1:
@@ -130,15 +134,17 @@ class PermitMinute:
             if token.kind != TOK.NUMBER or next.txt != "ferm":
                 continue
 
+            value = token.val[0]
+
             # Do not add up area for B-rými, scan to left
             lookbehind_tokens = self.inquiry_tokens[max(0, i - 4) : i + 1]
             if "B-rými" in [tok.txt for tok in lookbehind_tokens]:
                 continue
 
             if "Niðurrif" in [tok.txt for tok in lookbehind_tokens]:
-                subtracted: int = (subtracted or 0) + token.val[0]
+                subtracted: Decimal = (subtracted or 0) + Decimal(str(value))
             else:
-                added: int = (added or 0) + token.val[0]
+                added: Decimal = (added or 0) + Decimal(str(value))
         return added, subtracted
 
     def get_permit_type(self):
@@ -146,3 +152,25 @@ class PermitMinute:
 
     def get_building_type(self):
         return get_highest_scoring_key_from_hints(self.lemmas, building_type_lemma_hints)
+
+
+class PermitMinuteView:
+
+    PER_PAGE = 100
+
+    def __init__(self, db, page_bookmark, *filters):
+        query = (
+            db.query(Minute)
+            .join(Meeting)
+            .join(Council)
+            .join(Municipality)
+            .filter(Minute.remarks.op("~")("160 ?/ ?2010"), *filters)
+            .order_by(Meeting.start.desc(), Minute.id)
+        )
+
+        self.query = query
+        self.page = get_page(query, per_page=self.PER_PAGE, page=page_bookmark)
+
+    def __iter__(self):
+        for minute in self.page:
+            yield PermitMinute(minute)
