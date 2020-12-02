@@ -2,7 +2,7 @@ import datetime as dt
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
-from sqlalchemy import distinct, extract, func
+from sqlalchemy import distinct, extract, func, and_
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 import skipulagsstofnun
@@ -60,8 +60,33 @@ async def get_search(
 
 
 @router.get("/s")
-async def get_index():
-    return RedirectResponse("/s/reykjavik")
+async def get_index(
+    request: Request,
+    current_user: User = Depends(get_current_active_user_or_none),
+    db: Session = Depends(get_db),
+):
+    sq = (
+        db.query(Meeting.council_id, func.max(Meeting.start).label("meeting_latest"))
+        .group_by(Meeting.council_id)
+        .subquery()
+    )
+    meetings = (
+        db.query(Meeting)
+        .join(
+            (
+                sq,
+                and_(
+                    sq.c.council_id == Meeting.council_id,
+                    sq.c.meeting_latest == Meeting.start,
+                ),
+            )
+        )
+        .order_by(Meeting.start.desc())
+    )
+    return templates.TemplateResponse(
+        "municipalities.html",
+        {"request": request, "user": current_user, "meetings": meetings},
+    )
 
 
 @router.get("/s/{muni_slug}")
@@ -517,7 +542,7 @@ async def get_person(
 @router.get("/minutes/{id}")
 def get_minute_by_id(
     request: Request,
-    id: str,
+    id: int,
     db: Session = Depends(get_db),
 ):
     minute = db.query(Minute).get(id)
@@ -532,6 +557,28 @@ def get_minute_by_id(
             minute_id=hashids.encode(minute.id),
         )
     )
+
+
+@router.get("/minutes/{id}/suggested_plan")
+def get_permit_minute(
+    request: Request,
+    id: int,
+    db: Session = Depends(get_db),
+):
+    """Guess attributes of a permit from a meeting note."""
+    minute = db.query(Minute).get(id)
+    if minute is None:
+        raise HTTPException(404)
+    area = None
+    units = None
+    permit_type = None
+    building_type = None
+    return {
+        "area": area,
+        "units": units,
+        "permit_type": permit_type,
+        "building_type": building_type,
+    }
 
 
 @router.get("/meetings/{id}")

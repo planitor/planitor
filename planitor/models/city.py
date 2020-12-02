@@ -1,6 +1,3 @@
-import enum
-from collections import namedtuple
-
 from sqlalchemy import (
     Boolean,
     Column,
@@ -22,75 +19,13 @@ from sqlalchemy_utils import CompositeArray, CompositeType, TSVectorType
 from ..database import Base
 from ..utils.kennitala import Kennitala
 
-# It would be cleaner to not include the `name` in the namedtuple but on the client
-# side pydantic has only serialized the enum value so we don't have the enum identifier
-# which is the name. It's only incidental that the slug value is sometimes the same
-# as the name, look at `EntityTypeEnum` to see slugs not matching names. This is why
-# we added the name attribute to the namedtuple.
-
-EnumValue = namedtuple("EnumValue", ("slug", "label", "name"))
-ColorEnumValue = namedtuple("ColorEnumValue", ("slug", "label", "color"))
-
-
-class CouncilTypeEnum(enum.Enum):
-    byggingarfulltrui = EnumValue(
-        "byggingarfulltrui", "Byggingarfulltrúi", "byggingarfulltrui"
-    )
-    skipulagsfulltrui = EnumValue(
-        "skipulagsfulltrui", "Skipulagsfulltrúi", "skipulagsfulltrui"
-    )
-    skipulagsrad = EnumValue("skipulagsrad", "Skipulagsráð", "skipulagsrad")
-    borgarrad = EnumValue("borgarrad", "Borgarráð", "borgarrad")
-    borgarstjorn = EnumValue("borgarstjorn", "Borgarstjórn", "borgarstjorn")
-
-
-class PlanTypeEnum(enum.Enum):
-    deiliskipulag = EnumValue("deiliskipulag", "Deiliskipulag", "deiliskipulag")
-    adalskipulag = EnumValue("adalskipulag", "Aðalskipulag", "adalskipulag")
-    svaedisskipulag = EnumValue("svaedisskipulag", "Svæðisskipulag", "svaedisskipulag")
-
-
-class EntityTypeEnum(enum.Enum):
-    person = EnumValue("persona", "Persóna", "person")
-    company = EnumValue("fyrirtaeki", "Fyrirtæki", "company")
-
-
-class CaseStatusEnum(enum.Enum):
-    approved = ColorEnumValue("samthykkt", "Samþykkt", "green")
-    answered_positive = ColorEnumValue("jakvaett", "Jákvætt", "green")
-    delayed = ColorEnumValue("frestad", "Frestað", "yellow")
-
-    notice = ColorEnumValue("grenndarkynning", "Samþykkt að grenndarkynna", "yellow")
-
-    directed_to_skipulagsfulltrui = ColorEnumValue(
-        "visad-til-skipulagsfulltrua", "Vísað til skipulagsfulltrúa", "yellow"
-    )
-    directed_to_skipulagsrad = ColorEnumValue(
-        "visad-til-skipulags", "Vísað til Skipulags- og samgönguráðs", "yellow"
-    )
-    directed_to_adalskipulag = ColorEnumValue(
-        "visad-til-deildarstjora-adalskipulags",
-        "Vísað til umsagnar deildarstjóra aðalskipulags",
-        "yellow",
-    )
-    directed_to_mayor = ColorEnumValue(
-        "visad-til-skrifstofu-borgarstjora",
-        "Vísað til skrifstofu borgarstjóra",
-        "yellow",
-    )
-    directed_to_borgarrad = ColorEnumValue(
-        "visad-til-borgarrads", "Vísað til borgarráðs", "yellow"
-    )
-    directed_to_skipulagssvid = ColorEnumValue(
-        "visad-til-skipulagssvids", "Vísað til umhverfis- og skipulagssviðs", "yellow"
-    )
-    assigned_project_manager = ColorEnumValue(
-        "visad-til-verkefnastjora", "Vísað til verkefnisstjóra", "yellow"
-    )
-    answered_negative = ColorEnumValue("neikvaett", "Neikvætt", "red")
-    denied = ColorEnumValue("neitad", "Synjað", "red")
-    dismissed = ColorEnumValue("visad-fra", "Vísað frá", "red")
-    no_comment = ColorEnumValue("engar-athugasemdir", "Engar athugasemdir", "blue")
+from .enums import (
+    CouncilTypeEnum,
+    EntityTypeEnum,
+    CaseStatusEnum,
+    BuildingTypeEnum,
+    PermitTypeEnum,
+)
 
 
 class Geoname(Base):
@@ -240,6 +175,9 @@ class Municipality(Base):
     def __str__(self):
         return self.name
 
+    def __lt__(self, other):
+        return self.name < other.name
+
 
 class Plan(Base):
     __tablename__ = "plans"
@@ -270,6 +208,10 @@ class Council(Base):
 
     def __str__(self):
         return self.name
+
+    @property
+    def slug(self):
+        return self.council_type.value.slug
 
 
 class Meeting(Base):
@@ -506,3 +448,21 @@ class Minute(Base):
             if not text:
                 continue
             yield (category, text)
+
+
+class Permit(Base):
+    __tablename__ = "permits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    units = Column(Integer, nullable=True)
+    area_added = Column(Integer, nullable=True)
+    area_subtracted = Column(Integer, nullable=True)
+    permit_type = Column(Enum(BuildingTypeEnum), nullable=True)
+    building_type = Column(Enum(PermitTypeEnum), nullable=True)
+    keywords = Column(ARRAY(String), nullable=True)
+
+    minute_id = Column(Integer, ForeignKey(Minute.id), nullable=False, index=True)
+    minute = relationship(Minute)
+
+    def __repr__(self):
+        return f"<Permit id={self.id} case={self.minute.case.serial}>"

@@ -1,15 +1,12 @@
 from .accounts import User  # noqa
-from .city import (
+from .city import (  # noqa
     Address,
     Attachment,
     Case,
-    CaseEntity,  # noqa
-    CaseStatusEnum,
+    CaseEntity,
     Council,
-    CouncilTypeEnum,
     Entity,
     EntityMention,
-    EntityTypeEnum,
     Geoname,
     Housenumber,
     Meeting,
@@ -17,9 +14,15 @@ from .city import (
     Municipality,
     PDFAttachment,
     Plan,
-    PlanTypeEnum,
     Response,
 )
 from .monitor import Delivery, Subscription, SubscriptionTypeEnum  # noqa
+from .enums import (  # noqa
+    CaseStatusEnum,
+    CouncilTypeEnum,
+    EntityTypeEnum,
+    BuildingTypeEnum,
+    PermitTypeEnum,
+)
 
 _all = locals().values()
