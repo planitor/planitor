@@ -1,5 +1,9 @@
+import decimal
+
 from planitor import permits
 from planitor.models import Minute
+
+D = decimal.Decimal
 
 
 def test_get_area_from_minute_excludes_b_rymi():
@@ -9,7 +13,7 @@ Stærð, A-rými: 230 ferm., 767,8 rúmm.
 B-rými: 49,2 ferm.
 Gjald kr. 11.200 """
     minute = Minute(inquiry=inquiry)
-    assert permits.PermitMinute(minute).get_area() == 230.0
+    assert permits.PermitMinute(minute).area_added == D("230.0")
 
 
 def test_get_area_from_minute():
@@ -21,4 +25,16 @@ Erindi var grenndarkynnt fyrir hagsmunaaðilum að Grensásvegi 24 og 26. Lagt v
 Stækkun: 16.1 ferm., 46.4 rúmm.
 Gjald kr. 11.200"""
     minute = Minute(inquiry=inquiry)
-    assert permits.PermitMinute(minute).get_area() == 16.1
+    assert permits.PermitMinute(minute).area_added == D("16.1")
+
+
+def test_get_area_from_minute_with_totals_ignored():
+    inquiry = """Sótt er um leyfi til að byggja viðbyggingu sem hýsa mun vöru- og frystigeymslu ásamt tengigangi vestan við kjötvinnslu á byggingareit B á lóð 125744 Saltvík.
+Erindi fylgir minnisblað um brunavarnir dags. 19. október 2020.
+Stækkun: 2.366,2 ferm., 17.768,3 rúmm.
+Eftir stækkun, A-rými: 8.685,3 ferm., 48.683,6 rúmm.,
+B-rými: 178,8 ferm., 861,8 rúmm.
+Samtals: 8.864,1 ferm., 48.925,4 rúmm.
+Gjald kr. 11.200 """
+    minute = Minute(inquiry=inquiry)
+    assert permits.PermitMinute(minute).area_added == D("2366.2")

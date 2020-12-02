@@ -124,7 +124,7 @@ class PermitMinute:
         self.building_type = self.get_building_type()
 
     def get_area(self) -> Tuple[Optional[Decimal], Optional[Decimal]]:
-        decimal_getcontext().prec = 4
+        decimal_getcontext().prec = 10
         added, subtracted = None, None
         for i, token in enumerate(self.inquiry_tokens):
             if i == len(self.inquiry_tokens) - 1:
@@ -137,14 +137,24 @@ class PermitMinute:
             value = token.val[0]
 
             # Do not add up area for B-rými, scan to left
-            lookbehind_tokens = self.inquiry_tokens[max(0, i - 4) : i + 1]
-            if "B-rými" in [tok.txt for tok in lookbehind_tokens]:
+            lookbehind_tokens = [
+                tok.txt
+                for tok in self.inquiry_tokens[max(0, i - 5) : i + 1]
+                if tok.txt not in (None, ".")
+            ]
+            if "B-rými" in lookbehind_tokens:
                 continue
 
-            if "Niðurrif" in [tok.txt for tok in lookbehind_tokens]:
+            if lookbehind_tokens[:2] == ["Eftir", "stækkun"]:
+                continue
+
+            if "Niðurrif" in lookbehind_tokens:
                 subtracted: Decimal = (subtracted or 0) + Decimal(str(value))
             else:
+                if added and "Samtals" in lookbehind_tokens:
+                    continue
                 added: Decimal = (added or 0) + Decimal(str(value))
+
         return added, subtracted
 
     def get_permit_type(self):
