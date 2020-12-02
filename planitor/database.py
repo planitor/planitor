@@ -1,8 +1,10 @@
+from typing import Iterator
+
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy_utils import register_composites
 from starlette.datastructures import Secret
 
@@ -21,7 +23,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def get_db() -> Iterator[Session]:
     try:
         db = SessionLocal()
         register_composites(db.connection())

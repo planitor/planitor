@@ -32,7 +32,7 @@ else:
 
 @app.router.get("/")
 async def get_index():
-    return RedirectResponse("/s/reykjavik")
+    return RedirectResponse("/s")
 
 
 @app.router.get("/_error")
