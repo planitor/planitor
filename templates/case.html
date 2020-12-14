@@ -95,7 +95,7 @@
             muni_slug=case.municipality.slug,
             case_id=case.serial) }}">
             <span class="underline">{{ case.headline }}</span>
-            <span class="text-gray-600 font-thin">{{- case.serial -}}</span>
+            <span class="text-gray-600 font-light">{{- case.serial -}}</span>
           </a>
         </span>
       </div>
@@ -145,7 +145,7 @@
               <div class="text-sm font-bold">
                 {{ case.address }}
                 {% if case.stadgreinir %}
-                <span class="text-gray-600 font-thin ml-2">{{ case.stadgreinir }}</span>
+                <span class="text-gray-600 font-light ml-2">{{ case.stadgreinir }}</span>
                 {% endif %}
               </div>
               {% endif %}
@@ -198,7 +198,7 @@
                       {{ case.iceaddr }}
                     </a>
                   </div>
-                  <div class="text-sm font-thin tracking-tight">
+                  <div class="text-sm font-light tracking-tight">
                     {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
                   </div>
                 </div>
@@ -209,10 +209,10 @@
               {% if case_count %}
               <div class="mt-4">{{ get_cases(related_cases, case_count) }}</div>
               {% endif %}
-              <div class="text-xs font-thin tracking-tight mt-4">
+              <div class="text-xs font-light tracking-tight mt-4">
                 Landnúmer: {{ case.iceaddr.landnr }}
                 {% if case.iceaddr %}
-                <span class="ml-2 text-powder-dark hover:text-powder-darker font-bold">
+                <span class="ml-2 text-gray-600 hover:text-gray-900 font-bold">
                   <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
                     → skrá.is
                   </a>
@@ -227,6 +227,9 @@
 
           <div class="hidden">{{ case.get_coordinates() }}</div>
         </div>
+
+        {% block right %}{% endblock %}
+
       </div>
 
     </div>

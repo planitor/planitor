@@ -13,7 +13,6 @@ from planitor.models import (
     Case,
     CaseEntity,
     Council,
-    CouncilTypeEnum,
     Municipality,
 )
 from planitor.schemas import city as schemas
@@ -28,14 +27,6 @@ def get_municipalities(
     db: Session = Depends(get_db),
 ):
     return db.query(Municipality).outerjoin(Council).all()
-
-
-@router.get("/council-types", response_model=List[CouncilTypeEnum])
-def get_council_types(
-    request: Request,
-    db: Session = Depends(get_db),
-):
-    return list(CouncilTypeEnum)
 
 
 @router.get("/addresses/{hnitnum}/addresses")

@@ -44,6 +44,18 @@
   {% endcall %}
 {% endblock %}
 
+{% block right %}
+{% if user.is_superuser %}
+  <div class="mt-4">
+    <div class="mb-2 font-bold text-xl flex">
+      <div class="flex-grow">Byggingaleyfi</div>
+      <div class="sf">􀒳</div>
+    </div>
+    <div class="permit-form" data-minute-id="{{ minute.id }}"></div>
+  </div>
+{% endif %}
+{% endblock %}
+
 {% block inner %}
   <div class="mb-6">{{ meeting_card() }}</div>
   <div class="mb-4 flex text-xs md:text-sm">
@@ -73,7 +85,7 @@
   <div class="p-4 bg-white rounded-md shadow-lg">
     {% if minute.inquiry %}
     <div>
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Fyrirspurn</h5>
       <div>
         {% for kennitala, token in minute.get_inquiry_mention_tokens() -%}
           {% if not kennitala -%}
@@ -91,19 +103,19 @@
     {% endif %}
     {% if minute.remarks %}
     <div class="mt-4">
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Svar</h5>
       <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
     </div>
     {% endif %}
     {% if minute.participants %}
     <div class="mt-4">
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Gestir</h5>
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Gestir</h5>
       <div class="text-sm text-gray-800">{{ minute.participants }}</div>
     </div>
     {% endif %}
     {% if minute.entrants_and_leavers %}
     <div class="mt-4">
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Komur og brottfarir</h5>
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Komur og brottfarir</h5>
       <ul class="text-sm">
       {% for _ in minute.entrants_and_leavers %}
         <li class="text-gray-800">{{ _ }}</li>
@@ -115,7 +127,7 @@
   {% if minute.responses %}
   <div class="mt-6 p-4 bg-white rounded-md shadow-lg">
     <div>
-      <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Bókanir og gagnbókanir</h5>
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Bókanir og gagnbókanir</h5>
       <ul>
       {% for response in minute.responses %}
         <li class="mt-2">

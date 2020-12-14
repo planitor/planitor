@@ -1,9 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 body {
   font-family: "Work Sans", sans-serif;
+}
+
+.sf {
+  font-family: "SF Pro Text", ui-sans-serif, system-ui, -apple-system;
 }
 
 svg {
@@ -15,7 +19,7 @@ td {
 }
 
 .minilabel {
-  @apply uppercase tracking-wide text-gray-700 font-thin text-xs;
+  @apply uppercase tracking-wide text-gray-700 font-light text-xs;
 }
 
 .btn {

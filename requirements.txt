@@ -17,7 +17,7 @@ dnspython==2.0.0; python_version >= "3.6"
 dramatiq==1.9.0; python_version >= "3.5"
 email-validator==1.1.1
 emails==0.6
-fastapi==0.61.2; python_version >= "3.6"
+fastapi==0.62.0; python_version >= "3.6"
 fiona==1.8.17
 future==0.18.2; python_version >= "2.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0"
 h11==0.9.0
@@ -48,7 +48,7 @@ reynir==2.8.1
 s3transfer==0.3.3
 schemainspect==0.1.1603448192
 sentry-dramatiq==0.3.2
-sentry-sdk==0.19.4
+sentry-sdk==0.19.5
 shapely==1.7.1
 six==1.15.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.3.0"
 skipulagsstofnun==0.1.4; python_version >= "3.6" and python_version < "4.0"
