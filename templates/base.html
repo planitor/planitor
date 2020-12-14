@@ -56,9 +56,9 @@
             <a href="https://www.notion.so/planitor/Skilm-lar-og-pers-nuvernd-6164e13fac124fe9bc8779afc742d00b" target="_blank" class="text-xs text-gray-500"> Notendaskilmálar og persónuvernd</a>
           </p>
           <div class="flex-grow"></div>
-          <p class="my-1 text-powder-darker text-right">
+          <p class="my-1 text-gray-700 text-right">
             <a
-              class="text-powder-darker font-bold"
+              class="font-bold"
               href="https://www.notion.so/planitor/Um-okkur-49e0257450f147a2b006f9881a5723c3"
               target="_blank"
             >
@@ -72,7 +72,8 @@
         </div>
       </div>
     </footer>
-    {% include "modal.html" -%} {% if DEBUG -%} {# Hot reload script #} {{
+    {% include "modal.html" -%}
+    {% if DEBUG -%} {# Hot reload script #} {{
     hotreload.script(url_for('hot-reload')) | safe }}
     <script>
       window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8080";

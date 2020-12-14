@@ -1,16 +1,16 @@
-from typing import Any, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 from planitor.models import CouncilTypeEnum, SubscriptionTypeEnum
 
-from .city import Council, Municipality
+from .city import Municipality
 
 
 class Case(BaseModel):
     id: int
     serial: str
-    council: Optional[Council]
+    municipality: Optional[Municipality]
 
     class Config:
         orm_mode = True

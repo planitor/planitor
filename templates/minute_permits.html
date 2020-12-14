@@ -48,6 +48,7 @@
       <th class="text-left">Leyfi</th>
       <th class="text-left">Bygging</th>
       <th></th>
+      <th></th>
     </tr>
       {% for pm in permit_minutes %}
       {% set minute = pm.minute %}
@@ -76,6 +77,9 @@
         <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold shadow-lg">
           {{ minute.status.value.label if minute.status else "Annað" }}
         </div>
+      </td>
+      <td>
+        {{ "☑️" if pm.minute.permit }}
       </td>
     </tr>
       {% endfor %}

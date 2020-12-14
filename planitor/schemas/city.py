@@ -34,3 +34,10 @@ class Municipality(BaseMunicipality):
 
     class Config:
         orm_mode = True
+
+
+class Minute(BaseModel):
+    id: int
+
+    class Config:
+        orm_mode = True

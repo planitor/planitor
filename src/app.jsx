@@ -5,6 +5,7 @@ import { Subscriptions } from "./subscriptions.jsx";
 import { Login } from "./accounts.jsx";
 import { FollowCase, FollowAddress, FollowEntity } from "./follow.jsx";
 import { NewPasswordForm } from "./forms/new-password.jsx";
+import { PermitForm } from "./forms/permits.jsx";
 import { openModal } from "./modals.js";
 import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps.jsx";
 
@@ -100,4 +101,8 @@ mapkit.addEventListener("configuration-change", function (event) {
       targetPageEl.classList.remove("hidden");
     });
   });
+});
+
+[...document.querySelectorAll(".permit-form")].forEach((formEl) => {
+  render(<PermitForm minuteId={formEl.dataset.minuteId} />, formEl);
 });

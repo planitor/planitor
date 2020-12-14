@@ -15,6 +15,7 @@ from .city import (  # noqa
     PDFAttachment,
     Plan,
     Response,
+    Permit,
 )
 from .monitor import Delivery, Subscription, SubscriptionTypeEnum  # noqa
 from .enums import (  # noqa

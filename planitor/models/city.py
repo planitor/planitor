@@ -12,7 +12,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.types import ARRAY, BIGINT, NUMERIC, TEXT
 from sqlalchemy_utils import CompositeArray, CompositeType, TSVectorType
 
@@ -457,14 +457,15 @@ class Permit(Base):
     __tablename__ = "permits"
 
     id = Column(Integer, primary_key=True, index=True)
+    created = Column(DateTime, server_default=func.now())
     units = Column(Integer, nullable=True)
-    area_added = Column(Integer, nullable=True)
-    area_subtracted = Column(Integer, nullable=True)
-    permit_type = Column(Enum(BuildingTypeEnum), nullable=True)
-    building_type = Column(Enum(PermitTypeEnum), nullable=True)
+    area_added = Column(Numeric, nullable=True)
+    area_subtracted = Column(Numeric, nullable=True)
+    permit_type = Column(Enum(PermitTypeEnum), nullable=True)
+    building_type = Column(Enum(BuildingTypeEnum), nullable=True)
 
     minute_id = Column(Integer, ForeignKey(Minute.id), nullable=False, index=True)
-    minute = relationship(Minute)
+    minute = relationship(Minute, backref=backref("permit", uselist=False))
 
     def __repr__(self):
         return f"<Permit id={self.id} case={self.minute.case.serial}>"

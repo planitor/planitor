@@ -99,6 +99,15 @@ export const Navigation = () => {
     input.current && input.current.value && input.current.focus();
   }, [isSearchExpanded]);
 
+  const onSubmit = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    if (window.fathom !== undefined) {
+      window.fathom.trackGoal("PBZT1SCW", 0);
+    }
+    event.target.submit();
+  };
+
   return (
     <div class="flex justify-between items-center align-middle h-12">
       <div
@@ -129,6 +138,7 @@ export const Navigation = () => {
             class="search flex bg-white bg-opacity-25 rounded-md items-center mr-3 px-3 w-full"
             method="GET"
             action="/leit"
+            onSubmit={onSubmit}
           >
             <MagnifyingGlass />
             <input

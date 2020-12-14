@@ -12,7 +12,7 @@
             {{ minute.case.address }}
           </a>
           {% for applicant, case_entities in minute.case.entities|groupby('applicant') %}
-          <div class="mb-1 uppercase tracking-wide text-gray-700 font-thin text-xs">
+          <div class="mb-1 uppercase tracking-wide text-gray-700 font-light text-xs">
             {{ "Málsaðilar" if applicant else "Aðrir sem vísað er í" }}
           </div>
           <div class="entities mb-4">
@@ -38,7 +38,7 @@
             {% endfor %}
           </div>
           {% endfor %}
-          <div class="mb-1 uppercase tracking-wide text-gray-700 font-thin text-xs">
+          <div class="mb-1 uppercase tracking-wide text-gray-700 font-light text-xs">
             Verknúmer
           </div>
           <a
@@ -60,7 +60,7 @@
             </div>
           </div>
           <div class="mb-4">
-            <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Fyrirspurn</h5>
+            <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Fyrirspurn</h5>
             <div>
               {% for kennitala, token in minute.get_inquiry_mention_tokens() -%} {% if not kennitala -%} {{
               token.replace('\n\n', '<br />')|safe }} {% else -%} {% if kennitala.is_person() -%}
@@ -79,11 +79,11 @@
             </div>
           </div>
           <div class="mb-4">
-            <h5 class="uppercase tracking-wide text-gray-700 font-thin text-xs">Svar</h5>
+            <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Svar</h5>
             <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
           </div>
           <hr class="border-1 mb-2" />
-          <div class="name mr-4 font-thin text-xs uppercase tracking-wide text-gray-500">
+          <div class="name mr-4 font-light text-xs uppercase tracking-wide text-gray-500">
             Umsókn nr. {{ minute.serial }}
           </div>
         </div>

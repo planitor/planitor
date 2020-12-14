@@ -61,6 +61,12 @@ export const api = {
   getCouncilTypes() {
     return axios.get("/api/council-types", authHeaders());
   },
+  getBuildingTypes() {
+    return axios.get("/api/building-types", authHeaders());
+  },
+  getPermitTypes() {
+    return axios.get("/api/permit-types", authHeaders());
+  },
   getMunicipalities() {
     return axios.get("/api/municipalities", authHeaders());
   },
@@ -72,5 +78,11 @@ export const api = {
   },
   deleteSubscription(id) {
     return axios.delete(`/api/subscriptions/${id}`, authHeaders());
+  },
+  getPermit(minuteId) {
+    return axios.get(`/api/minutes/${minuteId}/permit`, authHeaders());
+  },
+  putPermit(minuteId, data) {
+    return axios.put(`/api/minutes/${minuteId}/permit`, data, authHeaders());
   },
 };
