@@ -47,11 +47,18 @@ def update_permit(
     permit = minute.permit
     if permit is None:
         permit = models.Permit(minute=minute)
+
     permit.units = form.units
     permit.area_added = form.area_added
     permit.area_subtracted = form.area_subtracted
-    permit.building_type = getattr(BuildingTypeEnum, form.building_type)
-    permit.permit_type = getattr(PermitTypeEnum, form.permit_type)
+
+    permit.building_type = None
+    permit.permit_type = None
+    if form.building_type:
+        permit.building_type = getattr(BuildingTypeEnum, form.building_type)
+    if form.permit_type:
+        permit.permit_type = getattr(PermitTypeEnum, form.permit_type)
+
     db.add(permit)
     db.commit()
     db.refresh(permit)
