@@ -25,9 +25,9 @@ export const PermitForm = ({ minuteId }) => {
       api.getBuildingTypes(),
     ]).then(([permitResponse, permitTypesResponse, buildingTypesResponse]) => {
       setForm({ ...form, data: permitResponse.data });
-      setPermitType(permitResponse.data.permit_type[0]);
+      setPermitType(permitResponse.data.permit_type && permitResponse.data.permit_type[0] || null);
       setPermitTypes(permitTypesResponse.data);
-      setBuildingType(permitResponse.data.building_type[0]);
+      setBuildingType(permitResponse.data.building_type && permitResponse.data.building_type[0] || null);
       setBuildingTypes(buildingTypesResponse.data);
     });
   }, []);
