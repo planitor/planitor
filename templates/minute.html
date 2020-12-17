@@ -6,7 +6,7 @@
     <div class="flex justify-between items-start mb-2">
       <div>
         <div class="text-lg font-extrabold">
-          Fundur
+          {{ meeting.council }}
           <a href="{{ meeting_url }}" class="underline font-semibold"> nr. {{ meeting.name }}</a>
         </div>
         <div class="text-sm">{{ human_date(meeting.start) }}</div>
