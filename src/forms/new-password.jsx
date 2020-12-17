@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
-import { PasswordInput } from "./widgets";
+import { PasswordInput } from "./widgets.jsx";
 
 const saveLocalToken = (token) => localStorage.setItem("token", token);
 

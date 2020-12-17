@@ -1,9 +1,7 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
-import { TextInput, PasswordInput } from "./widgets";
-
-const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
+import { TextInput, PasswordInput } from "./widgets.jsx";
 
 export const LoginForm = (props) => {
   const { onSuccess, setScreen } = props;

@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
-import { TextInput } from "./widgets";
+import { TextInput } from "./widgets.jsx";
 
 export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
   const [form, setForm] = useState({

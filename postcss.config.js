@@ -20,7 +20,12 @@ module.exports = (context) => {
     plugins: [
       require("postcss-import"),
       require("tailwindcss"),
-      require("postcss-preset-env")({ stage: 2 }),
+      require("postcss-preset-env")({
+        stage: 2,
+        features: {
+          "focus-within-pseudo-class": false,
+        },
+      }),
       require("postcss-100vh-fix"),
       ...(process.env.NODE_ENV === "production"
         ? [purgecss, require("cssnano")]
