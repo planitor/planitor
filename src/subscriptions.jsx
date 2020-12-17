@@ -5,7 +5,7 @@ import { groupBy, keyBy } from "lodash";
 import { openModal } from "./modals";
 import { api } from "./api";
 import { Ellipsis, TrashFill } from "./symbols.jsx";
-import { SelectWidget } from "./forms/widgets.jsx";
+import { Select } from "./forms/widgets.jsx";
 
 const SubscriptionLoading = () => {
   return (
@@ -231,9 +231,9 @@ const Settings = ({
   return (
     <div class="">
       {data.address && (
-        <div class="flex items-center py-4 sm:py-6 border-b border-gray-300">
-          <div class="flex-grow font-bold">Radíus</div>
-          <SelectWidget
+        <div class="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
+          <div class="font-bold">Radíus</div>
+          <Select
             value={data.radius || 0}
             onChange={onChangeRadius}
             isDisabled={isLoading}
@@ -245,12 +245,12 @@ const Settings = ({
               <option value={300}>+ 300m</option>
               <option value={500}>+ 500m</option>
             </Fragment>
-          </SelectWidget>
+          </Select>
         </div>
       )}
-      <div class="flex items-center py-4 sm:py-6 border-b border-gray-300">
-        <div class="flex-grow font-bold">Afhending</div>
-        <SelectWidget
+      <div class="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
+        <div class="font-bold">Afhending</div>
+        <Select
           value={delivery}
           onChange={onChangeDelivery}
           isDisabled={isLoading}
@@ -260,9 +260,9 @@ const Settings = ({
             <option value="immediate">Strax</option>
             <option value="weekly">Vikuleg</option>
           </Fragment>
-        </SelectWidget>
+        </Select>
       </div>
-      <div class="py-4 items-center sm:py-6 border-b border-gray-300">
+      <div class="py-4 items-center sm:py-6 border-gray-300">
         <div class="font-bold mb-1">Fundargerðir</div>
         <SelectCouncils
           councils={councils}
@@ -272,7 +272,7 @@ const Settings = ({
       </div>
       <div class="py-4 sm:py-6 text-center">
         <button
-          class="text-planitor-red font-bold"
+          class="text-planitor-red font-bold rounded-lg bg-red-200 p-3 w-full"
           onClick={(event) => {
             !isLoading && onDelete(event);
           }}

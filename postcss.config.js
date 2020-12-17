@@ -18,8 +18,9 @@ const purgecss = require("@fullhuman/postcss-purgecss")({
 module.exports = (context) => {
   return {
     plugins: [
-      require("postcss-preset-env")({ stage: 1 }),
+      require("postcss-import"),
       require("tailwindcss"),
+      require("postcss-preset-env")({ stage: 2 }),
       require("postcss-100vh-fix"),
       ...(process.env.NODE_ENV === "production"
         ? [purgecss, require("cssnano")]

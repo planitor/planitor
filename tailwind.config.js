@@ -1,8 +1,5 @@
 module.exports = {
-  plugins: [],
-  future: {
-    removeDeprecatedGapUtilities: true,
-  },
+  plugins: [require('@tailwindcss/forms')],
   purge: false, // manually configured in postcss.config.js
   theme: {
     extend: {

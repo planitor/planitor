@@ -1,7 +1,7 @@
 import { Fragment, h, render } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
-import { SelectWidget } from "../forms/widgets.jsx";
+import { Select, TextInput } from "../forms/widgets.jsx";
 import { api } from "../api";
 
 export const PermitForm = ({ minuteId }) => {
@@ -67,7 +67,7 @@ export const PermitForm = ({ minuteId }) => {
       <div class="mb-2 grid gap-2 grid-cols-2">
         <div>
           <label class="text-sm block mb-1">Tegund leyfis</label>
-          <SelectWidget
+          <Select
             value={permitType}
             onChange={onChangePermitType}
             isDisabled={form.isLoading}
@@ -78,11 +78,11 @@ export const PermitForm = ({ minuteId }) => {
                 return <option value={slug}>{label}</option>;
               })}
             </Fragment>
-          </SelectWidget>
+          </Select>
         </div>
         <div>
           <label class="text-sm block mb-1">Tegund byggingar</label>
-          <SelectWidget
+          <Select
             value={buildingType}
             onChange={onChangeBuildingType}
             isDisabled={form.isLoading}
@@ -93,15 +93,13 @@ export const PermitForm = ({ minuteId }) => {
                 return <option value={slug}>{label}</option>;
               })}
             </Fragment>
-          </SelectWidget>
+          </Select>
         </div>
       </div>
       <div class="mb-4 grid gap-2 grid-cols-3">
         <div>
           <label class="text-sm block mb-1">Einingar</label>
-          <input
-            class="shadow appearance-none border rounded w-full py-2 px-3"
-            type="text"
+          <TextInput
             value={form.data.units}
             onChange={(e) =>
               setForm({
@@ -113,9 +111,7 @@ export const PermitForm = ({ minuteId }) => {
         </div>
         <div>
           <label class="text-sm block mb-1">Viðbætt</label>
-          <input
-            class="shadow appearance-none border rounded w-full py-2 px-3"
-            type="text"
+          <TextInput
             value={form.data.area_added}
             onChange={(e) =>
               setForm({
@@ -127,9 +123,7 @@ export const PermitForm = ({ minuteId }) => {
         </div>
         <div>
           <label class="text-sm block mb-1">Niðurrif</label>
-          <input
-            class="shadow appearance-none border rounded w-full py-2 px-3"
-            type="text"
+          <TextInput
             value={form.data.area_subtracted}
             onChange={(e) =>
               setForm({

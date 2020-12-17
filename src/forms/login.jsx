@@ -1,6 +1,7 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
+import { TextInput, PasswordInput } from "./widgets";
 
 const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
@@ -90,25 +91,21 @@ export const LoginForm = (props) => {
 
   return (
     <div>
-      <h1 class="text-center text-2xl">Innskráning</h1>
+      <h1 class="text-2xl">Innskráning</h1>
       <div class="pt-6 pb-2 my-2">
         <form onSubmit={onSubmit}>
           {form.error && (
             <div class="mb-4 text-red-700 font-bold">{form.error}</div>
           )}
           <div class="mb-4">
-            <label class="block text-sm font-bold mb-2" for="username">
+            <label class="block text-sm mb-2" for="username">
               Netfang
             </label>
-            <input
-              class={classNames([
-                "shadow appearance-none border rounded w-full py-2 px-3",
-                (!username.isDirty && !!username.errors.length && "error") ||
-                  "",
-              ])}
+            <TextInput
               name="username"
-              type="text"
-              disabled={form.isLoading}
+              isInvalid={!!username.errors.length}
+              isDirty={username.isDirty}
+              isDisabled={form.isLoading}
               value={username.value}
               onInput={onUsernameChange}
             />
@@ -117,18 +114,14 @@ export const LoginForm = (props) => {
             })}
           </div>
           <div class="mb-6">
-            <label class="block text-sm font-bold mb-2" for="password">
+            <label class="block text-sm mb-2" for="password">
               Lykilorð
             </label>
-            <input
-              class={classNames([
-                "shadow appearance-none border rounded w-full py-2 px-3 mb-3",
-                (!password.isDirty && !!password.errors.length && "error") ||
-                  "",
-              ])}
+            <PasswordInput
               name="password"
               type="password"
-              disabled={form.isLoading}
+              isDirty={password.isDirty}
+              isDisabled={form.isLoading}
               value={password.value}
               onInput={onPasswordChange}
             />

@@ -1,6 +1,7 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
+import { PasswordInput } from "./widgets";
 
 const saveLocalToken = (token) => localStorage.setItem("token", token);
 
@@ -47,11 +48,10 @@ export const NewPasswordForm = ({ token }) => {
           </div>
         )}
         <div class="mb-4">
-          <input
-            class="shadow appearance-none border rounded w-full py-2 px-3"
+          <PasswordInput
             name="password"
             type="password"
-            disabled={form.isLoading || form.isSuccess}
+            isDisabled={form.isLoading || form.isSuccess}
             value={password.value}
             onInput={onChange}
           />

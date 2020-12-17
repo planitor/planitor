@@ -1,21 +1,44 @@
 import { h, render } from "preact";
 
-export const SelectWidget = ({ value, onChange, isDisabled, children }) => {
+const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
+
+const Input = ({ value, onInput, isDisabled, isDirty, isInvalid, type }) => {
   return (
-    <div class="inline-block relative text-sm lg:text-base">
+    <div class="text-sm lg-text-base">
+      <input
+        type={type}
+        class={classNames([
+          "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black",
+          (!isDirty && isInvalid && "border-red-700") || null,
+        ])}
+        onInput={onInput}
+        value={value}
+        disabled={isDisabled}
+        class="mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black bg-transparent"
+      />
+    </div>
+  );
+};
+
+export const TextInput = (props) => {
+  return <Input {...props} type="text" />;
+};
+
+export const PasswordInput = (props) => {
+  return <Input {...props} type="password" />;
+};
+
+export const Select = ({ value, onChange, isDisabled, children }) => {
+  return (
+    <div class="text-sm lg:text-base">
       <select
         value={value}
         onChange={onChange}
         disabled={isDisabled}
-        class="block appearance-none w-full border border-gray-400 hover:border-gray-500 px-1 lg:px-4 py-1 lg:py-2 pr-8 mr-3 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+        class="block w-full mt-0 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black bg-transparent"
       >
         {children}
       </select>
-      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-        <svg class="fill-current h-4 w-4" viewBox="0 0 20 20">
-          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-        </svg>
-      </div>
     </div>
   );
 };

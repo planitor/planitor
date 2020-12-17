@@ -1,8 +1,7 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 import { api } from "../api";
-
-const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
+import { TextInput } from "./widgets";
 
 export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
   const [form, setForm] = useState({
@@ -62,8 +61,7 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
             <label class="block text-sm font-bold mb-2" for="email">
               Netfang
             </label>
-            <input
-              class="shadow appearance-none border rounded w-full py-2 px-3"
+            <TextInput
               name="email"
               type="text"
               disabled={form.isLoading || form.isSuccess}
