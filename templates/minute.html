@@ -104,7 +104,7 @@
     {% if minute.remarks %}
     <div class="mt-4">
       <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Svar</h5>
-      <p>{{ minute.remarks.replace('\n\n', '<br />')|safe }}</p>
+      <p>{{ minute.remarks.replace('\n', '<br />')|safe }}</p>
     </div>
     {% endif %}
     {% if minute.participants %}
