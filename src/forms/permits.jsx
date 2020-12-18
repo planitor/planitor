@@ -25,9 +25,17 @@ export const PermitForm = ({ minuteId }) => {
       api.getBuildingTypes(),
     ]).then(([permitResponse, permitTypesResponse, buildingTypesResponse]) => {
       setForm({ ...form, data: permitResponse.data });
-      setPermitType(permitResponse.data.permit_type && permitResponse.data.permit_type[0] || null);
+      setPermitType(
+        (permitResponse.data.permit_type &&
+          permitResponse.data.permit_type[0]) ||
+          null
+      );
       setPermitTypes(permitTypesResponse.data);
-      setBuildingType(permitResponse.data.building_type && permitResponse.data.building_type[0] || null);
+      setBuildingType(
+        (permitResponse.data.building_type &&
+          permitResponse.data.building_type[0]) ||
+          null
+      );
       setBuildingTypes(buildingTypesResponse.data);
     });
   }, []);
@@ -64,9 +72,9 @@ export const PermitForm = ({ minuteId }) => {
 
   return (
     <div>
-      <div class="mb-2 grid gap-2 grid-cols-2">
+      <div class="mb-3 grid gap-2 grid-cols-2">
         <div>
-          <label class="text-sm block mb-1">Tegund leyfis</label>
+          <label class="text-xs block mb-1">Tegund leyfis</label>
           <Select
             value={permitType}
             onChange={onChangePermitType}
@@ -81,7 +89,7 @@ export const PermitForm = ({ minuteId }) => {
           </Select>
         </div>
         <div>
-          <label class="text-sm block mb-1">Tegund byggingar</label>
+          <label class="text-xs block mb-1">Tegund byggingar</label>
           <Select
             value={buildingType}
             onChange={onChangeBuildingType}
@@ -98,7 +106,7 @@ export const PermitForm = ({ minuteId }) => {
       </div>
       <div class="mb-4 grid gap-2 grid-cols-3">
         <div>
-          <label class="text-sm block mb-1">Einingar</label>
+          <label class="text-xs block mb-1">Einingar</label>
           <TextInput
             value={form.data.units}
             onChange={(e) =>
@@ -110,7 +118,7 @@ export const PermitForm = ({ minuteId }) => {
           />
         </div>
         <div>
-          <label class="text-sm block mb-1">Viðbætt</label>
+          <label class="text-xs block mb-1">Viðbætt</label>
           <TextInput
             value={form.data.area_added}
             onChange={(e) =>
@@ -122,7 +130,7 @@ export const PermitForm = ({ minuteId }) => {
           />
         </div>
         <div>
-          <label class="text-sm block mb-1">Niðurrif</label>
+          <label class="text-xs block mb-1">Niðurrif</label>
           <TextInput
             value={form.data.area_subtracted}
             onChange={(e) =>

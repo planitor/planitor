@@ -3,237 +3,235 @@
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 
 {% macro entity_label(entity) %}
-  <span class="sf-symbol">
-    {% if entity.entity_type.name == "company" %}
-      {% include "symbols/briefcase.fill.svg" %}
-    {% else %}
-      {% include "symbols/person.fill.svg" %}
-    {% endif %}
-  </span>
-  <span>{{ entity.name }}</span>
+<span class="sf-symbol">
+  {% if entity.entity_type.name == "company" %}
+  {% include "symbols/briefcase.fill.svg" %}
+  {% else %}
+  {% include "symbols/person.fill.svg" %}
+  {% endif %}
+</span>
+<span>{{ entity.name }}</span>
 {% endmacro %}
 
 {% macro entities(case) %}
-  {% for applicant, case_entities in case.entities | groupby('applicant') %}
-    <div class="mb-2 minilabel">
-      {{ "Málsaðilar" if applicant else "Aðilar sem vísað er í" }}
-    </div>
-    <div class="entities mb-2">
-    {% for case_entity in case_entities %}
-      {% set e = case_entity.entity %}
-      <div class="mb-1">
-        {% if e.entity_type.name == "company" %}
-        <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
+{% for applicant, case_entities in case.entities | groupby('applicant') %}
+<div class="mb-2 minilabel">
+  {{ "Málsaðilar" if applicant else "Aðilar sem vísað er í" }}
+</div>
+<div class="entities mb-2">
+  {% for case_entity in case_entities %}
+  {% set e = case_entity.entity %}
+  <div class="mb-1">
+    {% if e.entity_type.name == "company" %}
+    <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
                     if e.entity_type.name == 'company' else
                     url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}"
-          class="text-planitor-darkBlue font-semibold font-sm truncate"
-        >
-        {{ entity_label(e) }}
-        </a>
-        {% else %}
-        <span class="text-black">{{ entity_label(e) }}</span>
-        {% endif %}
-      </div>
-    {% endfor %}
-    </div>
+      class="text-planitor-darkBlue font-semibold font-sm truncate">
+      {{ entity_label(e) }}
+    </a>
+    {% else %}
+    <span class="text-black">{{ entity_label(e) }}</span>
+    {% endif %}
+  </div>
   {% endfor %}
+</div>
+{% endfor %}
 {% endmacro %}
 
 {% macro table(minutes) %}
-  <table class="table-auto min-w-full max-w-full">
-    <thead>
-      <tr>
-        <th class="px-0 md:px-3 py-2 minilabel text-left">Fundur</th>
-        <th class="px-0 md:px-3 py-2 minilabel text-left">Bókun</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for minute in minutes %}
-      <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }}">
-        <td class="md:border px-0 md:px-3 py-2">
-          <div>
-            <a href="{{ url_for('get_meeting',
+<table class="table-auto min-w-full max-w-full">
+  <thead>
+    <tr>
+      <th class="px-0 md:px-3 py-2 minilabel text-left">Fundur</th>
+      <th class="px-0 md:px-3 py-2 minilabel text-left">Bókun</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for minute in minutes %}
+    <tr class="{{ 'md:bg-white' if loop.index % 2 == 0 }}">
+      <td class="md:border px-0 md:px-3 py-2">
+        <div>
+          <a href="{{ url_for('get_meeting',
               muni_slug=municipality.slug,
               council_slug=minute.meeting.council.council_type.value.slug,
-              meeting_id=h.encode(minute.meeting.id)) }}" class="text-planitor-blue hover:underline whitespace-no-wrap">
+              meeting_id=h.encode(minute.meeting.id)) }}"
+            class="text-planitor-blue hover:underline whitespace-no-wrap">
 
-              {{ minute.meeting.council.name }} Nr.
-              {{ minute.meeting.name }}
-            </a>
-          </div>
-          <div class="hidden md:inline text-xs">
-            {{ timeago(minute.meeting.start) }}
-          </div>
-        </td>
-        <td class="md:border px-0 md:px-3 lg:px-3 py-2">
-          <div>
-            <a href="{{ url_for('get_minute',
+            {{ minute.meeting.council.name }} Nr.
+            {{ minute.meeting.name }}
+          </a>
+        </div>
+        <div class="hidden md:inline text-xs">
+          {{ timeago(minute.meeting.start) }}
+        </div>
+      </td>
+      <td class="md:border px-0 md:px-3 lg:px-3 py-2">
+        <div>
+          <a href="{{ url_for('get_minute',
               muni_slug=minute.case.municipality.slug,
               case_id=minute.case.serial,
               minute_id=h.encode(minute.id)) }}" class="underline">
-              {{ human_date(minute.meeting.start) -}}</a>
-          </div>
-          <div>
-            <span class="text-{{ minute.status.value.color if minute.status else 'gray' }}-700 text-xs">
-              {{ minute.status.value.label if minute.status else "Annað" -}}
-            </span>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+            {{ human_date(minute.meeting.start) -}}</a>
+        </div>
+        <div>
+          <span class="text-{{ minute.status.value.color if minute.status else 'gray' }}-700 text-xs">
+            {{ minute.status.value.label if minute.status else "Annað" -}}
+          </span>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endmacro %}
 
 {% macro get_cases(cases, count) %}
-  <ul>
-    {% for case in cases[:3] %}
-    <li class="mb-2 list-disc ml-4">
-      <div class="text-sm">
-        <span>
-          <a href="{{ url_for('get_case',
+<ul>
+  {% for case in cases[:3] %}
+  <li class="mb-2 list-disc ml-4">
+    <div class="text-sm">
+      <span>
+        <a href="{{ url_for('get_case',
             muni_slug=case.municipality.slug,
             case_id=case.serial) }}">
-            <span class="underline">{{ case.headline }}</span>
-            <span class="text-gray-600 font-light">{{- case.serial -}}</span>
-          </a>
-        </span>
-      </div>
-      <div class="font-light text-xs">
-        <span class="highlight-{{ case.status.value.color if case.status else 'none' }}">
-          {{ case.status.value.label if case.status else "Annað" }}
-        </span> {{ human_date(case.updated) }}
-      </div>
-    </li>
-    {% endfor %}
-  </ul>
-  {% if count > 3 %}
-    <div class="text-sm font-bold">
-      <a href="#" class="text-planitor-blue">
-      {% if count == 4 %}
-        … og eitt annað mál
-      {% else %}
-        … og {{ count - 3 }} önnur mál
-      {% endif %}
-      </a>
+          <span class="underline">{{ case.headline }}</span>
+          <span class="text-gray-600 font-light">{{- case.serial -}}</span>
+        </a>
+      </span>
     </div>
-  {% endif %}
+    <div class="font-light text-xs">
+      <span class="highlight-{{ case.status.value.color if case.status else 'none' }}">
+        {{ case.status.value.label if case.status else "Annað" }}
+      </span> {{ human_date(case.updated) }}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% if count > 3 %}
+<div class="text-sm font-bold">
+  <a href="#" class="text-planitor-blue">
+    {% if count == 4 %}
+    … og eitt annað mál
+    {% else %}
+    … og {{ count - 3 }} önnur mál
+    {% endif %}
+  </a>
+</div>
+{% endif %}
 {% endmacro %}
 
 {% block title %}Málsferill {{ case.serial }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 {% block og_title %}Málsferill {{ case.serial }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 
 {% block body %}
-  <div class="my-8 mt-4 sm:mt-8">
+<div class="my-8 mt-4 sm:mt-8">
 
-    {% block breadcrumbs %}
-      {% call breadcrumbs() %}
-      {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-      {{ breadcrumb(None, case.serial) }}
-      {% endcall %}
-    {% endblock %}
+  {% block breadcrumbs %}
+  {% call breadcrumbs() %}
+  {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
+  {{ breadcrumb(None, case.serial) }}
+  {% endcall %}
+  {% endblock %}
 
-    <div class="grid grid-cols-1 gap-x-8 w-full {{ 'lg:grid-cols-5' if case.get_coordinates() }}">
+  <div class="flex flex-col md:flex-row w-full">
 
-      <div class="mb-6 lg:col-span-3">
+    <div class="mb-6 md:mr-8">
 
-        <div class="mb-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start">
-            <div class="mb-8 sm:mb-0">
-              <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
-              {% if case.address %}
-              <div class="text-sm font-bold">
-                {{ case.address }}
-                {% if case.stadgreinir %}
-                <span class="text-gray-600 font-light ml-2">{{ case.stadgreinir }}</span>
-                {% endif %}
-              </div>
+      <div class="mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start">
+          <div class="mb-8 sm:mb-0">
+            <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
+            {% if case.address %}
+            <div class="text-sm font-bold">
+              {{ case.address }}
+              {% if case.stadgreinir %}
+              <span class="text-gray-600 font-light ml-2">{{ case.stadgreinir }}</span>
               {% endif %}
             </div>
-            <div class="follow-case w-full sm:w-auto mb-4 sm:mb-0" data-state="{{ "following" if subscription else "" }}" data-id="{{ case.id }}">
-              Vakta {{ case.serial }}
-            </div>
+            {% endif %}
+          </div>
+          <div class="follow-case w-full sm:w-auto mb-4 sm:mb-0" data-state="{{ "following" if subscription else "" }}"
+            data-id="{{ case.id }}">
+            Vakta {{ case.serial }}
           </div>
         </div>
-
-        <div class="mb-6">
-          Síðast
-          <span class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle shadow-lg">
-            {{- case.status.value.label if case.status else "tekið fyrir" -}}
-          </span>
-          á fundi
-          {{ timeago(last_updated).lower() }}.
-        </div>
-
-        <div class="mb-6">
-          {{ entities(case) }}
-        </div>
-
-        {% block inner %}
-        <div class="">
-          {{ table(minutes) }}
-        </div>
-        {% endblock%}
-
       </div>
 
-      <div class="mb-6 lg:col-span-2">
-        <div class="shadow-lg rounded-md overflow-hidden bg-white">
-
-          {% if case.get_coordinates() %}
-            {% set lat, lon = case.get_coordinates() %}
-            <div
-              class="map w-full lazyload"
-              data-address="{{ case.address }}" data-lat="{{ lat }}" data-lon="{{ lon }}"
-              id="map-{{ case.id }}"
-              style="height: 18rem;"
-            >
-            </div>
-            {% if case.iceaddr %}
-            <div class="p-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <div class="text-xl font-bold">
-                    <a href="{{ url_for("get_address", hnitnum=case.iceaddr.hnitnum) }}" class="underline">
-                      {{ case.iceaddr }}
-                    </a>
-                  </div>
-                  <div class="text-sm font-light tracking-tight">
-                    {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
-                  </div>
-                </div>
-                <div class="follow-address" data-state="{{ "following" if address_subscription else "" }}" data-id="{{ case.iceaddr.hnitnum }}">
-                </div>
-              </div>
-              {% set case_count = (related_cases.count() if related_cases else 0) %}
-              {% if case_count %}
-              <div class="mt-4">{{ get_cases(related_cases, case_count) }}</div>
-              {% endif %}
-              <div class="text-xs font-light tracking-tight mt-4">
-                Landnúmer: {{ case.iceaddr.landnr }}
-                {% if case.iceaddr %}
-                <span class="ml-2 text-gray-600 hover:text-gray-900 font-bold">
-                  <a href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
-                    → skrá.is
-                  </a>
-                </span>
-                {% endif %}
-                <br>
-                Hnitnúmer: {{ case.iceaddr.hnitnum }}
-              </div>
-            {% endif %}
-            </div>
-          {% endif %}
-
-          <div class="hidden">{{ case.get_coordinates() }}</div>
-        </div>
-
-        {% block right %}{% endblock %}
-
+      <div class="mb-6">
+        Síðast
+        <span
+          class="pill pill-big pill-{{ case.status.value.color if case.status else 'none' }} font-bold align-middle shadow-lg">
+          {{- case.status.value.label if case.status else "tekið fyrir" -}}
+        </span>
+        á fundi
+        {{ timeago(last_updated).lower() }}.
       </div>
+
+      <div class="mb-6">
+        {{ entities(case) }}
+      </div>
+
+      {% block inner %}
+      <div class="">
+        {{ table(minutes) }}
+      </div>
+      {% endblock%}
 
     </div>
 
+    <div class="mb-6 md:w-1/3 lg:w-2/5">
+      {% if case.get_coordinates() %}
+      <div class="shadow-lg rounded-md overflow-hidden bg-white">
+
+        {% set lat, lon = case.get_coordinates() %}
+        <div class="map w-full lazyload" data-address="{{ case.address }}" data-lat="{{ lat }}" data-lon="{{ lon }}"
+          id="map-{{ case.id }}" style="height: 18rem;">
+        </div>
+        {% if case.iceaddr %}
+        <div class="p-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="text-xl font-bold">
+                <a href="{{ url_for("get_address", hnitnum=case.iceaddr.hnitnum) }}" class="underline">
+                  {{ case.iceaddr }}
+                </a>
+              </div>
+              <div class="text-sm font-light tracking-tight">
+                {{ case.iceaddr.postnr }} {{ case.iceaddr.stadur_nf }}
+              </div>
+            </div>
+            <div class="follow-address" data-state="{{ "following" if address_subscription else "" }}"
+              data-id="{{ case.iceaddr.hnitnum }}">
+            </div>
+          </div>
+          {% set case_count = (related_cases.count() if related_cases else 0) %}
+          {% if case_count %}
+          <div class="mt-4">{{ get_cases(related_cases, case_count) }}</div>
+          {% endif %}
+          <div class="text-xs font-light tracking-tight mt-4">
+            Landnúmer: {{ case.iceaddr.landnr }}
+            {% if case.iceaddr %}
+            <span class="ml-2 text-gray-600 hover:text-gray-900 font-bold">
+              <a
+                href="https://skra.is/leit-i-fasteignaskra?streetname={{ case.iceaddr.landnr }}&pos=fp-advanced-search">
+                → skrá.is
+              </a>
+            </span>
+            {% endif %}
+            <br>
+            Hnitnúmer: {{ case.iceaddr.hnitnum }}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="hidden">{{ case.get_coordinates() }}</div>
+      </div>
+      {% endif %}
+      {% block right %}{% endblock %}
+    </div>
+
   </div>
+
+</div>
 
 {% endblock body %}

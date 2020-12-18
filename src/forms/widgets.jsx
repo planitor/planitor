@@ -7,14 +7,10 @@ const Input = ({ value, onInput, isDisabled, isDirty, isInvalid, type }) => {
     <div class="text-sm lg-text-base">
       <input
         type={type}
-        class={classNames([
-          "mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black",
-          (!isDirty && isInvalid && "border-red-700") || null,
-        ])}
         onInput={onInput}
         value={value}
         disabled={isDisabled}
-        class="mt-0 block w-full px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black bg-transparent"
+        class="mt-1 block w-full rounded-md bg-black bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
       />
     </div>
   );
@@ -35,7 +31,7 @@ export const Select = ({ value, onChange, isDisabled, children }) => {
         value={value}
         onChange={onChange}
         disabled={isDisabled}
-        class="block w-full mt-0 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black bg-transparent"
+        class="block w-full mt-1 rounded-md bg-black bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
       >
         {children}
       </select>

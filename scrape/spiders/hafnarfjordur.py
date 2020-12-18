@@ -87,7 +87,10 @@ def get_minutes(response):
         else:
             address = None
             case_address = None
-        paragraphs = row.css("tr:nth-child(2) td ::text").getall()
+        paragraphs = []
+        for tr in row.css("tr")[3:]:
+            for line in row.css("td").xpath("(.//br | .//text())").getall():
+                paragraphs.append(line.replace("<br>", "\n"))
         attachments = []
         for el in row.css("a"):
             # attachment URL’s are obfuscated for some reason, with whitespace characters
@@ -105,7 +108,7 @@ def get_minutes(response):
         remarks, inquiry, responses = None, None, []
         if paragraphs:
             responses = list(take_responses(paragraphs))
-            remarks = "\n".join(p.strip() for p in paragraphs)
+            remarks = "".join(paragraphs).strip("\n")
         yield {
             "case_serial": case_serial,
             "case_address": case_address,
