@@ -77,31 +77,35 @@
   </a>
   {% endif %}
 </div>
-<div class="p-4 bg-white rounded-md shadow-lg">
+<div class="p-4 py-6 bg-white rounded-md shadow-lg">
   {% if minute.inquiry %}
   <div>
-    <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Fyrirspurn</h5>
-    <div>
-      {% for kennitala, token in minute.get_inquiry_mention_tokens() -%}
-      {% if not kennitala -%}
-      {{ token.replace('\n\n', '<br />')|safe }}
-      {% else -%}
-      {% if kennitala.is_person() -%}
-      <a class="text-planitor-darkBlue underline"
-        href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
-      {% else -%}
-      <a class="text-planitor-darkBlue underline"
-        href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
-      {% endif -%}
-      {% endif -%}
-      {% endfor -%}
+    <div class="readable-clamp">
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Fyrirspurn</h5>
+      <div>
+        {% for kennitala, token in minute.get_inquiry_mention_tokens() -%}
+        {% if not kennitala -%}
+        {{ token.replace('\n\n', '<br />')|safe }}
+        {% else -%}
+        {% if kennitala.is_person() -%}
+        <a class="text-planitor-darkBlue underline"
+          href="{{ url_for('get_person', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+        {% else -%}
+        <a class="text-planitor-darkBlue underline"
+          href="{{ url_for('get_company', kennitala=kennitala.kennitala) }}">{{ token }}</a>
+        {% endif -%}
+        {% endif -%}
+        {% endfor -%}
+      </div>
     </div>
   </div>
   {% endif %}
   {% if minute.remarks %}
   <div class="mt-4">
-    <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Svar</h5>
-    <p>{{ minute.remarks.replace('\n', '<br />')|safe }}</p>
+    <div class="readable-clamp">
+      <h5 class="uppercase tracking-wide text-gray-700 font-light text-xs">Svar</h5>
+      <p>{{ minute.remarks.replace('\n', '<br />')|safe }}</p>
+    </div>
   </div>
   {% endif %}
   {% if minute.participants %}

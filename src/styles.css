@@ -18,6 +18,10 @@ td {
   vertical-align: top;
 }
 
+.readable-clamp {
+  width: min(65ch, 100%);
+}
+
 .minilabel {
   @apply uppercase tracking-wide text-gray-700 font-light text-xs;
 }
