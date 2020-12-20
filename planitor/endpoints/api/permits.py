@@ -36,9 +36,8 @@ def get_permits(
         .order_by(models.Meeting.start.desc(), models.Minute.id)
     )
     page = get_page(query, per_page=100, page=cursor)
-    response.headers[
-        "Link"
-    ] = f"<{request.url_for('get_permits')}?cursor={page.paging.bookmark_next}>; rel: \"next\""
+    url = request.url_for("get_permits")
+    response.headers["Link"] = f'<{url}?cursor={page.paging.bookmark_next}>; rel: "next"'
     permits = [ApiLoadPermit(request, permit) for permit in page]
     return permits
 
