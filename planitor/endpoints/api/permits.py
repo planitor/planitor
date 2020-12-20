@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import Depends, Request, Response
 from fastapi.exceptions import HTTPException
+from sqlakeyset.paging import get_page
 from sqlalchemy.orm import Session
 
 from planitor import models
@@ -10,11 +11,36 @@ from planitor.models.enums import BuildingTypeEnum, PermitTypeEnum
 from planitor.schemas.permits import (
     Permit,
     PermitForm,
+    ApiResponsePermit,
+    ApiLoadPermit,
 )
 from planitor.permits import PermitMinute
 from planitor.security import get_current_active_superuser
 
 from . import router
+
+
+@router.get("/permits", response_model=List[ApiResponsePermit])
+def get_permits(
+    request: Request,
+    response: Response,
+    cursor: str = None,
+    db: Session = Depends(get_db),
+):
+    query = (
+        db.query(models.Permit)
+        .join(models.Minute)
+        .join(models.Meeting)
+        .join(models.Case)
+        .join(models.Municipality)
+        .order_by(models.Meeting.start.desc(), models.Minute.id)
+    )
+    page = get_page(query, per_page=100, page=cursor)
+    response.headers[
+        "Link"
+    ] = f"<{request.url_for('get_permits')}?cursor={page.paging.bookmark_next}>; rel: \"next\""
+    permits = [ApiLoadPermit(request, permit) for permit in page]
+    return permits
 
 
 @router.get("/minutes/{minute_id}/permit", response_model=Permit)

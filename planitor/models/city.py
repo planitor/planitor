@@ -469,3 +469,4 @@ class Permit(Base):
 
     def __repr__(self):
         return f"<Permit id={self.id} case={self.minute.case.serial}>"
+    
