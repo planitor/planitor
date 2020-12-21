@@ -53,7 +53,7 @@
         <div>
           <a href="{{ url_for('get_meeting',
               muni_slug=municipality.slug,
-              council_slug=minute.meeting.council.council_type.value.slug,
+              council_slug=minute.meeting.council.council_type.value,
               meeting_id=h.encode(minute.meeting.id)) }}"
             class="text-planitor-blue hover:underline whitespace-no-wrap">
 

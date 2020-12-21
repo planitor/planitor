@@ -211,7 +211,7 @@ class Council(Base):
 
     @property
     def slug(self):
-        return self.council_type.value.slug
+        return self.council_type.value
 
 
 class Meeting(Base):
@@ -469,4 +469,3 @@ class Permit(Base):
 
     def __repr__(self):
         return f"<Permit id={self.id} case={self.minute.case.serial}>"
-    

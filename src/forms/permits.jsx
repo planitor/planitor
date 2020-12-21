@@ -1,7 +1,7 @@
 import { Fragment, h, render } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
-import { Select, TextInput } from "../forms/widgets.jsx";
+import { Select, NumberInput, TextInput } from "../forms/widgets.jsx";
 import { api } from "../api";
 
 export const PermitForm = ({ minuteId }) => {
@@ -10,10 +10,7 @@ export const PermitForm = ({ minuteId }) => {
     isLoading: false,
     error: null,
   });
-  const [permitType, setPermitType] = useState([]);
-  const [buildingType, setBuildingType] = useState([]);
-  const [permitTypes, setPermitTypes] = useState([]);
-  const [buildingTypes, setBuildingTypes] = useState([]);
+  const [enums, setEnums] = useState([]);
 
   useEffect(async () => {
     // Municipalities objects are needed to render all municipality options
@@ -21,22 +18,10 @@ export const PermitForm = ({ minuteId }) => {
     // and choose the councils being monitored
     const responses = await Promise.all([
       api.getPermit(minuteId),
-      api.getPermitTypes(),
-      api.getBuildingTypes(),
-    ]).then(([permitResponse, permitTypesResponse, buildingTypesResponse]) => {
+      api.getEnums(),
+    ]).then(([permitResponse, enumsResponse]) => {
       setForm({ ...form, data: permitResponse.data });
-      setPermitType(
-        (permitResponse.data.permit_type &&
-          permitResponse.data.permit_type[0]) ||
-          null
-      );
-      setPermitTypes(permitTypesResponse.data);
-      setBuildingType(
-        (permitResponse.data.building_type &&
-          permitResponse.data.building_type[0]) ||
-          null
-      );
-      setBuildingTypes(buildingTypesResponse.data);
+      setEnums(enumsResponse.data);
     });
   }, []);
 
@@ -46,21 +31,19 @@ export const PermitForm = ({ minuteId }) => {
 
   const created = !!form.data.created;
 
-  const onChangeBuildingType = (event) => {
-    setBuildingType(event.target.value || null);
-  };
-
-  const onChangePermitType = (event) => {
-    setPermitType(event.target.value || null);
-  };
-
-  const getSubmitData = ({ units, area_added, area_subtracted }) => {
+  const getSubmitData = ({
+    units,
+    area_added,
+    area_subtracted,
+    permit_type,
+    building_type,
+  }) => {
     return {
-      units: units || null,
-      area_added: area_added || null,
-      area_subtracted: area_subtracted || null,
-      permit_type: permitType,
-      building_type: buildingType,
+      units: Number(units) || null,
+      area_added: Number(area_added) || null,
+      area_subtracted: Number(area_subtracted) || null,
+      permit_type: permit_type,
+      building_type: building_type,
     };
   };
 
@@ -76,13 +59,18 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label class="text-xs block mb-1">Tegund leyfis</label>
           <Select
-            value={permitType}
-            onChange={onChangePermitType}
+            value={form.data.permit_type}
+            onChange={(e) => {
+              setForm({
+                ...form,
+                data: { ...form.data, permit_type: e.target.value || null },
+              });
+            }}
             isDisabled={form.isLoading}
           >
             <Fragment>
               <option value="">Ekkert valið</option>
-              {permitTypes.map(([slug, label]) => {
+              {enums.permit_types.map(([slug, label]) => {
                 return <option value={slug}>{label}</option>;
               })}
             </Fragment>
@@ -91,13 +79,18 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label class="text-xs block mb-1">Tegund byggingar</label>
           <Select
-            value={buildingType}
-            onChange={onChangeBuildingType}
+            value={form.data.building_type}
+            onChange={(e) => {
+              setForm({
+                ...form,
+                data: { ...form.data, building_type: e.target.value || null },
+              });
+            }}
             isDisabled={form.isLoading}
           >
             <Fragment>
               <option value="">Ekkert valið</option>
-              {buildingTypes.map(([slug, label]) => {
+              {enums.building_types.map(([slug, label]) => {
                 return <option value={slug}>{label}</option>;
               })}
             </Fragment>
@@ -107,9 +100,9 @@ export const PermitForm = ({ minuteId }) => {
       <div class="mb-4 grid gap-2 grid-cols-3">
         <div>
           <label class="text-xs block mb-1">Einingar</label>
-          <TextInput
+          <NumberInput
             value={form.data.units}
-            onChange={(e) =>
+            onInput={(e) =>
               setForm({
                 ...form,
                 data: { ...form.data, units: e.target.value },
@@ -121,19 +114,20 @@ export const PermitForm = ({ minuteId }) => {
           <label class="text-xs block mb-1">Viðbætt</label>
           <TextInput
             value={form.data.area_added}
-            onChange={(e) =>
+            onInput={(e) => {
               setForm({
                 ...form,
                 data: { ...form.data, area_added: e.target.value },
-              })
-            }
+              });
+            }}
           />
         </div>
         <div>
           <label class="text-xs block mb-1">Niðurrif</label>
           <TextInput
             value={form.data.area_subtracted}
-            onChange={(e) =>
+            // pattern="[0-9]+([\.][0-9])?"
+            onInput={(e) =>
               setForm({
                 ...form,
                 data: { ...form.data, area_subtracted: e.target.value },

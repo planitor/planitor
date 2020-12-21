@@ -79,6 +79,7 @@ def update_permit(
 
     permit.building_type = None
     permit.permit_type = None
+    print(form.building_type)
     if form.building_type:
         permit.building_type = getattr(BuildingTypeEnum, form.building_type)
     if form.permit_type:

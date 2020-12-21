@@ -173,7 +173,7 @@ async def get_meeting(
     meeting = db.query(Meeting).get(hashids.decode(meeting_id)[0])
     if (
         meeting is None
-        or meeting.council.council_type.value.slug != council_slug
+        or meeting.council.council_type.value != council_slug
         or meeting.council.municipality.slug != muni_slug
     ):
         raise HTTPException(status_code=404, detail="Fundargerð fannst ekki")
@@ -596,7 +596,7 @@ def get_meetings_by_id(
         request.url_for(
             "get_meeting",
             muni_slug=council.municipality.slug,
-            council_slug=council.council_type.value.slug,
+            council_slug=council.council_type.value,
             meeting_id=hashids.encode(meeting.id),
         )
     )

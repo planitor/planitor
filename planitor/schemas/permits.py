@@ -3,7 +3,7 @@ import datetime as dt
 from typing import Optional
 
 from fastapi import Request
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel
 
 from planitor import models
 from planitor.models.enums import BuildingTypeEnum, PermitTypeEnum
@@ -11,8 +11,7 @@ from planitor.models.enums import BuildingTypeEnum, PermitTypeEnum
 from .city import Minute, BaseMunicipality
 
 
-@dataclass
-class PermitBase:
+class PermitBase(BaseModel):
     units: Optional[int]
     area_added: Optional[Decimal]
     area_subtracted: Optional[Decimal]
@@ -20,7 +19,7 @@ class PermitBase:
     permit_type: Optional[PermitTypeEnum]
 
 
-class Permit(PermitBase.__pydantic_model__):
+class Permit(PermitBase):
     minute: Optional[Minute] = None
     created: Optional[dt.datetime] = None
 
@@ -28,7 +27,7 @@ class Permit(PermitBase.__pydantic_model__):
         orm_mode = True
 
 
-class PermitForm(PermitBase.__pydantic_model__):
+class PermitForm(PermitBase):
     """Can't use enums here because Pydantic does not support validating based on
     enum name and not value. If we hack it to support that via a validate decorator
     that in turn breaks other things (the -types endpoints)"""
@@ -37,7 +36,6 @@ class PermitForm(PermitBase.__pydantic_model__):
     permit_type: Optional[str] = None
 
 
-@dataclass
 class BaseApiPermit(PermitBase):
     approved: dt.datetime
     url: str
@@ -46,7 +44,6 @@ class BaseApiPermit(PermitBase):
     municipality: Optional[BaseMunicipality] = None
 
 
-@dataclass
 class ApiLoadPermit(BaseApiPermit):
     def __init__(self, request: Request, permit: models.Permit):
         self.units = permit.units
@@ -71,7 +68,7 @@ def to_camel(string: str) -> str:
     return first + "".join(word.capitalize() for word in tail)
 
 
-class ApiResponsePermit(BaseApiPermit.__pydantic_model__):
+class ApiResponsePermit(BaseApiPermit):
     class Config:
         orm_mode = True
         alias_generator = to_camel
