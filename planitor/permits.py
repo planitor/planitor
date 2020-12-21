@@ -122,6 +122,7 @@ class PermitMinute:
         self.area_added, self.area_subtracted = self.get_area()
         self.permit_type = self.get_permit_type()
         self.building_type = self.get_building_type()
+        self.units = None
 
     def get_area(self) -> Tuple[Optional[Decimal], Optional[Decimal]]:
         decimal_getcontext().prec = 10
