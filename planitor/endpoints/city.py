@@ -106,10 +106,8 @@ async def get_municipality(
         raise HTTPException(status_code=404, detail="Sveitarfélag fannst ekki")
 
     councils = db.query(Council).filter(Council.municipality == muni)
-    council_slugs = [ct.value.slug for ct in CouncilTypeEnum]
-    councils = sorted(
-        councils, key=lambda ct: council_slugs.index(ct.council_type.value.slug)
-    )
+    council_slugs = [str(ct) for ct in CouncilTypeEnum]
+    councils = sorted(councils, key=lambda ct: council_slugs.index(str(ct.council_type)))
 
     if council_slug is not None:
         if council_slug not in council_slugs:
