@@ -1,89 +1,85 @@
 <!DOCTYPE html>
 <html lang="is">
-  <head>
-    <meta charset="utf-8" />
-    <title>{% block title %}Planitor{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}" />
-    <meta
-      property="og:description"
-      content="{% block og_description %}Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi{% endblock %}"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="{{ request.url }}" />
-    <link rel="icon" href="{{ url_for('static', path='/favicon.svg') }}" />
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-    </style>
-    {% block og_image -%}
-    <meta property="og:image" content="{{ url_for('static', path='/planitor.png') }}" />
-    {% endblock -%}
-    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-    {% if not DEBUG %}
-    <link href="{{ url_for('dist', path=css_path) }}" rel="stylesheet" />
-    {% endif %}
-  </head>
 
-  <script>
-    document._user = {{ (user.to_dict() if user else None) | tojson }};
-    document._searchQuery = {{ (q if q is defined else None ) | tojson }}
-  </script>
+<head>
+  <meta charset="utf-8" />
+  <title>{% block title %}Planitor{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta property="og:title" content="{% block og_title %}Planitor{% endblock %}" />
+  <meta property="og:description"
+    content="{% block og_description %}Upplýsingagátt fyrir skipulagsmál og mannvirkjagerð á Íslandi{% endblock %}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="{{ request.url }}" />
+  <link rel="icon" href="{{ url_for('static', path='/favicon.svg') }}" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap"
+    rel="stylesheet">
+  {% block og_image -%}
+  <meta property="og:image" content="{{ url_for('static', path='/planitor.png') }}" />
+  {% endblock -%}
+  <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+  {% if not DEBUG %}
+  <link href="{{ url_for('dist', path=css_path) }}" rel="stylesheet" />
+  {% endif %}
+</head>
 
-  <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
-    <div class="bg-planitor-blue w-full text-white">
-      <nav id="navigation" class="px-4 py-2 sm:px-6 max-w-6xl mx-auto"></nav>
-    </div>
+<script>
+  document._user = {{ (user.to_dict() if user else None) | tojson }};
+  document._searchQuery = {{ (q if q is defined else None ) | tojson }}
+</script>
 
-    <div class="flex-grow w-full sheet">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6">{% block body %}{% endblock body %}</div>
-    </div>
+<body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
+  <div class="bg-planitor-blue w-full text-white">
+    <nav id="navigation" class="px-4 py-2 sm:px-6 max-w-6xl mx-auto"></nav>
+  </div>
 
-    <footer class="w-full mt-4">
-      <div class="mx-auto max-w-6xl p-4 sm:px-6 mb-4 text-sm sm:text-base">
-        <hr class="mb-4" />
-        <div class="flex">
-          <p class="my-1 text-gray-700">
-            <a
-              href="https://www.rsk.is/fyrirtaekjaskra/leit/kennitala/5105201060"
-              target="_blank"
-              class="font-bold underline"
-            >
-              Planitor ehf.
-            </a>
-            <br />
-            Mýrargata 26<br />101 Reykjavík
-            <br /><br />
-            <a href="https://www.notion.so/planitor/Skilm-lar-og-pers-nuvernd-6164e13fac124fe9bc8779afc742d00b" target="_blank" class="text-xs text-gray-500"> Notendaskilmálar og persónuvernd</a>
-          </p>
-          <div class="flex-grow"></div>
-          <p class="my-1 text-gray-700 text-right">
-            <a
-              class="font-bold"
-              href="https://www.notion.so/planitor/Um-okkur-49e0257450f147a2b006f9881a5723c3"
-              target="_blank"
-            >
-              Um Planitor 👋🏻
-            </a>
-            <br />
-            <a href="mailto:hallo@planitor.io"> hallo@planitor.io 💬 </a>
-            <br />
-            <a href="https://planitor.substack.com/" target="_blank"> Fréttabréf 📨 </a>
-          </p>
-        </div>
+  <div class="flex-grow w-full sheet">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">{% block body %}{% endblock body %}</div>
+  </div>
+
+  <footer class="w-full mt-4">
+    <div class="mx-auto max-w-6xl p-4 sm:px-6 mb-4 text-sm sm:text-base">
+      <hr class="mb-4" />
+      <div class="flex">
+        <p class="my-1 text-gray-700">
+          <a href="https://www.rsk.is/fyrirtaekjaskra/leit/kennitala/5105201060" target="_blank"
+            class="font-bold underline">
+            Planitor ehf.
+          </a>
+          <br />
+          Mýrargata 26<br />101 Reykjavík
+          <br /><br />
+          <a href="https://www.notion.so/planitor/Skilm-lar-og-pers-nuvernd-6164e13fac124fe9bc8779afc742d00b"
+            target="_blank" class="text-xs text-gray-500"> Notendaskilmálar og persónuvernd</a>
+        </p>
+        <div class="flex-grow"></div>
+        <p class="my-1 text-gray-700 text-right">
+          <a class="font-bold" href="https://www.notion.so/planitor/Um-okkur-49e0257450f147a2b006f9881a5723c3"
+            target="_blank">
+            Um Planitor 👋🏻
+          </a>
+          <br />
+          <a href="mailto:hallo@planitor.io"> hallo@planitor.io 💬 </a>
+          <br />
+          <a href="https://planitor.substack.com/" target="_blank"> Fréttabréf 📨 </a>
+        </p>
       </div>
-    </footer>
-    {% include "modal.html" -%}
-    {% if DEBUG -%} {# Hot reload script #} {{
+    </div>
+  </footer>
+  {% include "modal.html" -%}
+  {% if DEBUG -%} {# Hot reload script #} {{
     hotreload.script(url_for('hot-reload')) | safe }}
-    <script>
-      window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8080";
-    </script>
-    <script type="module" src="http://{{ request.url.hostname }}:8080/_dist_/index.js"></script>
-    {% else -%}
-    <script>
-      import("{{ url_for('dist', path=js_path) }}");
-    </script>
-    <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>
-    {# fathom analytics #} {% endif -%}
-  </body>
+  <script>
+    window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8080";
+  </script>
+  <script type="module" src="http://{{ request.url.hostname }}:8080/_dist_/index.js"></script>
+  {% else -%}
+  <script>
+    import("{{ url_for('dist', path=js_path) }}");
+  </script>
+  <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>
+  {# fathom analytics #} {% endif -%}
+</body>
+
 </html>
