@@ -3,7 +3,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from planitor.models import CouncilTypeEnum, SubscriptionTypeEnum
-from planitor.schemas.enums import EnumChoiceType
 
 from .city import Municipality
 
