@@ -10,7 +10,6 @@ from planitor.database import get_db
 from planitor.models.city import CouncilTypeEnum
 from planitor.schemas.monitor import (
     Subscription,
-    SubscriptionCouncilTypeForm,
     SubscriptionForm,
 )
 from planitor.security import get_current_active_user
@@ -43,7 +42,7 @@ def create_subscription():
 
 def set_subscription_council_types(
     subscription: models.Subscription,
-    council_types: List[SubscriptionCouncilTypeForm],
+    council_types: List[CouncilTypeEnum],
 ) -> None:
     """If all councils selected, whether within municipality or the available council
     types, turn field into None, which is the default state. If no councils selected,

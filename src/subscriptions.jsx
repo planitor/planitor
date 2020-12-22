@@ -65,6 +65,9 @@ const SelectCouncils = ({ councils, isDisabled, onChangeCouncils }) => {
         .filter(({ selected }) => {
           return selected;
         })
+        .map(({ name }) => {
+          return name;
+        })
     );
   };
 
@@ -104,21 +107,17 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
     return m.id;
   });
 
-  const subCouncilTypesByName = keyBy(subscription.council_types, (c) => {
-    const [_, __, name] = c;
-    return name;
-  });
+  let municipality;
+  if (subscription.case)
+    municipality = muniById[subscription.case.municipality.id];
+  if (subscription.address)
+    municipality = muniById[subscription.address.municipality.id];
 
   for (const councilType of councilTypes) {
-    const [enumSlug, enumLabel, enumName] = councilType;
+    const [enumSlug, enumLabel] = councilType;
     const selected =
-      !!subCouncilTypesByName[enumName] || subscription.council_types === null;
-
-    let municipality;
-    if (subscription.case)
-      municipality = muniById[subscription.case.municipality.id];
-    if (subscription.address)
-      municipality = muniById[subscription.address.municipality.id];
+      subscription.council_types === null ||
+      subscription.council_types.indexOf(enumSlug) > -1;
     let label = enumLabel;
 
     if (municipality) {
@@ -129,11 +128,10 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
       // entities are bound to municipalities, hence the if/else above for
       // case/address subscriptions.
       for (const council of municipality.councils) {
-        const [_, __, municipalityCouncilType] = council.council_type;
-        if (municipalityCouncilType === enumName) {
+        if (council.council_type === enumSlug) {
           councils.push({
             selected: selected,
-            name: enumName,
+            name: enumSlug,
             label: council.name,
           });
         }
@@ -141,7 +139,7 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
     } else {
       councils.push({
         selected: selected,
-        name: enumName,
+        name: enumSlug,
         label: label,
       });
     }
@@ -351,19 +349,13 @@ export const Subscriptions = () => {
     // and choose the councils being monitored
     const responses = await Promise.all([
       api.getSubscriptions(),
-      api.getCouncilTypes(),
       api.getMunicipalities(),
-    ]).then(
-      ([
-        subscriptionResponse,
-        councilTypesResponse,
-        municipalitiesResponse,
-      ]) => {
-        setSubscriptions(subscriptionResponse.data);
-        setCouncilTypes(councilTypesResponse.data);
-        setMunicipalities(municipalitiesResponse.data);
-      }
-    );
+      api.getEnums(),
+    ]).then(([subscriptionResponse, municipalitiesResponse, enumsResponse]) => {
+      setSubscriptions(subscriptionResponse.data);
+      setMunicipalities(municipalitiesResponse.data);
+      setCouncilTypes(enumsResponse.data.council_types);
+    });
   }, []);
 
   if (!subscriptions.length) {

@@ -1,20 +1,9 @@
-from pydantic import BaseModel
-from typing import List, Tuple
-
 from fastapi import Request
 
 from planitor.models import enums
+from planitor.schemas.enums import EnumListResponse
 
 from . import router
-
-
-EnumChoiceType = List[Tuple[str, str]]
-
-
-class EnumListResponse(BaseModel):
-    council_types: EnumChoiceType
-    building_types: EnumChoiceType
-    permit_types: EnumChoiceType
 
 
 @router.get("/_enums", response_model=EnumListResponse)
