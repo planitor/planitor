@@ -3,6 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from planitor.models import CouncilTypeEnum, SubscriptionTypeEnum
+from planitor.schemas.enums import EnumChoiceType
 
 from .city import Municipality
 
@@ -34,17 +35,6 @@ class Address(BaseModel):
         orm_mode = True
 
 
-class SubscriptionCouncilTypeForm(BaseModel):
-    name: str
-
-
-class SubscriptionForm(BaseModel):
-    active: Optional[bool] = None
-    immediate: Optional[bool] = None
-    radius: Optional[int] = None
-    council_types: Optional[List[SubscriptionCouncilTypeForm]] = None
-
-
 class SubscriptionBase(BaseModel):
     active: bool
     immediate: bool
@@ -53,6 +43,13 @@ class SubscriptionBase(BaseModel):
     address: Optional[Address] = None
     radius: Optional[int] = None
     entity: Optional[Entity] = None
+    council_types: Optional[List[CouncilTypeEnum]] = None
+
+
+class SubscriptionForm(BaseModel):
+    active: Optional[bool] = None
+    immediate: Optional[bool] = None
+    radius: Optional[int] = None
     council_types: Optional[List[CouncilTypeEnum]] = None
 
 

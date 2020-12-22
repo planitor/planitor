@@ -1,6 +1,3 @@
-import enum
-from collections import namedtuple
-
 from reynir import NounPhrase
 from sqlalchemy import (
     Boolean,
@@ -18,17 +15,7 @@ from sqlalchemy.types import ARRAY
 
 from ..database import Base
 from .city import CouncilTypeEnum
-
-EnumValue = namedtuple("EnumValue", ("slug", "label"))
-
-
-class SubscriptionTypeEnum(enum.Enum):
-    case = EnumValue("malsnumer", "Málsnúmer")
-    address = EnumValue("heimilisfang", "Heimilisfang")
-    street = EnumValue("gata", "Stræti")
-    entity = EnumValue("kennitala", "Kennitala")
-    radius = EnumValue("radius", "Radíus")
-    search = EnumValue("leit", "Leit")
+from .enums import SubscriptionTypeEnum
 
 
 class Subscription(Base):

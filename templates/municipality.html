@@ -12,7 +12,7 @@
           url_for(
             'get_municipality',
             muni_slug=municipality.slug,
-            council_slug=council.council_type.value.slug,
+            council_slug=council.council_type.value,
           ) if council else url_for(
             'get_municipality',
             muni_slug=municipality.slug,
@@ -35,7 +35,7 @@
           url_for(
             'get_municipality',
             muni_slug=municipality.slug,
-            council_slug=council.council_type.value.slug,
+            council_slug=council.council_type.value,
           ) if council else url_for(
             'get_municipality',
             muni_slug=municipality.slug,
@@ -67,7 +67,7 @@
               url_for(
                 'get_municipality',
                 muni_slug=municipality.slug,
-                council_slug=_council.council_type.value.slug
+                council_slug=_council.council_type.value
               )
             -}}{{ '?year={}'.format(year) if year }}
             ">
@@ -87,7 +87,7 @@
               {{-
                 url_for('get_municipality',
                   muni_slug=municipality.slug,
-                  council_slug=council.council_type.value.slug
+                  council_slug=council.council_type.value
                 ) if council else url_for(
                 'get_municipality',
                 muni_slug=municipality.slug
@@ -105,7 +105,7 @@
               url_for(
                 'get_municipality',
                 muni_slug=municipality.slug,
-                council_slug=council.council_type.value.slug
+                council_slug=council.council_type.value
               )  if council else url_for(
                 'get_municipality',
                 muni_slug=municipality.slug
@@ -135,7 +135,7 @@
               href="{{
                 url_for('get_meeting',
                   muni_slug=municipality.slug,
-                  council_slug=m.council.council_type.value.slug,
+                  council_slug=m.council.council_type.value,
                   meeting_id=h.encode(m.id)) }}">
               {{ m.council.name }} Nr. {{ m.name }}
             </a>
