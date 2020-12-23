@@ -5,6 +5,10 @@ if (typeof __sentryDsn__ !== "undefined") {
     dsn: __sentryDsn__,
     release: __version__ || null,
   });
+  if (document._user) {
+    const { email, id } = document._user;
+    Sentry.setUser({ email, id });
+  }
 }
 
 import "lazysizes";
