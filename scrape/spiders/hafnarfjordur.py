@@ -88,8 +88,8 @@ def get_minutes(response):
             address = None
             case_address = None
         paragraphs = []
-        for tr in row.css("tr")[3:]:
-            for line in row.css("td").xpath("(.//br | .//text())").getall():
+        for tr in row.css("tr")[1:]:
+            for line in tr.css("td").xpath("(.//br | .//text())").getall():
                 paragraphs.append(line.replace("<br>", "\n"))
         attachments = []
         for el in row.css("a"):
@@ -108,7 +108,7 @@ def get_minutes(response):
         remarks, inquiry, responses = None, None, []
         if paragraphs:
             responses = list(take_responses(paragraphs))
-            remarks = "".join(paragraphs).strip("\n")
+            remarks = "\n".join(paragraphs).strip("\n")
         yield {
             "case_serial": case_serial,
             "case_address": case_address,
@@ -154,12 +154,11 @@ class HafnarfjordurSpider(scrapy.Spider):
                 callback=self.parse_meeting,
                 cb_kwargs={"council_type_slug": council_type_slug},
             )
-        """
-        # Add this back if you want to scrape the whole history ... removing after initial import
+        # Add this back if you want to scrape the whole history ... removing after
+        # initial import
         if meeting_links:
             request = get_index_request(year - 1, council_form_value)
             yield request
-        """
 
     def parse_meeting(self, response: Response, council_type_slug: str):
         title, name = (
