@@ -8,7 +8,6 @@ from planitor.models import (
     Subscription,
     SubscriptionTypeEnum,
 )
-from planitor.schemas.monitor import SubscriptionCouncilTypeForm
 
 
 def test_set_subscription_council_types(
