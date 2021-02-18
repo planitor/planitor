@@ -70,6 +70,13 @@ def take_responses(paragraphs: List[str]):
         paragraphs.pop(i)
 
 
+def get_segment_with_linebreaks(node):
+    string = ""
+    for line in node.xpath("(.//br | .//text())").getall():
+        string += line.replace("\n", "").replace("<br>", "\n")
+    return string
+
+
 def get_minutes(response):
     subcategory = None
     for el in response.css("#table2>tbody>tr:nth-child(8) table.bodyclass tr"):
@@ -88,32 +95,40 @@ def get_minutes(response):
             address = None
             case_address = None
         paragraphs = []
-        for tr in row.css("tr")[1:]:
-            for line in tr.css("td").xpath("(.//br | .//text())").getall():
-                paragraphs.append(line.replace("<br>", "\n"))
         attachments = []
-        for el in row.css("a"):
-            # attachment URL’s are obfuscated for some reason, with whitespace characters
-            url = "".join(el.css("::attr(href)").re(r"\S"))
-            url = url.replace("&amp;", "&")
-            attachments.append(
-                {
-                    "type": "application/pdf",
-                    "url": requote_uri(url),
-                    "length": 0,
-                    "label": el.css("::text").get(),
-                }
-            )
-
         remarks, inquiry, responses = None, None, []
+
+        rows = list(row.css("tr")[1:])
+        if rows[0].css("i"):
+            inquiry = get_segment_with_linebreaks(rows.pop(0).css("i"))
+
+        for tr in rows:
+            link = tr.css("a")
+            if link:
+                # attachment URL’s are obfuscated for some reason, with
+                # whitespace characters
+                url = "".join(link.css("::attr(href)").re(r"\S"))
+                url = url.replace("&amp;", "&")
+                attachments.append(
+                    {
+                        "type": "application/pdf",
+                        "url": requote_uri(url),
+                        "length": 0,
+                        "label": link.css("::text").get(),
+                    }
+                )
+            else:
+                paragraphs.append(get_segment_with_linebreaks(tr.css("td")))
+
         if paragraphs:
             responses = list(take_responses(paragraphs))
-            remarks = "\n".join(paragraphs).strip("\n")
+            remarks = "".join(paragraphs)
+
         yield {
             "case_serial": case_serial,
             "case_address": case_address,
             "headline": headline,
-            "inquiry": inquiry or None,
+            "inquiry": inquiry,
             "remarks": remarks,
             "serial": serial,
             "subcategory": subcategory,
