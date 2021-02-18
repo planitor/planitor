@@ -166,6 +166,7 @@ class Municipality(Base):
     created = Column(DateTime, server_default=func.now())
     name = Column(String)
     slug = Column(String, unique=True, nullable=False)
+    contact_email = Column(String)
 
     geoname_osm_id = Column(BIGINT, ForeignKey(Geoname.osm_id))
     geoname = relationship(Geoname)
@@ -377,7 +378,7 @@ class Minute(Base):
     status = Column(Enum(CaseStatusEnum), nullable=True)
     meeting_id = Column(Integer, ForeignKey(Meeting.id), nullable=True, index=True)
     meeting = relationship(Meeting)
-    headline = Column(String)
+    headline = Column(String, nullable=False)
     inquiry = Column(String)
     remarks = Column(String)
     lemmas = Column(String)
@@ -469,3 +470,16 @@ class Permit(Base):
 
     def __repr__(self):
         return f"<Permit id={self.id} case={self.minute.case.serial}>"
+
+
+class Applicant(Base):
+    __tablename__ = "applicants"
+
+    id = Column(Integer, primary_key=True, index=True)
+    created = Column(DateTime, server_default=func.now())
+    municipality_id = Column(Integer, ForeignKey("municipalities.id"))
+    case_id = Column(Integer, ForeignKey("cases.id"))
+    case = relationship(Case)
+    serial = Column(String)  # Use for storing the serial as appearing when scraped
+    email = Column(String)
+    unsubscribed = Column(Boolean, default=False)

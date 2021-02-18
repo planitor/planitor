@@ -4,6 +4,7 @@ from .attachments import update_pdf_attachment
 from .database import db_context
 from .monitor import create_deliveries, send_meeting_emails, send_weekly_emails
 from .postprocess import update_minute_search_vector, update_minute_with_entity_mentions
+from .notifications import send_applicant_notifications
 
 
 @dramatiq.actor
@@ -20,4 +21,5 @@ __all__ = [
     "create_deliveries",
     "send_meeting_emails",
     "send_weekly_emails",
+    "send_applicant_notifications",
 ]

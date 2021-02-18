@@ -18,6 +18,7 @@ from .crud import (
 from .database import db_context
 from .language.companies import extract_company_names
 from .minutes import get_minute_lemmas
+from .notifications import send_applicant_notifications
 from .models import Meeting, Minute, Response
 from .monitor import create_deliveries, send_meeting_emails
 from .utils.kennitala import Kennitala
@@ -212,6 +213,9 @@ def process_minute(db: Session, item: dict, meeting: Meeting):
         ),
         # ... run matches
         create_deliveries.message_with_options(args=(minute.id,), pipe_ignore=True),
+        send_applicant_notifications.message_with_options(
+            args=(minute.id,), pipe_ignore=True
+        ),
     ]
 
     db.add(case)
