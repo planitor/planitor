@@ -2,6 +2,7 @@ from .accounts import User  # noqa
 from .city import (  # noqa
     Address,
     Attachment,
+    Applicant,
     Case,
     CaseEntity,
     Council,

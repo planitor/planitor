@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block inner %}
+<table cellspacing="0" cellpadding="0" border="0" align="center" width="100%">
+  <tr>
+    <td class="td">
+    {% if minute.inquiry %}
+      <p style="margin-bottom:1em;">
+        {{ minute.inquiry.replace('\n', '<br />')|safe }}
+      </p>
+    {% endif %}
+    {% if minute.remarks %}
+      <p>
+        {{ minute.remarks.replace('\n', '<br />')|safe }}
+      </p>
+    </td>
+    {% endif %}
+  </tr>
+  <tr>
+    <td class="td">
+      <p><a href="{{ link }}" style="color:black;">Málaferill á Planitor.io</a></p>
+    </td>
+  </tr>
+  <tr>
+    <td class="td">
+      <p><a href="{{ unsubscribe_link }}" style="color:black;">Afskráðu þig hér</a> ef þú vilt ekki fá frekari tilkynningar um þetta mál</p>
+    </td>
+  </tr>
+</table>
+{% endblock inner %}

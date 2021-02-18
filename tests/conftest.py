@@ -101,7 +101,15 @@ def municipality_fixture(db):
 
 @pytest.fixture(scope="function", name="case")
 def case_fixture(db, address, municipality):
-    from planitor.models import Case, Council, CouncilTypeEnum
+    from planitor.models import Case
+
+    case = _c(db, Case(municipality=municipality, iceaddr=address, serial="foo"))
+    return case
+
+
+@pytest.fixture(scope="function", name="council")
+def council_fixture(db, municipality):
+    from planitor.models import Council, CouncilTypeEnum
 
     council = _c(
         db,
@@ -111,8 +119,7 @@ def case_fixture(db, address, municipality):
             council_type=CouncilTypeEnum.byggingarfulltrui,
         ),
     )
-    case = _c(db, Case(council=council, iceaddr=address))
-    return case
+    return council
 
 
 @pytest.fixture(scope="function", name="meeting")
@@ -127,8 +134,18 @@ def meeting_fixture(db, case, council):
 def minute_fixture(db, case, meeting):
     from planitor.models import Minute
 
-    minute = _c(db, Minute(meeting=meeting, case=case))
+    minute = _c(db, Minute(meeting=meeting, case=case, headline="Minute"))
     return minute
+
+
+@pytest.fixture(scope="function", name="applicant")
+def applicant_fixture(db, municipality):
+    from planitor.models import Applicant
+
+    applicant = _c(
+        db, Applicant(municipality_id=municipality.id, email="foo@bar", serial="foo")
+    )
+    return applicant
 
 
 @pytest.fixture(scope="function", name="user")

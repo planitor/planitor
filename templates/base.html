@@ -34,8 +34,10 @@
     <nav id="navigation" class="px-4 py-2 sm:px-6 max-w-6xl mx-auto"></nav>
   </div>
 
-  <div class="flex-grow w-full sheet">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6">{% block body %}{% endblock body %}</div>
+  <div class="flex-grow w-full sheet flex flex-col">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col w-full h-full flex-grow">
+      {% block body %}{% endblock body %}
+    </div>
   </div>
 
   <footer class="w-full mt-4">

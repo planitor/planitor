@@ -7,6 +7,7 @@ import { FollowCase, FollowAddress, FollowEntity } from "./follow.jsx";
 import { NewPasswordForm } from "./forms/new-password.jsx";
 import { PermitForm } from "./forms/permits.jsx";
 import { openModal } from "./modals.js";
+import { Unsubscribe } from "./unsubscribe.jsx";
 import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps.jsx";
 
 mapkit.init({
@@ -24,6 +25,11 @@ const passwordRecoveryEl = document.getElementById("password-recovery");
 if (passwordRecoveryEl) {
   const [modalRender, closeModal] = openModal();
   modalRender(<NewPasswordForm token={passwordRecoveryEl.dataset.token} />);
+}
+
+const unsubscribeEl = document.getElementById("unsubscribe");
+if (unsubscribeEl) {
+  render(<Unsubscribe />, unsubscribeEl);
 }
 
 const loginEl = document.getElementById("login");

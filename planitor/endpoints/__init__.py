@@ -5,7 +5,7 @@ from starlette.datastructures import Secret
 from planitor import config
 from planitor.mapkit import get_token as mapkit_get_token
 
-from . import accounts, api, city, debug
+from . import accounts, api, city, debug, notifications
 from .api import city as api_city
 from .api import follow as api_follow
 from .api import monitor as api_monitor
@@ -30,4 +30,5 @@ async def mapkit_token(request: Request):
 router.include_router(city.router)
 router.include_router(api.router, prefix="/api")
 router.include_router(accounts.router, prefix="/notendur")
+router.include_router(notifications.router, prefix="/tilkynningar")
 router.include_router(debug.router, prefix="/__debug")
