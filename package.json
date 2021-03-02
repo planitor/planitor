@@ -64,6 +64,6 @@
     "classnames": "^2.2.6",
     "lazysizes": "^5.2.2",
     "lodash-es": "^4.17.15",
-    "preact": "^10.5.7"
+    "preact": "^10.5.12"
   }
 }

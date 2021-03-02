@@ -154,12 +154,13 @@
         </span>
       </div>
       {% if attachment.pdf %}
-      <div>
-        <ul class="overflow-x-scroll py-3 px-1">
+      <div class="pdf-viewer" data-title="{{ attachment.label }}">
+        <div class="inner"><div></div></div>
+        <ul class="py-3 px-1">
           {% for i in range(attachment.pdf.page_count) %}
           {% set page = "{}".format(i + 1) %}
-          <li class="overflow-hidden rounded shadow-md mr-2 mb-2 float-left block">
-            <a href="{{ imgix(attachment.pdf.key, {'page': page }) }}" target="_blank">
+          <li class="rounded overflow-hidden shadow-md mr-2 mb-2 float-left block">
+            <a href="{{ imgix(attachment.pdf.key, {'page': page, 'dpr': '2', 'w': '1024' }) }}" target="_blank">
               <img src="{{ imgix(attachment.pdf.key, {'h': '100', 'page': page }) }}">
             </a>
           </li>

@@ -8,6 +8,7 @@ import { NewPasswordForm } from "./forms/new-password.jsx";
 import { PermitForm } from "./forms/permits.jsx";
 import { openModal } from "./modals.js";
 import { Unsubscribe } from "./unsubscribe.jsx";
+import { PDFViewer } from "./pdfViewer.jsx";
 import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps.jsx";
 
 mapkit.init({
@@ -89,6 +90,34 @@ mapkit.addEventListener("configuration-change", function (event) {
     <FollowEntity id={button.dataset.kennitala} state={button.dataset.state} />,
     button
   );
+});
+
+[...document.querySelectorAll(".pdf-viewer")].forEach((el) => {
+  const innerEl = el.querySelector(".inner");
+  const title = el.dataset.title;
+  function unmount() {
+    render(null, innerEl);
+  }
+  function mount(index) {
+    render(
+      <PDFViewer
+        pages={pages}
+        title={title}
+        initialIndex={index}
+        onClose={() => {
+          unmount();
+        }}
+      />,
+      innerEl
+    );
+  }
+  const pages = [...el.querySelectorAll("a")].map((el, i) => {
+    el.addEventListener("click", (event) => {
+      event.preventDefault();
+      mount(i);
+    });
+    return el.href;
+  });
 });
 
 [...document.querySelectorAll(".tabs")].forEach((tabsEl) => {
