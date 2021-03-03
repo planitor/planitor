@@ -185,8 +185,15 @@ class HafnarfjordurSpider(scrapy.Spider):
             "#table2>tbody>tr:nth-child(2) td ::text"
         ).getall()
 
+        timing_components = re.findall(r"\d+", timing)
+
         # Get timing from this format of string: ' 02.09.2020 og hófst hann kl. 13:00'
-        date, month, year, hour, minute = [int(i) for i in re.findall(r"\d+", timing)]
+        if len(timing_components) == 3:
+            date, month, year = [int(i) for i in timing_components]
+            hour, minute = 0, 0
+        else:
+            date, month, year, hour, minute = [int(i) for i in timing_components]
+
         start = dt.datetime(year, month, date, hour, minute)
 
         minutes = [m for m in get_minutes(response)]
