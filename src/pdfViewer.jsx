@@ -1,9 +1,39 @@
 import { h, render } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 
 export const PDFViewer = ({ pages, title, initialIndex, onClose }) => {
   const [index, setIndex] = useState(initialIndex);
   const [loaded, setLoaded] = useState(true);
+
+  const clickPrevious = () => {
+    setIndex((index) => {
+      if (index === 0) return index;
+      setLoaded(false);
+      return index - 1;
+    });
+  };
+
+  const clickNext = () => {
+    setIndex((index) => {
+      if (index === pages.length - 1) return index;
+      setLoaded(false);
+      return index + 1;
+    });
+  };
+
+  const upHandler = (event) => {
+    if (event.keyCode === 37) clickPrevious();
+    if (event.keyCode === 39) clickNext();
+  };
+
+  useEffect(() => {
+    window.addEventListener("keyup", upHandler);
+    // cleanup
+    return () => {
+      window.removeEventListener("keyup", upHandler);
+    };
+  }, []);
+
   return (
     <div class="fixed z-10 inset-0 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -54,63 +84,64 @@ export const PDFViewer = ({ pages, title, initialIndex, onClose }) => {
               {title}
             </h3>
             <div class="mt-2">
-              <p class={`text-sm text-gray-500 ${!loaded && "opacity-30"}`}>
+              <div
+                style="max-height: calc(100vh - 210px)"
+                class={`overflow-y-auto ${!loaded && "opacity-30"}`}
+              >
                 <img
                   src={pages[index]}
                   onLoad={() => {
                     setLoaded(true);
                   }}
                 />
-              </p>
+              </div>
             </div>
           </div>
           <div class="mt-5 sm:mt-4 flex justify-between items-center">
-            <button
-              type="button"
-              class={`btn ${index === 0 || !loaded ? "btn-disabled" : ""}`}
-              onClick={() => {
-                if (index === 0) return;
-                setIndex(index - 1);
-                setLoaded(false);
-              }}
-            >
-              ← Fyrri
-            </button>
-            {!loaded && (
-              <svg
-                class="animate-spin -ml-1 mr-3 h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+            <div class="flex-1">
+              <button
+                type="button"
+                class={`btn ${index === 0 || !loaded ? "btn-disabled" : ""}`}
+                onClick={clickPrevious}
               >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
+                ← Fyrri
+              </button>
+            </div>
+            {!loaded && (
+              <div class="flex-1 flex justify-center">
+                <svg
+                  class="animate-spin -ml-1 mr-3 h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </div>
             )}
-            <button
-              type="button"
-              class={`btn ${
-                index === pages.length - 1 || !loaded ? "btn-disabled" : ""
-              }`}
-              onClick={() => {
-                if (index === pages.length - 1) return;
-                setIndex(index + 1);
-                setLoaded(false);
-              }}
-            >
-              Næsta →
-            </button>
+            <div class="flex-1 flex justify-end">
+              <button
+                type="button"
+                class={`btn ${
+                  index === pages.length - 1 || !loaded ? "btn-disabled" : ""
+                }`}
+                onClick={clickNext}
+              >
+                Næsta →
+              </button>
+            </div>
           </div>
         </div>
       </div>
