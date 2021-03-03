@@ -392,11 +392,6 @@ async def get_address(
     if _db_address is not None:
         address = _db_address
 
-    if current_user is None:
-        return templates.TemplateResponse(
-            "address_paywall.html", {"request": request, "address": address}
-        )
-
     def get_query(filters):
         sq = (
             db.query(Case.id, func.count(Minute.id).label("minute_count"))
