@@ -2,6 +2,11 @@
 
 {% block title %}{{ address }} — {{ super() }}{% endblock %}
 {% block og_title %}{{ address }} — {{ super() }}{% endblock %}
+{% block og_image %}
+{% set coordinates = ([address.lat_wgs84, address.long_wgs84])|map("string")|join(",") %}
+<meta property="og:image"
+  content="https://i.useflipp.com/zjw1mwnzm8ln.png?Website=Planitor&Address={{ address|string|urlencode }}&Minute={{ ""|urlencode }}&Map={{ coordinates|urlencode }}" />
+{% endblock %}
 
 {% from 'symbols/symbols.html' import arrow_up_right %}
 {% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}

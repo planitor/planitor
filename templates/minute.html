@@ -29,9 +29,11 @@
 {%- endblock %}
 
 {% block og_image -%}
+{% set coordinates = (case.get_coordinates() or [])|map("string")|join(",") %}
 {% if minute.attachments and minute.attachments[0].pdf %}
+{% set attachment_image_url = imgix(minute.attachments[0].pdf.key, {'dpr': '2', 'w': '1024', 'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) %}
 <meta property="og:image"
-  content="{{ imgix(minute.attachments[0].pdf.key, {'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) }}" />
+  content="https://i.useflipp.com/32lj531omndk.png?Website=Planitor&Address={{ case.iceaddr|urlencode }}&Minute={{ case.headline|urlencode }}&Attachment={{ attachment_image_url|urlencode }}&Map={{ coordinates|urlencode }}" />
 {% else %}
 {{ super() }}
 {% endif %}
@@ -50,7 +52,6 @@
 <div class="mt-4">
   <div class="mb-2 font-bold text-xl flex">
     <div class="flex-grow">Byggingaleyfi</div>
-    <div class="sf">􀒳</div>
   </div>
   <div class="permit-form" data-minute-id="{{ minute.id }}"></div>
 </div>
