@@ -1,3 +1,4 @@
+from planitor.models.city import Municipality
 from planitor.crud import (
     get_or_create_entity,
     lookup_icelandic_company_in_entities,
@@ -31,3 +32,26 @@ def test_geo(db, case):
     assert case.iceaddr.heiti_nf == "Barmahlíð"
     assert case.geoname == geoname
     assert case.housenumber == housenumber
+
+
+def test_update_case_address_arborg(db, case):
+    municipality = Municipality(id=8200, name="Árborg", slug="arborg")
+    db.add(municipality)
+    db.commit()
+    case.address = "Norðurgata 32"
+    case.municipality = municipality
+    case.iceaddr = None
+    update_case_address(db, case)
+    assert case.iceaddr.municipality == municipality
+
+
+def test_update_case_address_sunnuhvoll(db, case):
+    municipality = Municipality(id=8200, name="Árborg", slug="arborg")
+    db.add(municipality)
+    db.commit()
+    case.address = "Sunnuhvoll"
+    case.municipality = municipality
+    case.iceaddr = None
+    # Will pick up Grímsnes- og Grafningshreppur, for whatever reason, but is not in municipality so set to None
+    update_case_address(db, case)
+    assert case.iceaddr is None

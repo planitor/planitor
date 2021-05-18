@@ -18,11 +18,10 @@ from .crud import (
 from .database import db_context
 from .language.companies import extract_company_names
 from .minutes import get_minute_lemmas
-from .notifications import send_applicant_notifications
 from .models import Meeting, Minute, Response
 from .monitor import create_deliveries, send_meeting_emails
+from .notifications import send_applicant_notifications
 from .utils.kennitala import Kennitala
-from .utils.rsk import get_kennitala_from_rsk_search
 
 
 def _get_entity(db: Session, name: str):
@@ -33,6 +32,9 @@ def _get_entity(db: Session, name: str):
     if len(_all) == 1:
         return _all[0]
     # Try doing a lookup in the RSK.is fyrirtækjaskrá
+    # RSK now applies a ReCAPTCHA so we will try again later:
+
+    """
     kennitala = get_kennitala_from_rsk_search(name)
     if kennitala is not None:
         kennitala = Kennitala(kennitala)
@@ -40,6 +42,7 @@ def _get_entity(db: Session, name: str):
         if created:
             db.commit()
         return entity
+    """
 
 
 def update_minute_with_entity_relations(db: Session, minute: Minute, entity_items: list):
