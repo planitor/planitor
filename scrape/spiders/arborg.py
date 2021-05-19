@@ -130,13 +130,17 @@ def get_minutes(response):
             inquiry = get_segment_with_linebreaks(rows.pop(0).css("i"))
 
         for tr in rows:
-            link = tr.css("a")
-            if link:
+            links = tr.css("a")
+            for link in links:
                 # attachment URL’s are obfuscated for some reason, with
                 # whitespace characters
                 url = "".join(link.css("::attr(href)").re(r"\S"))
+                if not url.startswith(
+                    "https://ibuagatt.arborg.is/meetingsearch/displaydocument.aspx?"
+                ):
+                    continue
                 url = url.replace("&amp;", "&")
-                attachments.append(
+                print(
                     {
                         "type": "application/pdf",
                         "url": requote_uri(url),
@@ -190,7 +194,7 @@ class ArborgSpider(scrapy.Spider):
     def parse(self, response: Response, year: int, council_form_value: str):
         meeting_links = response.css("#l_Content table td a")
         council_type_slug = council_form_values[council_form_value]
-        for el in meeting_links:
+        for el in meeting_links[:1]:
             yield response.follow(
                 el,
                 callback=self.parse_meeting,
@@ -199,7 +203,7 @@ class ArborgSpider(scrapy.Spider):
 
         # Add this back if you want to scrape the whole history ... removing after
         # initial import
-
+        return
         if meeting_links:
             request = get_index_request(year - 1, council_form_value)
             yield request
