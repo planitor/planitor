@@ -5,7 +5,7 @@
 
   <div class="text-3xl mb-8 sm:mb-12 leading-relaxed">Fundargerðir skipulags- og byggingarmála</div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
     {% for municipality, meetings in meetings | groupby("council.municipality") %}
     <div>
       <div class="mb-4 flex justify-between sm:justify-start items-center">

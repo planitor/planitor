@@ -33,7 +33,7 @@
 {% if minute.attachments and minute.attachments[0].pdf %}
 {% set attachment_image_url = imgix(minute.attachments[0].pdf.key, {'dpr': '2', 'w': '1024', 'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) %}
 <meta property="og:image"
-  content="https://i.useflipp.com/32lj531omndk.png?Website=Planitor&Address={{ case.iceaddr|urlencode }}&Minute={{ case.headline|urlencode }}&Attachment={{ attachment_image_url|urlencode }}&Map={{ coordinates|urlencode }}" />
+  content="https://i.useflipp.com/32lj531omndk.png?Website=Planitor&Address={{ (case.iceaddr or "_")|urlencode }}&Minute={{ case.headline|urlencode }}&Attachment={{ attachment_image_url|urlencode }}&Map={{ coordinates|urlencode }}" />
 {% else %}
 {{ super() }}
 {% endif %}

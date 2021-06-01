@@ -108,6 +108,8 @@ class ReykjavikByggingarfulltruiSpider(scrapy.Spider):
             self.start_urls = [YEAR_URL.format(year[-2:])]
 
     def parse(self, response):
+        if not response.css("body>*"):
+            return
         index_year = int(response.css("h2::text").re_first(r"\d+"))
         for i, link in enumerate(response.css("menu a")):
             # In some meeting reports the date is only available in the link index and

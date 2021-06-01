@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, NamedTuple
 
 from iceaddr import iceaddr_lookup, iceaddr_suggest
 from iceaddr.addresses import _run_addr_query
@@ -29,16 +29,30 @@ from planitor.models import (
 from planitor.utils.kennitala import Kennitala
 from planitor.utils.text import fold, slugify
 
-MUNICIPALITIES_OSM_IDS = {
+MunicipalityAttributes = NamedTuple(
+    "MunicipalityAttributes", name=str, osm_id=int, placenames=Tuple[str]
+)
+
+MUNICIPALITIES = {
     # These are `name`, `osm_id` tuples
-    "reykjavik": ("Reykjavík", "2580605"),
-    "hafnarfjordur": ("Hafnarfjörður", "2582273"),
+    "reykjavik": MunicipalityAttributes("Reykjavík", "2580605", None),
+    "hafnarfjordur": MunicipalityAttributes("Hafnarfjörður", "2582273", None),
+    "arborg": MunicipalityAttributes(
+        "Árborg",
+        None,
+        (
+            "Sandvík",
+            "Stokkseyri",
+            "Eyrarbakki",
+            "Selfoss",
+        ),
+    ),
 }
 
 
 def get_or_create_municipality(db, slug) -> Tuple[Attachment, bool]:
-    name, osm_id = MUNICIPALITIES_OSM_IDS[slug]
-    muni = db.query(Municipality).filter_by(geoname_osm_id=osm_id).first()
+    name, osm_id, _ = MUNICIPALITIES[slug]
+    muni = db.query(Municipality).filter_by(slug=slug).first()
     created = False
     if muni is None:
         muni = Municipality(name=name, geoname_osm_id=osm_id, slug=slug)
@@ -61,7 +75,7 @@ def get_or_create_council(
         council = Council(
             council_type=council_type,
             municipality=municipality,
-            name=label or council_type.value.label,
+            name=label or council_type.label,
         )
         db.add(council)
         created = True
@@ -296,17 +310,35 @@ def update_case_address(db: Session, case: Case) -> None:
     overlaps between iceaddr and geoname functionality but good to have both.
 
     """
-    city = case.municipality.name
+
+    # For municipalities like Árborg there are many placenames, but for others there is
+    # only one, like Reykjavík
+    placenames = MUNICIPALITIES[case.municipality.slug].placenames or [
+        case.municipality.name
+    ]
+
     street, number, letter = get_address_lookup_params(case.address)
 
-    iceaddr_match = lookup_address(street, number, letter, city)
-    if iceaddr_match:
-        address, _ = get_or_create_address(db, iceaddr_match)
-        db.commit()
-        case.iceaddr = address
+    for placename in placenames:
+        iceaddr_match = lookup_address(street, number, letter, placename)
+        if iceaddr_match:
+            if (
+                iceaddr_match["stadur_nf"] != placename
+                or iceaddr_match["svfnr"] != case.municipality.id
+            ):
+                continue
+            address, _ = get_or_create_address(db, iceaddr_match)
+            db.commit()
+            case.iceaddr = address
+            break
 
-    geoname, housenumber = get_geoname_and_housenumber(db, street, number, letter, city)
-    case.geoname, case.housenumber = geoname, housenumber
+    for placename in placenames:
+        geoname, housenumber = get_geoname_and_housenumber(
+            db, street, number, letter, placename
+        )
+        case.geoname, case.housenumber = geoname, housenumber
+        if geoname:
+            break
 
     db.add(case)
     db.commit()

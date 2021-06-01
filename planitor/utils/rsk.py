@@ -26,6 +26,8 @@ def get_kennitala_from_rsk_search(name, max_retries=MAX_RETRIES):
                 if retry < max_retries:
                     time.sleep(2 * retry)  # Linearly increasing backoff
                     return perform_request(retry)
+                else:
+                    return None
             _, kennitala = location.rsplit("/", 1)
             return kennitala
 
