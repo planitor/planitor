@@ -107,7 +107,14 @@ def get_minutes(response):
         serial, case_serial = case_serial.split(". ")
         address = None
         case_address = None
-        if " - " in headline:
+
+        _original_headline = headline
+
+        if headline.startswith("Úthlutun lóða - "):
+            address = headline.split(" - ", 1)[1]
+            case_address = get_address(address) or address
+
+        elif " - " in headline:
             address, headline = headline.split(" - ", 1)
             case_address = get_address(address)
             if not case_address:
@@ -115,13 +122,19 @@ def get_minutes(response):
                 if case_address:
                     headline = address  # flip it!
                     address = case_address
+
+        if not case_address:
+            # Did not find an address, go back to original headline, set address to None
+            headline = _original_headline
+            address = None
+
         paragraphs = []
         attachments = []
         remarks, inquiry, responses = None, None, []
 
-        # Extremely fucked up way to find the position of the headline, sometimes its
-        # preceded by some event <tr> like "Magnús Gíslason víkur við afgreiðslu
-        # erindisins." ... skip this and count <tr> from the headline
+        # Extremely fucked up way to find the position of the headline, sometimes its preceded by
+        # some event <tr> like "Magnús Gíslason víkur við afgreiðslu erindisins." ... skip this and
+        # count <tr> from the headline
         index_of_headline_tr = list([r.get() for r in row.css("tr")]).index(
             row.css("tr.plainrow")[0].get()
         )
@@ -130,24 +143,26 @@ def get_minutes(response):
             inquiry = get_segment_with_linebreaks(rows.pop(0).css("i"))
 
         for tr in rows:
-            links = tr.css("a")
-            for link in links:
-                # attachment URL’s are obfuscated for some reason, with
-                # whitespace characters
-                url = "".join(link.css("::attr(href)").re(r"\S"))
-                if not url.startswith(
-                    "https://ibuagatt.arborg.is/meetingsearch/displaydocument.aspx?"
-                ):
-                    continue
-                url = url.replace("&amp;", "&")
-                print(
-                    {
-                        "type": "application/pdf",
-                        "url": requote_uri(url),
-                        "length": 0,
-                        "label": link.css("::text").get(),
-                    }
-                )
+            if tr.attrib.get("class") == "plainrow":
+                for link in tr.css("a"):
+                    # attachment URL’s are obfuscated for some reason, with whitespace characters
+                    url = "".join(link.css("::attr(href)").re(r"\S"))
+                    if not url.startswith(
+                        "https://ibuagatt.arborg.is/meetingsearch/displaydocument.aspx?"
+                    ):
+                        continue
+                    url = url.replace("&amp;", "&")
+                    attachments.append(
+                        {
+                            "type": "application/pdf",
+                            "url": requote_uri(url),
+                            "length": 0,
+                            "label": link.css("::text").get(),
+                        }
+                    )
+                break
+                # Stop iterating here. We have reached the first `plainrow` which
+                # contains links and that's the last
             else:
                 paragraphs.append(get_segment_with_linebreaks(tr.css("td")))
 
@@ -194,21 +209,20 @@ class ArborgSpider(scrapy.Spider):
     def parse(self, response: Response, year: int, council_form_value: str):
         meeting_links = response.css("#l_Content table td a")
         council_type_slug = council_form_values[council_form_value]
-        for el in meeting_links[:1]:
+        for el in meeting_links:
             yield response.follow(
                 el,
                 callback=self.parse_meeting,
                 cb_kwargs={"council_type_slug": council_type_slug},
             )
 
-        # Add this back if you want to scrape the whole history ... removing after
-        # initial import
-        return
+        # Add this back if you want to scrape the whole history removing after initial import
         if meeting_links:
             request = get_index_request(year - 1, council_form_value)
             yield request
 
-    def parse_meeting(self, response: Response, council_type_slug: str):
+    @staticmethod
+    def parse_meeting(response: Response, council_type_slug: str):
         title, name = (
             response.css("#table2>tbody>tr:nth-child(1) td ::text")
             .getall()[0]
