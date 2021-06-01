@@ -242,4 +242,4 @@ def process_minutes(db: Session, items: Iterable[dict], meeting: Meeting) -> Non
 
     g = group(pipes)
     g.add_completion_callback(send_meeting_emails.message())
-    # g.run()
+    g.run()
