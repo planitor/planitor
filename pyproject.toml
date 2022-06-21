@@ -5,7 +5,7 @@ description = ""
 authors = ["Jökull Sólberg <jokull@solberg.is>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.9"
 jinja2 = "^2.11.1"
 uvicorn = "^0.11.8"
 requests = "^2.24.0"
@@ -29,7 +29,7 @@ boto3 = "^1.14.17"
 imgix = "^3.2.1"
 reynir = "^2.8.1"
 iceaddr = {git = "https://github.com/jokull/iceaddr.git", rev = "f490eab"}
-skipulagsstofnun = "^0.1.4"
+skipulagsstofnun = "^0.2.1"
 tokenizer = "^2.3.1"
 SQLAlchemy = "^1.3.20"
 zeep = "^4.0.0"

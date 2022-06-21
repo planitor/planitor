@@ -1,18 +1,19 @@
+Warning: The lock file is not up to date with the latest changes in pyproject.toml. You may be getting outdated dependencies. Run update to update them.
 aiodns==2.0.0
 aiofiles==0.5.0
 appdirs==1.4.4; python_version >= "3.6"
-attrs==20.2.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.4.0" and python_version >= "3.6" and python_version < "4.0"
+attrs==20.2.0; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.4.0" and python_version >= "3.7" and python_version < "4.0"
 bcrypt==3.2.0; python_version >= "3.6"
 boto3==1.15.1
 botocore==1.18.1
 cached-property==1.5.2; python_version >= "3.6"
 cachetools==4.1.1; python_version >= "3.5" and python_version < "4.0"
-certifi==2020.6.20; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
+certifi==2020.6.20; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_full_version >= "3.5.0" and python_version >= "3.7" and python_version < "4.0"
 cffi==1.14.3
-chardet==3.0.4; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
-click-plugins==1.1.1; python_version >= "3.6" and python_version < "4.0"
-click==7.1.2; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" or python_version >= "3.6" and python_version < "4.0" and python_full_version >= "3.5.0"
-cligj==0.5.0; python_version >= "3.6" and python_version < "4.0"
+chardet==3.0.4; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
+click-plugins==1.1.1; python_version >= "3.7" and python_version < "4.0"
+click==7.1.2; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_version >= "3.7" and python_version < "4.0" and python_full_version >= "3.5.0"
+cligj==0.5.0; python_version >= "3.7" and python_version < "4.0"
 cryptography==3.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 cssselect==1.1.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0"
 cssutils==1.0.2
@@ -23,13 +24,13 @@ email-normalize==2.0.0
 email-validator==1.1.1
 emails==0.6
 fastapi==0.62.0; python_version >= "3.6"
-fiona==1.8.17; python_version >= "3.6" and python_version < "4.0"
+fiona==1.8.21; python_version >= "3.7" and python_version < "4.0"
 future==0.18.2; python_version >= "2.6" and python_full_version < "3.0.0" or python_full_version >= "3.3.0"
 h11==0.9.0
 hashids==1.3.1; python_version >= "2.7"
 httptools==0.1.1; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy"
 iceaddr @ git+https://github.com/jokull/iceaddr.git@f490eabd00567e9a41bd4b95839c6da796c0a0a1
-idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
+idna==2.10; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 imgix==3.2.1
 isodate==0.6.0; python_version >= "3.6"
 jinja2==2.11.2; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.5.0")
@@ -37,7 +38,7 @@ jmespath==0.10.0; python_version >= "2.6" and python_full_version < "3.0.0" or p
 lxml==4.5.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version >= "3.6"
 markupsafe==1.1.1; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.5.0"
 migra==1.0.1605230943
-munch==2.5.0; python_version >= "3.6" and python_version < "4.0"
+munch==2.5.0; python_version >= "3.7" and python_version < "4.0"
 passlib==1.7.4
 pathlib==1.0.1
 premailer==3.7.0
@@ -59,9 +60,9 @@ s3transfer==0.3.3
 schemainspect==0.1.1603448192
 sentry-dramatiq==0.3.2
 sentry-sdk==0.19.5
-shapely==1.7.1; python_version >= "3.6" and python_version < "4.0"
-six==1.15.0; python_version >= "3.6" and python_full_version < "3.0.0" and python_version < "4.0" or python_version >= "3.6" and python_version < "4.0" and python_full_version >= "3.3.0"
-skipulagsstofnun==0.1.4; python_version >= "3.6" and python_version < "4.0"
+shapely==1.8.2; python_version >= "3.7" and python_version < "4.0"
+six==1.15.0; python_version >= "3.7" and python_full_version < "3.0.0" and python_version < "4.0" or python_version >= "3.7" and python_version < "4.0" and python_full_version >= "3.3.0"
+skipulagsstofnun==0.2.1; python_version >= "3.7" and python_version < "4.0"
 sqlakeyset==0.1.1579837191
 sqlalchemy-utils==0.36.8
 sqlalchemy==1.3.20; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.4.0")
@@ -69,7 +70,7 @@ sqlbag==0.1.1579049654
 starlette==0.13.6; python_version >= "3.6"
 tokenizer==2.4.0
 typing-extensions==3.7.4.3
-urllib3==1.25.10; python_version >= "2.7" and python_full_version < "3.0.0" and python_version != "3.4" or python_full_version >= "3.5.0" and python_version < "4" and python_version != "3.4"
+urllib3==1.25.10; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.5.0" and python_version < "4" and python_version >= "3.6"
 uvicorn==0.11.8
 uvloop==0.14.0; sys_platform != "win32" and sys_platform != "cygwin" and platform_python_implementation != "PyPy"
 websockets==8.1; python_full_version >= "3.6.1"
