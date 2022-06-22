@@ -7,15 +7,41 @@ services:
     build: .
     stdin_open: true
     tty: true
-    entrypoint: [ "/usr/bin/fish" ]
-    command: echo ""
+    command: scrapy list | xargs -n 1 scrapy crawl
+    env_file: .env
+    depends_on:
+      - db
+
+  poetry:
+    build:
+      dockerfile: poetry.Dockerfile
+      context: .
+    volumes:
+      - .:/code
+    stdin_open: true
+    tty: true
+    command: /bin/sh -c "while sleep 1000; do :; done"
     environment:
       - SHELL=/usr/bin/fish
     env_file: .env
+
   web:
     build: .
     volumes:
       - .:/code
     ports:
-      - 8008:8000
+      - 8000:80
     env_file: .env
+    depends_on:
+      - db
+
+  db:
+    image: 'postgres:latest'
+    ports:
+      - 6432:5432
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: planitor
+      POSTGRES_DB: planitor
+      POSTGRES_PASSWORD: planitor
