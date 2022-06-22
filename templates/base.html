@@ -73,9 +73,9 @@
   {% if DEBUG -%} {# Hot reload script #} {{
     hotreload.script(url_for('hot-reload')) | safe }}
   <script>
-    window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8080";
+    window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8000";
   </script>
-  <script type="module" src="http://{{ request.url.hostname }}:8080/_dist_/index.js"></script>
+  <script type="module" src="/_dist_/index.js"></script>
   {% else -%}
   <script>
     import("{{ url_for('dist', path=js_path) }}");

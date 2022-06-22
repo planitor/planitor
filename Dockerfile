@@ -1,8 +1,6 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9 as requirements-stage
+FROM python:3.9
 
-WORKDIR /tmp
-
-RUN pip install poetry
+WORKDIR /code
 
 # Install system packages for Fiona python package
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
@@ -10,18 +8,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY ./pyproject.toml ./poetry.lock* /tmp/
-RUN poetry export --dev -f requirements.txt --output requirements.txt --without-hashes
+COPY requirements.txt /code/requirements.txt
 
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install uvicorn gunicorn
 
-WORKDIR /code
-
-COPY --from=requirements-stage /tmp/requirements.txt /code/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
-COPY ./planitor /code/planitor
-COPY ./scrape /code/scrape
+COPY . /code/
 
 CMD ["uvicorn", "--proxy-headers", "--host", "0.0.0.0", "--port", "80", "planitor.main:app"]

@@ -3,7 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
-.python-version
 
 # VSCode
 .vscode
@@ -23,3 +22,6 @@ poetry.lock
 .env
 .pytest_cache
 public
+
+# Snaplet
+.snaplet
