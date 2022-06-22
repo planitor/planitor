@@ -1,0 +1,25 @@
+.git
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# VSCode
+.vscode
+
+# Yarn
+node_modules
+yarn.lock
+yarn-error.log
+
+# Poetry
+poetry.lock
+
+# Project
+.pytest_cache
+public
+
+# Snaplet
+.snaplet

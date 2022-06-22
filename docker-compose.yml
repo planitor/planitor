@@ -3,14 +3,6 @@
 version: '3.8'
 
 services:
-  scrapy:
-    build: .
-    stdin_open: true
-    tty: true
-    command: scrapy list | xargs -n 1 scrapy crawl
-    env_file: .env
-    depends_on:
-      - db
 
   poetry:
     build:
@@ -26,10 +18,33 @@ services:
       - SHELL=/usr/bin/fish
     env_file: .env
 
+  scrapy:
+    build: .
+    env_file: .env
+    # command: /bin/sh -c "cd /code && scrapy list | xargs -n 1 scrapy crawl"
+    command: /bin/sh -c "pwd && while sleep 1000; do :; done"
+    depends_on:
+      - db
+      - worker
+
+  worker:
+    build: .
+    env_file: .env
+    command: dramatiq --processes 2 --threads 2 planitor.actors
+    depends_on:
+      - db
+      - redis
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - 6379:6379
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis:/data
+
   web:
     build: .
-    volumes:
-      - .:/code
     ports:
       - 8000:80
     env_file: .env
@@ -38,6 +53,8 @@ services:
 
   db:
     image: 'postgres:latest'
+    volumes:
+      - db:/var/lib/postgresql/data
     ports:
       - 6432:5432
     expose:
@@ -46,3 +63,9 @@ services:
       POSTGRES_USER: planitor
       POSTGRES_DB: planitor
       POSTGRES_PASSWORD: planitor
+
+volumes:
+  db:
+    driver: local
+  redis:
+    driver: local
