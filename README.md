@@ -65,6 +65,7 @@ Preparing deployment
 ```bash
 NODE_ENV=production yarn run build  # frontend build
 poetry export --without-hashes -f requirements.txt > requirements.txt
+poetry export --dev --without-hashes -f requirements.txt > requirements-dev.txt
 ```
 
 Then commit this to repo and push to GitHub. Render takes over from there.

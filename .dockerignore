@@ -14,9 +14,6 @@ node_modules
 yarn.lock
 yarn-error.log
 
-# Poetry
-poetry.lock
-
 # Project
 .pytest_cache
 public
