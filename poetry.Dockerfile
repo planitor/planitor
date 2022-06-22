@@ -54,7 +54,7 @@ RUN apt-get update \
 # by default it respects $POETRY_HOME
 RUN pip install poetry
 
-COPY pyproject.toml ./
+COPY pyproject.toml poetry.lock ./
 
 # install runtime deps
 # it also uses poetry caching, thanks @cbrochtrup
