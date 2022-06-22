@@ -3,7 +3,7 @@ import re
 from typing import Generator, Set
 
 from iceaddr import iceaddr_suggest
-from jinja2 import Markup
+from markupsafe import Markup
 from reynir.bindb import BIN_Db
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, contains_eager, joinedload

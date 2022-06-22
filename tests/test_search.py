@@ -1,4 +1,4 @@
-from jinja2 import Markup
+from markupsafe import Markup
 
 from planitor.search import get_terms_from_query, iter_preview_fragments
 
