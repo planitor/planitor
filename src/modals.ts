@@ -1,6 +1,9 @@
 import * as ReactDOM from "react-dom/client";
 
-export const openModal = () => {
+export const openModal = (): [
+  (component: React.ReactNode) => void,
+  () => void
+] => {
   /*
 
   Handle opening and closing the modal window, return the el where React can inject a login form or
@@ -30,7 +33,7 @@ export const openModal = () => {
       cleanup();
     });
   });
-  const modalRender = (component) => {
+  const modalRender = (component: React.ReactNode) => {
     root.render(component);
   };
 

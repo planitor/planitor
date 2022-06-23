@@ -60,9 +60,16 @@ if (navigationEl) {
   ReactDOM.createRoot(navigationEl).render(<Navigation />);
 }
 
+import { QueryClient, QueryClientProvider } from "react-query";
+const queryClient = new QueryClient();
+
 const subscriptionsEl = document.getElementById("subscriptions");
 if (subscriptionsEl) {
-  ReactDOM.createRoot(subscriptionsEl).render(<Subscriptions />);
+  ReactDOM.createRoot(subscriptionsEl).render(
+    <QueryClientProvider client={queryClient}>
+      <Subscriptions />
+    </QueryClientProvider>
+  );
 }
 
 mapkit.addEventListener("configuration-change", function (event) {

@@ -9,3 +9,4 @@ class EnumListResponse(BaseModel):
     council_types: EnumChoiceType
     building_types: EnumChoiceType
     permit_types: EnumChoiceType
+    subscription_types: EnumChoiceType

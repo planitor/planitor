@@ -3,6 +3,11 @@ import { Axios } from "axios";
 const axios = new Axios({
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
+    "Content-Type": "application/json",
+  },
+  responseType: "json",
+  transitional: {
+    forcedJSONParsing: true,
   },
 });
 

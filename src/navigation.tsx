@@ -66,7 +66,7 @@ const User = (props) => {
           <a href="/notendur/stillingar" className="text-sm block truncate">
             <span
               className="sm:hidden inline-block pl-4"
-              style="position: relative; top: 2px;"
+              style={{ position: "relative", top: 2 }}
             >
               <PersonFill />
             </span>

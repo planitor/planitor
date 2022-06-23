@@ -58,7 +58,7 @@ def get_login_response(user: User, response: Response) -> dict:
         COOKIE_NAME,
         token,
         path="/",
-        secure=(ENV == "production"),
+        secure=False,
         httponly=True,
         expires=TOKEN_EXPIRY,
     )

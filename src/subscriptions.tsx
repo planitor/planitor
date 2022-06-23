@@ -5,6 +5,7 @@ import { openModal } from "./modals";
 import { api } from "./api";
 import { Ellipsis, TrashFill } from "./symbols";
 import { Select } from "./forms/widgets";
+import { useQuery } from "react-query";
 
 const SubscriptionLoading = () => {
   return (
@@ -82,11 +83,7 @@ const SelectCouncils = ({ councils, disabled, onChangeCouncils }) => {
               onClick(name, !selected);
             }}
           >
-            <input
-              type="checkbox"
-              disabled={disabled}
-              checked={selected && "checked"}
-            />
+            <input type="checkbox" disabled={disabled} checked={selected} />
             <div className="flex-grow ml-2">{label}</div>
           </label>
         );
@@ -339,58 +336,61 @@ const Group = ({ type, subscriptions, ...props }) => {
   );
 };
 
+async function fetch() {
+  // Municipalities objects are needed to render all municipality options
+  // in address subscription widgets, specifically where the user can pick
+  // and choose the councils being monitored
+  return await Promise.all([
+    api.getSubscriptions(),
+    api.getMunicipalities(),
+    api.getEnums(),
+  ]).then(([subscriptionResponse, municipalitiesResponse, enumsResponse]) => {
+    return {
+      subscriptions: JSON.parse(subscriptionResponse.data),
+      municipalities: JSON.parse(municipalitiesResponse.data),
+      enums: JSON.parse(enumsResponse.data),
+    };
+  });
+}
+
 export const Subscriptions = () => {
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [councilTypes, setCouncilTypes] = useState([]);
-  const [municipalities, setMunicipalities] = useState([]);
+  const { data, isLoading } = useQuery("subscriptions", fetch);
 
-  useEffect(async () => {
-    // Municipalities objects are needed to render all municipality options
-    // in address subscription widgets, specifically where the user can pick
-    // and choose the councils being monitored
-    const responses = await Promise.all([
-      api.getSubscriptions(),
-      api.getMunicipalities(),
-      api.getEnums(),
-    ]).then(([subscriptionResponse, municipalitiesResponse, enumsResponse]) => {
-      setSubscriptions(subscriptionResponse.data);
-      setMunicipalities(municipalitiesResponse.data);
-      setCouncilTypes(enumsResponse.data.council_types);
-    });
-  }, []);
+  console.log({ data, isLoading });
 
-  if (!subscriptions.length) {
+  if (isLoading || !data) {
     return (
       <div>
-        <SubscriptionLoading />
-        <SubscriptionLoading />
-        <SubscriptionLoading />
+        <SubscriptionLoading key={"1"} />
+        <SubscriptionLoading key={"2"} />
+        <SubscriptionLoading key={"3"} />
       </div>
     );
   }
 
-  let types = {};
+  const { subscriptions, municipalities, enums } = data;
+
+  const subscriptionTypes = new Map<string, string>(enums.subscription_types);
+  const councilTypes = new Map<string, string>(enums.council_types);
 
   let groups = Object.entries(
     groupBy(subscriptions, (subscription) => {
-      types[subscription.type[0]] = subscription.type;
-      return subscription.type[0];
+      return subscription.type;
     })
   );
 
-  groups.sort(([key, _]) => {
-    return key;
-  });
+  groups.sort(([key, _]) => key);
 
   return (
     <div>
       {groups.map(([type, subscriptions]) => {
         return (
           <Group
+            key={type}
             subscriptions={subscriptions}
             councilTypes={councilTypes}
             municipalities={municipalities}
-            type={types[type][1]}
+            type={subscriptionTypes.get(type)}
           />
         );
       })}

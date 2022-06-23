@@ -16,4 +16,5 @@ def get_council_types(request: Request):
             (choice.value, choice.label) for choice in enums.BuildingTypeEnum
         ],
         "permit_types": [(choice.value, choice.label) for choice in enums.PermitTypeEnum],
+        "subscription_types": [(choice.value, choice.label) for choice in enums.SubscriptionTypeEnum],
     }
