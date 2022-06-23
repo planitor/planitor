@@ -1,5 +1,4 @@
-import { Fragment, h, render } from "preact";
-import { useEffect, useState } from "preact/hooks";
+import { Fragment, useEffect, useState } from "react";
 
 import { Select, NumberInput, TextInput } from "../forms/widgets";
 import { api } from "../api";
@@ -55,9 +54,9 @@ export const PermitForm = ({ minuteId }) => {
 
   return (
     <div>
-      <div class="mb-3 grid gap-2 grid-cols-2">
+      <div className="mb-3 grid gap-2 grid-cols-2">
         <div>
-          <label class="text-xs block mb-1">Tegund leyfis</label>
+          <label className="text-xs block mb-1">Tegund leyfis</label>
           <Select
             value={form.data.permit_type}
             onChange={(e) => {
@@ -66,7 +65,7 @@ export const PermitForm = ({ minuteId }) => {
                 data: { ...form.data, permit_type: e.target.value || null },
               });
             }}
-            isDisabled={form.isLoading}
+            disabled={form.isLoading}
           >
             <Fragment>
               <option value="">Ekkert valið</option>
@@ -77,7 +76,7 @@ export const PermitForm = ({ minuteId }) => {
           </Select>
         </div>
         <div>
-          <label class="text-xs block mb-1">Tegund byggingar</label>
+          <label className="text-xs block mb-1">Tegund byggingar</label>
           <Select
             value={form.data.building_type}
             onChange={(e) => {
@@ -86,7 +85,7 @@ export const PermitForm = ({ minuteId }) => {
                 data: { ...form.data, building_type: e.target.value || null },
               });
             }}
-            isDisabled={form.isLoading}
+            disabled={form.isLoading}
           >
             <Fragment>
               <option value="">Ekkert valið</option>
@@ -97,9 +96,9 @@ export const PermitForm = ({ minuteId }) => {
           </Select>
         </div>
       </div>
-      <div class="mb-4 grid gap-2 grid-cols-3">
+      <div className="mb-4 grid gap-2 grid-cols-3">
         <div>
-          <label class="text-xs block mb-1">Einingar</label>
+          <label className="text-xs block mb-1">Einingar</label>
           <NumberInput
             value={form.data.units}
             onInput={(e: Event) =>
@@ -111,7 +110,7 @@ export const PermitForm = ({ minuteId }) => {
           />
         </div>
         <div>
-          <label class="text-xs block mb-1">Viðbætt</label>
+          <label className="text-xs block mb-1">Viðbætt</label>
           <TextInput
             value={form.data.area_added}
             onInput={(e) => {
@@ -123,7 +122,7 @@ export const PermitForm = ({ minuteId }) => {
           />
         </div>
         <div>
-          <label class="text-xs block mb-1">Niðurrif</label>
+          <label className="text-xs block mb-1">Niðurrif</label>
           <TextInput
             value={form.data.area_subtracted}
             // pattern="[0-9]+([\.][0-9])?"
@@ -136,13 +135,13 @@ export const PermitForm = ({ minuteId }) => {
           />
         </div>
       </div>
-      <div class="flex items-baseline mb-2">
-        <div class="flex-grow text-right text-gray-500 pr-4">
+      <div className="flex items-baseline mb-2">
+        <div className="flex-grow text-right text-gray-500 pr-4">
           {(created && "Vistað") || "Ekkert leyfi vistað"}
         </div>
-        <div class="">
+        <div className="">
           <button
-            class="btn btn-small"
+            className="btn btn-small"
             disabled={form.isLoading}
             onClick={onSubmit}
           >

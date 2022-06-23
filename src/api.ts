@@ -1,13 +1,10 @@
-import axios from "axios";
+import { Axios } from "axios";
 
-function authHeaders() {
-  const token = localStorage.getItem("token");
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-}
+const axios = new Axios({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+});
 
 export const api = {
   logInGetToken(email: string, password: string) {
@@ -18,7 +15,7 @@ export const api = {
     return axios.post(`/notendur/login/access-token`, params);
   },
   getMe() {
-    return axios.get(`/notendur/me`, authHeaders());
+    return axios.get(`/notendur/me`);
   },
   passwordRecovery(email: string) {
     return axios.post(`/notendur/password-recovery/${email}`);
@@ -33,22 +30,22 @@ export const api = {
     return axios.get("/notendur/logout");
   },
   followCase(id: string) {
-    return axios.post(`/api/follow/cases/${id}`, null, authHeaders());
+    return axios.post(`/api/follow/cases/${id}`, null);
   },
   unfollowCase(id: string) {
-    return axios.delete(`/api/follow/cases/${id}`, authHeaders());
+    return axios.delete(`/api/follow/cases/${id}`);
   },
   followEntity(id: string) {
-    return axios.post(`/api/follow/entities/${id}`, null, authHeaders());
+    return axios.post(`/api/follow/entities/${id}`, null);
   },
   unfollowEntity(id: string) {
-    return axios.delete(`/api/follow/entities/${id}`, authHeaders());
+    return axios.delete(`/api/follow/entities/${id}`);
   },
   followAddress(hnitnum: string) {
-    return axios.post(`/api/follow/addresses/${hnitnum}`, null, authHeaders());
+    return axios.post(`/api/follow/addresses/${hnitnum}`, null);
   },
   unfollowAddress(hnitnum: string) {
-    return axios.delete(`/api/follow/addresses/${hnitnum}`, authHeaders());
+    return axios.delete(`/api/follow/addresses/${hnitnum}`);
   },
   getEntityAddresses(kennitala: string) {
     return axios.get(`/api/entities/${kennitala}/addresses`);
@@ -59,24 +56,24 @@ export const api = {
     );
   },
   getEnums() {
-    return axios.get("/api/_enums", authHeaders());
+    return axios.get("/api/_enums");
   },
   getMunicipalities() {
-    return axios.get("/api/municipalities", authHeaders());
+    return axios.get("/api/municipalities");
   },
   getSubscriptions() {
-    return axios.get("/api/subscriptions", authHeaders());
+    return axios.get("/api/subscriptions");
   },
   updateSubscription(id: string, data: any) {
-    return axios.post(`/api/subscriptions/${id}`, data, authHeaders());
+    return axios.post(`/api/subscriptions/${id}`, data);
   },
   deleteSubscription(id: string) {
-    return axios.delete(`/api/subscriptions/${id}`, authHeaders());
+    return axios.delete(`/api/subscriptions/${id}`);
   },
   getPermit(minuteId: string) {
-    return axios.get(`/api/minutes/${minuteId}/permit`, authHeaders());
+    return axios.get(`/api/minutes/${minuteId}/permit`);
   },
   putPermit(minuteId: string, data: { [key: string]: any }) {
-    return axios.put(`/api/minutes/${minuteId}/permit`, data, authHeaders());
+    return axios.put(`/api/minutes/${minuteId}/permit`, data);
   },
 };

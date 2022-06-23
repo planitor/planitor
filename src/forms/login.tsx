@@ -1,5 +1,4 @@
-
-import { useState } from "preact/hooks";
+import { useState } from "react";
 import { api } from "../api";
 import { TextInput, PasswordInput } from "./widgets";
 
@@ -89,61 +88,59 @@ export const LoginForm = (props) => {
 
   return (
     <div>
-      <h1 class="text-2xl">Innskráning</h1>
-      <div class="pt-6 pb-2 my-2">
+      <h1 className="text-2xl">Innskráning</h1>
+      <div className="pt-6 pb-2 my-2">
         <form onSubmit={onSubmit}>
           {form.error && (
-            <div class="mb-4 text-red-700 font-bold">{form.error}</div>
+            <div className="mb-4 text-red-700 font-bold">{form.error}</div>
           )}
-          <div class="mb-4">
-            <label class="block text-sm mb-2" for="username">
+          <div className="mb-4">
+            <label className="block text-sm mb-2">
               Netfang
+              <TextInput
+                isInvalid={!!username.errors.length}
+                isDirty={username.isDirty}
+                disabled={form.isLoading}
+                value={username.value}
+                onInput={onUsernameChange}
+              />
             </label>
-            <TextInput
-              name="username"
-              isInvalid={!!username.errors.length}
-              isDirty={username.isDirty}
-              isDisabled={form.isLoading}
-              value={username.value}
-              onInput={onUsernameChange}
-            />
             {username.errors.map((error) => {
-              return <div class="text-red-700 text-sm my-2">{error}</div>;
+              return <div className="text-red-700 text-sm my-2">{error}</div>;
             })}
           </div>
-          <div class="mb-6">
-            <label class="block text-sm mb-2" for="password">
+          <div className="mb-6">
+            <label className="block text-sm mb-2">
               Lykilorð
+              <PasswordInput
+                type="password"
+                isDirty={password.isDirty}
+                disabled={form.isLoading}
+                value={password.value}
+                onInput={onPasswordChange}
+              />
             </label>
-            <PasswordInput
-              name="password"
-              type="password"
-              isDirty={password.isDirty}
-              isDisabled={form.isLoading}
-              value={password.value}
-              onInput={onPasswordChange}
-            />
             {password.errors.map((error) => {
-              return <div class="text-red-700 text-sm my-2">{error}</div>;
+              return <div className="text-red-700 text-sm my-2">{error}</div>;
             })}
           </div>
-          <div class="block sm:flex items-center justify-between">
+          <div className="block sm:flex items-center justify-between">
             <div>
               <button
-                class="btn-primary"
+                className="btn-primary"
                 type="submit"
                 disabled={form.isLoading}
               >
                 Innskrá
               </button>
             </div>
-            <div class="mt-4 sm:mt-0">
+            <div className="mt-4 sm:mt-0">
               <button
                 onClick={(event) => {
                   event.stopPropagation();
                   setScreen(["password-recovery", username.value]);
                 }}
-                class="no-underline"
+                className="no-underline"
               >
                 Gleymt lykilorð?
               </button>

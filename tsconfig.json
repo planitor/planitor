@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
+    "jsx": "react-jsx",
     "esModuleInterop": true,
-    "jsx": "react",
-    "jsxFactory": "h",
-    "lib": ["dom", "esnext"],
+    "lib": ["dom", "esnext", "DOM.Iterable"],
     "module": "esnext",
     "moduleResolution": "node",
-    "strict": true,
-    "target": "es5"
+    "strict": false,
+    "target": "es6"
   },
   "include": ["src"]
 }

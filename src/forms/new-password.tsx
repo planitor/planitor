@@ -1,5 +1,4 @@
-
-import { useState } from "preact/hooks";
+import { useState } from "react";
 import { api } from "../api";
 import { PasswordInput } from "./widgets";
 
@@ -36,30 +35,30 @@ export const NewPasswordForm = ({ token }) => {
 
   return (
     <div>
-      <h1 class="text-center text-2xl">Nýtt lykilorð</h1>
-      <div class="py-2 my-2"></div>
+      <h1 className="text-center text-2xl">Nýtt lykilorð</h1>
+      <div className="py-2 my-2"></div>
       <form onSubmit={onSubmit}>
         {form.error && (
-          <div class="mb-4 text-red-700 font-bold">{form.error}</div>
+          <div className="mb-4 text-red-700 font-bold">{form.error}</div>
         )}
         {form.isSuccess && (
-          <div class="mb-4 text-green-600 font-bold">
+          <div className="mb-4 text-green-600 font-bold">
             Lykilorðið hefur verið uppfært.
           </div>
         )}
-        <div class="mb-4">
+        <div className="mb-4">
           <PasswordInput
             name="password"
             type="password"
-            isDisabled={form.isLoading || form.isSuccess}
+            disabled={form.isLoading || form.isSuccess}
             value={password.value}
             onInput={onChange}
           />
         </div>
-        <div class="block md:flex items-center justify-between">
+        <div className="block md:flex items-center justify-between">
           <div>
             <button
-              class="btn-primary"
+              className="btn-primary"
               type="submit"
               disabled={form.isLoading || form.isSuccess}
             >

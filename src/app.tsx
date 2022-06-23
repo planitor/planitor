@@ -1,5 +1,4 @@
-import { h, render } from "preact";
-
+import * as ReactDOM from "react-dom/client";
 import { Navigation } from "./navigation";
 import { Subscriptions } from "./subscriptions";
 import { Login } from "./accounts";
@@ -18,7 +17,8 @@ if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
   });
-  if (document._user) {
+  if ("_user" in document) {
+    // @ts-expect-error
     const { email, id } = document._user;
     Sentry.setUser({ email, id });
   }
@@ -43,7 +43,7 @@ if (passwordRecoveryEl) {
 
 const unsubscribeEl = document.getElementById("unsubscribe");
 if (unsubscribeEl) {
-  render(<Unsubscribe />, unsubscribeEl);
+  ReactDOM.createRoot(unsubscribeEl).render(<Unsubscribe />);
 }
 
 const loginEl = document.getElementById("login");
@@ -57,83 +57,90 @@ if (loginEl) {
 
 const navigationEl = document.getElementById("navigation");
 if (navigationEl) {
-  render(<Navigation />, navigationEl);
+  ReactDOM.createRoot(navigationEl).render(<Navigation />);
 }
 
 const subscriptionsEl = document.getElementById("subscriptions");
 if (subscriptionsEl) {
-  render(<Subscriptions />, subscriptionsEl);
+  ReactDOM.createRoot(subscriptionsEl).render(<Subscriptions />);
 }
 
 mapkit.addEventListener("configuration-change", function (event) {
   if (event.status === "Initialized") {
-    [...document.querySelectorAll(".entity-map")].forEach(async (el) => {
-      const options = await getEntityMapOptions(el.dataset.kennitala);
-      if (options) new mapkit.Map(el, options);
-    });
-    [...document.querySelectorAll(".nearby-map")].forEach(async (el) => {
-      const options = await getNearbyMapOptions(el.dataset);
-      if (options) new mapkit.Map(el, options);
-    });
+    [...document.querySelectorAll<HTMLElement>(".entity-map")].forEach(
+      async (el) => {
+        const options = await getEntityMapOptions(el.dataset.kennitala);
+        if (options) new mapkit.Map(el, options);
+      }
+    );
+    [...document.querySelectorAll<HTMLElement>(".nearby-map")].forEach(
+      async (el) => {
+        const options = await getNearbyMapOptions(
+          el.dataset as { hnitnum: string; radius: string; days: string }
+        );
+        if (options) new mapkit.Map(el, options);
+      }
+    );
   }
 });
 
-[...document.querySelectorAll(".follow-case")].forEach((button) => {
-  const defaultLabel = button.innerText;
-  button.innerHTML = "";
-  render(
-    <FollowCase
-      id={button.dataset.id}
-      state={button.dataset.state}
-      defaultLabel={defaultLabel}
-    />,
-    button
-  );
-});
+[...document.querySelectorAll<HTMLElement>(".follow-case")].forEach(
+  (button) => {
+    const defaultLabel = button.innerText;
+    button.innerHTML = "";
+    ReactDOM.createRoot(button).render(
+      <FollowCase
+        id={button.dataset.id}
+        state={button.dataset.state}
+        defaultLabel={defaultLabel}
+      />
+    );
+  }
+);
 
-[...document.querySelectorAll(".follow-address")].forEach((button) => {
-  render(
-    <FollowAddress id={button.dataset.id} state={button.dataset.state} />,
-    button
-  );
-});
+[...document.querySelectorAll<HTMLElement>(".follow-address")].forEach(
+  (button) => {
+    ReactDOM.createRoot(button).render(
+      <FollowAddress id={button.dataset.id} state={button.dataset.state} />
+    );
+  }
+);
 
-[...document.querySelectorAll(".follow-entity")].forEach((button) => {
-  render(
-    <FollowEntity id={button.dataset.kennitala} state={button.dataset.state} />,
-    button
-  );
-});
+[...document.querySelectorAll<HTMLElement>(".follow-entity")].forEach(
+  (button) => {
+    ReactDOM.createRoot(button).render(
+      <FollowEntity
+        id={button.dataset.kennitala}
+        state={button.dataset.state}
+      />
+    );
+  }
+);
 
-[...document.querySelectorAll(".pdf-viewer")].forEach((el) => {
+[...document.querySelectorAll<HTMLElement>(".pdf-viewer")].forEach((el) => {
   const innerEl = el.querySelector(".inner");
   const title = el.dataset.title;
-  function unmount() {
-    render(null, innerEl);
-  }
-  function mount(index) {
-    render(
+  const root = ReactDOM.createRoot(innerEl);
+  function render(index: number) {
+    root.render(
       <PDFViewer
         pages={pages}
         title={title}
         initialIndex={index}
-        onClose={() => {
-          unmount();
-        }}
-      />,
-      innerEl
+        onClose={() => root.unmount()}
+      />
     );
   }
   const pages = [...el.querySelectorAll("a")].map((el, i) => {
     el.addEventListener("click", (event) => {
       event.preventDefault();
-      mount(i);
+      render(i);
     });
     return el.href;
   });
 });
 
-[...document.querySelectorAll(".tabs")].forEach((tabsEl) => {
+[...document.querySelectorAll<HTMLElement>(".tabs")].forEach((tabsEl) => {
   const pageEls = tabsEl.parentElement.querySelectorAll(".tabPage");
   const tabEls = tabsEl.querySelectorAll("button");
   [...tabEls].forEach((tabEl) => {
@@ -151,6 +158,10 @@ mapkit.addEventListener("configuration-change", function (event) {
   });
 });
 
-[...document.querySelectorAll(".permit-form")].forEach((formEl) => {
-  render(<PermitForm minuteId={formEl.dataset.minuteId} />, formEl);
-});
+[...document.querySelectorAll<HTMLElement>(".permit-form")].forEach(
+  (formEl) => {
+    ReactDOM.createRoot(formEl).render(
+      <PermitForm minuteId={formEl.dataset.minuteId} />
+    );
+  }
+);

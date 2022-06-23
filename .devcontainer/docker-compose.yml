@@ -1,8 +1,5 @@
-version: '3.8'
+version: "3.8"
 services:
-  web:
-    volumes:
-      - .:/code
   poetry:
     build:
       context: .
@@ -18,3 +15,5 @@ services:
       - .:/workspace:cached
       # Uncomment the next line to use Docker from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker-compose for details.
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8000:80

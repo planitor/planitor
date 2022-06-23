@@ -86,7 +86,7 @@ export async function getEntityMapOptions(kennitala) {
   return { annotations: pins, region: region };
 }
 
-export async function getNearbyMapOptions({ hnitnum, radius, days }) {
+export async function getNearbyMapOptions({ hnitnum, radius, days }: { hnitnum: string, radius: string, days: string }) {
   const { address, addresses, plan } = await api
     .getNearbyAddresses(hnitnum, radius, days)
     .then((response) => {

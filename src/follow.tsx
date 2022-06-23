@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState } from "react";
 import classNames from "classnames";
 
 import { api } from "./api";
@@ -8,7 +8,7 @@ const Button = (props) => {
   const { loading, onClick, hover, setHover, following, defaultLabel } = props;
   return (
     <button
-      class={classNames("btn sm:inline block mx-auto", {
+      className={classNames("btn sm:inline block mx-auto", {
         "text-gray-500 border-gray-500": loading,
         "bg-planitor-blue text-white": following && !loading,
         "text-planitor-blue": !following && !loading,
@@ -36,13 +36,16 @@ const Button = (props) => {
 const Banner = (props) => {
   const Link = () => {
     return (
-      <a class="text-planitor-blue underline" href="mailto:hallo@planitor.io">
+      <a
+        className="text-planitor-blue underline"
+        href="mailto:hallo@planitor.io"
+      >
         hallo@planitor.io
       </a>
     );
   };
   return (
-    <p class="text-center">
+    <p className="text-center">
       Vaktarinn stendur öllum til boða gegn mánaðargjaldi. <br />
       Til að fá aðgang sendu okkur línu á <Link />.
     </p>
@@ -61,7 +64,7 @@ const Follow = (props) => {
     const toggle = () => {
       setForm({ isLoading: true, error: null });
       (following ? unfollowApi(id) : followApi(id))
-        .then((response) => {
+        .then(() => {
           setFollowing(!following);
           setHover(false);
           setForm({ isLoading: false, error: null });
@@ -70,6 +73,7 @@ const Follow = (props) => {
           setForm({ isLoading: false, error: error });
         });
     };
+    // @ts-expect-error
     if (document._user === null) {
       const [modalRender, _] = openModal();
       modalRender(<Banner />);

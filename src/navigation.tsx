@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useState, useRef, useEffect } from "react";
 import classNames from "classnames";
 import { Login } from "./accounts";
 import { openModal } from "./modals";
@@ -19,7 +19,7 @@ const LogoutButton = (props) => {
       onClick={onClick}
       href="/notendur/logout"
       role="button"
-      class="text-sm font-bold text-powder-light"
+      className="text-sm font-bold text-powder-light"
     >
       Útskrá
     </a>
@@ -40,7 +40,7 @@ const LoginButton = (props) => {
   };
 
   return (
-    <a href="#" role="button" onClick={onClick} class="block p-2">
+    <a href="#" role="button" onClick={onClick} className="block p-2">
       <PersonFill />
     </a>
   );
@@ -61,19 +61,19 @@ const User = (props) => {
   };
   if (!!user) {
     return (
-      <div class="flex flex-row sm:flex-col">
+      <div className="flex flex-row sm:flex-col">
         <div>
-          <a href="/notendur/stillingar" class="text-sm block truncate">
+          <a href="/notendur/stillingar" className="text-sm block truncate">
             <span
-              class="sm:hidden inline-block pl-4"
+              className="sm:hidden inline-block pl-4"
               style="position: relative; top: 2px;"
             >
               <PersonFill />
             </span>
-            <span class="hidden sm:inline">{user.email}</span>
+            <span className="hidden sm:inline">{user.email}</span>
           </a>
         </div>
-        <div class="order-first sm:order-last flex-grow">
+        <div className="order-first sm:order-last flex-grow">
           <LogoutButton />
         </div>
       </div>
@@ -108,9 +108,9 @@ export const Navigation = () => {
   };
 
   return (
-    <div class="flex justify-between items-center align-middle h-12">
+    <div className="flex justify-between items-center align-middle h-12">
       <div
-        class={classNames(
+        className={classNames(
           "sm:order-2 sm:flex-grow text-center sm:px-10 sm:max-w-4xl",
           {
             "flex-grow": isSearchExpanded,
@@ -123,44 +123,47 @@ export const Navigation = () => {
               setIsSearchExpanded(true);
             }}
             role="button"
-            class="sm:hidden block"
+            className="sm:hidden block"
           >
             <MagnifyingGlass />
           </span>
         )}
         <div
-          class={classNames("sm:flex pr-4 sm:pr-0", {
+          className={classNames("sm:flex pr-4 sm:pr-0", {
             hidden: !isSearchExpanded,
           })}
         >
           <form
-            class="search flex bg-white bg-opacity-25 rounded-md items-center mr-3 px-3 w-full"
+            className="search flex bg-white bg-opacity-25 rounded-md items-center mr-3 px-3 w-full"
             method="GET"
             action="/leit"
             onSubmit={onSubmit}
           >
             <MagnifyingGlass />
             <input
-              value={value}
+              value={value || ""}
               ref={input}
               onChange={onChange}
               name="q"
-              size="1"
-              class="bg-transparent flex-grow py-2 px-2 text-sm font-light overflow-hidden focus:outline-none"
+              minLength={1}
+              className="bg-transparent flex-grow py-2 px-2 text-sm font-light overflow-hidden focus:outline-none"
               placeholder="Leit - t.d. 'Reitir ehf.', 'Brautarholt' eða 'gistiheimili'"
             />
           </form>
         </div>
       </div>
       <div
-        class={classNames("flex-grow sm:order-1 sm:flex-grow-0 text-center", {
-          hidden: isSearchExpanded,
-          "sm:block": isSearchExpanded,
-        })}
+        className={classNames(
+          "flex-grow sm:order-1 sm:flex-grow-0 text-center",
+          {
+            hidden: isSearchExpanded,
+            "sm:block": isSearchExpanded,
+          }
+        )}
       >
-        <a href="/s" alt="Planitor Logo" class="text-white">
-          <svg viewBox="0 0 141 175" class="h-6 inline sm:hidden">
-            <g stroke="none" stroke-width="1" fill-rule="evenodd">
+        <a href="/s" alt="Planitor Logo" className="text-white">
+          <svg viewBox="0 0 141 175" className="h-6 inline sm:hidden">
+            <g stroke="none" strokeWidth="1" fillRule="evenodd">
               <g transform="translate(-1302.000000, -561.000000)">
                 <g transform="translate(1302.000000, 561.000000)">
                   <path d="M42.6751907,24.758 C42.8521907,46.802 43.1141907,69.166 43.1141907,69.166 C43.1191907,103.766 43.1151907,138.365 43.1151907,172.963 C43.1151907,173.589 43.1151907,174.215 43.1151907,174.971 C29.0461907,174.971 15.0921907,174.971 0.939190743,174.971 C0.911190743,174.262 0.856190743,173.52 0.856190743,172.778 C0.851190743,143.981 0.235190743,115.254 0.218190743,86.456 C0.213190743,78.106 -0.563809257,64.484 0.845190743,56.488 C2.74619074,45.704 6.64619074,40.115 8.90019074,36.427 C18.7071907,20.378 48.2991907,0.641 48.2991907,0.641 C48.2991907,0.641 42.5331907,7.075 42.6751907,24.758"></path>
@@ -171,8 +174,8 @@ export const Navigation = () => {
               </g>
             </g>
           </svg>
-          <svg viewBox="0 0 843 176" class="h-6 hidden sm:inline">
-            <g stroke="none" stroke-width="1" fill-rule="evenodd">
+          <svg viewBox="0 0 843 176" className="h-6 hidden sm:inline">
+            <g stroke="none" strokeWidth="1" fillRule="evenodd">
               <g transform="translate(-123.000000, -101.000000)">
                 <g transform="translate(123.000000, 101.000000)" fill="#FFFFFF">
                   <g transform="translate(215.285191, 17.394101)">
@@ -199,7 +202,7 @@ export const Navigation = () => {
           </svg>
         </a>
       </div>
-      <div class="order-last text-right">
+      <div className="order-last text-right">
         <User />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState } from 'react';
 import { LoginForm } from "./forms/login";
 import { PasswordRecoveryForm } from "./forms/password-recovery";
 

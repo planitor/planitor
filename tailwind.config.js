@@ -1,6 +1,6 @@
 module.exports = {
-  plugins: [require('@tailwindcss/forms')],
-  content: ["./templates/**/*.html", "./src/styles.css", "./src/**/*.jsx"],
+  plugins: [require("@tailwindcss/forms")],
+  content: ["./templates/**/*.html", "./src/styles.css", "./src/**/*.tsx"],
   theme: {
     extend: {
       colors: {

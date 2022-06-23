@@ -1,14 +1,16 @@
-import { FunctionComponent, h } from "preact";
-
 // const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
-const inputStyling =
-  "mt-1 block w-full rounded-md bg-black bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0";
+import { FC, PropsWithChildren } from "react";
 
-type InputProps = Pick<HTMLInputElement, "value" | "type"> & {
-  onInput: () => void;
-  isInvalid: boolean;
-  isDirty: boolean;
+const inputStyling =
+  "mt-1 block w-full rounded-md bg-black/10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0";
+
+type InputProps = Pick<
+  React.HTMLProps<HTMLInputElement>,
+  "value" | "type" | "max" | "min" | "step" | "onInput" | "disabled"
+> & {
+  isInvalid?: boolean;
+  isDirty?: boolean;
 };
 
 const Input = ({
@@ -20,29 +22,29 @@ const Input = ({
   ...props
 }: InputProps) => {
   return (
-    <div class="text-sm lg-text-base">
+    <div className="text-sm lg-text-base">
       <input
         type={type}
         onInput={onInput}
-        value={value}
-        class={inputStyling}
+        value={value || ""}
+        className={inputStyling}
         {...props}
       />
     </div>
   );
 };
 
-export const TextInput: FunctionComponent<InputProps> = (props) => {
+export const TextInput: FC<InputProps> = (props) => {
   return <Input {...props} type="text" />;
 };
 
-export const NumberInput: FunctionComponent<
-  InputProps & Pick<HTMLInputElement, "max" | "min" | "step">
+export const NumberInput: FC<
+  InputProps & Pick<React.HTMLProps<HTMLInputElement>, "max" | "min" | "step">
 > = (props) => {
   return (
     <Input
       {...props}
-      max={props.max || null}
+      max={props.max || undefined}
       min={props.min || 0}
       step={props.step || 1}
       type="number"
@@ -50,22 +52,20 @@ export const NumberInput: FunctionComponent<
   );
 };
 
-export const PasswordInput: FunctionComponent<InputProps> = (props) => {
+export const PasswordInput: FC<InputProps> = (props) => {
   return <Input {...props} type="password" />;
 };
 
-export const Select: FunctionComponent<{
-  value: string;
-  onChange: h.JSX.GenericEventHandler<HTMLSelectElement>;
-  disabled?: boolean;
-}> = ({ value, onChange, disabled = false, children }) => {
+export const Select: FC<
+  PropsWithChildren<React.HTMLProps<HTMLSelectElement>>
+> = ({ value, onChange, disabled = false, children }) => {
   return (
-    <div class="text-sm lg:text-base">
+    <div className="text-sm lg:text-base">
       <select
         value={value}
         onChange={onChange}
         disabled={disabled}
-        class="block w-full mt-1 rounded-md bg-black bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
+        className="block w-full mt-1 rounded-md bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
       >
         {children}
       </select>

@@ -1,5 +1,4 @@
-import { h, render } from "preact";
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect } from "react";
 
 export const Unsubscribe = () => {
   const [success, setSuccess] = useState(false);

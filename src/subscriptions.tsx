@@ -1,5 +1,4 @@
-import { Fragment, h, render } from "preact";
-import { useState, useEffect } from "preact/hooks";
+import { Fragment, useState, useEffect } from "react";
 import { groupBy, keyBy } from "lodash";
 
 import { openModal } from "./modals";
@@ -9,11 +8,11 @@ import { Select } from "./forms/widgets";
 
 const SubscriptionLoading = () => {
   return (
-    <div class="rounded-lg shadow-sm p-4 w-full bg-white mb-4">
-      <div class="animate-pulse flex flex-row">
-        <div class="bg-gray-400 rounded w-3/4 mr-4 h-8"></div>
-        <div class="bg-gray-400 rounded w-1/4 mr-4 h-8"></div>
-        <div class="bg-gray-400 rounded w-16 h-8"></div>
+    <div className="rounded-lg shadow-sm p-4 w-full bg-white mb-4">
+      <div className="animate-pulse flex flex-row">
+        <div className="bg-gray-400 rounded w-3/4 mr-4 h-8"></div>
+        <div className="bg-gray-400 rounded w-1/4 mr-4 h-8"></div>
+        <div className="bg-gray-400 rounded w-16 h-8"></div>
       </div>
     </div>
   );
@@ -21,10 +20,12 @@ const SubscriptionLoading = () => {
 
 const Case = ({ serial, id, municipality }) => {
   return (
-    <a href={`/cases/${id}`} class="block">
+    <a href={`/cases/${id}`} className="block">
       <div>{serial}</div>
       {municipality && (
-        <div class="font-normal text-gray-700 text-xs">{municipality.name}</div>
+        <div className="font-normal text-gray-700 text-xs">
+          {municipality.name}
+        </div>
       )}
     </a>
   );
@@ -36,23 +37,23 @@ const Search = ({ search_query }) => {
 
 const Address = ({ name, hnitnum, stadur_nf }) => {
   return (
-    <a href={`/heimilisfong/${hnitnum}`} class="block">
+    <a href={`/heimilisfong/${hnitnum}`} className="block">
       <div>{name}</div>
-      <div class="font-normal text-gray-700 text-xs">{stadur_nf}</div>
+      <div className="font-normal text-gray-700 text-xs">{stadur_nf}</div>
     </a>
   );
 };
 
 const Entity = ({ kennitala, name }) => {
   return (
-    <a href={`/f/${kennitala}`} class="block">
+    <a href={`/f/${kennitala}`} className="block">
       <div>{name}</div>
-      <div class="font-normal text-gray-700 text-xs">kt. {kennitala}</div>
+      <div className="font-normal text-gray-700 text-xs">kt. {kennitala}</div>
     </a>
   );
 };
 
-const SelectCouncils = ({ councils, isDisabled, onChangeCouncils }) => {
+const SelectCouncils = ({ councils, disabled, onChangeCouncils }) => {
   const onClick = (_name, _selected) => {
     onChangeCouncils(
       councils
@@ -76,17 +77,17 @@ const SelectCouncils = ({ councils, isDisabled, onChangeCouncils }) => {
       {councils.map(({ label, name, selected }) => {
         return (
           <label
-            class="flex items-center text-left"
+            className="flex items-center text-left"
             onClick={(event) => {
               onClick(name, !selected);
             }}
           >
             <input
               type="checkbox"
-              disabled={isDisabled}
+              disabled={disabled}
               checked={selected && "checked"}
             />
-            <div class="flex-grow ml-2">{label}</div>
+            <div className="flex-grow ml-2">{label}</div>
           </label>
         );
       })}
@@ -227,14 +228,14 @@ const Settings = ({
   };
 
   return (
-    <div class="">
+    <div className="">
       {data.address && (
-        <div class="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
-          <div class="font-bold">Radíus</div>
+        <div className="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
+          <div className="font-bold">Radíus</div>
           <Select
             value={data.radius || 0}
             onChange={onChangeRadius}
-            isDisabled={isLoading}
+            disabled={isLoading}
           >
             <Fragment>
               <option value={0}>0m</option>
@@ -246,12 +247,12 @@ const Settings = ({
           </Select>
         </div>
       )}
-      <div class="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
-        <div class="font-bold">Afhending</div>
+      <div className="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
+        <div className="font-bold">Afhending</div>
         <Select
           value={delivery}
           onChange={onChangeDelivery}
-          isDisabled={isLoading}
+          disabled={isLoading}
         >
           <Fragment>
             <option value="never">Afvirkja</option>
@@ -260,17 +261,17 @@ const Settings = ({
           </Fragment>
         </Select>
       </div>
-      <div class="py-4 items-center sm:py-6 border-gray-300">
-        <div class="font-bold mb-1">Fundargerðir</div>
+      <div className="py-4 items-center sm:py-6 border-gray-300">
+        <div className="font-bold mb-1">Fundargerðir</div>
         <SelectCouncils
           councils={councils}
-          isDisabled={isLoading}
+          disabled={isLoading}
           onChangeCouncils={onChangeCouncils}
         />
       </div>
-      <div class="py-4 sm:py-6 text-center">
+      <div className="py-4 sm:py-6 text-center">
         <button
-          class="text-planitor-red font-bold rounded-lg bg-red-200 p-3 w-full"
+          className="text-planitor-red font-bold rounded-lg bg-red-200 p-3 w-full"
           onClick={(event) => {
             !isLoading && onDelete(event);
           }}
@@ -305,9 +306,9 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
   };
 
   return (
-    <div class="pb-2 mb-2 sm:mb-0 sm:p-4 w-full">
-      <div class="flex align-middle">
-        <div class="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
+    <div className="pb-2 mb-2 sm:mb-0 sm:p-4 w-full">
+      <div className="flex align-middle">
+        <div className="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
           {data.case && <Case {...data.case} />}
           {data.search_query && <Search search_query={data.search_query} />}
           {data.address && <Address {...data.address} />}
@@ -325,11 +326,11 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
 
 const Group = ({ type, subscriptions, ...props }) => {
   return (
-    <div class="mb-4 sm:mb-8">
-      <div class="mb-4 sm:px-5 uppercase font-light tracking-wider text-xs">
+    <div className="mb-4 sm:mb-8">
+      <div className="mb-4 sm:px-5 uppercase font-light tracking-wider text-xs">
         {type}
       </div>
-      <div class="sm:rounded-lg sm:shadow-sm pb-2 sm:p-1 w-full sm:bg-white">
+      <div className="sm:rounded-lg sm:shadow-sm pb-2 sm:p-1 w-full sm:bg-white">
         {subscriptions.map((sub) => {
           return <Subscription key={sub.id} subscription={sub} {...props} />;
         })}

@@ -1,13 +1,17 @@
-import { render, h } from "preact";
+import * as ReactDOM from "react-dom/client";
 
 export const openModal = () => {
-  /* Handle opening and closing the modal window, return the el where Preact
-  can inject a login form or whatever.
+  /*
+
+  Handle opening and closing the modal window, return the el where React can inject a login form or
+  whatever.
 
    */
 
   const modalEl = document.getElementById("modal");
   const innerEl = modalEl.querySelector(".form");
+
+  const root = ReactDOM.createRoot(innerEl);
 
   modalEl.classList.remove("hidden");
   const cleanup = () => {
@@ -26,12 +30,9 @@ export const openModal = () => {
       cleanup();
     });
   });
-
-  // if we render multiple times, Preact wants us to use a reference
-  // to the same element, returned from `render`
   const modalRender = (component) => {
-    render(component, innerEl, innerEl.firstChild);
+    root.render(component);
   };
 
-  return [modalRender, cleanup]; // the section that can be taken over by Preact
+  return [modalRender, cleanup];
 };

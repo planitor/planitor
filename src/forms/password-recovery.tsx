@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState } from "react";
 import { api } from "../api";
 import { TextInput } from "./widgets";
 
@@ -45,19 +45,19 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
 
   return (
     <div>
-      <h1 class="text-center text-2xl">Sækja um nýtt lykilorð</h1>
-      <div class="pt-6 pb-2 my-2">
+      <h1 className="text-center text-2xl">Sækja um nýtt lykilorð</h1>
+      <div className="pt-6 pb-2 my-2">
         <form onSubmit={onSubmit}>
           {form.error && (
-            <div class="mb-4 text-red-700 font-bold">{form.error}</div>
+            <div className="mb-4 text-red-700 font-bold">{form.error}</div>
           )}
           {form.isSuccess && (
-            <div class="mb-4 text-green-600 font-bold">
+            <div className="mb-4 text-green-600 font-bold">
               Tölvupóstur með leiðbeiningum var sendur á {email.value}
             </div>
           )}
-          <div class="mb-4">
-            <label class="block text-sm font-bold mb-2" for="email">
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" for="email">
               Netfang
             </label>
             <TextInput
@@ -68,10 +68,10 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
               onInput={onEmailChange}
             />
           </div>
-          <div class="block md:flex items-center justify-between">
+          <div className="block md:flex items-center justify-between">
             <div>
               <button
-                class="btn-primary"
+                className="btn-primary"
                 type="submit"
                 disabled={form.isLoading || form.isSuccess}
               >
@@ -79,13 +79,13 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
               </button>
             </div>
 
-            <div class="mt-4 md:mt-0">
+            <div className="mt-4 md:mt-0">
               <button
                 onClick={(event) => {
                   event.stopPropagation();
                   setScreen(["login", email.value]);
                 }}
-                class="no-underline"
+                className="no-underline"
               >
                 Til baka
               </button>
