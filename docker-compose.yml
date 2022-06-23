@@ -1,9 +1,8 @@
 # docker-compose.yml
 
-version: '3.8'
+version: "3.8"
 
 services:
-
   poetry:
     build:
       dockerfile: poetry.Dockerfile
@@ -37,7 +36,7 @@ services:
   web:
     build: .
     ports:
-      - 8000:80
+      - 8900:80
     env_file: .env
     depends_on:
       - db
@@ -52,7 +51,7 @@ services:
       - worker
 
   db:
-    image: 'postgres:latest'
+    image: "postgres:latest"
     volumes:
       - db:/var/lib/postgresql/data
     ports:

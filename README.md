@@ -39,7 +39,14 @@ npm install
 poetry install
 ```
 
-Use VS Code devcontainer to start the server
+Use VS Code devcontainer to start the server. Start the devcontainer by opening
+the top level folder in VS Code. You'll get a prompt to build and start in
+devcontainer. Open a new shell. It should use Fish. Start a reload webserver on
+port 80.
+
+```
+uvicorn --reload --reload-dir planitor --host 0.0.0.0 --port 80 planitor.main:app
+```
 
 Run frontend on host machine
 
