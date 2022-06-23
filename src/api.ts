@@ -10,7 +10,7 @@ function authHeaders() {
 }
 
 export const api = {
-  logInGetToken(email, password) {
+  logInGetToken(email: string, password: string) {
     const params = new URLSearchParams();
     // Using FastAPI OAuth2PasswordRequestForm which requires `username` not email
     params.append("username", email);
@@ -20,10 +20,10 @@ export const api = {
   getMe() {
     return axios.get(`/notendur/me`, authHeaders());
   },
-  passwordRecovery(email) {
+  passwordRecovery(email: string) {
     return axios.post(`/notendur/password-recovery/${email}`);
   },
-  resetPassword(password, token) {
+  resetPassword(password: string, token: string) {
     return axios.post(`/notendur/reset-password`, {
       new_password: password,
       token,
@@ -32,28 +32,28 @@ export const api = {
   logout() {
     return axios.get("/notendur/logout");
   },
-  followCase(id) {
+  followCase(id: string) {
     return axios.post(`/api/follow/cases/${id}`, null, authHeaders());
   },
-  unfollowCase(id) {
+  unfollowCase(id: string) {
     return axios.delete(`/api/follow/cases/${id}`, authHeaders());
   },
-  followEntity(id) {
+  followEntity(id: string) {
     return axios.post(`/api/follow/entities/${id}`, null, authHeaders());
   },
-  unfollowEntity(id) {
+  unfollowEntity(id: string) {
     return axios.delete(`/api/follow/entities/${id}`, authHeaders());
   },
-  followAddress(hnitnum) {
+  followAddress(hnitnum: string) {
     return axios.post(`/api/follow/addresses/${hnitnum}`, null, authHeaders());
   },
-  unfollowAddress(hnitnum) {
+  unfollowAddress(hnitnum: string) {
     return axios.delete(`/api/follow/addresses/${hnitnum}`, authHeaders());
   },
-  getEntityAddresses(kennitala) {
+  getEntityAddresses(kennitala: string) {
     return axios.get(`/api/entities/${kennitala}/addresses`);
   },
-  getNearbyAddresses(hnitnum, radius, days) {
+  getNearbyAddresses(hnitnum: string, radius: string, days: string) {
     return axios.get(
       `/api/addresses/${hnitnum}/addresses?radius=${radius}&days=${days}`
     );
@@ -67,16 +67,16 @@ export const api = {
   getSubscriptions() {
     return axios.get("/api/subscriptions", authHeaders());
   },
-  updateSubscription(id, data) {
+  updateSubscription(id: string, data: any) {
     return axios.post(`/api/subscriptions/${id}`, data, authHeaders());
   },
-  deleteSubscription(id) {
+  deleteSubscription(id: string) {
     return axios.delete(`/api/subscriptions/${id}`, authHeaders());
   },
-  getPermit(minuteId) {
+  getPermit(minuteId: string) {
     return axios.get(`/api/minutes/${minuteId}/permit`, authHeaders());
   },
-  putPermit(minuteId, data) {
+  putPermit(minuteId: string, data: { [key: string]: any }) {
     return axios.put(`/api/minutes/${minuteId}/permit`, data, authHeaders());
   },
 };

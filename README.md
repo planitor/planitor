@@ -12,15 +12,6 @@ respectively.
 
 # Development
 
-You will need Python Poetry, Yarn and Postgres.
-
-```bash
-createuser planitor
-createdb -O planitor planitor
-createdb -O planitor planitor_test
-psql planitor_test -c "CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;"
-```
-
 Configure .env in the project root
 
 ```
@@ -44,20 +35,16 @@ IMGIX_TOKEN=
 Install dependencies
 
 ```bash
-yarn install
+npm install
 poetry install
 ```
 
-Run server
+Use VS Code devcontainer to start the server
+
+Run frontend on host machine
 
 ```bash
-poetry run dev-server
-```
-
-Run frontend
-
-```bash
-yarn run start
+npm run start
 ```
 
 Preparing deployment
@@ -79,12 +66,6 @@ poetry run migrate
 This will create a test database based upon the declarative SQLAlchemy schema,
 then use migra to detect the diff, suggest to run a migration to sync the
 databases. It shows the SQL migration code which you can copy-paste to tweak.
-
-Run workers
-
-```bash
-poetry run dramatiq --processes 2 --threads 2 planitor.actors
-```
 
 Run development bpython shell with db object and all models imported
 

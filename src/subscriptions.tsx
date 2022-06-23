@@ -4,8 +4,8 @@ import { groupBy, keyBy } from "lodash";
 
 import { openModal } from "./modals";
 import { api } from "./api";
-import { Ellipsis, TrashFill } from "./symbols.jsx";
-import { Select } from "./forms/widgets.jsx";
+import { Ellipsis, TrashFill } from "./symbols";
+import { Select } from "./forms/widgets";
 
 const SubscriptionLoading = () => {
   return (

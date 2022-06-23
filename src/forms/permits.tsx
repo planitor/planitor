@@ -1,7 +1,7 @@
 import { Fragment, h, render } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
-import { Select, NumberInput, TextInput } from "../forms/widgets.jsx";
+import { Select, NumberInput, TextInput } from "../forms/widgets";
 import { api } from "../api";
 
 export const PermitForm = ({ minuteId }) => {
@@ -102,10 +102,10 @@ export const PermitForm = ({ minuteId }) => {
           <label class="text-xs block mb-1">Einingar</label>
           <NumberInput
             value={form.data.units}
-            onInput={(e) =>
+            onInput={(e: Event) =>
               setForm({
                 ...form,
-                data: { ...form.data, units: e.target.value },
+                data: { ...form.data, units: e.target?.value },
               })
             }
           />

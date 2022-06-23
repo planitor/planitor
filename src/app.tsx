@@ -1,15 +1,28 @@
 import { h, render } from "preact";
 
-import { Navigation } from "./navigation.jsx";
-import { Subscriptions } from "./subscriptions.jsx";
-import { Login } from "./accounts.jsx";
-import { FollowCase, FollowAddress, FollowEntity } from "./follow.jsx";
-import { NewPasswordForm } from "./forms/new-password.jsx";
-import { PermitForm } from "./forms/permits.jsx";
-import { openModal } from "./modals.js";
-import { Unsubscribe } from "./unsubscribe.jsx";
-import { PDFViewer } from "./pdfViewer.jsx";
-import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps.jsx";
+import { Navigation } from "./navigation";
+import { Subscriptions } from "./subscriptions";
+import { Login } from "./accounts";
+import { FollowCase, FollowAddress, FollowEntity } from "./follow";
+import { NewPasswordForm } from "./forms/new-password";
+import { PermitForm } from "./forms/permits";
+import { openModal } from "./modals";
+import { Unsubscribe } from "./unsubscribe";
+import { PDFViewer } from "./pdfViewer";
+import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps";
+import "lazysizes";
+
+import * as Sentry from "@sentry/browser";
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+  });
+  if (document._user) {
+    const { email, id } = document._user;
+    Sentry.setUser({ email, id });
+  }
+}
 
 mapkit.init({
   authorizationCallback: (done) => {

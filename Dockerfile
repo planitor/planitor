@@ -1,3 +1,4 @@
+# syntax = docker/dockerfile:1.3
 FROM python:3.9
 
 WORKDIR /code
@@ -10,8 +11,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 COPY requirements.txt /code/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
-RUN pip install uvicorn gunicorn
+RUN --mount=type=cache,target=/root/.cache pip install --upgrade -r requirements.txt
 
 COPY . /code/
 

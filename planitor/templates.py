@@ -1,3 +1,4 @@
+from pathlib import Path
 import datetime as dt
 from urllib.parse import urlparse
 
@@ -34,6 +35,15 @@ def human_date(date: dt.datetime) -> str:
     return "{}. {}, {}".format(date.day, MONTHS[date.month - 1], date.year)
 
 
+DEBUG = config("DEBUG", cast=bool, default=False)
+
+frontend_snippet_path = Path(__file__).resolve().parent.parent / "dist" / "index.html"
+
+with open(frontend_snippet_path) as fp:
+    frontend_snippet = fp.read().replace(
+        "/index", "http://localhost:1234/index" if DEBUG else "/dist/index"
+    )
+
 templates = Jinja2Templates(directory="templates")
 templates.env.globals.update(
     {
@@ -42,6 +52,7 @@ templates.env.globals.update(
         "timeago": timeago,
         "human_date": human_date,
         "imgix": Imgix(),
-        "DEBUG": config("DEBUG", cast=bool, default=False),
+        "DEBUG": DEBUG,
+        "FRONTEND": frontend_snippet,
     }
 )

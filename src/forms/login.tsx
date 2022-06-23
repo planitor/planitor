@@ -1,7 +1,7 @@
-import { h } from "preact";
+
 import { useState } from "preact/hooks";
 import { api } from "../api";
-import { TextInput, PasswordInput } from "./widgets.jsx";
+import { TextInput, PasswordInput } from "./widgets";
 
 export const LoginForm = (props) => {
   const { onSuccess, setScreen } = props;

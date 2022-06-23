@@ -2,7 +2,6 @@
   "name": "planitor",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -22,8 +21,8 @@
     ]
   },
   "scripts": {
-    "start": "snowpack dev",
-    "build": "rm -rf dist && mkdir dist && NODE_ENV=production yarn run rollup -c"
+    "start": "parcel --hmr-port 9898 src/index.html",
+    "build": "NODE_ENV=production parcel build src/index.html"
   },
   "browserslist": [
     "last 1 version or > 1%",
@@ -32,39 +31,26 @@
     "maintained node versions"
   ],
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.10",
-    "@babel/preset-react": "^7.12.10",
-    "@fullhuman/postcss-purgecss": "^3.1.0",
-    "@rollup/plugin-babel": "^5.2.2",
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^11.0.0",
-    "@rollup/plugin-replace": "^2.3.4",
     "@sentry/cli": "^1.61.0",
-    "@snowpack/app-scripts-preact": "^1.9.5",
-    "@snowpack/plugin-postcss": "^1.0.11",
-    "@tailwindcss/forms": "^0.2.1",
-    "cssnano": "^4.1.10",
+    "@tailwindcss/forms": "^0.5.2",
+    "autoprefixer": "^10.4.7",
+    "buffer": "^6.0.3",
     "dotenv": "^8.2.0",
-    "postcss": "^8.2.1",
+    "parcel": "^2.6.2",
+    "postcss": "^8.4.14",
     "postcss-100vh-fix": "^1.0.2",
-    "postcss-cli": "^8.3.1",
     "postcss-import": "^14.0.0",
-    "postcss-preset-env": "^6.7.0",
+    "postcss-preset-env": "^7.7.1",
     "prettier": "^2.2.1",
-    "rollup": "^2.35.0",
-    "rollup-plugin-postcss": "^4.0.0",
-    "rollup-plugin-terser": "^7.0.1",
-    "snowpack": "^2.18.4",
-    "tailwindcss": "^2.0.2"
+    "process": "^0.11.10",
+    "tailwindcss": "^3.1.4"
   },
   "dependencies": {
-    "@sentry/browser": "^5.29.1",
-    "axios": "^0.21.0",
+    "@sentry/browser": "^7.2.0",
+    "axios": "^0.27.2",
     "classnames": "^2.2.6",
     "lazysizes": "^5.2.2",
-    "lodash-es": "^4.17.15",
-    "preact": "^10.5.12"
+    "lodash": "^4.17.21",
+    "preact": "^10.8.2"
   }
 }

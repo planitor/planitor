@@ -22,11 +22,12 @@
   {% if not DEBUG %}
   <link href="{{ url_for('dist', path=css_path) }}" rel="stylesheet" />
   {% endif %}
+  {{ FRONTEND|safe }}
 </head>
 
 <script>
   document._user = {{ (user.to_dict() if user else None) | tojson }};
-  document._searchQuery = {{ (q if q is defined else None ) | tojson }}
+  document._searchQuery = {{ (q if q is defined else None ) | tojson }};
 </script>
 
 <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">
@@ -73,13 +74,9 @@
   {% if DEBUG -%} {# Hot reload script #} {{
     hotreload.script(url_for('hot-reload')) | safe }}
   <script>
-    window.HMR_WEBSOCKET_URL = "ws://{{ request.url.hostname }}:8000";
+    window.HMR_WEBSOCKET_URL = "ws://localhost:8080";
   </script>
-  <script type="module" src="/_dist_/index.js"></script>
   {% else -%}
-  <script>
-    import("{{ url_for('dist', path=js_path) }}");
-  </script>
   <script src="https://bandicoot.solberg.is/script.js" site="PZNOBCKF" defer></script>
   {# fathom analytics #} {% endif -%}
 </body>

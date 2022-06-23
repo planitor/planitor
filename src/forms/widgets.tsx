@@ -1,27 +1,30 @@
-import { h, render } from "preact";
+import { FunctionComponent, h } from "preact";
 
 // const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
 const inputStyling =
   "mt-1 block w-full rounded-md bg-black bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0";
 
+type InputProps = Pick<HTMLInputElement, "value" | "type"> & {
+  onInput: () => void;
+  isInvalid: boolean;
+  isDirty: boolean;
+};
+
 const Input = ({
   value,
   onInput,
-  isDisabled,
   isDirty,
   isInvalid,
-  inputProps,
   type,
   ...props
-}) => {
+}: InputProps) => {
   return (
     <div class="text-sm lg-text-base">
       <input
         type={type}
         onInput={onInput}
         value={value}
-        disabled={isDisabled}
         class={inputStyling}
         {...props}
       />
@@ -29,11 +32,13 @@ const Input = ({
   );
 };
 
-export const TextInput = (props) => {
+export const TextInput: FunctionComponent<InputProps> = (props) => {
   return <Input {...props} type="text" />;
 };
 
-export const NumberInput = (props) => {
+export const NumberInput: FunctionComponent<
+  InputProps & Pick<HTMLInputElement, "max" | "min" | "step">
+> = (props) => {
   return (
     <Input
       {...props}
@@ -45,17 +50,21 @@ export const NumberInput = (props) => {
   );
 };
 
-export const PasswordInput = (props) => {
+export const PasswordInput: FunctionComponent<InputProps> = (props) => {
   return <Input {...props} type="password" />;
 };
 
-export const Select = ({ value, onChange, isDisabled, children }) => {
+export const Select: FunctionComponent<{
+  value: string;
+  onChange: h.JSX.GenericEventHandler<HTMLSelectElement>;
+  disabled?: boolean;
+}> = ({ value, onChange, disabled = false, children }) => {
   return (
     <div class="text-sm lg:text-base">
       <select
         value={value}
         onChange={onChange}
-        disabled={isDisabled}
+        disabled={disabled}
         class="block w-full mt-1 rounded-md bg-black bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
       >
         {children}

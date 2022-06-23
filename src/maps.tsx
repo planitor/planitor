@@ -1,4 +1,4 @@
-import { h } from "preact";
+
 import { api } from "./api";
 
 export let mapkit = window["mapkit"];

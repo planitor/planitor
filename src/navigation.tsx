@@ -1,10 +1,9 @@
-import { h, render } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 import classNames from "classnames";
-import { Login } from "./accounts.jsx";
+import { Login } from "./accounts";
 import { openModal } from "./modals";
 import { api } from "./api";
-import { PersonFill, MagnifyingGlass } from "./symbols.jsx";
+import { PersonFill, MagnifyingGlass } from "./symbols";
 
 const LogoutButton = (props) => {
   const onClick = (event) => {

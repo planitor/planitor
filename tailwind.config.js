@@ -1,6 +1,6 @@
 module.exports = {
   plugins: [require('@tailwindcss/forms')],
-  purge: false, // manually configured in postcss.config.js
+  content: ["./templates/**/*.html", "./src/styles.css", "./src/**/*.jsx"],
   theme: {
     extend: {
       colors: {

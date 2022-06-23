@@ -1,4 +1,3 @@
-import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import classNames from "classnames";
 
