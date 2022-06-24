@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../api";
+import { logInGetToken } from "../api/client";
 import { TextInput, PasswordInput } from "./widgets";
 
 export const LoginForm = (props) => {
@@ -19,8 +19,7 @@ export const LoginForm = (props) => {
   const onSubmit = (event) => {
     event.preventDefault();
     setForm({ isLoading: true, error: null });
-    api
-      .logInGetToken(username.value, password.value)
+    logInGetToken(username.value, password.value)
       .then((response) => {
         localStorage.setItem("token", response.data.access_token);
         onSuccess();

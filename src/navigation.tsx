@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import classNames from "classnames";
 import { Login } from "./accounts";
 import { openModal } from "./modals";
-import { api } from "./api";
 import { PersonFill, MagnifyingGlass } from "./symbols";
+import { getMe, logout } from "./api/client";
 
 const LogoutButton = (props) => {
   const onClick = (event) => {
     event.stopPropagation();
     event.preventDefault();
-    api.logout().then((response) => {
+    logout().then((response) => {
       localStorage.removeItem("token");
       window.location.pathname = "/";
     });
@@ -49,8 +49,7 @@ const LoginButton = (props) => {
 const User = (props) => {
   const [user, setUser] = useState(document._user);
   const onLogin = () => {
-    api
-      .getMe()
+    getMe()
       .then((response) => {
         setUser(response.data);
         document._user = response.data;

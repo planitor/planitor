@@ -22,7 +22,8 @@
   },
   "scripts": {
     "start": "parcel --hmr-port 9898 src/index.html",
-    "build": "NODE_ENV=production parcel build src/index.html"
+    "build": "NODE_ENV=production parcel build src/index.html",
+    "codegen": "orval"
   },
   "browserslist": [
     "last 1 version or > 1%",
@@ -33,12 +34,14 @@
   "devDependencies": {
     "@sentry/cli": "^1.61.0",
     "@tailwindcss/forms": "^0.5.2",
+    "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
     "autoprefixer": "^10.4.7",
     "buffer": "^6.0.3",
     "dotenv": "^8.2.0",
+    "orval": "^6.8.1",
     "parcel": "^2.6.2",
     "postcss": "^8.4.14",
     "postcss-100vh-fix": "^1.0.2",
@@ -54,7 +57,7 @@
     "axios": "^0.27.2",
     "classnames": "^2.2.6",
     "lazysizes": "^5.2.2",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.1"

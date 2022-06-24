@@ -7,7 +7,7 @@ from . import router
 
 
 @router.get("/_enums", response_model=EnumListResponse)
-def get_council_types(request: Request):
+def get_enums(request: Request):
     return {
         "council_types": [
             (choice.value, choice.label) for choice in enums.CouncilTypeEnum

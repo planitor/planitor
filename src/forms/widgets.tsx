@@ -1,9 +1,7 @@
 // const classNames = (classArr) => classArr.filter((el) => el).join(" "); // filter falsy values
 
+import classNames from "classnames";
 import { FC, PropsWithChildren } from "react";
-
-const inputStyling =
-  "mt-1 block w-full rounded-md bg-black/10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0";
 
 type InputProps = Pick<
   React.HTMLProps<HTMLInputElement>,
@@ -27,7 +25,7 @@ const Input = ({
         type={type}
         onInput={onInput}
         value={value || ""}
-        className={inputStyling}
+        className="block w-full rounded-md bg-black/10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
         {...props}
       />
     </div>
@@ -65,7 +63,10 @@ export const Select: FC<
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className="block w-full mt-1 rounded-md bg-opacity-10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
+        className={classNames(
+          "block w-full rounded-md bg-black/10 border-0",
+          "focus:ring-planitor-blue focus:ring-opacity-30 focus:ring-2"
+        )}
       >
         {children}
       </select>

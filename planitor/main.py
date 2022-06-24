@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.exception_handlers import http_exception_handler
 from fastapi.exceptions import HTTPException
 from fastapi.responses import RedirectResponse

@@ -64,7 +64,7 @@ class ChoicesMeta(enum.EnumMeta):
         return [value for value, _ in cls.choices]
 
 
-class Choices(enum.Enum, metaclass=ChoicesMeta):
+class Choices(str, enum.Enum, metaclass=ChoicesMeta):
     """Class for creating enumerated choices."""
 
     def __str__(self):

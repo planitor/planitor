@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../api";
+import { passwordRecovery } from "../api/client";
 import { TextInput } from "./widgets";
 
 export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
@@ -17,8 +17,7 @@ export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     setForm({ isLoading: true, isSuccess: false, error: null });
-    api
-      .passwordRecovery(email.value)
+    passwordRecovery(email.value)
       .then((response) => {
         setForm({ isLoading: false, error: null, isSuccess: true });
       })

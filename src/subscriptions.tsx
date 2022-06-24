@@ -1,11 +1,22 @@
-import { Fragment, useState, useEffect } from "react";
-import { groupBy, keyBy } from "lodash";
+import { keyBy } from "lodash-es";
+import { Fragment } from "react";
 
-import { openModal } from "./modals";
-import { api } from "./api";
-import { Ellipsis, TrashFill } from "./symbols";
-import { Select } from "./forms/widgets";
 import { useQuery } from "react-query";
+import {
+  Case as CaseModel,
+  CouncilTypeEnum,
+  Municipality,
+  Subscription as SubscriptionModel,
+  SubscriptionTypeEnum,
+  useDeleteSubscription,
+  useGetEnums,
+  useGetMunicipalities,
+  useGetSubscriptions,
+  useUpdateSubscription,
+} from "./api/types";
+import { Select } from "./forms/widgets";
+import { openModal } from "./modals";
+import { Ellipsis } from "./symbols";
 
 const SubscriptionLoading = () => {
   return (
@@ -19,7 +30,7 @@ const SubscriptionLoading = () => {
   );
 };
 
-const Case = ({ serial, id, municipality }) => {
+const Case = ({ serial, id, municipality }: CaseModel) => {
   return (
     <a href={`/cases/${id}`} className="block">
       <div>{serial}</div>
@@ -92,7 +103,11 @@ const SelectCouncils = ({ councils, disabled, onChangeCouncils }) => {
   );
 };
 
-const getCouncils = (subscription, councilTypes, municipalities) => {
+const getCouncils = (
+  subscription: SubscriptionModel,
+  councilTypes: Map<CouncilTypeEnum, string>,
+  municipalities: Municipality[]
+) => {
   /* A subscription usually monitors across all council types. The user
      can narrow it down to a few types of councils. Furthermore, to make
      the UX better, the actual council names are displayed if the
@@ -111,8 +126,7 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
   if (subscription.address)
     municipality = muniById[subscription.address.municipality.id];
 
-  for (const councilType of councilTypes) {
-    const [enumSlug, enumLabel] = councilType;
+  Array.from(councilTypes).forEach(([enumSlug, enumLabel]) => {
     const selected =
       subscription.council_types === null ||
       subscription.council_types.indexOf(enumSlug) > -1;
@@ -141,96 +155,74 @@ const getCouncils = (subscription, councilTypes, municipalities) => {
         label: label,
       });
     }
-  }
+  });
 
   return councils;
 };
 
 const Settings = ({
-  parentData,
-  setParentData,
-  setDeleted,
+  subscription,
   councilTypes,
   municipalities,
   closeModal,
+}: {
+  subscription: SubscriptionModel;
+  councilTypes: Map<CouncilTypeEnum, string>;
+  municipalities: Municipality[];
+  closeModal: () => void;
 }) => {
-  const [data, setChildData] = useState(parentData);
-  const [isLoading, setLoading] = useState(false);
+  const { mutateAsync: deleteSubscription, isLoading: isLoadingDelete } =
+    useDeleteSubscription();
+  const { mutateAsync: updateSubscription, isLoading: isLoadingUpdate } =
+    useUpdateSubscription();
 
-  const councils = getCouncils(data, councilTypes, municipalities);
+  const isLoading = isLoadingDelete || isLoadingUpdate;
 
-  const setData = (data) => {
-    // A dirty way to connect two Preact trees together, this one is inside a modal window
-    // so not inside the component tree and a part of another `render` call.
-    setChildData(data);
-    setParentData(data);
-  };
+  const councils = getCouncils(subscription, councilTypes, municipalities);
 
-  const { id, active, immediate } = data;
+  const { id, active, immediate } = subscription;
   let delivery = immediate ? "immediate" : "weekly";
 
   if (!active) {
     delivery = "never";
   }
 
-  const onDelete = async (event) => {
+  const onDelete = async () => {
     const isConfirmed = confirm(
       "Ertu viss um að þú viljir fjárlægja þennan vaktara?"
     );
     if (!isConfirmed) return;
-    setLoading(true);
-    const data = await api.deleteSubscription(id).then((response) => {
-      return response.data;
-    });
-    setDeleted(true);
+    await deleteSubscription({ id });
     closeModal();
   };
 
-  const onChangeCouncils = async (councils) => {
-    setLoading(true);
-    const responseData = await api
-      .updateSubscription(id, { council_types: councils })
-      .then((response) => {
-        return response.data;
-      });
-    setLoading(false);
-    setData(responseData);
+  const onChangeCouncils = async (council_types: CouncilTypeEnum[]) => {
+    await updateSubscription({ id, data: { council_types } });
   };
 
   const onChangeDelivery = async (event) => {
     const { value } = event.target;
-    const requestData = {
-      active: value !== "never",
-      immediate: value === "immediate",
-    };
-    setLoading(true);
-    const responseData = await api
-      .updateSubscription(id, requestData)
-      .then((response) => {
-        return response.data;
-      });
-    setLoading(false);
-    setData(responseData);
+    await updateSubscription({
+      id,
+      data: {
+        active: value !== "never",
+        immediate: value === "immediate",
+      },
+    });
   };
 
   const onChangeRadius = async (event) => {
     const { value } = event.target;
-    const responseData = await api
-      .updateSubscription(id, { radius: Number(value) })
-      .then((response) => {
-        return response.data;
-      });
-    setLoading(false);
-    setData(responseData);
+    await updateSubscription({ id, data: { radius: Number(value) } });
   };
 
   return (
     <div className="">
-      {data.address && (
+      {subscription.address && (
         <div className="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
           <div className="font-bold">Radíus</div>
           <Select
-            value={data.radius || 0}
+            value={subscription.radius || 0}
             onChange={onChangeRadius}
             disabled={isLoading}
           >
@@ -269,8 +261,8 @@ const Settings = ({
       <div className="py-4 sm:py-6 text-center">
         <button
           className="text-planitor-red font-bold rounded-lg bg-red-200 p-3 w-full"
-          onClick={(event) => {
-            !isLoading && onDelete(event);
+          onClick={() => {
+            !isLoading && onDelete();
           }}
         >
           Eyða
@@ -280,21 +272,22 @@ const Settings = ({
   );
 };
 
-const Subscription = ({ subscription, municipalities, councilTypes }) => {
-  const [isDeleted, setDeleted] = useState(false);
-  const [data, setData] = useState(subscription);
-
-  if (isDeleted) return null;
-
+const Subscription = ({
+  subscription,
+  municipalities,
+  councilTypes,
+}: {
+  subscription: SubscriptionModel;
+  municipalities: Municipality[];
+  councilTypes: Map<CouncilTypeEnum, string>;
+}) => {
   const openSettings = (event) => {
     event.stopPropagation();
     const [modalRender, closeModal] = openModal();
 
     modalRender(
       <Settings
-        parentData={data}
-        setParentData={setData}
-        setDeleted={setDeleted}
+        subscription={subscription}
         councilTypes={councilTypes}
         municipalities={municipalities}
         closeModal={closeModal}
@@ -306,10 +299,12 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
     <div className="pb-2 mb-2 sm:mb-0 sm:p-4 w-full">
       <div className="flex align-middle">
         <div className="mr-4 flex-grow font-bold sm:text-lg whitespace-no-wrap flex items-center mb-1 sm:mb-0">
-          {data.case && <Case {...data.case} />}
-          {data.search_query && <Search search_query={data.search_query} />}
-          {data.address && <Address {...data.address} />}
-          {data.entity && <Entity {...data.entity} />}
+          {subscription.case && <Case {...subscription.case} />}
+          {subscription.search_query && (
+            <Search search_query={subscription.search_query} />
+          )}
+          {subscription.address && <Address {...subscription.address} />}
+          {subscription.entity && <Entity {...subscription.entity} />}
         </div>
         <div>
           <button onClick={openSettings}>
@@ -321,44 +316,46 @@ const Subscription = ({ subscription, municipalities, councilTypes }) => {
   );
 };
 
-const Group = ({ type, subscriptions, ...props }) => {
+const Group = ({
+  label,
+  subscriptions,
+  councilTypes,
+  municipalities,
+}: {
+  label: string;
+  subscriptions: SubscriptionModel[];
+  municipalities: Municipality[];
+  councilTypes: Map<CouncilTypeEnum, string>;
+}) => {
   return (
     <div className="mb-4 sm:mb-8">
       <div className="mb-4 sm:px-5 uppercase font-light tracking-wider text-xs">
-        {type}
+        {label}
       </div>
       <div className="sm:rounded-lg sm:shadow-sm pb-2 sm:p-1 w-full sm:bg-white">
         {subscriptions.map((sub) => {
-          return <Subscription key={sub.id} subscription={sub} {...props} />;
+          return (
+            <Subscription
+              key={sub.id}
+              subscription={sub}
+              councilTypes={councilTypes}
+              municipalities={municipalities}
+            />
+          );
         })}
       </div>
     </div>
   );
 };
 
-async function fetch() {
-  // Municipalities objects are needed to render all municipality options
-  // in address subscription widgets, specifically where the user can pick
-  // and choose the councils being monitored
-  return await Promise.all([
-    api.getSubscriptions(),
-    api.getMunicipalities(),
-    api.getEnums(),
-  ]).then(([subscriptionResponse, municipalitiesResponse, enumsResponse]) => {
-    return {
-      subscriptions: JSON.parse(subscriptionResponse.data),
-      municipalities: JSON.parse(municipalitiesResponse.data),
-      enums: JSON.parse(enumsResponse.data),
-    };
-  });
-}
-
 export const Subscriptions = () => {
-  const { data, isLoading } = useQuery("subscriptions", fetch);
+  const subs = useGetSubscriptions();
+  const munis = useGetMunicipalities();
+  const enums = useGetEnums();
 
-  console.log({ data, isLoading });
+  const isLoading = subs.isLoading || munis.isLoading || enums.isLoading;
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <div>
         <SubscriptionLoading key={"1"} />
@@ -368,29 +365,28 @@ export const Subscriptions = () => {
     );
   }
 
-  const { subscriptions, municipalities, enums } = data;
-
-  const subscriptionTypes = new Map<string, string>(enums.subscription_types);
-  const councilTypes = new Map<string, string>(enums.council_types);
-
-  let groups = Object.entries(
-    groupBy(subscriptions, (subscription) => {
-      return subscription.type;
-    })
+  const subscriptionTypes = new Map<SubscriptionTypeEnum, string>(
+    enums.data.subscription_types as [SubscriptionTypeEnum, string][]
+  );
+  const councilTypes = new Map<CouncilTypeEnum, string>(
+    enums.data.council_types as [CouncilTypeEnum, string][]
   );
 
-  groups.sort(([key, _]) => key);
+  const subscriptionMap = subs.data.reduce((m, sub) => {
+    m.has(sub.type) ? m.get(sub.type).push(sub) : m.set(sub.type, [sub]);
+    return m;
+  }, new Map<SubscriptionTypeEnum, typeof subs.data>());
 
   return (
     <div>
-      {groups.map(([type, subscriptions]) => {
+      {Array.from(subscriptionMap).map(([type, subscriptions]) => {
         return (
           <Group
             key={type}
-            subscriptions={subscriptions}
+            subscriptions={subs.data}
             councilTypes={councilTypes}
-            municipalities={municipalities}
-            type={subscriptionTypes.get(type)}
+            municipalities={munis.data}
+            label={subscriptionTypes.get(type)}
           />
         );
       })}

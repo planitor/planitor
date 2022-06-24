@@ -1,12 +1,15 @@
-from typing import List, Tuple
+from typing import List, Tuple, TypeVar
 from pydantic import BaseModel
 
+from planitor.models.enums import BuildingTypeEnum, CouncilTypeEnum, PermitTypeEnum, SubscriptionTypeEnum
 
-EnumChoiceType = List[Tuple[str, str]]
+K = TypeVar('K')
 
+
+EnumChoiceType = List[Tuple[K, str]]
 
 class EnumListResponse(BaseModel):
-    council_types: EnumChoiceType
-    building_types: EnumChoiceType
-    permit_types: EnumChoiceType
-    subscription_types: EnumChoiceType
+    council_types: EnumChoiceType[CouncilTypeEnum]
+    building_types: EnumChoiceType[BuildingTypeEnum]
+    permit_types: EnumChoiceType[PermitTypeEnum]
+    subscription_types: EnumChoiceType[SubscriptionTypeEnum]

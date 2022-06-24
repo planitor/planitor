@@ -1,6 +1,3 @@
-
-import { api } from "./api";
-
 export let mapkit = window["mapkit"];
 
 // Render map only when it is in the viewport
@@ -86,7 +83,15 @@ export async function getEntityMapOptions(kennitala) {
   return { annotations: pins, region: region };
 }
 
-export async function getNearbyMapOptions({ hnitnum, radius, days }: { hnitnum: string, radius: string, days: string }) {
+export async function getNearbyMapOptions({
+  hnitnum,
+  radius,
+  days,
+}: {
+  hnitnum: string;
+  radius: string;
+  days: string;
+}) {
   const { address, addresses, plan } = await api
     .getNearbyAddresses(hnitnum, radius, days)
     .then((response) => {

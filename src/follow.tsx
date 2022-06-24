@@ -1,7 +1,6 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import { api } from "./api";
 import { openModal } from "./modals";
 
 const Button = (props) => {

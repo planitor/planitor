@@ -1,34 +1,28 @@
 import { Fragment, useEffect, useState } from "react";
+import {
+  BuildingTypeEnum,
+  PermitTypeEnum,
+  useGetEnums,
+  useGetPermit,
+  useUpdatePermit,
+} from "../api/types";
 
 import { Select, NumberInput, TextInput } from "../forms/widgets";
-import { api } from "../api";
 
 export const PermitForm = ({ minuteId }) => {
-  const [form, setForm] = useState({
-    data: null,
-    isLoading: false,
-    error: null,
-  });
-  const [enums, setEnums] = useState([]);
+  const { data } = useGetPermit(minuteId);
+  const { data: enums } = useGetEnums();
+  const { mutateAsync } = useUpdatePermit();
+  const [form, setForm] = useState({});
 
-  useEffect(async () => {
-    // Municipalities objects are needed to render all municipality options
-    // in address subscription widgets, specifically where the user can pick
-    // and choose the councils being monitored
-    const responses = await Promise.all([
-      api.getPermit(minuteId),
-      api.getEnums(),
-    ]).then(([permitResponse, enumsResponse]) => {
-      setForm({ ...form, data: permitResponse.data });
-      setEnums(enumsResponse.data);
-    });
-  }, []);
+  enums.building_types as [BuildingTypeEnum, string][];
+  enums.permit_types as [PermitTypeEnum, string][];
 
-  if (form.data === null) {
+  if (!data || !enums) {
     return <div>Hleð ...</div>;
   }
 
-  const created = !!form.data.created;
+  const created = !!data.created;
 
   const getSubmitData = ({
     units,
@@ -47,9 +41,7 @@ export const PermitForm = ({ minuteId }) => {
   };
 
   const onSubmit = async (event) => {
-    setForm({ ...form, isLoading: true });
-    const response = await api.putPermit(minuteId, getSubmitData(form.data));
-    setForm({ ...form, isLoading: false, data: response.data });
+    const response = await mutateAsync({ minuteId, data: getSubmitData(form) });
   };
 
   return (
@@ -58,11 +50,11 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label className="text-xs block mb-1">Tegund leyfis</label>
           <Select
-            value={form.data.permit_type}
+            value={form.permit_type}
             onChange={(e) => {
               setForm({
                 ...form,
-                data: { ...form.data, permit_type: e.target.value || null },
+                permit_type: e.target.value || null,
               });
             }}
             disabled={form.isLoading}
@@ -78,11 +70,11 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label className="text-xs block mb-1">Tegund byggingar</label>
           <Select
-            value={form.data.building_type}
+            value={form.building_type}
             onChange={(e) => {
               setForm({
                 ...form,
-                data: { ...form.data, building_type: e.target.value || null },
+                building_type: e.target.value || null,
               });
             }}
             disabled={form.isLoading}
@@ -100,11 +92,11 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label className="text-xs block mb-1">Einingar</label>
           <NumberInput
-            value={form.data.units}
+            value={form.units}
             onInput={(e: Event) =>
               setForm({
                 ...form,
-                data: { ...form.data, units: e.target?.value },
+                units: e.target?.value,
               })
             }
           />
@@ -112,11 +104,11 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label className="text-xs block mb-1">Viðbætt</label>
           <TextInput
-            value={form.data.area_added}
+            value={form.area_added}
             onInput={(e) => {
               setForm({
                 ...form,
-                data: { ...form.data, area_added: e.target.value },
+                area_added: e.target.value,
               });
             }}
           />
@@ -124,12 +116,12 @@ export const PermitForm = ({ minuteId }) => {
         <div>
           <label className="text-xs block mb-1">Niðurrif</label>
           <TextInput
-            value={form.data.area_subtracted}
+            value={form.area_subtracted}
             // pattern="[0-9]+([\.][0-9])?"
             onInput={(e) =>
               setForm({
                 ...form,
-                data: { ...form.data, area_subtracted: e.target.value },
+                area_subtracted: e.target.value,
               })
             }
           />
@@ -142,7 +134,7 @@ export const PermitForm = ({ minuteId }) => {
         <div className="">
           <button
             className="btn btn-small"
-            disabled={form.isLoading}
+            disabled={isLoading}
             onClick={onSubmit}
           >
             {(!created && "Vista") || "Uppfæra"}

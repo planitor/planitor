@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "../api";
+import { resetPassword } from "../api/client";
 import { PasswordInput } from "./widgets";
 
 const saveLocalToken = (token) => localStorage.setItem("token", token);
@@ -19,8 +19,7 @@ export const NewPasswordForm = ({ token }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     setForm({ isLoading: true, isSuccess: false, error: null });
-    api
-      .resetPassword(password, token)
+    resetPassword(password, token)
       .then((response) => {
         saveLocalToken(response.data.access_token);
         setForm({ isLoading: false, error: null, isSuccess: true });
