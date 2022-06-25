@@ -27,6 +27,19 @@ export interface ValidationError {
   type: string;
 }
 
+export interface User {
+  email?: string;
+  is_active?: boolean;
+  is_superuser?: boolean;
+  full_name?: string;
+  id?: number;
+}
+
+export interface Token {
+  access_token: string;
+  token_type: string;
+}
+
 /**
  * An enumeration.
  */
@@ -107,6 +120,10 @@ export interface Municipality {
   councils?: BaseCouncil[];
 }
 
+export interface Msg {
+  msg: string;
+}
+
 export interface Minute {
   id: number;
 }
@@ -167,6 +184,20 @@ export const BuildingTypeEnum = {
   sumarhus: 'sumarhus',
   verslun_skrifstofur: 'verslun_skrifstofur',
 } as const;
+
+export interface BodyResetPassword {
+  token: string;
+  new_password: string;
+}
+
+export interface BodyLoginAccessToken {
+  grant_type?: string;
+  username: string;
+  password: string;
+  scope?: string;
+  client_id?: string;
+  client_secret?: string;
+}
 
 export interface BaseMunicipality {
   id: number;
@@ -881,3 +912,175 @@ export const useGetEnums = <TData = Awaited<ReturnType<typeof getEnums>>, TError
 }
 
 
+/**
+ * @summary Read User Me
+ */
+export const readUserMe = (
+    
+ signal?: AbortSignal
+) => {
+      return client<User>(
+      {url: `/api/me`, method: 'get', signal
+    },
+      );
+    }
+  
+
+export const getReadUserMeQueryKey = () => [`/api/me`];
+
+    
+export type ReadUserMeQueryResult = NonNullable<Awaited<ReturnType<typeof readUserMe>>>
+export type ReadUserMeQueryError = ErrorType<unknown>
+
+export const useReadUserMe = <TData = Awaited<ReturnType<typeof readUserMe>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof readUserMe>>, TError, TData>, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+
+  const {query: queryOptions} = options ?? {}
+
+  const queryKey = queryOptions?.queryKey ?? getReadUserMeQueryKey();
+
+  
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof readUserMe>>> = ({ signal }) => readUserMe(signal);
+
+  const query = useQuery<Awaited<ReturnType<typeof readUserMe>>, TError, TData>(queryKey, queryFn, queryOptions)
+
+  return {
+    queryKey,
+    ...query
+  }
+}
+
+
+/**
+ * @summary Login Access Token
+ */
+export const loginAccessToken = (
+    bodyLoginAccessToken: BodyLoginAccessToken,
+ 
+) => {const formUrlEncoded = new URLSearchParams();
+if(bodyLoginAccessToken.grant_type !== undefined) {
+ formUrlEncoded.append('grant_type', bodyLoginAccessToken.grant_type)
+ }
+formUrlEncoded.append('username', bodyLoginAccessToken.username)
+formUrlEncoded.append('password', bodyLoginAccessToken.password)
+if(bodyLoginAccessToken.scope !== undefined) {
+ formUrlEncoded.append('scope', bodyLoginAccessToken.scope)
+ }
+if(bodyLoginAccessToken.client_id !== undefined) {
+ formUrlEncoded.append('client_id', bodyLoginAccessToken.client_id)
+ }
+if(bodyLoginAccessToken.client_secret !== undefined) {
+ formUrlEncoded.append('client_secret', bodyLoginAccessToken.client_secret)
+ }
+
+      return client<Token>(
+      {url: `/api/login/access-token`, method: 'post',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+       data: formUrlEncoded
+    },
+      );
+    }
+  
+
+
+    export type LoginAccessTokenMutationResult = NonNullable<Awaited<ReturnType<typeof loginAccessToken>>>
+    export type LoginAccessTokenMutationBody = BodyLoginAccessToken
+    export type LoginAccessTokenMutationError = ErrorType<HTTPValidationError>
+
+    export const useLoginAccessToken = <TError = ErrorType<HTTPValidationError>,
+    
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginAccessToken>>, TError,{data: BodyLoginAccessToken}, TContext>, }
+) => {
+      const {mutation: mutationOptions} = options ?? {}
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginAccessToken>>, {data: BodyLoginAccessToken}> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginAccessToken(data,)
+        }
+
+      return useMutation<Awaited<ReturnType<typeof loginAccessToken>>, TError, {data: BodyLoginAccessToken}, TContext>(mutationFn, mutationOptions)
+    }
+    
+/**
+ * @summary Recover Password
+ */
+export const recoverPassword = (
+    email: string,
+ 
+) => {
+      return client<Msg>(
+      {url: `/api/password-recovery/${email}`, method: 'post'
+    },
+      );
+    }
+  
+
+
+    export type RecoverPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof recoverPassword>>>
+    
+    export type RecoverPasswordMutationError = ErrorType<HTTPValidationError>
+
+    export const useRecoverPassword = <TError = ErrorType<HTTPValidationError>,
+    
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recoverPassword>>, TError,{email: string}, TContext>, }
+) => {
+      const {mutation: mutationOptions} = options ?? {}
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recoverPassword>>, {email: string}> = (props) => {
+          const {email} = props ?? {};
+
+          return  recoverPassword(email,)
+        }
+
+      return useMutation<Awaited<ReturnType<typeof recoverPassword>>, TError, {email: string}, TContext>(mutationFn, mutationOptions)
+    }
+    
+/**
+ * @summary Reset Password
+ */
+export const resetPassword = (
+    bodyResetPassword: BodyResetPassword,
+ 
+) => {
+      return client<unknown>(
+      {url: `/api/reset-password`, method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      data: bodyResetPassword
+    },
+      );
+    }
+  
+
+
+    export type ResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetPassword>>>
+    export type ResetPasswordMutationBody = BodyResetPassword
+    export type ResetPasswordMutationError = ErrorType<HTTPValidationError>
+
+    export const useResetPassword = <TError = ErrorType<HTTPValidationError>,
+    
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,{data: BodyResetPassword}, TContext>, }
+) => {
+      const {mutation: mutationOptions} = options ?? {}
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetPassword>>, {data: BodyResetPassword}> = (props) => {
+          const {data} = props ?? {};
+
+          return  resetPassword(data,)
+        }
+
+      return useMutation<Awaited<ReturnType<typeof resetPassword>>, TError, {data: BodyResetPassword}, TContext>(mutationFn, mutationOptions)
+    }
+    

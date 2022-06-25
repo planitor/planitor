@@ -1,4 +1,6 @@
 import * as ReactDOM from "react-dom/client";
+import { QueryClientProvider } from "react-query";
+import { queryClient } from "./query";
 
 export const openModal = (): [
   (component: React.ReactNode) => void,
@@ -34,7 +36,11 @@ export const openModal = (): [
     });
   });
   const modalRender = (component: React.ReactNode) => {
-    root.render(component);
+    root.render(
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    );
   };
 
   return [modalRender, cleanup];

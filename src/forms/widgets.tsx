@@ -5,15 +5,16 @@ import { FC, PropsWithChildren } from "react";
 
 type InputProps = Pick<
   React.HTMLProps<HTMLInputElement>,
-  "value" | "type" | "max" | "min" | "step" | "onInput" | "disabled"
+  "value" | "type" | "max" | "min" | "step" | "disabled"
 > & {
   isInvalid?: boolean;
   isDirty?: boolean;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
 const Input = ({
   value,
-  onInput,
+  onChange,
   isDirty,
   isInvalid,
   type,
@@ -23,16 +24,19 @@ const Input = ({
     <div className="text-sm lg-text-base">
       <input
         type={type}
-        onInput={onInput}
+        onChange={onChange}
         value={value || ""}
-        className="block w-full rounded-md bg-black/10 border-transparent focus:border-gray-500 focus:bg-white focus:ring-0"
+        className={classNames(
+          "block w-full rounded-md border-1 border-gray-400",
+          "focus:ring-powder-default focus:ring-2"
+        )}
         {...props}
       />
     </div>
   );
 };
 
-export const TextInput: FC<InputProps> = (props) => {
+export const TextInput: FC<Omit<InputProps, "type">> = (props) => {
   return <Input {...props} type="text" />;
 };
 
@@ -50,7 +54,7 @@ export const NumberInput: FC<
   );
 };
 
-export const PasswordInput: FC<InputProps> = (props) => {
+export const PasswordInput: FC<Omit<InputProps, "type">> = (props) => {
   return <Input {...props} type="password" />;
 };
 
@@ -64,8 +68,8 @@ export const Select: FC<
         onChange={onChange}
         disabled={disabled}
         className={classNames(
-          "block w-full rounded-md bg-black/10 border-0",
-          "focus:ring-planitor-blue focus:ring-opacity-30 focus:ring-2"
+          "block w-full rounded-md border-1 border-gray-400",
+          "focus:ring-powder-default focus:ring-2"
         )}
       >
         {children}

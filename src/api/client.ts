@@ -10,7 +10,6 @@ export const axios = Axios.create({
 
 export const client = async <T>(config: AxiosRequestConfig): Promise<T> => {
   const source = Axios.CancelToken.source();
-  console.log("AXIOS!", config);
   const promise = axios({
     ...config,
     cancelToken: source.token,
@@ -23,29 +22,6 @@ export const client = async <T>(config: AxiosRequestConfig): Promise<T> => {
 
   return promise;
 };
-
-export function logInGetToken(email, password) {
-  const params = new URLSearchParams();
-  // Using FastAPI OAuth2PasswordRequestForm which requires `username` not email
-  params.append("username", email);
-  params.append("password", password);
-  return axios.post(`/notendur/login/access-token`, params);
-}
-
-export function getMe() {
-  return axios.get(`/notendur/me`);
-}
-
-export function passwordRecovery(email) {
-  return axios.post(`/notendur/password-recovery/${email}`);
-}
-
-export function resetPassword(password, token) {
-  return axios.post(`/notendur/reset-password`, {
-    new_password: password,
-    token,
-  });
-}
 
 export function logout() {
   return axios.get("/notendur/logout");

@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@sentry/browser": "^7.2.0",
+    "@shopify/react-form": "^2.1.1",
     "axios": "^0.27.2",
     "classnames": "^2.2.6",
     "lazysizes": "^5.2.2",

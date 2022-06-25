@@ -4,6 +4,7 @@ import { Login } from "./accounts";
 import { openModal } from "./modals";
 import { PersonFill, MagnifyingGlass } from "./symbols";
 import { getMe, logout } from "./api/client";
+import { readUserMe, useReadUserMe } from "./api/types";
 
 const LogoutButton = (props) => {
   const onClick = (event) => {
@@ -49,10 +50,10 @@ const LoginButton = (props) => {
 const User = (props) => {
   const [user, setUser] = useState(document._user);
   const onLogin = () => {
-    getMe()
-      .then((response) => {
-        setUser(response.data);
-        document._user = response.data;
+    readUserMe()
+      .then((user) => {
+        setUser(user);
+        document._user = user;
       })
       .catch(function (error) {
         console.log(error);

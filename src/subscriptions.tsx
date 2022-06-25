@@ -1,7 +1,6 @@
 import { keyBy } from "lodash-es";
 import { Fragment } from "react";
 
-import { useQuery } from "react-query";
 import {
   Case as CaseModel,
   CouncilTypeEnum,
@@ -65,42 +64,49 @@ const Entity = ({ kennitala, name }) => {
   );
 };
 
-const SelectCouncils = ({ councils, disabled, onChangeCouncils }) => {
-  const onClick = (_name, _selected) => {
+const SelectCouncils = ({
+  councils,
+  disabled,
+  onChangeCouncils,
+}: {
+  councils: MunicipalityCouncil[];
+  disabled: boolean;
+  onChangeCouncils: (councils: CouncilTypeEnum[]) => void;
+}) => {
+  const onClick = (_name: string, _selected: boolean) => {
     onChangeCouncils(
       councils
-        .map(({ name, selected }) => {
-          return {
-            name: name,
-            selected: _name === name ? _selected : selected,
-          };
-        })
-        .filter(({ selected }) => {
-          return selected;
-        })
-        .map(({ name }) => {
-          return name;
-        })
+        .map(({ name, selected }) => ({
+          name: name,
+          selected: _name === name ? _selected : selected,
+        }))
+        .filter(({ selected }) => selected)
+        .map(({ name }) => name)
     );
   };
 
   return (
     <div>
-      {councils.map(({ label, name, selected }) => {
-        return (
-          <label
-            className="flex items-center text-left"
-            onClick={(event) => {
-              onClick(name, !selected);
-            }}
-          >
-            <input type="checkbox" disabled={disabled} checked={selected} />
-            <div className="flex-grow ml-2">{label}</div>
-          </label>
-        );
-      })}
+      {councils.map(({ label, name, selected }) => (
+        <label
+          key={label}
+          className="flex items-center text-left"
+          onClick={() => {
+            onClick(name, !selected);
+          }}
+        >
+          <input type="checkbox" disabled={disabled} checked={selected} />
+          <div className="flex-grow ml-2">{label}</div>
+        </label>
+      ))}
     </div>
   );
+};
+
+type MunicipalityCouncil = {
+  selected: boolean;
+  name: CouncilTypeEnum;
+  label: string;
 };
 
 const getCouncils = (
@@ -114,13 +120,13 @@ const getCouncils = (
      subscription type is bound to an area (therefore bound to a municipality).
   */
 
-  let councils = [];
+  let councils: MunicipalityCouncil[] = [];
 
   const muniById = keyBy(municipalities, (m) => {
     return m.id;
   });
 
-  let municipality;
+  let municipality: Municipality;
   if (subscription.case)
     municipality = muniById[subscription.case.municipality.id];
   if (subscription.address)

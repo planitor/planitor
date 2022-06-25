@@ -11,12 +11,14 @@ from .api import follow as api_follow
 from .api import monitor as api_monitor
 from .api import permits as api_permits
 from .api import enums as api_enums
+from .api import accounts as api_accounts
 
 assert api_city
 assert api_follow
 assert api_monitor
 assert api_permits
 assert api_enums
+assert api_accounts
 
 
 router = APIRouter()
@@ -24,7 +26,9 @@ router = APIRouter()
 
 @router.get("/mapkit-token")
 async def mapkit_token(request: Request):
-    return PlainTextResponse(mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret)))
+    return PlainTextResponse(
+        mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret))
+    )
 
 
 router.include_router(city.router)

@@ -1,17 +1,19 @@
+import "lazysizes";
 import * as ReactDOM from "react-dom/client";
-import { Navigation } from "./navigation";
-import { Subscriptions } from "./subscriptions";
 import { Login } from "./accounts";
-import { FollowCase, FollowAddress, FollowEntity } from "./follow";
+import { FollowAddress, FollowCase, FollowEntity } from "./follow";
 import { NewPasswordForm } from "./forms/new-password";
 import { PermitForm } from "./forms/permits";
+import { getEntityMapOptions, getNearbyMapOptions, mapkit } from "./maps";
 import { openModal } from "./modals";
-import { Unsubscribe } from "./unsubscribe";
+import { Navigation } from "./navigation";
 import { PDFViewer } from "./pdfViewer";
-import { mapkit, getEntityMapOptions, getNearbyMapOptions } from "./maps";
-import "lazysizes";
+import { Subscriptions } from "./subscriptions";
+import { Unsubscribe } from "./unsubscribe";
 
 import * as Sentry from "@sentry/browser";
+import { QueryClientProvider } from "react-query";
+import { queryClient } from "./query";
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({
@@ -35,15 +37,22 @@ mapkit.init({
   },
 });
 
+function render(el: HTMLElement, children: () => React.ReactNode) {
+  if (el) {
+    ReactDOM.createRoot(el).render(
+      <QueryClientProvider client={queryClient}>
+        {children()}
+      </QueryClientProvider>
+    );
+  } else {
+    console.warn(`\`el\` not defined, was ${el}`);
+  }
+}
+
 const passwordRecoveryEl = document.getElementById("password-recovery");
 if (passwordRecoveryEl) {
   const [modalRender, closeModal] = openModal();
   modalRender(<NewPasswordForm token={passwordRecoveryEl.dataset.token} />);
-}
-
-const unsubscribeEl = document.getElementById("unsubscribe");
-if (unsubscribeEl) {
-  ReactDOM.createRoot(unsubscribeEl).render(<Unsubscribe />);
 }
 
 const loginEl = document.getElementById("login");
@@ -55,22 +64,9 @@ if (loginEl) {
   modalRender(<Login onSuccess={onSuccess} />);
 }
 
-const navigationEl = document.getElementById("navigation");
-if (navigationEl) {
-  ReactDOM.createRoot(navigationEl).render(<Navigation />);
-}
-
-import { QueryClient, QueryClientProvider } from "react-query";
-const queryClient = new QueryClient();
-
-const subscriptionsEl = document.getElementById("subscriptions");
-if (subscriptionsEl) {
-  ReactDOM.createRoot(subscriptionsEl).render(
-    <QueryClientProvider client={queryClient}>
-      <Subscriptions />
-    </QueryClientProvider>
-  );
-}
+render(document.getElementById("subscriptions"), () => <Subscriptions />);
+render(document.getElementById("navigation"), () => <Navigation />);
+render(document.getElementById("password-recovery"), () => <Unsubscribe />);
 
 mapkit.addEventListener("configuration-change", function (event) {
   if (event.status === "Initialized") {
@@ -95,32 +91,32 @@ mapkit.addEventListener("configuration-change", function (event) {
   (button) => {
     const defaultLabel = button.innerText;
     button.innerHTML = "";
-    ReactDOM.createRoot(button).render(
+    render(button, () => (
       <FollowCase
         id={button.dataset.id}
         state={button.dataset.state}
         defaultLabel={defaultLabel}
       />
-    );
+    ));
   }
 );
 
 [...document.querySelectorAll<HTMLElement>(".follow-address")].forEach(
   (button) => {
-    ReactDOM.createRoot(button).render(
+    render(button, () => (
       <FollowAddress id={button.dataset.id} state={button.dataset.state} />
-    );
+    ));
   }
 );
 
 [...document.querySelectorAll<HTMLElement>(".follow-entity")].forEach(
   (button) => {
-    ReactDOM.createRoot(button).render(
+    render(button, () => (
       <FollowEntity
         id={button.dataset.kennitala}
         state={button.dataset.state}
       />
-    );
+    ));
   }
 );
 
@@ -167,8 +163,6 @@ mapkit.addEventListener("configuration-change", function (event) {
 
 [...document.querySelectorAll<HTMLElement>(".permit-form")].forEach(
   (formEl) => {
-    ReactDOM.createRoot(formEl).render(
-      <PermitForm minuteId={formEl.dataset.minuteId} />
-    );
+    render(formEl, () => <PermitForm minuteId={formEl.dataset.minuteId} />);
   }
 );

@@ -29,7 +29,8 @@
       "extensions": [
 		"ms-python.python",
 		"esbenp.prettier-vscode",
-		"bradlc.vscode-tailwindcss"
+		"bradlc.vscode-tailwindcss",
+		"WakaTime.vscode-wakatime"
 	]
     }
   }
