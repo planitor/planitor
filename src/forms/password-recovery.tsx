@@ -1,96 +1,70 @@
+import { notEmptyString, useField, useForm } from "@shopify/react-form";
+import { AxiosError } from "axios";
 import { useState } from "react";
-import { passwordRecovery } from "../api/client";
-import { TextInput } from "./widgets";
+import { useRecoverPassword } from "../api/types";
+import { Primary, TextInput } from "./widgets";
 
 export const PasswordRecoveryForm = ({ setScreen, emailDefaultValue }) => {
-  const [form, setForm] = useState({
-    isLoading: false,
-    isSuccess: false,
-    error: null,
+  const { mutateAsync } = useRecoverPassword();
+  const [message, setMessage] = useState("");
+  const { fields, submit, submitting, dirty } = useForm({
+    fields: {
+      email: useField({
+        value: emailDefaultValue || "",
+        validates: notEmptyString("Netfang vantar"),
+      }),
+    },
+    async onSubmit(form) {
+      try {
+        const response = await mutateAsync({ ...form });
+        setMessage(response.msg);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          setMessage(
+            error.response.status === 404
+              ? "Netfang fannst ekki"
+              : "Villa á vefþjóni"
+          );
+        } else {
+          throw error;
+        }
+      }
+      return { status: "success" };
+    },
   });
-
-  const [email, setEmail] = useState({
-    value: emailDefaultValue,
-    isDirty: false,
-  });
-
-  const onSubmit = (event) => {
-    event.preventDefault();
-    setForm({ isLoading: true, isSuccess: false, error: null });
-    passwordRecovery(email.value)
-      .then((response) => {
-        setForm({ isLoading: false, error: null, isSuccess: true });
-      })
-      .catch(function (error) {
-        // remove dirty from email, meant for highlighting invalid fields until user edits
-        setEmail((prevState) => ({
-          ...prevState,
-          isDirty: false,
-        }));
-        let errorMessage =
-          error.response.data.detail || "Óþekkt villa á vefþjóni";
-        setForm({
-          isLoading: false,
-          isSuccess: false,
-          error: errorMessage,
-        });
-      });
-  };
-
-  const onEmailChange = (event) => {
-    const { value } = event.target;
-    setEmail({ value: value, isDirty: true });
-  };
 
   return (
     <div>
       <h1 className="text-center text-2xl">Sækja um nýtt lykilorð</h1>
       <div className="pt-6 pb-2 my-2">
-        <form onSubmit={onSubmit}>
-          {form.error && (
-            <div className="mb-4 text-red-700 font-bold">{form.error}</div>
-          )}
-          {form.isSuccess && (
-            <div className="mb-4 text-green-600 font-bold">
-              Tölvupóstur með leiðbeiningum var sendur á {email.value}
+        <form onSubmit={submit}>
+          {message && (
+            <div className="mb-8 shadow-planitor-green rounded-lg px-3 py-2 font-medium text-center text-planitor-green bg-planitor-green/30">
+              {message}
             </div>
           )}
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" for="email">
-              Netfang
-            </label>
+          <div className="flex gap-3 items-center">
             <TextInput
-              name="email"
-              type="text"
-              disabled={form.isLoading || form.isSuccess}
-              value={email.value}
-              onInput={onEmailChange}
+              value={fields.email.value}
+              onChange={fields.email.onChange}
+              className="w-full"
             />
-          </div>
-          <div className="block md:flex items-center justify-between">
-            <div>
-              <button
-                className="btn-primary"
-                type="submit"
-                disabled={form.isLoading || form.isSuccess}
-              >
-                Senda
-              </button>
-            </div>
-
-            <div className="mt-4 md:mt-0">
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setScreen(["login", email.value]);
-                }}
-                className="no-underline"
-              >
-                Til baka
-              </button>
-            </div>
+            <Primary type="submit" disabled={submitting || !dirty}>
+              Senda
+            </Primary>
           </div>
         </form>
+        <div className="mt-4 md:mt-0">
+          <button
+            onClick={(event) => {
+              event.stopPropagation();
+              setScreen(["login", fields.email.value]);
+            }}
+            className="no-underline"
+          >
+            Til baka
+          </button>
+        </div>
       </div>
     </div>
   );

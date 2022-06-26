@@ -32,7 +32,7 @@ const Button = (props) => {
   );
 };
 
-const Banner = (props) => {
+const Banner = () => {
   const Link = () => {
     return (
       <a
@@ -51,8 +51,7 @@ const Banner = (props) => {
   );
 };
 
-const Follow = (props) => {
-  const { id, state, defaultLabel, unfollowApi, followApi } = props;
+const Follow = ({ id, state, defaultLabel, unfollowApi, followApi }) => {
   const [hover, setHover] = useState(false);
   const [following, setFollowing] = useState(state === "following");
   const [form, setForm] = useState({ isLoading: false, error: null });

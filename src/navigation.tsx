@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from "react";
 import classNames from "classnames";
+import { useEffect, useRef, useState } from "react";
 import { Login } from "./accounts";
+import { logout } from "./api/client";
+import { User, useReadUserMe } from "./api/types";
 import { openModal } from "./modals";
-import { PersonFill, MagnifyingGlass } from "./symbols";
-import { getMe, logout } from "./api/client";
-import { readUserMe, useReadUserMe } from "./api/types";
+import { MagnifyingGlass, PersonFill } from "./symbols";
 
 const LogoutButton = (props) => {
   const onClick = (event) => {
@@ -27,11 +27,8 @@ const LogoutButton = (props) => {
   );
 };
 
-const LoginButton = (props) => {
-  const { onLogin } = props;
-  const onClick = (event) => {
-    event.stopPropagation();
-    event.preventDefault();
+const LoginButton = ({ onLogin }: { onLogin: () => void }) => {
+  const onClick = () => {
     const [modalRender, closeModal] = openModal();
     const onSuccess = () => {
       onLogin();
@@ -41,25 +38,34 @@ const LoginButton = (props) => {
   };
 
   return (
-    <a href="#" role="button" onClick={onClick} className="block p-2">
+    <button
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick();
+      }}
+      className="block p-2"
+    >
       <PersonFill />
-    </a>
+    </button>
   );
 };
 
-const User = (props) => {
-  const [user, setUser] = useState(document._user);
-  const onLogin = () => {
-    readUserMe()
-      .then((user) => {
-        setUser(user);
-        document._user = user;
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+const User = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { data: user } = useReadUserMe({
+    query: {
+      initialData: (document as any)._user as User,
+      enabled: isAuthenticated,
+      onSuccess(data) {
+        (document as any)._user = data;
+      },
+    },
+  });
+  const onLogin = async () => {
+    setIsAuthenticated(true);
   };
-  if (!!user) {
+  if (user) {
     return (
       <div className="flex flex-row sm:flex-col">
         <div>
@@ -83,10 +89,9 @@ const User = (props) => {
 };
 
 export const Navigation = () => {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(
-    typeof document._searchQuery === "string"
-  );
-  const [value, setValue] = useState(document._searchQuery);
+  const query = new URL(window.location.toString()).searchParams.get("q");
+  const [isSearchExpanded, setIsSearchExpanded] = useState(Boolean(query));
+  const [value, setValue] = useState(query);
 
   const onChange = (event) => {
     setValue(event.target.value);
@@ -101,8 +106,9 @@ export const Navigation = () => {
   const onSubmit = (event) => {
     event.stopPropagation();
     event.preventDefault();
-    if (window.fathom !== undefined) {
-      window.fathom.trackGoal("PBZT1SCW", 0);
+    console.log(globalThis.fathom);
+    if (typeof globalThis.fathom !== "undefined") {
+      globalThis.fathom.trackGoal("PBZT1SCW", 0);
     }
     event.target.submit();
   };

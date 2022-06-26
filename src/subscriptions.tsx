@@ -1,3 +1,4 @@
+import { useField, useForm } from "@shopify/react-form";
 import { keyBy } from "lodash-es";
 import { Fragment } from "react";
 
@@ -13,8 +14,9 @@ import {
   useGetSubscriptions,
   useUpdateSubscription,
 } from "./api/types";
-import { Select } from "./forms/widgets";
+import { Primary, Select } from "./forms/widgets";
 import { openModal } from "./modals";
+import { queryClient } from "./query";
 import { Ellipsis } from "./symbols";
 
 const SubscriptionLoading = () => {
@@ -61,45 +63,6 @@ const Entity = ({ kennitala, name }) => {
       <div>{name}</div>
       <div className="font-normal text-gray-700 text-xs">kt. {kennitala}</div>
     </a>
-  );
-};
-
-const SelectCouncils = ({
-  councils,
-  disabled,
-  onChangeCouncils,
-}: {
-  councils: MunicipalityCouncil[];
-  disabled: boolean;
-  onChangeCouncils: (councils: CouncilTypeEnum[]) => void;
-}) => {
-  const onClick = (_name: string, _selected: boolean) => {
-    onChangeCouncils(
-      councils
-        .map(({ name, selected }) => ({
-          name: name,
-          selected: _name === name ? _selected : selected,
-        }))
-        .filter(({ selected }) => selected)
-        .map(({ name }) => name)
-    );
-  };
-
-  return (
-    <div>
-      {councils.map(({ label, name, selected }) => (
-        <label
-          key={label}
-          className="flex items-center text-left"
-          onClick={() => {
-            onClick(name, !selected);
-          }}
-        >
-          <input type="checkbox" disabled={disabled} checked={selected} />
-          <div className="flex-grow ml-2">{label}</div>
-        </label>
-      ))}
-    </div>
   );
 };
 
@@ -166,6 +129,120 @@ const getCouncils = (
   return councils;
 };
 
+enum DeliveryOptions {
+  IMMEDIATE = "immediate",
+  WEEKLY = "weekly",
+  NEVER = "never",
+}
+
+function Form({
+  subscription,
+  councils,
+}: {
+  subscription: SubscriptionModel;
+  councils: MunicipalityCouncil[];
+}) {
+  const { mutateAsync } = useUpdateSubscription({
+    mutation: {
+      onSuccess() {
+        queryClient.invalidateQueries([["/api/subscriptions"]]);
+      },
+    },
+  });
+
+  const { fields, submitting, submit, dirty } = useForm({
+    fields: {
+      delivery: useField<DeliveryOptions>(
+        subscription.active
+          ? subscription.immediate
+            ? DeliveryOptions.IMMEDIATE
+            : DeliveryOptions.WEEKLY
+          : DeliveryOptions.NEVER
+      ),
+      councils: useField<Set<CouncilTypeEnum>>(
+        new Set(subscription.council_types)
+      ),
+      radius: useField<number>(subscription.radius || 0),
+    },
+    async onSubmit(form) {
+      await mutateAsync({
+        id: subscription.id,
+        data: {
+          active: form.delivery !== DeliveryOptions.NEVER,
+          immediate: form.delivery === DeliveryOptions.IMMEDIATE,
+          council_types: [...form.councils],
+          radius: subscription.address ? Number(form.radius) : undefined,
+        },
+      });
+      return { status: "success" };
+    },
+  });
+  return (
+    <form onSubmit={submit}>
+      <div className="grid grid-cols-2 gap-4 items-center py-4 sm:py-6 border-gray-300">
+        {subscription.address && (
+          <>
+            <div className="font-bold">Radíus</div>
+            <Select
+              value={fields.radius.value}
+              onChange={(event) =>
+                fields.radius.onChange(parseInt(event.target.value, 10))
+              }
+            >
+              <option value={0}>0m</option>
+              <option value={50}>+ 50m</option>
+              <option value={100}>+ 100m</option>
+              <option value={300}>+ 300m</option>
+              <option value={500}>+ 500m</option>
+            </Select>
+          </>
+        )}
+        <div className="font-bold mb-1">Afhending</div>
+        <Select
+          value={fields.delivery.value}
+          onChange={(event) =>
+            fields.delivery.onChange(event.target.value as DeliveryOptions)
+          }
+        >
+          <option value="never">Afvirkja</option>
+          <option value="immediate">Strax</option>
+          <option value="weekly">Vikuleg</option>
+        </Select>
+        <div className="font-bold mb-1">Fundargerðir</div>
+        <div>
+          {councils.map((council) => (
+            <label
+              className="flex items-center mb-2 focus-within:focus:ring-powder-default focus-within:focus:ring-2"
+              key={council.name}
+            >
+              <input
+                type="checkbox"
+                className="rounded-sm mr-2 border-gray-400 cursor-pointer"
+                checked={fields.councils.value.has(council.name)}
+                onChange={(event) => {
+                  const set = new Set<CouncilTypeEnum>(fields.councils.value);
+                  if (event.target.checked) {
+                    set.add(council.name);
+                  } else {
+                    set.delete(council.name);
+                  }
+                  fields.councils.onChange(set);
+                }}
+              />
+              {council.label}
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="pb-4 sm:pb-6 text-center">
+        <Primary type="submit" disabled={!dirty || submitting}>
+          Vista breytingar
+        </Primary>
+      </div>
+    </form>
+  );
+}
+
 const Settings = ({
   subscription,
   councilTypes,
@@ -177,94 +254,29 @@ const Settings = ({
   municipalities: Municipality[];
   closeModal: () => void;
 }) => {
-  const { mutateAsync: deleteSubscription, isLoading: isLoadingDelete } =
-    useDeleteSubscription();
-  const { mutateAsync: updateSubscription, isLoading: isLoadingUpdate } =
-    useUpdateSubscription();
-
-  const isLoading = isLoadingDelete || isLoadingUpdate;
+  const { mutateAsync: deleteSubscription, isLoading } = useDeleteSubscription({
+    mutation: {
+      onSuccess() {
+        queryClient.invalidateQueries([["/api/subscriptions"]]);
+      },
+    },
+  });
 
   const councils = getCouncils(subscription, councilTypes, municipalities);
 
-  const { id, active, immediate } = subscription;
-  let delivery = immediate ? "immediate" : "weekly";
-
-  if (!active) {
-    delivery = "never";
-  }
-
   const onDelete = async () => {
     const isConfirmed = confirm(
-      "Ertu viss um að þú viljir fjárlægja þennan vaktara?"
+      "Ertu viss um að þú viljir eyða þessum vaktara?"
     );
     if (!isConfirmed) return;
-    await deleteSubscription({ id });
+    await deleteSubscription({ id: subscription.id });
     closeModal();
-  };
-
-  const onChangeCouncils = async (council_types: CouncilTypeEnum[]) => {
-    await updateSubscription({ id, data: { council_types } });
-  };
-
-  const onChangeDelivery = async (event) => {
-    const { value } = event.target;
-    await updateSubscription({
-      id,
-      data: {
-        active: value !== "never",
-        immediate: value === "immediate",
-      },
-    });
-  };
-
-  const onChangeRadius = async (event) => {
-    const { value } = event.target;
-    await updateSubscription({ id, data: { radius: Number(value) } });
   };
 
   return (
     <div className="">
-      {subscription.address && (
-        <div className="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
-          <div className="font-bold">Radíus</div>
-          <Select
-            value={subscription.radius || 0}
-            onChange={onChangeRadius}
-            disabled={isLoading}
-          >
-            <Fragment>
-              <option value={0}>0m</option>
-              <option value={50}>+ 50m</option>
-              <option value={100}>+ 100m</option>
-              <option value={300}>+ 300m</option>
-              <option value={500}>+ 500m</option>
-            </Fragment>
-          </Select>
-        </div>
-      )}
-      <div className="grid grid-cols-2 items-center py-4 sm:py-6 border-gray-300">
-        <div className="font-bold">Afhending</div>
-        <Select
-          value={delivery}
-          onChange={onChangeDelivery}
-          disabled={isLoading}
-        >
-          <Fragment>
-            <option value="never">Afvirkja</option>
-            <option value="immediate">Strax</option>
-            <option value="weekly">Vikuleg</option>
-          </Fragment>
-        </Select>
-      </div>
-      <div className="py-4 items-center sm:py-6 border-gray-300">
-        <div className="font-bold mb-1">Fundargerðir</div>
-        <SelectCouncils
-          councils={councils}
-          disabled={isLoading}
-          onChangeCouncils={onChangeCouncils}
-        />
-      </div>
-      <div className="py-4 sm:py-6 text-center">
+      <Form subscription={subscription} councils={councils} />
+      <div className="pt-4 sm:pt-6 text-center border-t border-gray-300">
         <button
           className="text-planitor-red font-bold rounded-lg bg-red-200 p-3 w-full"
           onClick={() => {

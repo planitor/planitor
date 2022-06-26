@@ -26,27 +26,6 @@ td {
   @apply uppercase tracking-wide text-gray-700 font-light text-xs;
 }
 
-.btn {
-  @apply rounded-lg shadow-lg border-planitor-darkBlue border bg-planitor-darkBlue px-4 py-2 font-bold text-white;
-}
-
-.btn-secondary {
-  @apply text-planitor-darkBlue bg-transparent shadow-none;
-}
-
-.btn-disabled {
-  @apply bg-gray-500 border-gray-500;
-  opacity: 0.3;
-}
-
-.btn-primary {
-  @apply btn bg-planitor-green border-planitor-green text-white;
-}
-
-.btn-primary:hover {
-  @apply text-opacity-75;
-}
-
 .btn .sf-symbol {
   position: relative;
   top: -1px;

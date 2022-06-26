@@ -27,7 +27,6 @@
 
 <script>
   document._user = {{ (user.to_dict() if user else None) | tojson }};
-  document._searchQuery = {{ (q if q is defined else None ) | tojson }};
 </script>
 
 <body class="flex flex-col flex-wrap items-center min-h-screen bg-gray-100">

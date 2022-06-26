@@ -2,6 +2,11 @@ import * as ReactDOM from "react-dom/client";
 import { QueryClientProvider } from "react-query";
 import { queryClient } from "./query";
 
+const modalEl = document.getElementById("modal");
+const classNames = modalEl.classList;
+const innerEl = modalEl.querySelector(".form");
+const root = ReactDOM.createRoot(innerEl);
+
 export const openModal = (): [
   (component: React.ReactNode) => void,
   () => void
@@ -13,28 +18,32 @@ export const openModal = (): [
 
    */
 
-  const modalEl = document.getElementById("modal");
-  const innerEl = modalEl.querySelector(".form");
+  classNames.remove("hidden");
+  classNames.add("flex");
 
-  const root = ReactDOM.createRoot(innerEl);
-
-  modalEl.classList.remove("hidden");
-  const cleanup = () => {
-    modalEl.classList.add("hidden");
-    innerEl.innerHTML = "<div></div>";
-  };
-  window.addEventListener("click", (event) => {
+  function onOutsideClick(event: MouseEvent) {
     // `Element.closest` traverses parents to find matching selector
     // if we did not find #modal in ancestors we must have clicked somewhere outside
-    const clickedOutsideModalEl = !event.target.closest("#modal .inner");
-    if (clickedOutsideModalEl) cleanup();
-  });
+    const clickedOutsideModalEl =
+      event.target instanceof Element && !event.target.closest("#modal .inner");
+    if (clickedOutsideModalEl && !classNames.contains("hidden")) close();
+  }
+
+  const close = () => {
+    classNames.add("hidden");
+    classNames.remove("flex");
+    window.removeEventListener("click", onOutsideClick);
+    // root.unmount();
+  };
+
+  window.addEventListener("click", onOutsideClick);
 
   modalEl.querySelectorAll(".close").forEach((el) => {
     el.addEventListener("click", (event) => {
-      cleanup();
+      close();
     });
   });
+
   const modalRender = (component: React.ReactNode) => {
     root.render(
       <QueryClientProvider client={queryClient}>
@@ -43,5 +52,5 @@ export const openModal = (): [
     );
   };
 
-  return [modalRender, cleanup];
+  return [modalRender, close];
 };

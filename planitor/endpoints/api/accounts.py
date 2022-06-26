@@ -56,7 +56,9 @@ def recover_password(request: Request, email: str, db: Session = Depends(get_db)
     reset_url = request.url_for("reset_password")
     link = f"{reset_url}?token={password_reset_token}"
     send_reset_password_email(email_to=user.email, link=link)
-    return {"msg": "Tölvupóstur með leiðbeiningum hefur verið sendur."}
+    return {
+        "msg": f"Tölvupóstur með leiðbeiningum hefur verið sendur á netfangið {user.email}."
+    }
 
 
 @router.post("/reset-password", tags=["login"])
