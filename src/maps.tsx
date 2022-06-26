@@ -4,7 +4,7 @@ import {
   MapEntityResponse,
 } from "./api/types";
 
-export let mapkit = window["mapkit"];
+export let mapkit = globalThis["mapkit"];
 
 // Render map only when it is in the viewport
 document.addEventListener("lazybeforeunveil", function (e) {

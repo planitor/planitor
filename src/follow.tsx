@@ -37,7 +37,7 @@ const Follow = ({
   unfollow,
   follow,
 }: {
-  state?: "following";
+  state: string;
   defaultLabel?: string;
   follow: () => Promise<void>;
   unfollow: () => Promise<void>;
@@ -88,7 +88,7 @@ export const FollowCase = ({
   ...props
 }: {
   id: string;
-  state?: "following";
+  state: string;
   defaultLabel?: string;
 }) => {
   const { mutateAsync: unfollow } = useUnfollowCase();
@@ -110,7 +110,7 @@ export const FollowAddress = ({
   ...props
 }: {
   id: string;
-  state?: "following";
+  state: string;
   defaultLabel?: string;
 }) => {
   const { mutateAsync: unfollow } = useUnfollowAddress();
@@ -132,7 +132,7 @@ export const FollowEntity = ({
   ...props
 }: {
   id: string;
-  state?: "following";
+  state: string;
   defaultLabel?: string;
 }) => {
   const { mutateAsync: unfollow } = useUnfollowEntity();

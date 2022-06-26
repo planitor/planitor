@@ -168,6 +168,7 @@ export const Navigation = () => {
         )}
       >
         <a href="/s" className="text-white">
+          <span className="sr-only">Planitor</span>
           <svg viewBox="0 0 141 175" className="h-6 inline sm:hidden">
             <g stroke="none" strokeWidth="1" fillRule="evenodd">
               <g transform="translate(-1302.000000, -561.000000)">
