@@ -39,10 +39,13 @@ DEBUG = config("DEBUG", cast=bool, default=False)
 
 frontend_snippet_path = Path(__file__).resolve().parent.parent / "dist" / "index.html"
 
-with open(frontend_snippet_path) as fp:
-    frontend_snippet = fp.read().replace(
-        "/index", "http://localhost:1234/index" if DEBUG else "/dist/index"
-    )
+if frontend_snippet_path.exists():
+    with open(frontend_snippet_path) as fp:
+        frontend_snippet = fp.read().replace(
+            "/index", "http://localhost:1234/index" if DEBUG else "/dist/index"
+        )
+else:
+    frontend_snippet = ""
 
 templates = Jinja2Templates(directory="templates")
 templates.env.globals.update(
