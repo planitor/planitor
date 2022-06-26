@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { resetPassword } from "../api/client";
+import { useResetPassword } from "../api/types";
 import { PasswordInput } from "./widgets";
 
 const saveLocalToken = (token) => localStorage.setItem("token", token);
 
 export const NewPasswordForm = ({ token }) => {
+  const { mutateAsync } = useResetPassword();
   const [form, setForm] = useState({
     isSuccess: false,
     isLoading: false,
@@ -12,24 +13,23 @@ export const NewPasswordForm = ({ token }) => {
   });
   const [password, setPassword] = useState("");
 
-  const onChange = (event) => {
-    setPassword(event.target.value);
+  const onChange = (password: string) => {
+    setPassword(password);
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     setForm({ isLoading: true, isSuccess: false, error: null });
-    resetPassword(password, token)
-      .then((response) => {
-        saveLocalToken(response.data.access_token);
-        setForm({ isLoading: false, error: null, isSuccess: true });
-      })
-      .catch(function (error) {
-        // remove dirty, meant for highlighting invalid fields until user edits
-        let errorMessage =
-          error.response.data.detail || "Óþekkt villa á vefþjóni";
-        setForm({ isLoading: false, isSuccess: false, error: errorMessage });
-      });
+    const data = await mutateAsync({
+      data: { new_password: password, token },
+    }).catch(function (error) {
+      // remove dirty, meant for highlighting invalid fields until user edits
+      let errorMessage =
+        error.response.data.detail || "Óþekkt villa á vefþjóni";
+      setForm({ isLoading: false, isSuccess: false, error: errorMessage });
+    });
+    saveLocalToken(data);
+    setForm({ isLoading: false, error: null, isSuccess: true });
   };
 
   return (
@@ -47,11 +47,11 @@ export const NewPasswordForm = ({ token }) => {
         )}
         <div className="mb-4">
           <PasswordInput
-            name="password"
-            type="password"
             disabled={form.isLoading || form.isSuccess}
-            value={password.value}
-            onInput={onChange}
+            value={password}
+            onChange={({ target }) => {
+              onChange(target.value);
+            }}
           />
         </div>
         <div className="block md:flex items-center justify-between">

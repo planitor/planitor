@@ -1052,7 +1052,7 @@ export const resetPassword = (
     bodyResetPassword: BodyResetPassword,
  
 ) => {
-      return client<unknown>(
+      return client<Token>(
       {url: `/api/reset-password`, method: 'post',
       headers: {'Content-Type': 'application/json'},
       data: bodyResetPassword
