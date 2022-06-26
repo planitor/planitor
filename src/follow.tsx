@@ -1,36 +1,16 @@
-import { useState } from "react";
 import classNames from "classnames";
+import { useState } from "react";
 
+import {
+  useFollowAddress,
+  useFollowCase,
+  useFollowEntity,
+  useUnfollowAddress,
+  useUnfollowCase,
+  useUnfollowEntity,
+} from "./api/types";
+import { FollowButton } from "./forms/widgets";
 import { openModal } from "./modals";
-
-const Button = (props) => {
-  const { loading, onClick, hover, setHover, following, defaultLabel } = props;
-  return (
-    <button
-      className={classNames("btn sm:inline block mx-auto", {
-        "text-gray-500 border-gray-500": loading,
-        "bg-planitor-blue text-white": following && !loading,
-        "text-planitor-blue": !following && !loading,
-        "border-planitor-blue": !loading,
-      })}
-      onClick={onClick}
-      onMouseOver={(event) => {
-        setHover(true);
-      }}
-      onMouseOut={(event) => {
-        setHover(false);
-      }}
-    >
-      {(() => {
-        if (hover) {
-          return following ? "Afvakta" : defaultLabel || "Vakta";
-        } else {
-          return following ? "Vaktað" : defaultLabel || "Vakta";
-        }
-      })()}
-    </button>
-  );
-};
 
 const Banner = () => {
   const Link = () => {
@@ -51,17 +31,25 @@ const Banner = () => {
   );
 };
 
-const Follow = ({ id, state, defaultLabel, unfollowApi, followApi }) => {
+const Follow = ({
+  state,
+  defaultLabel,
+  unfollow,
+  follow,
+}: {
+  state?: "following";
+  defaultLabel?: string;
+  follow: () => Promise<void>;
+  unfollow: () => Promise<void>;
+}) => {
   const [hover, setHover] = useState(false);
   const [following, setFollowing] = useState(state === "following");
   const [form, setForm] = useState({ isLoading: false, error: null });
-  const onClick = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const onClick = () => {
     if (form.isLoading) return;
     const toggle = () => {
       setForm({ isLoading: true, error: null });
-      (following ? unfollowApi(id) : followApi(id))
+      (following ? unfollow() : follow())
         .then(() => {
           setFollowing(!following);
           setHover(false);
@@ -80,42 +68,83 @@ const Follow = ({ id, state, defaultLabel, unfollowApi, followApi }) => {
     }
   };
   return (
-    <Button
+    <FollowButton
       loading={form.isLoading}
       following={following}
       hover={hover}
       setHover={setHover}
-      onClick={onClick}
-      defaultLabel={defaultLabel || null}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick();
+      }}
+      defaultLabel={defaultLabel}
     />
   );
 };
 
-export const FollowCase = (props) => {
+export const FollowCase = ({
+  id,
+  ...props
+}: {
+  id: string;
+  state?: "following";
+  defaultLabel?: string;
+}) => {
+  const { mutateAsync: unfollow } = useUnfollowCase();
+  const { mutateAsync: follow } = useFollowCase();
   return (
     <Follow
-      unfollowApi={api.unfollowCase}
-      followApi={api.followCase}
+      unfollow={async () => {
+        await unfollow({ caseId: Number(id) });
+      }}
+      follow={async () => {
+        await follow({ caseId: Number(id) });
+      }}
       {...props}
     />
   );
 };
-
-export const FollowAddress = (props) => {
+export const FollowAddress = ({
+  id,
+  ...props
+}: {
+  id: string;
+  state?: "following";
+  defaultLabel?: string;
+}) => {
+  const { mutateAsync: unfollow } = useUnfollowAddress();
+  const { mutateAsync: follow } = useFollowAddress();
   return (
     <Follow
-      unfollowApi={api.unfollowAddress}
-      followApi={api.followAddress}
+      unfollow={async () => {
+        await unfollow({ hnitnum: Number(id) });
+      }}
+      follow={async () => {
+        await follow({ hnitnum: Number(id) });
+      }}
       {...props}
     />
   );
 };
-
-export const FollowEntity = (props) => {
+export const FollowEntity = ({
+  id,
+  ...props
+}: {
+  id: string;
+  state?: "following";
+  defaultLabel?: string;
+}) => {
+  const { mutateAsync: unfollow } = useUnfollowEntity();
+  const { mutateAsync: follow } = useFollowEntity();
   return (
     <Follow
-      unfollowApi={api.unfollowEntity}
-      followApi={api.followEntity}
+      unfollow={async () => {
+        await unfollow({ kennitala: id });
+      }}
+      follow={async () => {
+        await follow({ kennitala: id });
+      }}
       {...props}
     />
   );

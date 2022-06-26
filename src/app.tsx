@@ -44,8 +44,6 @@ function render(el: HTMLElement, children: () => React.ReactNode) {
         {children()}
       </QueryClientProvider>
     );
-  } else {
-    console.warn(`\`el\` not defined, was ${el}`);
   }
 }
 

@@ -76,6 +76,11 @@ export interface Subscription {
   type: SubscriptionTypeEnum;
 }
 
+export interface PlanPolygon {
+  plan?: unknown;
+  polygon?: unknown;
+}
+
 /**
  * An enumeration.
  */
@@ -104,16 +109,6 @@ export interface PermitForm {
   permit_type?: string;
 }
 
-export interface Permit {
-  units?: number;
-  area_added?: number;
-  area_subtracted?: number;
-  building_type?: BuildingTypeEnum;
-  permit_type?: PermitTypeEnum;
-  minute?: Minute;
-  created?: string;
-}
-
 export interface Municipality {
   id: number;
   name: string;
@@ -126,6 +121,33 @@ export interface Msg {
 
 export interface Minute {
   id: number;
+}
+
+export interface Permit {
+  units?: number;
+  area_added?: number;
+  area_subtracted?: number;
+  building_type?: BuildingTypeEnum;
+  permit_type?: PermitTypeEnum;
+  minute?: Minute;
+  created?: string;
+}
+
+export interface MapAddress {
+  lat: number;
+  lon: number;
+  label: string;
+  status?: CaseStatusEnum;
+}
+
+export interface MapEntityResponse {
+  addresses: MapAddress[];
+}
+
+export interface MapCasesResponse {
+  plan?: PlanPolygon;
+  address: MapAddress;
+  addresses: MapAddress[];
 }
 
 export interface HTTPValidationError {
@@ -158,6 +180,11 @@ export const CouncilTypeEnum = {
   borgarrad: 'borgarrad',
   borgarstjorn: 'borgarstjorn',
 } as const;
+
+/**
+ * An enumeration.
+ */
+export type CaseStatusEnum = unknown;
 
 export interface Case {
   id: number;
@@ -287,7 +314,7 @@ export const getNearbyCaseAddresses = (
     params?: GetNearbyCaseAddressesParams,
  signal?: AbortSignal
 ) => {
-      return client<unknown>(
+      return client<MapCasesResponse>(
       {url: `/api/addresses/${hnitnum}/addresses`, method: 'get', signal,
         params,
     },
@@ -332,7 +359,7 @@ export const getEntityAddresses = (
     kennitala: string,
  signal?: AbortSignal
 ) => {
-      return client<unknown>(
+      return client<MapEntityResponse>(
       {url: `/api/entities/${kennitala}/addresses`, method: 'get', signal
     },
       );

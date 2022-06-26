@@ -96,3 +96,50 @@ export const Primary: FC<
     {children}
   </button>
 );
+
+export const FollowButton: FC<
+  PropsWithChildren<
+    React.ButtonHTMLAttributes<HTMLButtonElement> & {
+      loading: boolean;
+      hover: boolean;
+      setHover: (value: boolean) => void;
+      following: boolean;
+      defaultLabel?: string;
+    }
+  >
+> = ({
+  className,
+  children,
+  loading,
+  onClick,
+  hover,
+  setHover,
+  following,
+  defaultLabel,
+  ...props
+}) => (
+  <button
+    className={classNames("btn sm:inline block mx-auto", {
+      "text-gray-500 border-gray-500": loading,
+      "bg-planitor-blue text-white": following && !loading,
+      "text-planitor-blue": !following && !loading,
+      "border-planitor-blue": !loading,
+    })}
+    onClick={onClick}
+    onMouseOver={(event) => {
+      setHover(true);
+    }}
+    onMouseOut={(event) => {
+      setHover(false);
+    }}
+    {...props}
+  >
+    {(() => {
+      if (hover) {
+        return following ? "Afvakta" : defaultLabel || "Vakta";
+      } else {
+        return following ? "Vaktað" : defaultLabel || "Vakta";
+      }
+    })()}
+  </button>
+);

@@ -1,9 +1,15 @@
+import {
+  getEntityAddresses,
+  getNearbyCaseAddresses,
+  MapEntityResponse,
+} from "./api/types";
+
 export let mapkit = window["mapkit"];
 
 // Render map only when it is in the viewport
 document.addEventListener("lazybeforeunveil", function (e) {
   let el = e.target;
-  if (el.classList.contains("map")) {
+  if (el instanceof HTMLElement && el.classList.contains("map")) {
     var address = new mapkit.Coordinate(
       parseFloat(el.dataset.lat),
       parseFloat(el.dataset.lon)
@@ -56,7 +62,7 @@ function getRegion(coordinateSets) {
   ).toCoordinateRegion();
 }
 
-function getMarkersForAddresses(addresses) {
+function getMarkersForAddresses(addresses: MapEntityResponse["addresses"]) {
   var pins = [];
   for (var address of addresses) {
     const { lat, lon, label, status } = address;
@@ -73,10 +79,8 @@ function getMarkersForAddresses(addresses) {
   return pins;
 }
 
-export async function getEntityMapOptions(kennitala) {
-  const addresses = await api.getEntityAddresses(kennitala).then((response) => {
-    return response.data.addresses;
-  });
+export async function getEntityMapOptions(kennitala: string) {
+  const { addresses } = await getEntityAddresses(kennitala);
   if (addresses.length === 0) return null;
   const pins = getMarkersForAddresses(addresses);
   const region = getRegion(addresses);
@@ -92,11 +96,13 @@ export async function getNearbyMapOptions({
   radius: string;
   days: string;
 }) {
-  const { address, addresses, plan } = await api
-    .getNearbyAddresses(hnitnum, radius, days)
-    .then((response) => {
-      return response.data;
-    });
+  const { address, addresses, plan } = await getNearbyCaseAddresses(
+    parseInt(hnitnum, 10),
+    {
+      days: parseInt(days, 10),
+      radius: parseInt(radius, 10),
+    }
+  );
   if (addresses.length === 0) return null;
   const pins = getMarkersForAddresses(addresses);
   const region = getRegion(addresses);
@@ -112,7 +118,7 @@ export async function getNearbyMapOptions({
   const overlays = [];
   if (plan !== null) {
     const polygonOverlay = new mapkit.PolygonOverlay(
-      plan.polygon.map(([x, y]) => {
+      (plan.polygon as any).map(([x, y]) => {
         return new mapkit.Coordinate(x, y);
       }),
       {

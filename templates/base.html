@@ -19,9 +19,6 @@
   <meta property="og:image" content="{{ url_for('static', path='/planitor.png') }}" />
   {% endblock -%}
   <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-  {% if not DEBUG %}
-  <link href="{{ url_for('dist', path=css_path) }}" rel="stylesheet" />
-  {% endif %}
   {{ FRONTEND|safe }}
 </head>
 

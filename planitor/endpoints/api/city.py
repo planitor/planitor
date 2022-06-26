@@ -29,7 +29,7 @@ def get_municipalities(
     return db.query(Municipality).outerjoin(Council).all()
 
 
-@router.get("/addresses/{hnitnum}/addresses")
+@router.get("/addresses/{hnitnum}/addresses", response_model=schemas.MapCasesResponse)
 async def get_nearby_case_addresses(
     request: Request,
     hnitnum: int,
@@ -83,7 +83,9 @@ async def get_nearby_case_addresses(
         .order_by(sq.c.updated.desc())
     )
 
-    polygon, plan = skipulagsstofnun.plans.get_plan(address.lat_wgs84, address.long_wgs84)
+    polygon, plan = skipulagsstofnun.plans.get_plan(
+        address.lat_wgs84, address.long_wgs84
+    )
     if polygon is not None:
         polygon = list(polygon.exterior.coords)
 
@@ -106,7 +108,7 @@ async def get_nearby_case_addresses(
     }
 
 
-@router.get("/entities/{kennitala}/addresses")
+@router.get("/entities/{kennitala}/addresses", response_model=schemas.MapEntityResponse)
 async def get_entity_addresses(
     request: Request, kennitala: str, db: Session = Depends(get_db)
 ):
