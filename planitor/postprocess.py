@@ -45,7 +45,9 @@ def _get_entity(db: Session, name: str):
     """
 
 
-def update_minute_with_entity_relations(db: Session, minute: Minute, entity_items: list):
+def update_minute_with_entity_relations(
+    db: Session, minute: Minute, entity_items: list
+):
     """Here we have kennitala and name, whereas in `update_minute_with_entity_mentions`
     we only have the names."""
 
@@ -147,13 +149,15 @@ def update_minute_with_response_items(
     db: Session, minute: Minute, response_items: List[List[str]]
 ) -> None:
     for i, (headline, contents) in enumerate(response_items):
-        response = Response(order=i, headline=headline, contents=contents, minute=minute)
+        response = Response(
+            order=i, headline=headline, contents=contents, minute=minute
+        )
         response.subjects = get_subjects(response.headline)
         db.add(response)
         db.commit()
 
 
-def _update_minute_search_vector(minute, db):
+def _update_minute_search_vector(minute: Minute, db: Session):
     lemmas = get_minute_lemmas(minute)
     minute.search_vector = func.to_tsvector("simple", " ".join(lemmas))
     minute.lemmas = ", ".join(lemmas)

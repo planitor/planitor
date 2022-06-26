@@ -16,8 +16,8 @@ This module helps find lemmas suitable for fulltext indexing.
 import re
 from typing import Iterable, List, Optional, Set
 
-from reynir.bintokenizer import PersonName
-from tokenizer import TOK
+from tokenizer import Tok, TOK
+from tokenizer.definitions import PersonNameList
 
 from planitor import greynir
 from planitor.utils.stopwords import stopwords
@@ -25,7 +25,7 @@ from planitor.utils.stopwords import stopwords
 from .companies import INDEXABLE_TOKEN_TYPES, extract_company_names
 
 
-def get_token_lemmas(token, ignore) -> List[str]:
+def get_token_lemmas(token: Tok, ignore) -> List[str]:
     if ignore is None:
         ignore = []
     if token.kind not in INDEXABLE_TOKEN_TYPES or token.txt in ignore:
@@ -38,7 +38,7 @@ def get_token_lemmas(token, ignore) -> List[str]:
         return [token.txt]
     lemmas = []
     for word in token.val:
-        if isinstance(word, PersonName):
+        if isinstance(word, PersonNameList):
             lemma = word.name
         else:
             lemma = word.stofn

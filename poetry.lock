@@ -416,22 +416,23 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "dramatiq"
-version = "1.9.0"
+version = "1.13.0"
 description = "Background Processing for Python 3."
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 
 [package.dependencies]
 prometheus-client = ">=0.2"
 
 [package.extras]
-all = ["watchdog-gevent (==0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "pika (>=1.0,<2.0)", "redis (>=2.0,<4.0)"]
-dev = ["watchdog-gevent (==0.1)", "watchdog (>=0.8,<0.9)", "pylibmc (>=1.5,<2.0)", "pika (>=1.0,<2.0)", "redis (>=2.0,<4.0)", "alabaster", "sphinx (<1.8)", "sphinxcontrib-napoleon", "flake8", "flake8-bugbear", "flake8-quotes", "isort", "bumpversion", "hiredis", "twine", "wheel", "pytest (<4)", "pytest-benchmark", "pytest-cov", "tox"]
+all = ["redis (>=2.0,<5.0)", "pylibmc (>=1.5,<2.0)", "watchdog", "watchdog-gevent", "pika (>=1.0,<2.0)", "gevent (>=1.1)"]
+dev = ["redis (>=2.0,<5.0)", "pylibmc (>=1.5,<2.0)", "watchdog", "watchdog-gevent", "pika (>=1.0,<2.0)", "gevent (>=1.1)", "alabaster", "sphinx (<1.8)", "sphinxcontrib-napoleon", "flake8", "flake8-bugbear", "flake8-quotes", "isort", "bumpversion", "hiredis", "twine", "wheel", "pytest", "pytest-benchmark", "pytest-cov", "tox"]
+gevent = ["gevent (>=1.1)"]
 memcached = ["pylibmc (>=1.5,<2.0)"]
 rabbitmq = ["pika (>=1.0,<2.0)"]
-redis = ["redis (>=2.0,<4.0)"]
-watch = ["watchdog (>=0.8,<0.9)", "watchdog-gevent (==0.1)"]
+redis = ["redis (>=2.0,<5.0)"]
+watch = ["watchdog", "watchdog-gevent"]
 
 [[package]]
 name = "email-normalize"
@@ -710,6 +711,18 @@ notebook = ["notebook", "ipywidgets"]
 parallel = ["ipyparallel"]
 qtconsole = ["qtconsole"]
 test = ["nose (>=0.10.1)", "requests", "testpath", "pygments", "nbformat", "ipykernel", "numpy (>=1.14)"]
+
+[[package]]
+name = "islenska"
+version = "0.4.3"
+description = "The vocabulary of the modern Icelandic language, packed in a Python package"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+cffi = ">=1.13.0"
+typing_extensions = "*"
 
 [[package]]
 name = "isodate"
@@ -1354,7 +1367,7 @@ requests = ">=2.0.1,<3.0.0"
 
 [[package]]
 name = "reynir"
-version = "2.8.1"
+version = "3.5.1"
 description = "A natural language parser for Icelandic"
 category = "main"
 optional = false
@@ -1362,7 +1375,8 @@ python-versions = "*"
 
 [package.dependencies]
 cffi = ">=1.13.0"
-tokenizer = ">=2.4.0"
+islenska = ">=0.4.3"
+tokenizer = ">=3.4.0"
 typing-extensions = "*"
 
 [[package]]
@@ -1433,7 +1447,7 @@ test = ["coverage", "flake8", "isort", "pytest"]
 
 [[package]]
 name = "sentry-sdk"
-version = "0.19.5"
+version = "1.6.0"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -1452,8 +1466,10 @@ chalice = ["chalice (>=1.16.0)"]
 django = ["django (>=1.8)"]
 falcon = ["falcon (>=1.4)"]
 flask = ["flask (>=0.11)", "blinker (>=1.1)"]
+httpx = ["httpx (>=0.16.0)"]
 pure_eval = ["pure-eval", "executing", "asttokens"]
 pyspark = ["pyspark (>=2.4.4)"]
+quart = ["quart (>=0.16.1)", "blinker (>=1.1)"]
 rq = ["rq (>=0.6)"]
 sanic = ["sanic (>=0.8)"]
 sqlalchemy = ["sqlalchemy (>=1.2)"]
@@ -1674,7 +1690,7 @@ requests-file = ">=1.4"
 
 [[package]]
 name = "tokenizer"
-version = "2.5.0"
+version = "3.4.1"
 description = "A tokenizer for Icelandic text"
 category = "main"
 optional = false
@@ -1910,7 +1926,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7b582713273c4381c49aa137f260f14b711cbd9f161d899acff2f4fdb032f78c"
+content-hash = "6d5603fdd27a11c50e5838000266b9ae7cb71e15ed88b42ddbc50584f36cf461"
 
 [metadata.files]
 aiodns = [
@@ -2184,8 +2200,8 @@ docutils = [
     {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
 ]
 dramatiq = [
-    {file = "dramatiq-1.9.0-py3-none-any.whl", hash = "sha256:360cd436a434a513c87a9769943543c1d065835e3fa0b01f96c4fdd959bfa1c3"},
-    {file = "dramatiq-1.9.0.tar.gz", hash = "sha256:8112941ab2eda4f0288bacd137a991f9b1b1c600fe3dd5960eaba4256c873839"},
+    {file = "dramatiq-1.13.0-py3-none-any.whl", hash = "sha256:8ef7509ca62bc45c3f1e3b1a0248e9f774337100e32ba1502cfcca15df79ad61"},
+    {file = "dramatiq-1.13.0.tar.gz", hash = "sha256:b4fe0ca6b55b06bebf82cd14c88044fb267505a57d4aa47378194efa0cef5f47"},
 ]
 email-normalize = [
     {file = "email-normalize-2.0.0.tar.gz", hash = "sha256:b47d101afeda3d9dde3f9f81b1073c69a7987d656ac51a02215aedadd27934cd"},
@@ -2358,6 +2374,16 @@ ipdb = [
 ipython = [
     {file = "ipython-7.13.0-py3-none-any.whl", hash = "sha256:eb8d075de37f678424527b5ef6ea23f7b80240ca031c2dd6de5879d687a65333"},
     {file = "ipython-7.13.0.tar.gz", hash = "sha256:ca478e52ae1f88da0102360e57e528b92f3ae4316aabac80a2cd7f7ab2efb48a"},
+]
+islenska = [
+    {file = "islenska-0.4.3-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:16b73b1dda128d21991504a88556fc2239af81cf542782179e677d6bae6438cc"},
+    {file = "islenska-0.4.3-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:c0127ad08b6762656649d52dc5d477e73a1017775b8a30025877db5ad22894e2"},
+    {file = "islenska-0.4.3-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:37827a68ac221e4d6551ba7cf28d0479e993652654438d136dcd14ed89494294"},
+    {file = "islenska-0.4.3-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:0a26ecfa5c0f5de9c2a4e51e6ad1c61a8b91a77bcc58952048cdbdec373f2300"},
+    {file = "islenska-0.4.3-pp36-pypy36_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:a62435655aafe0326b09b38eece440573b06ff3fbb8fc05b06b761867d48086f"},
+    {file = "islenska-0.4.3-pp36-pypy3_72-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:ee1b7f8618b9a2ecf8ac60667c35c4bfaeaf5dd297228928232758e0014f355d"},
+    {file = "islenska-0.4.3-pp37-pypy37_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:1624f5a0b76e26b90dc977490918aab1ce073972e276dacbade57f5238315101"},
+    {file = "islenska-0.4.3.tar.gz", hash = "sha256:09e429e59cf10fb990db6e5af44d0c58c42de40b75bbc6b47d3d54afc3f46c89"},
 ]
 isodate = [
     {file = "isodate-0.6.1-py2.py3-none-any.whl", hash = "sha256:0751eece944162659049d35f4f549ed815792b38793f07cf73381c1c87cbed96"},
@@ -2830,21 +2856,14 @@ requests-toolbelt = [
     {file = "requests_toolbelt-0.9.1-py2.py3-none-any.whl", hash = "sha256:380606e1d10dc85c3bd47bf5a6095f815ec007be7a8b69c878507068df059e6f"},
 ]
 reynir = [
-    {file = "reynir-2.8.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:c55360b2b5dc16aad6193e5d6b7ca7dbc702a4aa88318d91cb634ae6d4fb39bb"},
-    {file = "reynir-2.8.1-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:96eaae6a309db72742645c837cc95fde88d826640f15785f00cc20bdffc80141"},
-    {file = "reynir-2.8.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:685e7f36806a891a1aa628e9d8759ba723ffcdf2d96f5194836a1549e0eaa66c"},
-    {file = "reynir-2.8.1-cp37-cp37m-manylinux2010_x86_64.whl", hash = "sha256:cd98318f85d5bc8626a14c5183ff93cb668ce7323901fa4327d4e35470f524e9"},
-    {file = "reynir-2.8.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:14c427c0c33938a15423c83b7b90767ea8997bac677a1862413f8579998f0ccd"},
-    {file = "reynir-2.8.1-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:63d7fc52b2b32b3dc6fb4b2fbae3893b8b1a1bfcc4eb85184c32885e5bc26267"},
-    {file = "reynir-2.8.1-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:b162dcf83306d2406ecfbe44a6c9cfcf3eeca0b51e0938c9042a6266432a0546"},
-    {file = "reynir-2.8.1-cp39-cp39-manylinux2010_x86_64.whl", hash = "sha256:4eeb3189693548b55c3b048baf25cadbfbc9171c3c18ac9a6adfc63386d1c561"},
-    {file = "reynir-2.8.1-pp36-pypy36_pp73-manylinux1_x86_64.whl", hash = "sha256:3e7f9e4391decda9590e0f9e4493660ffa6917523dc90f895253fc45f1583f67"},
-    {file = "reynir-2.8.1-pp36-pypy36_pp73-manylinux2010_x86_64.whl", hash = "sha256:c63b55ca2aa0d53edcab9c9ea5ea7f6467024c195e28945e8bc53d31c6f17836"},
-    {file = "reynir-2.8.1-pp36-pypy3_72-manylinux1_x86_64.whl", hash = "sha256:d57917c5915cc1f2a91ee7286eb76b22a3540820e9822abd074afd99fab51658"},
-    {file = "reynir-2.8.1-pp36-pypy3_72-manylinux2010_x86_64.whl", hash = "sha256:a14e14f491cd28913303c1961cfca37e1fb1233ac889aab9457d759a99a103ca"},
-    {file = "reynir-2.8.1-pp37-pypy37_pp73-manylinux1_x86_64.whl", hash = "sha256:b2869108ed0df79ff9ff1481f8dbfa854e2bfdcc7b041e5b3c57e2cdd9f48ef3"},
-    {file = "reynir-2.8.1-pp37-pypy37_pp73-manylinux2010_x86_64.whl", hash = "sha256:ca65e99a1282ab1a3affa43e990d9c533bfacb717c1e68d0e5df31f0257a38f7"},
-    {file = "reynir-2.8.1.tar.gz", hash = "sha256:0bbdf9726dd81898bff0217c5eb1be2db5202da306576ddbfd1b04d3e258fcd5"},
+    {file = "reynir-3.5.1-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:e36335e99caf8605fe5d0234ca40fa84a137971c3116e9503805db7b1a8c48f1"},
+    {file = "reynir-3.5.1-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:ca09af7745ae8040243a5b8e792e4c5abad3878f954d729c3e4f6f603b87292f"},
+    {file = "reynir-3.5.1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:70513d3b14bfaec0e9d39cb87b88f3732a578f2d4f88aafc827871660188e9b8"},
+    {file = "reynir-3.5.1-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:e6a1555f922decf83776e679145a73e7e6a70e5a457a10f0230991e428ecfce4"},
+    {file = "reynir-3.5.1-pp36-pypy36_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:de5150a2214020f9fff9cce5d8b97af4402237eb3094332ce6b97e814653c47c"},
+    {file = "reynir-3.5.1-pp36-pypy3_72-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f2a601a38b0d90145c74e8bbb8fabb5688bd373653a2bc39bf9b8351f704c8d8"},
+    {file = "reynir-3.5.1-pp37-pypy37_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:a73140f4960b63df1416e363d36e65b316425dd5210b30cd919255690ea35c40"},
+    {file = "reynir-3.5.1.tar.gz", hash = "sha256:8dd2eaecd1335e4fc305eec7c4d0250fdaa8c49b367131019cc90724c3964284"},
 ]
 s3transfer = [
     {file = "s3transfer-0.3.7-py2.py3-none-any.whl", hash = "sha256:efa5bd92a897b6a8d5c1383828dca3d52d0790e0756d49740563a3fb6ed03246"},
@@ -2863,8 +2882,8 @@ sentry-dramatiq = [
     {file = "sentry_dramatiq-0.3.2.tar.gz", hash = "sha256:f270fe577ffbd91f1a2fe38027060cd761a169b634f3507a27a03e724eb7f195"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-0.19.5.tar.gz", hash = "sha256:737a094e49a529dd0fdcaafa9e97cf7c3d5eb964bd229821d640bc77f3502b3f"},
-    {file = "sentry_sdk-0.19.5-py2.py3-none-any.whl", hash = "sha256:0a711ec952441c2ec89b8f5d226c33bc697914f46e876b44a4edd3e7864cf4d0"},
+    {file = "sentry-sdk-1.6.0.tar.gz", hash = "sha256:b82ad57306d5546713f15d5d70daea0408cf7f998c7566db16e0e6257e51e561"},
+    {file = "sentry_sdk-1.6.0-py2.py3-none-any.whl", hash = "sha256:ddbd191b6f4e696b7845b4d87389898ae1207981faf114f968a57363aa6be03c"},
 ]
 service-identity = [
     {file = "service-identity-21.1.0.tar.gz", hash = "sha256:6e6c6086ca271dc11b033d17c3a8bea9f24ebff920c587da090afc9519419d34"},
@@ -2994,8 +3013,8 @@ tldextract = [
     {file = "tldextract-3.3.0.tar.gz", hash = "sha256:adcd24abf21ce3450417cd5a00f23b7e57554ce8ae827334dd12bfcbb6274cf1"},
 ]
 tokenizer = [
-    {file = "tokenizer-2.5.0-py2.py3-none-any.whl", hash = "sha256:56c3b90a5633242e7b7bddb251c7f3493cb3dc374e699d95e799b5667f9694c5"},
-    {file = "tokenizer-2.5.0.tar.gz", hash = "sha256:eaf27ae80c81b4c202ba7c4deda1c49f19acd5d42d0ffaa7d33049f39dc86a0e"},
+    {file = "tokenizer-3.4.1-py2.py3-none-any.whl", hash = "sha256:69325cf36c64d058109dd1d1a6cf665ff67204f1e8d67933ceea7983735a555e"},
+    {file = "tokenizer-3.4.1.tar.gz", hash = "sha256:dc0343ed8b87a7d04b9eedb29f25bbbe3c41906fa2231862077b780aa8537f3e"},
 ]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},

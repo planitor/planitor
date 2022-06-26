@@ -4,12 +4,12 @@ from typing import Generator, Set
 
 from iceaddr import iceaddr_suggest
 from markupsafe import Markup
-from reynir.bindb import BIN_Db
+from reynir.bindb import GreynirBin
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, contains_eager, joinedload
 
 from planitor.language.search import get_wordforms, lemmatize_query
-from planitor.models import Case, CaseEntity, Council, Entity, Meeting, Minute
+from planitor.models import Case, CaseEntity, Council, Meeting, Minute
 
 
 def get_tsquery(search_query):
@@ -218,7 +218,7 @@ class MinuteResults:
             self.db.query(func.querytree(get_tsquery(self.search_query))).scalar()
         )
         highlight_terms = set()
-        with BIN_Db.get_db() as bindb:
+        with GreynirBin.get_db() as bindb:
             for term in index_terms:
                 highlight_terms.update(get_wordforms(bindb, term))
         return highlight_terms

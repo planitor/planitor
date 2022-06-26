@@ -3,10 +3,7 @@
 import classNames from "classnames";
 import { FC, PropsWithChildren } from "react";
 
-type InputProps = Pick<
-  React.HTMLProps<HTMLInputElement>,
-  "value" | "type" | "max" | "min" | "step" | "disabled" | "className"
-> & {
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   isInvalid?: boolean;
   isDirty?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -28,35 +25,26 @@ const Input = ({
       value={value || ""}
       className={classNames(
         className,
-        "block w-full rounded-md border-1 border-gray-400 font-normal",
-        "focus:ring-powder-default focus:ring-2"
+        "block w-full rounded-md border-1 font-normal",
+        "focus:ring-powder-default focus:ring-2",
+        isInvalid ? "border-planitor-red" : "border-gray-400"
       )}
       {...props}
     />
   );
 };
 
-export const TextInput: FC<Omit<InputProps, "type">> = (props) => {
-  return <Input {...props} type="text" />;
-};
+export const TextInput: FC<Omit<InputProps, "type">> = (props) => (
+  <Input {...props} type="text" />
+);
 
-export const NumberInput: FC<
-  InputProps & Pick<React.HTMLProps<HTMLInputElement>, "max" | "min" | "step">
-> = (props) => {
-  return (
-    <Input
-      {...props}
-      max={props.max || undefined}
-      min={props.min || 0}
-      step={props.step || 1}
-      type="number"
-    />
-  );
-};
+export const NumberInput: FC<Omit<InputProps, "type">> = (props) => (
+  <Input {...props} type="number" />
+);
 
-export const PasswordInput: FC<Omit<InputProps, "type">> = (props) => {
-  return <Input {...props} type="password" />;
-};
+export const PasswordInput: FC<Omit<InputProps, "type">> = (props) => (
+  <Input {...props} type="password" />
+);
 
 export const Select: FC<
   PropsWithChildren<React.SelectHTMLAttributes<HTMLSelectElement>>
@@ -119,13 +107,21 @@ export const FollowButton: FC<
   ...props
 }) => (
   <button
-    className={classNames("btn sm:inline block mx-auto", {
-      "text-gray-500 border-gray-500": loading,
-      "bg-planitor-blue text-white": following && !loading,
-      "text-planitor-blue": !following && !loading,
-      "border-planitor-blue": !loading,
-    })}
+    className={classNames(
+      "sm:inline block mx-auto",
+      "focus:ring-powder-default focus:ring",
+      "text-white font-semibold rounded-md px-3 py-2",
+      "enabled:hover:border-planitor-darkBlue",
+      "disabled:opacity-60 disabled:cursor-default",
+      {
+        "bg-planitor-blue enabled:hover:bg-planitor-darkBlue text-white disabled:hover:bg-planitor-blue":
+          following,
+        "text-planitor-blue bg-powder-dark enabled:hover:ring-2 enabled:hover:bg-powder-default":
+          !following,
+      }
+    )}
     onClick={onClick}
+    disabled={loading}
     onMouseOver={(event) => {
       setHover(true);
     }}
