@@ -16,8 +16,10 @@ This module helps find lemmas suitable for fulltext indexing.
 import re
 from typing import Iterable, List, Optional, Set
 
+from reynir.bindb import GreynirBin
+
 from tokenizer import Tok, TOK
-from tokenizer.definitions import PersonNameList
+from tokenizer.definitions import PersonNameTuple
 
 from planitor import greynir
 from planitor.utils.stopwords import stopwords
@@ -38,7 +40,7 @@ def get_token_lemmas(token: Tok, ignore) -> List[str]:
         return [token.txt]
     lemmas = []
     for word in token.val:
-        if isinstance(word, PersonNameList):
+        if isinstance(word, PersonNameTuple):
             lemma = word.name
         else:
             lemma = word.stofn
@@ -125,10 +127,10 @@ def get_lemmas(text, ignore=None) -> Iterable[str]:
     yield from with_wordbases(parse_lemmas(text, ignore))
 
 
-def get_wordforms(bindb, term) -> Set[str]:
+def get_wordforms(bindb: GreynirBin, term) -> Set[str]:
     matches = {term}
 
-    _, meanings = bindb.lookup_word(term, auto_uppercase=True)
+    _, meanings = bindb.lookup_g(term, auto_uppercase=True)
     for meaning in meanings:
         for f in (
             bindb.lookup_nominative,
@@ -136,7 +138,7 @@ def get_wordforms(bindb, term) -> Set[str]:
             bindb.lookup_dative,
             bindb.lookup_genitive,
         ):
-            matches.update(tuple(m.ordmynd.lower() for m in (f(meaning.stofn) or [])))
+            matches.update(tuple(m.ord.lower() for m in (f(meaning.stofn) or [])))
 
     return matches
 

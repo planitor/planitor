@@ -6,6 +6,7 @@ from queue import Empty
 import dramatiq
 from dramatiq.worker import _WorkerThread
 
+from . import broker
 from .attachments import update_pdf_attachment
 from .database import db_context
 from .monitor import create_deliveries, send_meeting_emails, send_weekly_emails
@@ -26,6 +27,7 @@ def test_actor(num):
 def run(self: _WorkerThread):
     self.logger.debug("Running worker thread...")
     self.running = True
+    print("CONSUMSER", self.consumers)
     while self.running:
         if self.paused:
             self.logger.debug("Worker is paused. Sleeping for %.02f...", self.timeout)
@@ -38,14 +40,24 @@ def run(self: _WorkerThread):
             self.process_message(message)
         except Empty:
             # Here comes the hacked line - kill when work is done
-            os.kill(os.getpid(), signal.SIGHUP)
-            continue
+
+            for consumer in self.consumers.values():
+                if consumer.delay_queue.unfinished_tasks:
+                    continue
+            else:
+                if self.work_queue.unfinished_tasks:
+                    continue
+
+            break
+
+    self.logger.info("Queue is empty, shutting down process")
+    os.kill(os.getppid(), signal.SIGTERM)
 
     self.broker.emit_before("worker_thread_shutdown", self)
     self.logger.debug("Worker thread stopped.")
 
 
-_WorkerThread.run = run
+# _WorkerThread.run = run
 
 __all__ = [
     "update_minute_with_entity_mentions",
@@ -56,3 +68,23 @@ __all__ = [
     "send_weekly_emails",
     "send_applicant_notifications",
 ]
+
+"""
+
+    def join(self):
+        while True:
+            for consumer in self.consumers.values():
+                consumer.delay_queue.join()
+
+            self.work_queue.join()
+
+            # If nothing got put on the delay queues while we were
+            # joining on the work queue then it shoud be safe to exit.
+            # This could still miss stuff but the chances are slim.
+            for consumer in self.consumers.values():
+                if consumer.delay_queue.unfinished_tasks:
+                    break
+            else:
+                if self.work_queue.unfinished_tasks:
+                    continue
+                return"""

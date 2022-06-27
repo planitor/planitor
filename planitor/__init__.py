@@ -1,6 +1,6 @@
 import dramatiq
 import sentry_sdk
-from dramatiq.brokers.redis import RedisBroker
+from dramatiq.brokers.redis import RedisBroker, _RedisConsumer
 from dramatiq.brokers.stub import StubBroker
 from dramatiq.middleware import GroupCallbacks
 from dramatiq.rate_limits.backends.redis import RedisBackend as RateLimiterRedisBackend
@@ -29,8 +29,18 @@ if not DEBUG and SENTRY_DSN:
     )
 
 
+class CustomRedisConsumer(_RedisConsumer):
+    pass
+
+
+class CustomRedisBroker(RedisBroker):
+    @property
+    def consumer_class(self):
+        return CustomRedisConsumer
+
+
 if config("REDIS_URL", default=False):
-    broker = RedisBroker(url=config("REDIS_URL"))
+    broker = CustomRedisBroker(url=config("REDIS_URL"))
     broker.add_middleware(Results(backend=RedisBackend(url=config("REDIS_URL"))))
     broker.add_middleware(
         GroupCallbacks(
