@@ -41,4 +41,5 @@ else:
     backend = StubBackend()
     broker = StubBroker()
 
+
 dramatiq.set_broker(broker)

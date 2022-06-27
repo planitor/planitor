@@ -21,7 +21,7 @@ if (process.env.SENTRY_DSN) {
   });
   if ("_user" in document) {
     // @ts-expect-error
-    const { email, id } = document._user;
+    const { email, id } = document._user || {};
     Sentry.setUser({ email, id });
   }
 }
