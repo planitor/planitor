@@ -87,7 +87,7 @@ export const PDFViewer = ({ pages, title, initialIndex, onClose }) => {
             </h3>
             <div className="mt-2">
               <div
-                style="max-height: calc(100vh - 210px)"
+                style={{ maxHeight: "calc(100vh - 210px)" }}
                 className={`overflow-y-auto ${!loaded && "opacity-30"}`}
               >
                 <img
