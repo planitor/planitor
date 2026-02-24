@@ -6,14 +6,24 @@ significantly reducing memory usage in worker processes.
 """
 
 import logging
-from typing import List
+import os
+from typing import List, Optional
 
 import requests
 
 logger = logging.getLogger(__name__)
 
 LEMMA_API_URL = "https://lemma.solberg.is"
+LEMMA_API_KEY = os.environ.get("LEMMA_API_KEY")  # Optional: bypasses rate limiting
 TIMEOUT = 30  # seconds
+
+
+def _get_headers() -> dict:
+    """Get request headers, including API key if configured."""
+    headers = {"Content-Type": "application/json"}
+    if LEMMA_API_KEY:
+        headers["X-API-Key"] = LEMMA_API_KEY
+    return headers
 
 
 def lemmatize_text(text: str) -> List[str]:
@@ -30,6 +40,7 @@ def lemmatize_text(text: str) -> List[str]:
         response = requests.post(
             f"{LEMMA_API_URL}/api/text",
             json={"text": text},
+            headers=_get_headers(),
             timeout=TIMEOUT,
         )
         response.raise_for_status()
@@ -56,6 +67,7 @@ def lemmatize_word(word: str) -> List[str]:
         response = requests.post(
             f"{LEMMA_API_URL}/api/lemmatize",
             json={"word": word},
+            headers=_get_headers(),
             timeout=TIMEOUT,
         )
         response.raise_for_status()
@@ -86,6 +98,7 @@ def lemmatize_batch(words: List[str]) -> List[dict]:
         response = requests.post(
             f"{LEMMA_API_URL}/api/batch",
             json={"words": words},
+            headers=_get_headers(),
             timeout=TIMEOUT,
         )
         response.raise_for_status()
