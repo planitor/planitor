@@ -3,14 +3,15 @@ queue worker.
 
 This is how we index at Planitor.
 
-1.  Lemmatize using Greynir (ex. leiguíbúðir → leiguíbúð), or if that fails,
-    bintokenizer which yields all possible meanings of a word.
-2.  Remove stopwords and leave only nouns, verbs, streets and persons. Postgres has
-    no default stopword dictionary for Icelandic so we need to do this in Python.
+1.  Lemmatize using the lemma.solberg.is API (based on BÍN data).
+2.  Remove stopwords. Postgres has no default stopword dictionary for Icelandic
+    so we need to do this in Python.
 3.  Persist in a column which has a ts_vector gin index on it.
 
 This module helps find lemmas suitable for fulltext indexing.
 
+Previously this used Greynir which required loading large language models into memory.
+Now we use a lightweight HTTP API which significantly reduces worker memory usage.
 """
 
 import re
@@ -18,99 +19,22 @@ from typing import Iterable, List, Optional, Set
 
 from reynir.bindb import GreynirBin
 
-from tokenizer import Tok, TOK
-from tokenizer.definitions import PersonNameTuple
-
-from planitor import greynir
 from planitor.utils.stopwords import stopwords
 
-from .companies import INDEXABLE_TOKEN_TYPES, extract_company_names
-
-
-def get_token_lemmas(token: Tok, ignore) -> List[str]:
-    if ignore is None:
-        ignore = []
-    if token.kind not in INDEXABLE_TOKEN_TYPES or token.txt in ignore:
-        return []
-    if token.kind == TOK.NUMWLETTER:
-        # For tokens like "12a" return both "12a" and "12"
-        num, letter = token.val
-        return [f"{num}{letter}", str(num)]
-    if token.kind not in (TOK.PERSON, TOK.WORD, TOK.ENTITY) or token.val is None:
-        return [token.txt]
-    lemmas = []
-    for word in token.val:
-        if isinstance(word, PersonNameTuple):
-            lemma = word.name
-        else:
-            lemma = word.stofn
-        if lemma in stopwords:
-            return []
-        if lemma not in lemmas:
-            lemmas.append(lemma)
-    return lemmas
-
-
-def get_lemma_terminals(terminals, ignore=None) -> List[str]:
-    if ignore is None:
-        ignore = []
-    lemmas = []
-    for text, lemma, category, variants, index in terminals:
-        if text in ignore:
-            continue
-        if category not in (
-            "no",
-            "so",
-            "gata",
-            "person",
-            "talameðbókstaf",
-            "tala",
-            "fyrirtæki",
-            "sérnafn",
-            "mælieining",
-            "dagsafs",
-            "dagsföst",
-            "sameind",  # case serials are marked as sameind sometimes
-        ):
-            continue
-        if text.lower() in stopwords:
-            continue
-        lemmas.append(lemma)
-    return lemmas
-
-
-def parse_lemmas(text: str, ignore=None, max_sent_tokens=40) -> Iterable[str]:
-    """If Greynir cannot parse we drop down to the less clever tokenizer which is inflection
-    and case aware, but will give us multiple meanings for words like "svala" and "á".
-    ReynirPackage has an extremely high `max_sent_tokens` default at 90. This can easily
-    max out memory of a worker process so we set it much lower.
-    """
-    if ignore is None:
-        ignore = []
-    job = greynir.parse(text, max_sent_tokens=max_sent_tokens)
-    for sentence in job["sentences"]:
-        terminals = sentence.terminals
-        if terminals is None:
-            for token in sentence.tokens:
-                for lemma in get_token_lemmas(token, ignore):
-                    yield lemma
-        else:
-            for lemma in get_lemma_terminals(terminals, ignore):
-                yield lemma
-    for lemma in extract_company_names(text, sentences=job["sentences"]).keys():
-        yield lemma
+from .lemma_api import lemmatize_text, lemmatize_word
 
 
 def get_wordbase(word) -> Optional[str]:
+    """If word is a compound word with a dash, return the base (right part)."""
     if re.search(r"\w-\w", word) is not None:
         _, wordbase = word.rsplit("-", 1)
         return wordbase
+    return None
 
 
-def with_wordbases(lemmas) -> Iterable[str]:
-    """If word is a compound word, Greynir adds a dash. In this case, yield the base of
-    the word like "skemmdir" in "raka-skemmdir", along with the compound word without
-    the dash.
+def with_wordbases(lemmas: Iterable[str]) -> Iterable[str]:
+    """If word is a compound word, yield the base of the word like "skemmdir" in
+    "raka-skemmdir", along with the compound word without the dash.
     """
     for lemma in lemmas:
         wordbase = get_wordbase(lemma)
@@ -121,13 +45,50 @@ def with_wordbases(lemmas) -> Iterable[str]:
             yield lemma
 
 
-def get_lemmas(text, ignore=None) -> Iterable[str]:
+def filter_stopwords(lemmas: Iterable[str]) -> Iterable[str]:
+    """Filter out stopwords from lemmas."""
+    for lemma in lemmas:
+        if lemma.lower() not in stopwords:
+            yield lemma
+
+
+def get_lemmas(text: str, ignore: List[str] = None) -> Iterable[str]:
+    """
+    Get lemmas from text suitable for search indexing.
+    
+    Uses the lemma.solberg.is API for lemmatization, then filters stopwords.
+    
+    Args:
+        text: The text to lemmatize
+        ignore: List of terms to ignore (currently not used with API)
+    
+    Yields:
+        Lemmas suitable for indexing
+    """
     if ignore is None:
         ignore = []
-    yield from with_wordbases(parse_lemmas(text, ignore))
+    
+    # Get lemmas from the API
+    lemmas = lemmatize_text(text)
+    
+    # Filter out ignored terms and stopwords
+    filtered = (l for l in lemmas if l not in ignore)
+    filtered = filter_stopwords(filtered)
+    
+    # Handle compound words
+    yield from with_wordbases(filtered)
 
 
-def get_wordforms(bindb: GreynirBin, term) -> Set[str]:
+def get_wordforms(bindb: GreynirBin, term: str) -> Set[str]:
+    """
+    Get all word forms for a term (for search result highlighting).
+    
+    This expands a lemma to all its inflected forms so we can highlight
+    any form in search results.
+    
+    Note: This still uses GreynirBin as it's a read-time operation for
+    search highlighting, not a write-time indexing operation.
+    """
     matches = {term}
 
     _, meanings = bindb.lookup_g(term, auto_uppercase=True)
@@ -143,36 +104,61 @@ def get_wordforms(bindb: GreynirBin, term) -> Set[str]:
     return matches
 
 
-def lemmatize_query(search_query) -> str:
-    """We need to alter the query to get around a few limitations of the Postgres simple
-    dictionary and the way things are indexed. Read the inline comments for a step by
-    step explanation.
-
+def lemmatize_query(search_query: str) -> str:
     """
-
-    # Only title case if this is an "exact" web query with quotes
-    if (search_query[0], search_query[-1]) == ('"', '"'):
+    Transform a search query by lemmatizing each term.
+    
+    This helps match queries like "bílakjallarar" (plural) to indexed lemmas
+    like "bílakjallari" (singular nominative).
+    
+    For exact phrase queries (in quotes), preserves the phrase but titlecases terms.
+    """
+    # Handle exact phrase queries with quotes
+    if len(search_query) >= 2 and (search_query[0], search_query[-1]) == ('"', '"'):
         terms = search_query.strip('"').split()
         return '"{}"'.format(" ".join(term.title() for term in terms))
 
     def repl(matchobj):
-        query = matchobj.group(0).title()
-        # Use titleize the term because the Postgres simple dictionary doesn’t lowercase
-        # accented characters and the lemma column preserves case
-        lemmas = parse_lemmas(query)
-
-        # Take the first matched lemma, if there are lemmas, and remove dashes from
-        # compound words
+        query = matchobj.group(0)
+        query_title = query.title()
+        
+        # Get lemmas for this term
+        lemmas = lemmatize_word(query)
+        
+        # Remove dashes from compound words and titlecase
         lemmas = [lemma.replace("-", "").title() for lemma in lemmas][:1]
-
-        # Ensure the search term is included as is, because sometimes we interpret
-        # things like "Árni" as a verb
-        lemmas = {query, *lemmas}
-
+        
+        # Include original term as fallback (handles cases like "Árni" interpreted as verb)
+        lemmas = {query_title, *lemmas}
+        
         if len(lemmas) == 1:
-            # Return the
             return lemmas.pop()
-
+        
         return " or ".join(sorted(lemmas))
 
     return re.sub(r"\w+", repl, search_query)
+
+
+# Legacy function stubs for backwards compatibility with tests
+# These are no longer used in production but kept for test compatibility
+
+def parse_lemmas(text: str, ignore=None, max_sent_tokens=40) -> Iterable[str]:
+    """Legacy wrapper - now uses lemma API instead of Greynir."""
+    if ignore is None:
+        ignore = []
+    lemmas = lemmatize_text(text)
+    for lemma in lemmas:
+        if lemma not in ignore:
+            yield lemma
+
+
+def get_token_lemmas(token, ignore=None) -> List[str]:
+    """Legacy stub - tokens are now handled by the API."""
+    if ignore is None:
+        ignore = []
+    # The API handles tokenization internally, so this is just a passthrough
+    # for any code that still calls it directly
+    if hasattr(token, 'txt'):
+        lemmas = lemmatize_word(token.txt)
+        return [l for l in lemmas if l not in ignore]
+    return []
