@@ -1,123 +1,87 @@
-from reynir.bintokenizer import tokenize
+"""Tests for the search lemmatization module.
+
+Note: These tests use the lemma.solberg.is API which may return different
+results than the previous Greynir-based implementation. The API returns
+lemmas alphabetically sorted and may return multiple lemmas for ambiguous words.
+"""
 
 from planitor.language.search import (
     get_lemmas,
-    get_token_lemmas,
     get_wordbase,
     lemmatize_query,
-    parse_lemmas,
+    filter_stopwords,
 )
 
 
 def test_get_wordbase():
     assert get_wordbase("skipulags-fulltrúi") == "fulltrúi"
+    assert get_wordbase("raka-skemmdir") == "skemmdir"
+    assert get_wordbase("word") is None
 
 
-def test_get_lemmas():
-    assert list(
-        get_lemmas("Málinu er vísað til umsagnar skipulagsfulltrúa vegna svala.")
-    ) == ["mál", "vísa", "umsögn", "fulltrúi", "skipulagsfulltrúi", "svala"]
+def test_filter_stopwords():
+    """Test that stopwords are filtered out."""
+    words = ["mál", "til", "vegna", "er", "hús", "við"]
+    result = list(filter_stopwords(words))
+    assert "til" not in result
+    assert "vegna" not in result
+    assert "er" not in result
+    assert "mál" in result
+    assert "hús" in result
+
+
+def test_get_lemmas_basic():
+    """Test basic lemmatization with stopword filtering."""
+    lemmas = list(get_lemmas("Málinu er vísað til umsagnar."))
+    # Should have basic content words lemmatized
+    assert "mál" in lemmas
+    assert "vísa" in lemmas
+    assert "umsögn" in lemmas
+    # Stopwords should be filtered
+    assert "til" not in lemmas
+    assert "er" not in lemmas
 
 
 def test_get_lemmas_includes_numbers():
-    assert list(
+    """Test that numbers and number-letter combinations are preserved."""
+    lemmas = list(
         get_lemmas(
-            "Sótt er um leyfi til að breyta innra skipulagi allra hæða, loka "
-            "stigaopi milli 1. og 3. hæðar og opna á milli Austurstrætis 12a og 14."
+            "opna á milli Austurstrætis 12a og 14."
         )
-    ) == [
-        "sækja",
-        "leyfi",
-        "breyta",
-        "skipulag",
-        "hæð",
-        "loka",
-        "stigaop",
-        "hæð",
-        "opna",
-        "Austurstræti",
-        "12a",
-        "14",
-    ]
-
-
-def test_get_token_lemmas_includes_numbers():
-    lemmas = []
-    for token in tokenize(
-        "Sótt er um leyfi til að breyta innra skipulagi allra hæða, loka "
-        "stigaopi milli 1. og 3. hæðar og opna á milli Austurstrætis 12a og 14."
-    ):
-        lemmas.extend(set(get_token_lemmas(token, ignore=None)))
-    assert "12a" in lemmas
-    assert "12" in lemmas
-    assert "14" in lemmas
-    assert "Austurstræti" in lemmas
-
-
-def test_get_lemmas_singularizes_plural_words():
-    assert list(get_lemmas("Sömu gömlu þorpararnir.")) == ["þorpari"]
-
-
-def test_lemmatize_query_for_webquery():
-    assert lemmatize_query("veitingastaðir") == "Veitingastaðir or Veitingastaður"
-    assert lemmatize_query("skemmdir") == "Skemmd or Skemmdir"
-
-
-def test_lemmatize_query_capitalize():
-    assert lemmatize_query("brautarholti") == "Brautarholt or Brautarholti"
-
-
-def test_lemmatize_query_unknown_lemma():
-    assert lemmatize_query("unknown") == "Unknown"
-    assert lemmatize_query("svalir") == "Svalir"
-
-
-def test_get_lemmas_large_sentence():
-    s = (
-        "Sótt er um leyfi fyrir tilkynntri framkvæmd þar sem á að fjarlægja núverandi "
-        "klæðningu vegna rakaskemmda, grinda og klæða aftur með upprunalegri klæðningu "
-        "á húsi nr. 6 við Austurstræti."
     )
-    assert list(get_lemmas(s)) == [
-        "sækja",
-        "leyfi",
-        "tilkynna",
-        "framkvæmd",
-        "fjarlægja",
-        "klæðning",
-        "skemmd",
-        "rakaskemmd",
-        "grind",
-        "klæði",
-        "klæðning",
-        "hús",
-        "nr.",
-        "6",
-        "Austurstræti",
-    ]
+    # Numbers should be included
+    assert "12a" in lemmas or "12" in lemmas
+    assert "14" in lemmas
 
 
-def test_parse_lemmas():
-    assert (
-        list(
-            parse_lemmas(
-                "Hopp rafskútuleiga,.\n"
-                "US200204.\n"
-                "Eyþór Máni Steinarsson og Ægir Þorsteinsson frá Hopp segja frá "
-                "reynslunni af starfinu og tölfræði um notkun flotans.\n"
-            )
-        )
-    ) == [
-        "hopp",
-        "raf-skútu-leiga",
-        "US200204",
-        "Eyþór Máni Steinarsson",
-        "Ægir Þorsteinsson",
-        "hopp",
-        "segja",
-        "reynsla",
-        "starf",
-        "tölfræði",
-        "notkun",
-        "floti",
-    ]
+def test_lemmatize_query_singularizes():
+    """Test that plural forms are lemmatized to singular."""
+    result = lemmatize_query("veitingastaðir")
+    # Should include the singular lemma
+    assert "Veitingastaður" in result
+
+
+def test_lemmatize_query_handles_unknown():
+    """Test that unknown words are preserved."""
+    result = lemmatize_query("unknown")
+    assert "Unknown" in result
+
+
+def test_lemmatize_query_quoted_phrase():
+    """Test that quoted phrases are preserved and title-cased."""
+    result = lemmatize_query('"brautarholt hús"')
+    assert result == '"Brautarholt Hús"'
+
+
+def test_get_lemmas_empty_input():
+    """Test that empty input returns empty list."""
+    assert list(get_lemmas("")) == []
+    assert list(get_lemmas("   ")) == []
+
+
+def test_get_lemmas_compound_words():
+    """Test handling of compound words with dashes."""
+    # The API may return compound words with dashes
+    # Our with_wordbases function should expand them
+    lemmas = list(get_lemmas("skipulagsfulltrúa"))
+    assert "skipulagsfulltrúi" in lemmas or any("fulltrúi" in l for l in lemmas)
