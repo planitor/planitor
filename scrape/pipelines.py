@@ -80,7 +80,7 @@ class DatabasePipeline(object):
         else:
             # If meeting already has at least one minute, assume meeting already scraped
             if self.db.query(Minute).filter(Minute.meeting == meeting).count():
-                return None
+                raise DropItem(f"Meeting {meeting.name} already has minutes")
 
         self.db.commit()
 
