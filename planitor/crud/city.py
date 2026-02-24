@@ -185,7 +185,7 @@ def create_minute(db, meeting: Meeting, **items: dict) -> Minute:
 
     # Also persist this status on the case unless a more recent meeting with the case
     # has been held
-    if case_created or case.updated < meeting.start:
+    if case_created or case.updated is None or case.updated < meeting.start:
         case.status = minute.status
         case.updated = meeting.start
         case.headline = minute.headline
