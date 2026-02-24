@@ -96,13 +96,18 @@ def extract_status(text: str):
 def parse_pdf_content(pdf_bytes: bytes, url: str):
     """Parse PDF content and extract meeting data
     
-    PDF format:
+    PDF format (old, 2020-2021):
     1. Ármúli 17 (01.264.004) 103527 Mál nr. BN057410
     460616-0420 MAL ehf., Nökkvavogi 26, 104 Reykjavík
     Sótt er um leyfi til að breyta skrifstofuhúsnæði...
     Gjald kr. 11.200
     Frestað.
     Lagfæra skráningu.
+    
+    PDF format (new, 2024+):
+    1. Ármúli 38 - USK24060289
+    Sótt er um leyfi til að breyta notkun...
+    Frestað. Vísað til athugasemda.
     """
     
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
@@ -116,15 +121,24 @@ def parse_pdf_content(pdf_bytes: bytes, url: str):
     date = parse_date_from_text(full_text) or parse_date_from_filename(url)
     meeting_num = extract_meeting_number(full_text)
     
-    # Parse agenda items
-    # Format: "1. Ármúli 17 (01.264.004) 103527 Mál nr. BN057410"
-    # The pattern is: number. Address (property_id) case_number Mál nr. serial
-    item_pattern = re.compile(
+    # Parse agenda items - try both formats
+    # Old format: "1. Ármúli 17 (01.264.004) 103527 Mál nr. BN057410"
+    old_pattern = re.compile(
         r"^(\d+)\.\s+(.+?)\s+\(\d+\.\d+\.\d+\)\s+\d+\s+Mál\s+nr\.\s+(BN\d+)",
         re.MULTILINE
     )
     
-    matches = list(item_pattern.finditer(full_text))
+    # New format: "1. Ármúli 38 - USK24060289"
+    new_pattern = re.compile(
+        r"^(\d+)\.\s+(.+?)\s+-\s+(USK\d+)",
+        re.MULTILINE
+    )
+    
+    matches = list(old_pattern.finditer(full_text))
+    if not matches:
+        # Try new format
+        matches = list(new_pattern.finditer(full_text))
+    
     minutes = []
     
     for i, match in enumerate(matches):
