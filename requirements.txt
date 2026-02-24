@@ -106,3 +106,4 @@ webencodings==0.5.1; python_version >= "2.7" and python_full_version < "3.0.0" o
 websockets==10.3; python_version >= "3.7"
 zeep==4.0.0; python_version >= "3.6"
 zope.interface==5.4.0; python_full_version >= "3.6.7" and python_version >= "3.6"
+pdfplumber==0.11.4
