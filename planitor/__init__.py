@@ -4,6 +4,7 @@ from dramatiq.brokers.redis import RedisBroker, _RedisConsumer
 from dramatiq.brokers.stub import StubBroker
 from dramatiq.middleware import GroupCallbacks
 from dramatiq.rate_limits.backends.redis import RedisBackend as RateLimiterRedisBackend
+from dramatiq.rate_limits.backends.stub import StubBackend as RateLimiterStubBackend
 from dramatiq.results import Results
 from dramatiq.results.backends import RedisBackend, StubBackend
 from hashids import Hashids
@@ -50,6 +51,8 @@ if config("REDIS_URL", default=False):
 else:
     backend = StubBackend()
     broker = StubBroker()
+    broker.add_middleware(Results(backend=backend))
+    broker.add_middleware(GroupCallbacks(rate_limiter_backend=RateLimiterStubBackend()))
 
 
 dramatiq.set_broker(broker)
