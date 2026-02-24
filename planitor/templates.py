@@ -2,19 +2,45 @@ from pathlib import Path
 import datetime as dt
 from urllib.parse import urlparse
 
-import imgix
 from markupsafe import Markup
 from starlette.templating import Jinja2Templates
 
 from planitor import config, hashids
 from planitor.utils.timeago import timeago
+from planitor.imgproxy import ImgProxy
 
 
-class Imgix:
-    builder = imgix.UrlBuilder("planitor.imgix.net", sign_key=config.get("IMGIX_TOKEN"))
+# imgproxy URL builder for S3 attachments
+_imgproxy_builder = ImgProxy.factory(
+    proxy_host='https://imgproxy.plex.uno',
+    key=config.get("IMGPROXY_KEY"),
+    salt=config.get("IMGPROXY_SALT"),
+)
+
+
+class ImageProxy:
+    """imgproxy wrapper for templates - drop-in replacement for imgix."""
 
     def __call__(self, path: str, params: dict = None):
-        return Markup(self.builder.create_url(path, params))
+        """Generate imgproxy URL for an S3 path or full URL.
+        
+        Args:
+            path: S3 key (e.g., "production/attachments/123.pdf") or full URL
+            params: Optional params like width, height (mapped to imgproxy options)
+        """
+        # Build full S3 URL if just a path
+        if not path.startswith("http"):
+            # Assume S3 bucket URL
+            url = f"https://planitor.s3.eu-west-1.amazonaws.com/{path}"
+        else:
+            url = path
+        
+        # Map common imgix params to imgproxy options
+        width = params.get("w", 0) if params else 0
+        height = params.get("h", 0) if params else 0
+        
+        proxy = _imgproxy_builder(url, width=width, height=height)
+        return Markup(str(proxy))
 
 
 def human_date(date: dt.datetime) -> str:
@@ -54,7 +80,8 @@ templates.env.globals.update(
         "urlparse": urlparse,
         "timeago": timeago,
         "human_date": human_date,
-        "imgix": Imgix(),
+        "imgix": ImageProxy(),  # Legacy name kept for template compatibility
+        "imgproxy": ImageProxy(),  # New name
         "DEBUG": DEBUG,
         "FRONTEND": frontend_snippet,
     }
