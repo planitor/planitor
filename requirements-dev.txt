@@ -51,7 +51,6 @@ httptools==0.4.0; python_version >= "3.7" and python_full_version >= "3.5.0"
 hyperlink==21.0.0; python_full_version >= "3.6.7" and python_version >= "3.6"
 iceaddr==0.5.3
 idna==2.10; python_full_version >= "3.6.7" and python_version >= "3.7"
-imgix==3.2.1
 incremental==21.3.0; python_full_version >= "3.6.7" and python_version >= "3.6"
 iniconfig==1.1.1; python_version >= "3.7"
 ipdb==0.13.2; python_version >= "2.7"

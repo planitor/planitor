@@ -40,7 +40,6 @@ httptools==0.4.0; python_version >= "3.7" and python_full_version >= "3.5.0"
 hyperlink==21.0.0; python_full_version >= "3.6.7" and python_version >= "3.6"
 iceaddr==0.5.3
 idna==2.10; python_full_version >= "3.6.7" and python_version >= "3.7"
-imgix==3.2.1
 incremental==21.3.0; python_full_version >= "3.6.7" and python_version >= "3.6"
 islenska==0.4.3
 isodate==0.6.1; python_version >= "3.6"

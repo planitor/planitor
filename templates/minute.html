@@ -31,7 +31,7 @@
 {% block og_image -%}
 {% set coordinates = (case.get_coordinates() or [])|map("string")|join(",") %}
 {% if minute.attachments and minute.attachments[0].pdf %}
-{% set attachment_image_url = imgix(minute.attachments[0].pdf.key, {'dpr': '2', 'w': '1024', 'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) %}
+{% set attachment_image_url = imgproxy(minute.attachments[0].pdf.key, {'dpr': '2', 'w': '1024', 'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) %}
 <meta property="og:image"
   content="https://i.useflipp.com/32lj531omndk.png?Website=Planitor&Address={{ (case.iceaddr or "_")|urlencode }}&Minute={{ case.headline|urlencode }}&Attachment={{ attachment_image_url|urlencode }}&Map={{ coordinates|urlencode }}" />
 {% else %}
@@ -161,8 +161,8 @@
           {% for i in range(attachment.pdf.page_count) %}
           {% set page = "{}".format(i + 1) %}
           <li class="rounded overflow-hidden shadow-md mr-2 mb-2 float-left block">
-            <a href="{{ imgix(attachment.pdf.key, {'page': page, 'dpr': '2', 'w': '1024' }) }}" target="_blank">
-              <img src="{{ imgix(attachment.pdf.key, {'h': '100', 'page': page }) }}">
+            <a href="{{ imgproxy(attachment.pdf.key, {'page': page, 'dpr': '2', 'w': '1024' }) }}" target="_blank">
+              <img src="{{ imgproxy(attachment.pdf.key, {'h': '100', 'page': page }) }}">
             </a>
           </li>
           {% endfor %}

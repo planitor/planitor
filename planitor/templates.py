@@ -19,27 +19,32 @@ _imgproxy_builder = ImgProxy.factory(
 
 
 class ImageProxy:
-    """imgproxy wrapper for templates - drop-in replacement for imgix."""
+    """imgproxy wrapper for templates."""
 
     def __call__(self, path: str, params: dict = None):
         """Generate imgproxy URL for an S3 path or full URL.
-        
+
         Args:
             path: S3 key (e.g., "production/attachments/123.pdf") or full URL
-            params: Optional params like width, height (mapped to imgproxy options)
+            params: Optional dict with w, h, page (1-based), dpr
         """
-        # Build full S3 URL if just a path
         if not path.startswith("http"):
-            # Assume S3 bucket URL
             url = f"https://planitor.s3.eu-west-1.amazonaws.com/{path}"
         else:
             url = path
-        
-        # Map common imgix params to imgproxy options
-        width = params.get("w", 0) if params else 0
-        height = params.get("h", 0) if params else 0
-        
-        proxy = _imgproxy_builder(url, width=width, height=height)
+
+        width = int(params.get("w", 0)) if params else 0
+        height = int(params.get("h", 0)) if params else 0
+
+        advanced = []
+        if params:
+            if "page" in params:
+                # imgproxy uses 0-based pages, templates use 1-based
+                advanced.append(f"pg:{int(params['page']) - 1}")
+            if "dpr" in params:
+                advanced.append(f"dpr:{params['dpr']}")
+
+        proxy = _imgproxy_builder(url, *advanced, width=width, height=height)
         return Markup(str(proxy))
 
 
@@ -80,8 +85,7 @@ templates.env.globals.update(
         "urlparse": urlparse,
         "timeago": timeago,
         "human_date": human_date,
-        "imgix": ImageProxy(),  # Legacy name kept for template compatibility
-        "imgproxy": ImageProxy(),  # New name
+        "imgproxy": ImageProxy(),
         "DEBUG": DEBUG,
         "FRONTEND": frontend_snippet,
     }

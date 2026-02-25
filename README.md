@@ -29,7 +29,6 @@ SMTP_TLS=true
 SMTP_USER=
 SMTP_PASSWORD=
 SENTRY_DSN=
-IMGIX_TOKEN=
 ```
 
 Install dependencies
