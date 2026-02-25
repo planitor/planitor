@@ -199,15 +199,15 @@ async def get_index(
 
     # Themed case clusters — search index queries, no time window
     theme_clusters = [
-        ("Hótel og gisting", "hótel | gistirými | gistiheimili | gisting"),
-        ("Veitingastaðir", "veitingastaður | veitingahús | veitingaleyfi"),
         ("Kærur", "kæra"),
-        ("Skilti og auglýsingar", "skilti | auglýsing"),
+        ("Skipulagsbreytingar", "deiliskipulag & breyting"),
         ("Niðurrif", "niðurrif | rífa"),
+        ("Hótel og gisting", "hótel | gistirými | gistiheimili"),
+        ("Starfsleyfi", "starfsleyfi"),
     ]
     themed_cases = []
     for label, query_str in theme_clusters:
-        tsquery = func.websearch_to_tsquery("simple", query_str)
+        tsquery = func.to_tsquery("simple", query_str)
         case_ids_sq = (
             db.query(Case.id)
             .join(Minute, Minute.case_id == Case.id)
