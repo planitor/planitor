@@ -131,7 +131,10 @@
   {% block breadcrumbs %}
   {% call breadcrumbs() %}
   {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-  {{ breadcrumb(None, case.serial) }}
+  {% if council %}
+  {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council.council_type.value), council.name_at(last_updated) if last_updated else council.name, mobile_collapse=True) }}
+  {% endif %}
+  {{ breadcrumb(None, case.address or case.headline or case.serial, truncate=True) }}
   {% endcall %}
   {% endblock %}
 
@@ -142,7 +145,15 @@
       <div class="mb-6">
         <div class="flex flex-col sm:flex-row justify-between items-start">
           <div class="mb-8 sm:mb-0">
-            <div class="flex-shrink text-2xl tracking-tight">{{ case.headline }}</div>
+            <div class="flex-shrink text-2xl tracking-tight">
+              {% if minute is defined %}
+              <a href="{{ url_for('get_case', muni_slug=municipality.slug, case_id=case.serial) }}" class="hover:underline">
+                {{ case.headline }}
+              </a>
+              {% else %}
+              {{ case.headline }}
+              {% endif %}
+            </div>
             {% if case.address %}
             <div class="text-sm font-bold">
               {{ case.address }}

@@ -79,8 +79,10 @@
           </h5>
           {% endif %}
           <p class="text-xs text-gray-600 hidden sm:block">
-            {{ minute.meeting.council.municipality.name }},
-            {{ minute.meeting.council.name }}
+            <a href="{{ url_for('get_municipality', muni_slug=minute.case.municipality.slug) }}" class="hover:underline">
+              {{ minute.meeting.council.municipality.name }}</a>,
+            <a href="{{ url_for('get_municipality', muni_slug=minute.case.municipality.slug, council_slug=minute.meeting.council.council_type.value) }}" class="hover:underline">
+              {{ minute.meeting.council.name }}</a>
           </p>
         </div>
         <div class="flex-grow">

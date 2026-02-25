@@ -6,10 +6,18 @@
   <div class="flex justify-between items-start mb-2">
     <div>
       <div class="text-lg font-extrabold">
-        {{ meeting.council }}
+        {{ meeting.council_name }}
         <a href="{{ meeting_url }}" class="underline font-semibold"> nr. {{ meeting.name }}</a>
       </div>
-      <div class="text-sm">{{ human_date(meeting.start) }}</div>
+      <div class="text-sm">
+        {{ human_date(meeting.start) }}
+        {% if meeting.url %}
+        · <a href="{{ meeting.url }}" target="_blank" class="underline opacity-50 hover:opacity-75">
+          Fundargerð
+          <span class="sf-symbol">{% include "symbols/arrow.up.right.circle.fill.svg" %}</span>
+        </a>
+        {% endif %}
+      </div>
     </div>
     <div class="pill pill-big pill-{{ minute.status.value.color if minute.status else 'none' }} font-bold shadow-lg">
       {{ minute.status.value.label if minute.status else "Annað" }}
@@ -30,8 +38,10 @@
 
 {% block og_image -%}
 {% set coordinates = (case.get_coordinates() or [])|map("string")|join(",") %}
-{% if minute.attachments and minute.attachments[0].pdf %}
-{% set attachment_image_url = imgproxy(minute.attachments[0].pdf.key, {'dpr': '2', 'w': '1024', 'page': '{}'.format(minute.attachments[0].pdf.page_highlight or 1) }) %}
+{% if minute.attachments and minute.attachments[0].pdf and minute.attachments[0].pdf.pages_rendered_at %}
+{% set _page_idx = (minute.attachments[0].pdf.page_highlight or 1) - 1 %}
+{% set _page_key = "{}-page-{}.jpg".format(minute.attachments[0].pdf.attachment_id, _page_idx) %}
+{% set attachment_image_url = imgproxy(_page_key, {'dpr': '2', 'w': '1024'}) %}
 <meta property="og:image"
   content="https://i.useflipp.com/32lj531omndk.png?Website=Planitor&Address={{ (case.iceaddr or "_")|urlencode }}&Minute={{ case.headline|urlencode }}&Attachment={{ attachment_image_url|urlencode }}&Map={{ coordinates|urlencode }}" />
 {% else %}
@@ -42,12 +52,45 @@
 {% block breadcrumbs %}
 {% call breadcrumbs() %}
 {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-{{ breadcrumb(url_for('get_case', muni_slug=municipality.slug, case_id=case.serial), case.serial) }}
-{{ breadcrumb(None, minute.serial, mobile_collapse=True) }}
+{{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council.council_type.value), meeting.council_name, mobile_collapse=True) }}
+{{ breadcrumb(url_for('get_meeting', muni_slug=municipality.slug, council_slug=council.council_type.value, meeting_id=h.encode(meeting.id)), "Nr. {}".format(meeting.name), mobile_collapse=True) }}
+{{ breadcrumb(None, case.address or case.headline, truncate=True) }}
 {% endcall %}
 {% endblock %}
 
 {% block right %}
+{% if case_minutes and case_minutes.count() > 1 %}
+<div class="mt-6">
+  <div class="flex items-baseline mb-3">
+    <span class="text-sm font-bold">Málsferill</span>
+    <span class="text-xs text-gray-500 ml-2">{{ case_minutes.count() }} fundir</span>
+  </div>
+  <div class="bg-white rounded-md shadow-lg overflow-hidden">
+    {% for m in case_minutes %}
+    {% set is_current = m.id == minute.id %}
+    <a href="{{ url_for('get_minute', muni_slug=municipality.slug, case_id=case.serial, minute_id=h.encode(m.id)) }}"
+       class="block px-3 py-3 {{ 'border-l-4 border-planitor-blue bg-blue-50' if is_current else 'border-l-4 border-transparent hover:bg-gray-50' }} {{ 'border-b border-gray-100' if not loop.last }}">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-sm {{ 'font-bold' if is_current else 'text-gray-800' }}">
+          {{ human_date(m.meeting.start) }}
+        </span>
+        <span class="pill pill-big pill-{{ m.status.value.color if m.status else 'none' }} font-bold ml-2 flex-shrink-0">
+          {{ m.status.value.label if m.status else "Annað" }}
+        </span>
+      </div>
+      <div class="text-xs text-gray-500">
+        {{ m.meeting.council.name }} nr. {{ m.meeting.name }}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  <div class="mt-3 text-center">
+    <a href="{{ url_for('get_case', muni_slug=municipality.slug, case_id=case.serial) }}" class="text-xs text-planitor-blue hover:underline">
+      Sjá málsferil →
+    </a>
+  </div>
+</div>
+{% endif %}
 {% if user.is_superuser %}
 <div class="mt-4">
   <div class="mb-2 font-bold text-xl flex">
@@ -154,19 +197,24 @@
           {{ {'application/pdf': 'PDF'}.get(attachment.type, '') }}
         </span>
       </div>
-      {% if attachment.pdf %}
+      {% if attachment.pdf and attachment.pdf.pages_rendered_at %}
       <div class="pdf-viewer" data-title="{{ attachment.label }}">
         <div class="inner"><div></div></div>
         <ul class="py-3 px-1">
           {% for i in range(attachment.pdf.page_count) %}
-          {% set page = "{}".format(i + 1) %}
+          {% set page_key = "{}-page-{}.jpg".format(attachment.pdf.attachment_id, i) %}
           <li class="rounded overflow-hidden shadow-md mr-2 mb-2 float-left block">
-            <a href="{{ imgproxy(attachment.pdf.key, {'page': page, 'dpr': '2', 'w': '1024' }) }}" target="_blank">
-              <img src="{{ imgproxy(attachment.pdf.key, {'h': '100', 'page': page }) }}">
+            <a href="{{ imgproxy(page_key, {'dpr': '2', 'w': '1024' }) }}" target="_blank">
+              <img src="{{ imgproxy(page_key, {'h': '100'}) }}">
             </a>
           </li>
           {% endfor %}
         </ul>
+      </div>
+      {% elif attachment.pdf %}
+      <div class="mt-1 text-xs text-gray-500">
+        {{ attachment.pdf.page_count }} bls. &mdash;
+        <a class="underline" href="{{ attachment.url }}" target="_blank">Opna PDF</a>
       </div>
       {% endif %}
     </li>

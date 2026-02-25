@@ -1,13 +1,13 @@
 {% macro breadcrumbs() %}
-  <ul class="breadcrumbs flex items-center md:text-lg mb-6 md:mb-8 whitespace-no-wrap">
+  <ul class="breadcrumbs flex items-center text-sm mb-6 md:mb-8 overflow-hidden">
     {{ caller() }}
   </ul>
 {% endmacro %}
 
-{% macro breadcrumb(url, text, mobile_collapse = False, dash = True) %}
-  <li class="{{ 'hidden sm:flex' if mobile_collapse }}">
+{% macro breadcrumb(url, text, mobile_collapse = False, dash = True, truncate = False) %}
+  <li class="{{ 'hidden sm:flex' if mobile_collapse }} {{ 'min-w-0 truncate' if truncate else 'flex-shrink-0' }}">
     {%- if dash -%}
-      <span class="{{ 'hidden sm:flex' if mobile_collapse }} mx-2 md:mx-4">/</span>
+      <span class="{{ 'hidden sm:flex' if mobile_collapse }} mx-2 md:mx-3">/</span>
     {%- endif %}
     {%- if url -%}
       <a class="text-planitor-blue inline-block" href="{{ url }}">{{ text }}</a>

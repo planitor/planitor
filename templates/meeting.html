@@ -4,8 +4,8 @@
 
 {% extends "base.html" %}
 
-{% block title %}Fundur nr. {{ meeting.name }}, {{ council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
-{% block og_title %}Fundur nr. {{ meeting.name }}, {{ council.name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
+{% block title %}Fundur nr. {{ meeting.name }}, {{ meeting.council_name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
+{% block og_title %}Fundur nr. {{ meeting.name }}, {{ meeting.council_name }} í {{ municipality.name }} — {{ super() }}{% endblock %}
 
 {% block body %}
 
@@ -13,7 +13,7 @@
 
   {% call breadcrumbs() %}
   {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug), municipality.name, dash=False) }}
-  {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council_slug), council.name) }}
+  {{ breadcrumb(url_for('get_municipality', muni_slug=municipality.slug, council_slug=council_slug), meeting.council_name) }}
   {{ breadcrumb(None, "Nr. {}".format(meeting.name)) }}
   {% endcall %}
 
@@ -62,6 +62,10 @@
               {% if minute.case.address %}
               <div class="text-sm">{{ minute.headline }}</div>
               {% endif %}
+              <div class="text-xs md:hidden mt-1">
+                <a href="{{ url_for('get_case', muni_slug=municipality.slug, case_id=minute.case.serial) }}"
+                   class="underline text-gray-500">{{ minute.case.serial }}</a>
+              </div>
             </td>
             <td class="md:border px-0 md:px-4 py-2 hidden md:table-cell">
               <a href="{{ url_for('get_case', muni_slug=municipality.slug, case_id=minute.case.serial) }}" class="underline whitespace-no-wrap">

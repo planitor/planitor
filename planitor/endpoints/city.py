@@ -242,6 +242,7 @@ async def get_case(
 
     last_minute = minutes.first()
     last_updated = last_minute.meeting.start
+    council = last_minute.meeting.council if last_minute else None
 
     if case.iceaddr is not None:
         related_cases = (
@@ -261,6 +262,7 @@ async def get_case(
         "case.html",
         {
             "municipality": case.municipality,
+            "council": council,
             "case": case,
             "minutes": minutes,
             "request": request,
@@ -351,6 +353,13 @@ def get_minute(
 
     address_subscription = crud.get_address_subscription(db, current_user, case.iceaddr)
 
+    case_minutes = (
+        db.query(Minute)
+        .join(Meeting)
+        .filter(Minute.case_id == case.id)
+        .order_by(Meeting.start.desc())
+    )
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -360,6 +369,7 @@ def get_minute(
             "minute": minute,
             "case": case,
             "case_count": case_count,
+            "case_minutes": case_minutes,
             "request": request,
             "user": current_user,
             "headline": minute.headline,
@@ -443,6 +453,8 @@ async def get_address(
 
     subscription = crud.get_address_subscription(db, current_user, address)
 
+    municipality = db.query(Municipality).filter(Municipality.id == address.svfnr).first()
+
     polygon, plan = None, None
     if address:
         polygon, plan = skipulagsstofnun.plans.get_plan(
@@ -453,6 +465,7 @@ async def get_address(
         "address.html",
         {
             "address": address,
+            "municipality": municipality,
             "cases": cases.all(),
             "nearby_cases": nearby_cases.limit(100).all(),
             "request": request,
