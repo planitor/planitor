@@ -15,8 +15,11 @@ from planitor.models import (
     Address,
     Case,
     CaseEntity,
+    CaseStatusEnum,
     Council,
     CouncilTypeEnum,
+    Entity,
+    EntityTypeEnum,
     Meeting,
     Minute,
     Municipality,
@@ -66,6 +69,9 @@ async def get_index(
     current_user: User = Depends(get_current_active_user_or_none),
     db: Session = Depends(get_db),
 ):
+    sixty_days_ago = dt.datetime.utcnow() - dt.timedelta(days=60)
+
+    # Latest meeting per council (existing)
     sq = (
         db.query(Meeting.council_id, func.max(Meeting.start).label("meeting_latest"))
         .group_by(Meeting.council_id)
@@ -84,9 +90,129 @@ async def get_index(
         )
         .order_by(Meeting.start.desc())
     )
+
+    # Quick stats
+    total_meetings = (
+        db.query(func.count(Meeting.id))
+        .filter(Meeting.start >= sixty_days_ago)
+        .scalar()
+    )
+    total_minutes = (
+        db.query(func.count(Minute.id))
+        .join(Meeting)
+        .filter(Meeting.start >= sixty_days_ago)
+        .scalar()
+    )
+    total_new_cases = (
+        db.query(func.count(Case.id))
+        .filter(Case.created >= sixty_days_ago)
+        .scalar()
+    )
+
+    # Hot addresses: top 10 addresses with most minute entries in last 60 days
+    hot_addresses = (
+        db.query(
+            Address,
+            func.count(Minute.id).label("minute_count"),
+        )
+        .join(Case, Case.address_id == Address.hnitnum)
+        .join(Minute, Minute.case_id == Case.id)
+        .join(Meeting, Minute.meeting_id == Meeting.id)
+        .filter(Meeting.start >= sixty_days_ago, Case.address_id.isnot(None))
+        .group_by(Address.hnitnum)
+        .order_by(func.count(Minute.id).desc())
+        .limit(10)
+        .all()
+    )
+
+    # Latest case headline per hot address
+    hot_address_hnits = [a.hnitnum for a, _ in hot_addresses]
+    hot_address_headlines = {}
+    if hot_address_hnits:
+        for hnitnum in hot_address_hnits:
+            latest_case = (
+                db.query(Case)
+                .filter(Case.address_id == hnitnum)
+                .order_by(Case.updated.desc())
+                .first()
+            )
+            if latest_case and latest_case.headline:
+                hot_address_headlines[hnitnum] = latest_case.headline
+
+    # Hottest streets: top 5 streets by distinct case count
+    hot_streets = (
+        db.query(
+            Address.heiti_nf,
+            func.count(distinct(Case.id)).label("case_count"),
+        )
+        .join(Case, Case.address_id == Address.hnitnum)
+        .join(Minute, Minute.case_id == Case.id)
+        .join(Meeting, Minute.meeting_id == Meeting.id)
+        .filter(Meeting.start >= sixty_days_ago, Address.heiti_nf.isnot(None))
+        .group_by(Address.heiti_nf)
+        .order_by(func.count(distinct(Case.id)).desc())
+        .limit(5)
+        .all()
+    )
+
+    # Status scoreboard: count of each status in last 60 days
+    status_counts = (
+        db.query(
+            Minute.status,
+            func.count(Minute.id).label("count"),
+        )
+        .join(Meeting)
+        .filter(Meeting.start >= sixty_days_ago, Minute.status.isnot(None))
+        .group_by(Minute.status)
+        .order_by(func.count(Minute.id).desc())
+        .all()
+    )
+
+    # Busiest entities: top 5 companies by distinct case count
+    busy_entities = (
+        db.query(
+            Entity,
+            func.count(distinct(Case.id)).label("case_count"),
+        )
+        .join(CaseEntity, CaseEntity.entity_id == Entity.kennitala)
+        .join(Case, CaseEntity.case_id == Case.id)
+        .join(Minute, Minute.case_id == Case.id)
+        .join(Meeting, Minute.meeting_id == Meeting.id)
+        .filter(
+            Meeting.start >= sixty_days_ago,
+            Entity.entity_type == EntityTypeEnum.company,
+        )
+        .group_by(Entity.kennitala)
+        .order_by(func.count(distinct(Case.id)).desc())
+        .limit(5)
+        .all()
+    )
+
+    # Freshest cases: 5 most recently created
+    fresh_cases = (
+        db.query(Case)
+        .filter(Case.created >= sixty_days_ago)
+        .order_by(Case.created.desc())
+        .limit(5)
+        .all()
+    )
+
     return templates.TemplateResponse(
         "municipalities.html",
-        {"request": request, "user": current_user, "meetings": meetings},
+        {
+            "request": request,
+            "user": current_user,
+            "meetings": meetings,
+            "total_meetings": total_meetings,
+            "total_minutes": total_minutes,
+            "total_new_cases": total_new_cases,
+            "hot_addresses": hot_addresses,
+            "hot_address_headlines": hot_address_headlines,
+            "hot_streets": hot_streets,
+            "status_counts": status_counts,
+            "busy_entities": busy_entities,
+            "fresh_cases": fresh_cases,
+        },
     )
 
 

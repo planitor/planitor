@@ -3,8 +3,131 @@
 {% block body %}
 <div class="my-8 mt-4 sm:mt-8">
 
-  <div class="text-3xl mb-8 sm:mb-12 leading-relaxed">Fundargerðir skipulags- og byggingarmála</div>
+  <div class="text-3xl mb-6 sm:mb-8 leading-relaxed">Fundargerðir skipulags- og byggingarmála</div>
 
+  {# Quick Stats #}
+  {% if total_meetings or total_minutes or total_new_cases %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-lg p-4 shadow-sm text-center">
+      <div class="text-3xl font-bold text-planitor-blue">{{ total_meetings }}</div>
+      <div class="text-sm text-gray-500 mt-1">Fundir</div>
+    </div>
+    <div class="bg-white rounded-lg p-4 shadow-sm text-center">
+      <div class="text-3xl font-bold text-planitor-blue">{{ total_minutes }}</div>
+      <div class="text-sm text-gray-500 mt-1">Dagskrárliðir</div>
+    </div>
+    <div class="bg-white rounded-lg p-4 shadow-sm text-center col-span-2 sm:col-span-1">
+      <div class="text-3xl font-bold text-planitor-blue">{{ total_new_cases }}</div>
+      <div class="text-sm text-gray-500 mt-1">Ný mál</div>
+    </div>
+  </div>
+  <div class="minilabel mb-8 -mt-6 text-center">Síðastliðna 60 daga</div>
+  {% endif %}
+
+  {# Two column layout: Hot addresses + right sidebar #}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+
+    {# Left: Hot Addresses #}
+    {% if hot_addresses %}
+    <div>
+      <div class="text-lg font-bold mb-3">Virkustu heimilisföng</div>
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        {% for address, count in hot_addresses %}
+        <div class="px-4 py-3 flex items-start justify-between {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
+          <div class="flex-1 min-w-0">
+            <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-planitor-blue hover:underline font-medium">
+              {{ address.address }}{% if address.stadur_nf %}, {{ address.stadur_nf }}{% endif %}
+            </a>
+            {% if hot_address_headlines.get(address.hnitnum) %}
+            <div class="text-xs text-gray-500 truncate mt-0.5">{{ hot_address_headlines[address.hnitnum] }}</div>
+            {% endif %}
+          </div>
+          <span class="bg-planitor-blue text-white text-xs font-bold rounded-full px-2 py-0.5 ml-2 flex-shrink-0">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Right: Stacked leaderboards #}
+    <div class="space-y-8">
+
+      {# Status Scoreboard #}
+      {% if status_counts %}
+      <div>
+        <div class="text-lg font-bold mb-3">Niðurstöður</div>
+        <div class="flex flex-wrap gap-2">
+          {% for status, count in status_counts %}
+          <span class="pill pill-big pill-{{ status.value.color }}">
+            {{ status.value.label }} <span class="ml-1 opacity-75">{{ count }}</span>
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {# Hottest Streets #}
+      {% if hot_streets %}
+      <div>
+        <div class="text-lg font-bold mb-3">Heitustu götur</div>
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          {% for street_name, case_count in hot_streets %}
+          <div class="px-4 py-2 flex items-center justify-between {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
+            <span class="font-medium">{{ street_name }}</span>
+            <span class="text-xs text-gray-500">{{ case_count }} {{ 'mál' if case_count != 1 else 'mál' }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {# Busiest Entities #}
+      {% if busy_entities %}
+      <div>
+        <div class="text-lg font-bold mb-3">Virkustu aðilar</div>
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          {% for entity, case_count in busy_entities %}
+          <div class="px-4 py-2 flex items-center justify-between {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
+            <a href="{{ url_for('get_company', kennitala=entity.kennitala, slug=entity.slug) }}" class="text-planitor-blue hover:underline">{{ entity.name }}</a>
+            <span class="text-xs text-gray-500">{{ case_count }} mál</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  {# Freshest Cases #}
+  {% if fresh_cases %}
+  <div class="mb-8">
+    <div class="text-lg font-bold mb-3">Nýjustu mál</div>
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      {% for case in fresh_cases %}
+      <div class="px-4 py-3 {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
+        <div class="flex items-start justify-between">
+          <div class="flex-1 min-w-0">
+            <a href="{{ url_for('get_case', muni_slug=case.municipality.slug, case_id=case.serial) }}" class="text-planitor-blue hover:underline font-medium">
+              {{ case.headline or case.serial }}
+            </a>
+            <div class="text-xs text-gray-500 mt-0.5">
+              {% if case.iceaddr %}{{ case.iceaddr.address }}{% if case.iceaddr.stadur_nf %}, {{ case.iceaddr.stadur_nf }}{% endif %} &middot; {% endif %}
+              {{ human_date(case.created) }}
+            </div>
+          </div>
+          {% if case.status %}
+          <span class="pill pill-{{ case.status.value.color }} ml-2 flex-shrink-0">{{ case.status.value.label }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# Existing municipalities grid #}
+  <div class="text-lg font-bold mb-3">Sveitarfélög</div>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
     {% for municipality, meetings in meetings | groupby("council.municipality") %}
     <div>
@@ -24,7 +147,7 @@
           <a href="{{ url_for('get_meeting', muni_slug=municipality.slug, council_slug=meeting.council.slug, meeting_id=h.encode(meeting.id)) }}"
             class="text-planitor-blue">
             <div>
-              {{ meeting.council }}
+              {{ meeting.council_name }}
             </div>
             <div class="text-xs text-gray-400">{{ human_date(meeting.start) }}</div>
           </a>
