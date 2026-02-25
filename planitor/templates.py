@@ -18,18 +18,25 @@ _imgproxy_builder = ImgProxy.factory(
 )
 
 
+MINIO_PUBLIC_BASE = "https://link.plex.uno/planitor-pages"
+
+
 class ImageProxy:
     """imgproxy wrapper for templates."""
 
     def __call__(self, path: str, params: dict = None):
-        """Generate imgproxy URL for an S3 path or full URL.
+        """Generate imgproxy URL for an S3 path, MinIO page key, or full URL.
 
         Args:
-            path: S3 key (e.g., "production/attachments/123.pdf") or full URL
-            params: Optional dict with w, h, page (1-based), dpr
+            path: S3 key, MinIO page key (e.g., "123-page-0.jpg"), or full URL
+            params: Optional dict with w, h, dpr
         """
-        if not path.startswith("http"):
-            url = f"https://planitor.s3.eu-west-1.amazonaws.com/{path}"
+        if not path.startswith("http") and not path.startswith("s3://"):
+            if path.endswith(".jpg") and "-page-" in path:
+                # MinIO page image — use public URL
+                url = f"{MINIO_PUBLIC_BASE}/{path}"
+            else:
+                url = f"s3://planitor/{path}"
         else:
             url = path
 
@@ -38,9 +45,6 @@ class ImageProxy:
 
         advanced = []
         if params:
-            if "page" in params:
-                # imgproxy uses 0-based pages, templates use 1-based
-                advanced.append(f"pg:{int(params['page']) - 1}")
             if "dpr" in params:
                 advanced.append(f"dpr:{params['dpr']}")
 

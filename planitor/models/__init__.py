@@ -14,6 +14,7 @@ from .city import (  # noqa
     Minute,
     Municipality,
     PDFAttachment,
+    PersonContact,
     Plan,
     Response,
     Permit,

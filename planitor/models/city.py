@@ -17,6 +17,8 @@ from sqlalchemy.types import ARRAY, BIGINT, NUMERIC, TEXT
 from sqlalchemy_utils import CompositeArray, CompositeType, TSVectorType
 
 from ..database import Base
+import datetime as dt
+
 from ..utils.kennitala import Kennitala
 
 from .enums import (
@@ -207,12 +209,30 @@ class Council(Base):
 
     council_type = Column(Enum(CouncilTypeEnum), nullable=False)
 
+    # Hardcoded name history for councils that were renamed
+    _NAME_HISTORY = {
+        # (council_type, municipality_id): [(cutoff_date, old_name)]
+        # Reykjavik skipulagsrad was "Skipulags- og samgönguráð" until Oct 2024
+        (CouncilTypeEnum.skipulagsrad, 0): [
+            (dt.datetime(2024, 10, 1), "Skipulags- og samgönguráð"),
+        ],
+    }
+
     def __str__(self):
         return self.name
 
     @property
     def slug(self):
         return self.council_type.value
+
+    def name_at(self, date):
+        """Return the council name that was in effect at the given date."""
+        history = self._NAME_HISTORY.get((self.council_type, self.municipality_id))
+        if history and date:
+            for cutoff, old_name in history:
+                if date < cutoff:
+                    return old_name
+        return self.name
 
 
 class Meeting(Base):
@@ -232,8 +252,13 @@ class Meeting(Base):
 
     minutes = relationship("Minute")
 
+    @property
+    def council_name(self):
+        """Council name appropriate for this meeting's date."""
+        return self.council.name_at(self.start)
+
     def __str__(self):
-        return f"{self.council.name} {self.name}"
+        return f"{self.council_name} {self.name}"
 
     def __repr__(self):
         return f"<Meeting id={self.id} name={self.name}>"
@@ -251,6 +276,7 @@ class PDFAttachment(Base):
     key = Column(String)
     page_count = Column(Integer)
     page_highlight = Column(Integer)
+    pages_rendered_at = Column(DateTime, nullable=True)
     attachment_id = Column(Integer, ForeignKey("attachments.id"))
     attachment = relationship("Attachment")
 
@@ -470,6 +496,12 @@ class Permit(Base):
 
     def __repr__(self):
         return f"<Permit id={self.id} case={self.minute.case.serial}>"
+
+
+class PersonContact(Base):
+    __tablename__ = "person_contacts"
+    name = Column(String, primary_key=True)
+    kennitala = Column(String(10), nullable=False)
 
 
 class Applicant(Base):

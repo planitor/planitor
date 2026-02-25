@@ -197,6 +197,35 @@ async def get_index(
         .all()
     )
 
+    # Themed case clusters — search index queries, no time window
+    theme_clusters = [
+        ("Hótel og gisting", "hótel | gistirými | gistiheimili | gisting"),
+        ("Veitingastaðir", "veitingastaður | veitingahús | veitingaleyfi"),
+        ("Kærur", "kæra"),
+        ("Skilti og auglýsingar", "skilti | auglýsing"),
+        ("Niðurrif", "niðurrif | rífa"),
+    ]
+    themed_cases = []
+    for label, query_str in theme_clusters:
+        tsquery = func.websearch_to_tsquery("simple", query_str)
+        case_ids_sq = (
+            db.query(Case.id)
+            .join(Minute, Minute.case_id == Case.id)
+            .filter(Minute.search_vector.op("@@")(tsquery))
+            .group_by(Case.id)
+            .order_by(func.max(Case.updated).desc().nullslast())
+            .limit(5)
+            .subquery()
+        )
+        cases = (
+            db.query(Case)
+            .filter(Case.id.in_(db.query(case_ids_sq.c.id)))
+            .order_by(Case.updated.desc().nullslast())
+            .all()
+        )
+        if cases:
+            themed_cases.append((label, cases))
+
     return templates.TemplateResponse(
         "municipalities.html",
         {
@@ -212,6 +241,7 @@ async def get_index(
             "status_counts": status_counts,
             "busy_entities": busy_entities,
             "fresh_cases": fresh_cases,
+            "themed_cases": themed_cases,
         },
     )
 

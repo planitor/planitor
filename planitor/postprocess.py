@@ -14,9 +14,11 @@ from .crud import (
     get_or_create_case_entity,
     get_or_create_entity,
     lookup_icelandic_company_in_entities,
+    lookup_person_in_contacts,
 )
 from .database import db_context
 from .language.companies import extract_company_names
+from .language.persons import extract_person_names
 from .minutes import get_minute_lemmas
 from .models import Meeting, Minute, Response
 from .monitor import create_deliveries, send_meeting_emails
@@ -97,17 +99,21 @@ def _update_minute_with_entity_mentions(db, minute):
     if minute.inquiry is None:
         return
 
-    mentions = extract_company_names(minute.inquiry)
+    # Parse text once with Greynir, share sentences between extractors
+    sentences = greynir.parse(minute.inquiry)["sentences"]
 
-    if not mentions:
+    company_mentions = extract_company_names(minute.inquiry, sentences=sentences)
+    person_mentions = extract_person_names(minute.inquiry, sentences=sentences)
+
+    if not company_mentions and not person_mentions:
         _update_entity_mentions_raw(db, minute.id, {})
         return
 
-    # We only want to persist mentions that have matching local entities, this is to
-    # track those
+    # We only want to persist mentions that have matching local entities
     _matched_mentions = {}
 
-    for co_name, locations in mentions.items():
+    # Company mentions — lookup in entities table
+    for co_name, locations in company_mentions.items():
         entity = _get_entity(db, co_name)
         if entity is None:
             continue
@@ -117,6 +123,29 @@ def _update_minute_with_entity_mentions(db, minute):
         if created:
             db.commit()
         _matched_mentions[entity.kennitala] = locations
+
+    # Person mentions — lookup in person_contacts table
+    for canonical_name, locations in person_mentions.items():
+        contact = lookup_person_in_contacts(db, canonical_name)
+        if contact is None:
+            continue
+        kennitala = Kennitala(contact.kennitala)
+        if not kennitala.validate():
+            continue
+        entity, created = get_or_create_entity(
+            db, kennitala, canonical_name, address=None
+        )
+        if created:
+            db.commit()
+        case_entity, created = get_or_create_case_entity(
+            db, minute.case, entity, applicant=False
+        )
+        if created:
+            db.commit()
+        if entity.kennitala in _matched_mentions:
+            _matched_mentions[entity.kennitala].extend(locations)
+        else:
+            _matched_mentions[entity.kennitala] = locations
 
     _update_entity_mentions_raw(db, minute.id, _matched_mentions)
 

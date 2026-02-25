@@ -1,98 +1,101 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="my-8 mt-4 sm:mt-8">
+<div class="mt-4 sm:mt-6 mb-4">
 
-  <div class="text-3xl mb-6 sm:mb-8 leading-relaxed">Fundargerðir skipulags- og byggingarmála</div>
+  <div class="text-xs uppercase tracking-wider font-bold text-gray-700 mb-4">Fundargerðir skipulags- og byggingarmála</div>
 
-  {# Quick Stats #}
+  {# Quick Stats — inline row #}
   {% if total_meetings or total_minutes or total_new_cases %}
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-    <div class="bg-white rounded-lg p-4 shadow-sm text-center">
-      <div class="text-3xl font-bold text-planitor-blue">{{ total_meetings }}</div>
-      <div class="text-sm text-gray-500 mt-1">Fundir</div>
+  <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-gray-300 pb-3 mb-4">
+    <div>
+      <span class="text-2xl font-mono font-bold" style="font-variant-numeric: tabular-nums">{{ total_meetings }}</span>
+      <span class="text-xs text-gray-500">fundir</span>
     </div>
-    <div class="bg-white rounded-lg p-4 shadow-sm text-center">
-      <div class="text-3xl font-bold text-planitor-blue">{{ total_minutes }}</div>
-      <div class="text-sm text-gray-500 mt-1">Dagskrárliðir</div>
+    <span class="text-gray-300">&middot;</span>
+    <div>
+      <span class="text-2xl font-mono font-bold" style="font-variant-numeric: tabular-nums">{{ total_minutes }}</span>
+      <span class="text-xs text-gray-500">dagskrárliðir</span>
     </div>
-    <div class="bg-white rounded-lg p-4 shadow-sm text-center col-span-2 sm:col-span-1">
-      <div class="text-3xl font-bold text-planitor-blue">{{ total_new_cases }}</div>
-      <div class="text-sm text-gray-500 mt-1">Ný mál</div>
+    <span class="text-gray-300">&middot;</span>
+    <div>
+      <span class="text-2xl font-mono font-bold" style="font-variant-numeric: tabular-nums">{{ total_new_cases }}</span>
+      <span class="text-xs text-gray-500">ný mál</span>
     </div>
+    <span class="text-xs text-gray-400">síðustu 60 dagar</span>
   </div>
-  <div class="minilabel mb-8 -mt-6 text-center">Síðastliðna 60 daga</div>
   {% endif %}
 
-  {# Two column layout: Hot addresses + right sidebar #}
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+  {# Two column layout #}
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 
     {# Left: Hot Addresses #}
     {% if hot_addresses %}
     <div>
-      <div class="text-lg font-bold mb-3">Virkustu heimilisföng</div>
-      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-        {% for address, count in hot_addresses %}
-        <div class="px-4 py-3 flex items-start justify-between {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
-          <div class="flex-1 min-w-0">
-            <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-planitor-blue hover:underline font-medium">
-              {{ address.address }}{% if address.stadur_nf %}, {{ address.stadur_nf }}{% endif %}
-            </a>
-            {% if hot_address_headlines.get(address.hnitnum) %}
-            <div class="text-xs text-gray-500 truncate mt-0.5">{{ hot_address_headlines[address.hnitnum] }}</div>
-            {% endif %}
-          </div>
-          <span class="bg-planitor-blue text-white text-xs font-bold rounded-full px-2 py-0.5 ml-2 flex-shrink-0">{{ count }}</span>
+      <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-2">Virkustu heimilisföng</div>
+      {% for address, count in hot_addresses %}
+      <div class="py-1 flex items-start justify-between {{ 'border-b border-gray-100' if not loop.last else '' }}">
+        <div class="flex-1 min-w-0">
+          <a href="{{ url_for('get_address', hnitnum=address.hnitnum) }}" class="text-planitor-blue hover:underline text-sm">
+            {{ address.address }}{% if address.stadur_nf %}, {{ address.stadur_nf }}{% endif %}
+          </a>
+          {% if hot_address_headlines.get(address.hnitnum) %}
+          <div class="text-xs text-gray-400 truncate">{{ hot_address_headlines[address.hnitnum] }}</div>
+          {% endif %}
         </div>
-        {% endfor %}
+        <span class="font-mono text-xs text-gray-500 ml-2 flex-shrink-0" style="font-variant-numeric: tabular-nums">{{ count }}</span>
       </div>
+      {% endfor %}
     </div>
     {% endif %}
 
     {# Right: Stacked leaderboards #}
-    <div class="space-y-8">
+    <div class="space-y-4">
 
-      {# Status Scoreboard #}
+      {# Status Scoreboard — horizontal bars #}
       {% if status_counts %}
+      {% set color_map = {'green': 'bg-planitor-green', 'yellow': 'bg-planitor-gold', 'red': 'bg-planitor-red', 'blue': 'bg-blue-800'} %}
+      {% set ns = namespace(max=0) %}
+      {% for status, count in status_counts %}
+        {% if count > ns.max %}{% set ns.max = count %}{% endif %}
+      {% endfor %}
       <div>
-        <div class="text-lg font-bold mb-3">Niðurstöður</div>
-        <div class="flex flex-wrap gap-2">
-          {% for status, count in status_counts %}
-          <span class="pill pill-big pill-{{ status.value.color }}">
-            {{ status.value.label }} <span class="ml-1 opacity-75">{{ count }}</span>
-          </span>
-          {% endfor %}
+        <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-2">Niðurstöður</div>
+        {% for status, count in status_counts %}
+        <div class="py-1 flex items-center gap-2 {{ 'border-b border-gray-100' if not loop.last else '' }}">
+          <span class="text-xs truncate w-32 flex-shrink-0">{{ status.value.label }}</span>
+          <div class="flex-1">
+            <div class="{{ color_map.get(status.value.color, 'bg-gray-400') }}" style="height: 6px; width: {{ (count / ns.max * 100) | round(1) }}%"></div>
+          </div>
+          <span class="font-mono text-xs text-gray-500 w-8 text-right flex-shrink-0" style="font-variant-numeric: tabular-nums">{{ count }}</span>
         </div>
+        {% endfor %}
       </div>
       {% endif %}
 
       {# Hottest Streets #}
       {% if hot_streets %}
       <div>
-        <div class="text-lg font-bold mb-3">Heitustu götur</div>
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-          {% for street_name, case_count in hot_streets %}
-          <div class="px-4 py-2 flex items-center justify-between {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
-            <span class="font-medium">{{ street_name }}</span>
-            <span class="text-xs text-gray-500">{{ case_count }} {{ 'mál' if case_count != 1 else 'mál' }}</span>
-          </div>
-          {% endfor %}
+        <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-2">Heitustu götur</div>
+        {% for street_name, case_count in hot_streets %}
+        <div class="py-1 flex items-center justify-between {{ 'border-b border-gray-100' if not loop.last else '' }}">
+          <span class="text-sm">{{ street_name }}</span>
+          <span class="font-mono text-xs text-gray-500" style="font-variant-numeric: tabular-nums">{{ case_count }}</span>
         </div>
+        {% endfor %}
       </div>
       {% endif %}
 
       {# Busiest Entities #}
       {% if busy_entities %}
       <div>
-        <div class="text-lg font-bold mb-3">Virkustu aðilar</div>
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-          {% for entity, case_count in busy_entities %}
-          <div class="px-4 py-2 flex items-center justify-between {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
-            <a href="{{ url_for('get_company', kennitala=entity.kennitala, slug=entity.slug) }}" class="text-planitor-blue hover:underline">{{ entity.name }}</a>
-            <span class="text-xs text-gray-500">{{ case_count }} mál</span>
-          </div>
-          {% endfor %}
+        <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-2">Virkustu aðilar</div>
+        {% for entity, case_count in busy_entities %}
+        <div class="py-1 flex items-center justify-between {{ 'border-b border-gray-100' if not loop.last else '' }}">
+          <a href="{{ url_for('get_company', kennitala=entity.kennitala, slug=entity.slug) }}" class="text-planitor-blue hover:underline text-sm">{{ entity.name }}</a>
+          <span class="font-mono text-xs text-gray-500" style="font-variant-numeric: tabular-nums">{{ case_count }}</span>
         </div>
+        {% endfor %}
       </div>
       {% endif %}
 
@@ -101,55 +104,66 @@
 
   {# Freshest Cases #}
   {% if fresh_cases %}
-  <div class="mb-8">
-    <div class="text-lg font-bold mb-3">Nýjustu mál</div>
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-      {% for case in fresh_cases %}
-      <div class="px-4 py-3 {{ 'bg-gray-50' if loop.index is even else '' }} {{ 'border-t border-gray-100' if not loop.first else '' }}">
-        <div class="flex items-start justify-between">
-          <div class="flex-1 min-w-0">
-            <a href="{{ url_for('get_case', muni_slug=case.municipality.slug, case_id=case.serial) }}" class="text-planitor-blue hover:underline font-medium">
-              {{ case.headline or case.serial }}
-            </a>
-            <div class="text-xs text-gray-500 mt-0.5">
-              {% if case.iceaddr %}{{ case.iceaddr.address }}{% if case.iceaddr.stadur_nf %}, {{ case.iceaddr.stadur_nf }}{% endif %} &middot; {% endif %}
-              {{ human_date(case.created) }}
-            </div>
-          </div>
-          {% if case.status %}
-          <span class="pill pill-{{ case.status.value.color }} ml-2 flex-shrink-0">{{ case.status.value.label }}</span>
-          {% endif %}
+  <div class="mb-6">
+    <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-2">Nýjustu mál</div>
+    {% for case in fresh_cases %}
+    <div class="py-1 flex items-center justify-between {{ 'border-b border-gray-100' if not loop.last else '' }}">
+      <div class="flex-1 min-w-0">
+        <a href="{{ url_for('get_case', muni_slug=case.municipality.slug, case_id=case.serial) }}" class="text-planitor-blue hover:underline text-sm">{{ case.headline or case.serial }}</a>
+        <span class="text-xs text-gray-400 ml-2">
+          {% if case.iceaddr %}{{ case.iceaddr.address }}{% if case.iceaddr.stadur_nf %}, {{ case.iceaddr.stadur_nf }}{% endif %} &middot; {% endif %}{{ human_date(case.created) }}
+        </span>
+      </div>
+      {% if case.status %}
+      <span class="pill pill-{{ case.status.value.color }} ml-2 flex-shrink-0">{{ case.status.value.label }}</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Themed Case Clusters #}
+  {% if themed_cases %}
+  <div class="mb-6">
+    <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-3">Efnisflokkar</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {% for label, cases in themed_cases %}
+      <div>
+        <div class="text-xs font-bold text-gray-600 mb-1">{{ label }}</div>
+        {% for case in cases %}
+        <div class="py-0.5">
+          <a href="{{ url_for('get_case', muni_slug=case.municipality.slug, case_id=case.serial) }}" class="text-planitor-blue hover:underline text-xs leading-tight block truncate">{{ case.headline or case.serial }}</a>
+          <span class="text-xs text-gray-400">{{ human_date(case.updated or case.created) }}</span>
         </div>
+        {% endfor %}
       </div>
       {% endfor %}
     </div>
   </div>
   {% endif %}
 
-  {# Existing municipalities grid #}
-  <div class="text-lg font-bold mb-3">Sveitarfélög</div>
+  {# Municipalities grid #}
+  <div class="text-xs uppercase tracking-wider font-bold text-gray-700 border-b border-gray-300 pb-1 mb-3">Sveitarfélög</div>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
     {% for municipality, meetings in meetings | groupby("council.municipality") %}
     <div>
-      <div class="mb-4 flex justify-between sm:justify-start items-center">
-        <a class="text-2xl font-bold" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}">
+      <div class="mb-2 flex justify-between sm:justify-start items-center">
+        <a class="text-lg font-bold" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}">
           {{ municipality }}
         </a>
         <a class="sm:ml-2 text-gray-400" href="{{ url_for('get_municipality', muni_slug=municipality.slug) }}">
-          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z"></path>
           </svg>
         </a>
       </div>
       <div>
         {% for meeting in meetings %}
-        <div class="mb-2">
+        <div class="mb-1">
           <a href="{{ url_for('get_meeting', muni_slug=municipality.slug, council_slug=meeting.council.slug, meeting_id=h.encode(meeting.id)) }}"
-            class="text-planitor-blue">
-            <div>
-              {{ meeting.council_name }}
-            </div>
-            <div class="text-xs text-gray-400">{{ human_date(meeting.start) }}</div>
+            class="text-planitor-blue text-sm">
+            {{ meeting.council_name }}
+            <span class="text-xs text-gray-400">{{ human_date(meeting.start) }}</span>
           </a>
         </div>
         {% endfor %}

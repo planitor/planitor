@@ -25,6 +25,7 @@ from planitor.models import (
     Meeting,
     Minute,
     Municipality,
+    PersonContact,
 )
 from planitor.utils.kennitala import Kennitala
 from planitor.utils.text import fold, slugify
@@ -362,6 +363,10 @@ def update_case_status(db: Session, case: Case):
         db.add(minute)
     case.status = status
     db.add(case)
+
+
+def lookup_person_in_contacts(db, canonical_name):
+    return db.query(PersonContact).get(canonical_name)
 
 
 def lookup_icelandic_company_in_entities(db, name):
