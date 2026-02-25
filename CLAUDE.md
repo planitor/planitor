@@ -66,6 +66,7 @@ docker compose exec -T planitor scrapy list
 |--------|--------|--------|
 | `reykjavik_byggingarfulltrui_pdf` | ✅ Working | PDFs on reykjavik.is (2021+) |
 | `reykjavik_skipulagsfulltrui_html` | ✅ Working | HTML on reykjavik.is (2023+) |
+| `reykjavik_skipulagsrad_html` | ✅ Working | HTML on reykjavik.is (2024+, meetings #322+) |
 | `reykjavik_skipulagsfulltrui` | ⚠️ Old | gamli.rvk.is (pre-2023) |
 | `reykjavik_skipulagsrad` | ❌ Dead | Endpoint removed |
 | `arborg` | ✅ Working | OneSystem API |
