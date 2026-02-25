@@ -96,7 +96,7 @@ def get_segment_with_linebreaks(node):
 
 def get_minutes(response):
     subcategory = None
-    for el in response.css("#table2>tbody>tr:nth-child(9)>.tdborder>table>tbody>tr"):
+    for el in response.css("#table2>tbody>tr:nth-child(8)>.tdborder>table>tbody>tr"):
         if el.css("td.underline"):
             subcategory = el.css("td::text").get()
         row = el.css("table.bodyclass")
