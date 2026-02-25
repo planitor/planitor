@@ -17,6 +17,7 @@ PATTERNS = {
         r"^samþykkt að gefa út framkvæmdaleyfi með vísan til",
         r"^jákvætt\.",
         r"^jákvætt með vísan til umsagnar",
+        r"^jákvætt með þeim skilyrðum",
         r"^samþykkt að falla frá kynningu",
         r"^tekið er jákvætt",
         r"^skipulags- og byggingarráð heimilar",
@@ -28,6 +29,7 @@ PATTERNS = {
         r"^samræmist ákvæðum laga",
         r"^afgreitt\.",
         r"umsögn skipulagsfulltrúa.+samþykkt",
+        r"^með vísan til umsagnar skipulagsfulltrúa.+samþykkt",
     ),
     CaseStatusEnum.denied: (
         r"^neikvætt\.",
@@ -66,6 +68,7 @@ PATTERNS = {
     ),
     CaseStatusEnum.directed_to_skipulagsrad: (
         r"vísað til umhverfis- og skipu?lagsráðs",
+        r"vísað til skipu?lagsráðs",
         r"vísað til skipulags- og samgönguráðs",
         r"skipulagsfulltrúi vísar erindinu til skipulags- og byggingarráðs",
         r"vísað í skipulags- og byggingarráð",
@@ -75,7 +78,9 @@ PATTERNS = {
         r"vísað til meðferðar (?:hjá )?verkefn\w*stjóra\.",
     ),
     CaseStatusEnum.no_comment: (
-        r"ekki eru gerðar skipulagslegar athugasemdir við",
+        r"ekki eru gerðar skipulagslegar athugasemdir",
+        r"ekki eru gerðar athugasemdir",
+        r"ekki gerðar skipulagslegar athugasemdir",
         r"ekki er gerð athugasemd við erindið",
         r"ekki gerð athugasemd við erindið",
     ),
