@@ -172,7 +172,7 @@ def create_minute(db, meeting: Meeting, **items: dict) -> Minute:
     case.address = case_address
     case.stagreinir = case_stadgreinir
 
-    if case_created and case_address:
+    if case_address and (case_created or not case.address_id):
         update_case_address(db, case)
         case.updated = meeting.start
         db.add(case)

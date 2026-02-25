@@ -76,23 +76,6 @@ def extract_meeting_number(text: str):
     return None
 
 
-def extract_status(text: str):
-    """Extract decision status from remarks text"""
-    if not text:
-        return None
-    text_lower = text.lower()
-    
-    if re.search(r"\bsamþykkt\b", text_lower):
-        return "samþykkt"
-    if re.search(r"\bfrestað\b", text_lower):
-        return "frestað"
-    if re.search(r"\bsynjað\b", text_lower):
-        return "synjað"
-    if re.search(r"\bvísað til\b", text_lower):
-        return "vísað"
-    return None
-
-
 def parse_pdf_content(pdf_bytes: bytes, url: str):
     """Parse PDF content and extract meeting data
     

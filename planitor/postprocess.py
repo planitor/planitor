@@ -3,8 +3,8 @@ from typing import Iterable, List
 
 from dramatiq import group, pipeline
 from sentry_sdk import capture_exception
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy import func, text
+from sqlalchemy.orm import Session, defer
 
 from . import dramatiq, greynir
 from .attachments import update_pdf_attachment
@@ -70,6 +70,28 @@ def update_minute_with_entity_relations(
     db.commit()
 
 
+def _update_entity_mentions_raw(db, minute_id: int, mentions: dict):
+    """Update entity_mentions using raw SQL to avoid SQLAlchemy-Utils composite type bug."""
+    if not mentions:
+        # Set to empty array
+        db.execute(
+            text("UPDATE minutes SET entity_mentions = '{}' WHERE id = :id"),
+            {"id": minute_id}
+        )
+    else:
+        # Build array of ROW values
+        rows = []
+        for kennitala, locations in mentions.items():
+            for start, end in locations:
+                rows.append(f"ROW('{kennitala}', {start}, {end})::entity_mention_type")
+        array_literal = "ARRAY[" + ", ".join(rows) + "]"
+        db.execute(
+            text(f"UPDATE minutes SET entity_mentions = {array_literal} WHERE id = :id"),
+            {"id": minute_id}
+        )
+    db.commit()
+
+
 def _update_minute_with_entity_mentions(db, minute):
 
     if minute.inquiry is None:
@@ -78,9 +100,7 @@ def _update_minute_with_entity_mentions(db, minute):
     mentions = extract_company_names(minute.inquiry)
 
     if not mentions:
-        minute.assign_entity_mentions({})
-        db.add(minute)
-        db.commit()
+        _update_entity_mentions_raw(db, minute.id, {})
         return
 
     # We only want to persist mentions that have matching local entities, this is to
@@ -98,17 +118,15 @@ def _update_minute_with_entity_mentions(db, minute):
             db.commit()
         _matched_mentions[entity.kennitala] = locations
 
-    minute.assign_entity_mentions(_matched_mentions)
-    db.add(minute)
-    db.commit()
+    _update_entity_mentions_raw(db, minute.id, _matched_mentions)
 
 
 @dramatiq.actor
 def update_minute_with_entity_mentions(minute_id: int):
 
     with db_context() as db:
-
-        minute = db.query(Minute).get(minute_id)
+        # Defer entity_mentions to avoid SQLAlchemy-Utils composite type deserialization bug
+        minute = db.query(Minute).options(defer(Minute.entity_mentions)).get(minute_id)
         _update_minute_with_entity_mentions(db, minute)
 
 
@@ -159,7 +177,6 @@ def update_minute_with_response_items(
 
 def _update_minute_search_vector(minute: Minute, db: Session):
     lemmas = get_minute_lemmas(minute)
-    print("MINUTE", minute.id, lemmas)
     minute.search_vector = func.to_tsvector("simple", " ".join(lemmas))
     minute.lemmas = ", ".join(lemmas)
     db.add(minute)
@@ -168,7 +185,8 @@ def _update_minute_search_vector(minute: Minute, db: Session):
 @dramatiq.actor
 def update_minute_search_vector(minute_id: int, force: bool = False):
     with db_context() as db:
-        minute = db.query(Minute).get(minute_id)
+        # Defer entity_mentions to avoid SQLAlchemy-Utils composite type deserialization bug
+        minute = db.query(Minute).options(defer(Minute.entity_mentions)).get(minute_id)
         if minute is None:
             return
         if not minute.search_vector or force:
@@ -219,11 +237,12 @@ def process_minute(db: Session, item: dict, meeting: Meeting):
         update_minute_search_vector.message_with_options(
             args=(minute.id,), pipe_ignore=True
         ),
-        # ... run matches
+        # Delivery matching (creates delivery rows but doesn't send emails)
         create_deliveries.message_with_options(args=(minute.id,), pipe_ignore=True),
-        send_applicant_notifications.message_with_options(
-            args=(minute.id,), pipe_ignore=True
-        ),
+        # Email sending disabled:
+        # send_applicant_notifications.message_with_options(
+        #     args=(minute.id,), pipe_ignore=True
+        # ),
     ]
 
     db.add(case)
@@ -246,5 +265,6 @@ def process_minutes(db: Session, items: Iterable[dict], meeting: Meeting) -> Non
         return
 
     g = group(pipes)
-    g.add_completion_callback(send_meeting_emails.message())
+    # Email sending disabled:
+    # g.add_completion_callback(send_meeting_emails.message())
     g.run()

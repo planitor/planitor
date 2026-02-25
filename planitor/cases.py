@@ -27,6 +27,7 @@ PATTERNS = {
         r"samþykkir samhljóða afgreiðslu",
         r"^samræmist ákvæðum laga",
         r"^afgreitt\.",
+        r"umsögn skipulagsfulltrúa.+samþykkt",
     ),
     CaseStatusEnum.denied: (
         r"^neikvætt\.",
@@ -64,19 +65,17 @@ PATTERNS = {
         r"^skipulagsfulltrúa falið",
     ),
     CaseStatusEnum.directed_to_skipulagsrad: (
-        r"vísað til umhverfis- og skipulagsráðs",
+        r"vísað til umhverfis- og skipu?lagsráðs",
         r"vísað til skipulags- og samgönguráðs",
         r"skipulagsfulltrúi vísar erindinu til skipulags- og byggingarráðs",
         r"vísað í skipulags- og byggingarráð",
     ),
     CaseStatusEnum.assigned_project_manager: (
-        r"vísað til umsagnar verkefnisstjóra\.",
-        r"vísað til umsagnar hjá verkefnisstjóra\.",
-        r"vísað til meðferðar verkefnisstjóra\.",
-        r"vísað til meðferðar hjá verkefnisstjóra\.",
+        r"vísað til umsagnar (?:hjá )?verkefn\w*stjóra\.",
+        r"vísað til meðferðar (?:hjá )?verkefn\w*stjóra\.",
     ),
     CaseStatusEnum.no_comment: (
-        r"ekki eru gerðar skipulagslegar athugasemdir við erindið",
+        r"ekki eru gerðar skipulagslegar athugasemdir við",
         r"ekki er gerð athugasemd við erindið",
         r"ekki gerð athugasemd við erindið",
     ),

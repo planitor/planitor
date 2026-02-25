@@ -30,9 +30,9 @@ def get_address_lookup_params(address) -> Tuple[str, Optional[int], Optional[str
     # Remove staðnúmer and long digits
     address = re.sub(r" [\d\.]{4,10}", "", address)
 
-    # Two times, take pick whatever comes before, or -
+    # Two times, take pick whatever comes before a separator
     for i in range(2):
-        for split_token in (", ", " - "):
+        for split_token in (", ", " - ", " – ", " — "):
             if split_token in address:
                 address, _ = address.split(split_token, 1)
                 break
@@ -61,6 +61,12 @@ def lookup_address(
     match = iceaddr_lookup(
         address, number=number, letter=letter, placename=placename, limit=1
     )
+    if not match and letter:
+        # Retry without letter suffix — e.g. "Borgartún 24C" when iceaddr only
+        # has "Borgartún 24". The building location is the same.
+        match = iceaddr_lookup(
+            address, number=number, letter=None, placename=placename, limit=1
+        )
     if match:
         addr = match[0]
         if number is None and addr["husnr"] and addr["serheiti"] != address:

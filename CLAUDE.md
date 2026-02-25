@@ -48,6 +48,7 @@ cd ~/mediaserver/planitor
 
 # Run specific spider
 docker compose exec -T planitor scrapy crawl reykjavik_byggingarfulltrui_pdf
+docker compose exec -T planitor scrapy crawl reykjavik_skipulagsfulltrui_html
 
 # Run with year filter (if spider supports it)
 docker compose exec -T planitor scrapy crawl reykjavik_byggingarfulltrui_pdf -a year=2024
@@ -58,6 +59,17 @@ docker compose exec -T planitor scrapy crawl reykjavik_byggingarfulltrui_pdf -a 
 # List all spiders
 docker compose exec -T planitor scrapy list
 ```
+
+### Spider Status
+
+| Spider | Status | Source |
+|--------|--------|--------|
+| `reykjavik_byggingarfulltrui_pdf` | ✅ Working | PDFs on reykjavik.is (2021+) |
+| `reykjavik_skipulagsfulltrui_html` | ✅ Working | HTML on reykjavik.is (2023+) |
+| `reykjavik_skipulagsfulltrui` | ⚠️ Old | gamli.rvk.is (pre-2023) |
+| `reykjavik_skipulagsrad` | ❌ Dead | Endpoint removed |
+| `arborg` | ✅ Working | OneSystem API |
+| `hafnarfjordur` | ✅ Working | OneSystem API |
 
 ### Spider output flow
 
