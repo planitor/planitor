@@ -4,7 +4,7 @@ import { Login } from "./accounts";
 import { FollowAddress, FollowCase, FollowEntity } from "./follow";
 import { NewPasswordForm } from "./forms/new-password";
 import { PermitForm } from "./forms/permits";
-import { getEntityMapOptions, getNearbyMapOptions, mapkit } from "./maps";
+import { renderEntityMap, renderNearbyMap } from "./maps";
 import { openModal } from "./modals";
 import { Navigation } from "./navigation";
 import { PDFViewer } from "./pdfViewer";
@@ -26,15 +26,12 @@ if (process.env.SENTRY_DSN) {
   }
 }
 
-mapkit.init({
-  authorizationCallback: (done) => {
-    fetch("/mapkit-token")
-      .then((res) => res.text())
-      .then((token) => done(token))
-      .catch((error) => {
-        console.error(error);
-      });
-  },
+// Initialize Leaflet maps for entity and nearby views
+[...document.querySelectorAll<HTMLElement>(".entity-map")].forEach((el) => {
+  renderEntityMap(el, el.dataset.kennitala);
+});
+[...document.querySelectorAll<HTMLElement>(".nearby-map")].forEach((el) => {
+  renderNearbyMap(el, el.dataset as { hnitnum: string; radius: string; days: string });
 });
 
 function render(el: HTMLElement, children: () => React.ReactNode) {
@@ -66,24 +63,6 @@ render(document.getElementById("subscriptions"), () => <Subscriptions />);
 render(document.getElementById("navigation"), () => <Navigation />);
 render(document.getElementById("password-recovery"), () => <Unsubscribe />);
 
-mapkit.addEventListener("configuration-change", function (event) {
-  if (event.status === "Initialized") {
-    [...document.querySelectorAll<HTMLElement>(".entity-map")].forEach(
-      async (el) => {
-        const options = await getEntityMapOptions(el.dataset.kennitala);
-        if (options) new mapkit.Map(el, options);
-      }
-    );
-    [...document.querySelectorAll<HTMLElement>(".nearby-map")].forEach(
-      async (el) => {
-        const options = await getNearbyMapOptions(
-          el.dataset as { hnitnum: string; radius: string; days: string }
-        );
-        if (options) new mapkit.Map(el, options);
-      }
-    );
-  }
-});
 
 [...document.querySelectorAll<HTMLElement>(".follow-case")].forEach(
   (button) => {

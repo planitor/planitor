@@ -18,7 +18,7 @@
   {% block og_image -%}
   <meta property="og:image" content="{{ url_for('static', path='/planitor.png') }}" />
   {% endblock -%}
-  <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   {{ FRONTEND|safe }}
 </head>
 

@@ -16,7 +16,6 @@ Configure .env in the project root
 
 ```
 DEBUG=true
-MAPKIT_PRIVATE_KEY=
 SECRET_KEY=
 PROJECT_NAME=Planitor
 DOMAIN=planitor.io

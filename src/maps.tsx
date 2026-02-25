@@ -1,135 +1,118 @@
+import L from "leaflet";
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 import {
   getEntityAddresses,
   getNearbyCaseAddresses,
   MapEntityResponse,
 } from "./api/types";
 
-export let mapkit = globalThis["mapkit"];
+// Fix default marker icon paths broken by bundlers
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
+
+const TILE_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILE_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
+function createTileLayer() {
+  return L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION });
+}
+
+function getMarkerColor(status: MapEntityResponse["addresses"][0]["status"]) {
+  const labelColor = status ? status[2] : null;
+  return (
+    { green: "#0c7556", yellow: "#755600", red: "#A33417" }[labelColor] ||
+    "#0D2475"
+  );
+}
+
+function createCircleMarker(
+  lat: number,
+  lon: number,
+  title: string,
+  color: string
+) {
+  return L.circleMarker([lat, lon], {
+    radius: 8,
+    fillColor: color,
+    color: color,
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.7,
+  }).bindPopup(title);
+}
 
 // Render map only when it is in the viewport
 document.addEventListener("lazybeforeunveil", function (e) {
   let el = e.target;
   if (el instanceof HTMLElement && el.classList.contains("map")) {
-    var address = new mapkit.Coordinate(
-      parseFloat(el.dataset.lat),
-      parseFloat(el.dataset.lon)
-    );
-    var region = new mapkit.CoordinateRegion(
-      address,
-      new mapkit.CoordinateSpan(0.03, 0.04)
-    );
-    var map = new mapkit.Map(el);
+    const lat = parseFloat(el.dataset.lat);
+    const lon = parseFloat(el.dataset.lon);
+    const address = el.dataset.address || "";
 
-    var addressAnnotation = new mapkit.MarkerAnnotation(address, {
-      color: "#f4a56d",
-      title: el.dataset.address,
-    });
-    map.showItems([addressAnnotation]);
+    const map = L.map(el).setView([lat, lon], 14);
+    createTileLayer().addTo(map);
 
-    map.region = region;
+    const marker = L.marker([lat, lon]).addTo(map);
+    if (address) marker.bindPopup(address);
   }
 });
 
-function getRegion(coordinateSets) {
-  var north = coordinateSets[0].lat,
-    south = north,
-    west = coordinateSets[0].lon,
-    east = west;
-
-  if (coordinateSets.length === 1) {
-    return new mapkit.CoordinateRegion(
-      new mapkit.Coordinate(north, west),
-      new mapkit.CoordinateSpan(0.01, 0.01)
-    );
-  }
-
-  // Shift direction variables to the outermost parts of pins to create a boundary region
-  for (var coordinates of coordinateSets) {
-    const { lat, lon } = coordinates;
-    if (lat > north) north = lat;
-    if (lat < south) south = lat;
-    if (lon < west) west = lon;
-    if (lon > east) east = lon;
-  }
-
-  const latDiff = Math.abs(north - south) * 0.1;
-  const lonDiff = Math.abs(east - west) * 0.1;
-  return new mapkit.BoundingRegion(
-    north + latDiff,
-    east + lonDiff,
-    south - latDiff,
-    west - lonDiff
-  ).toCoordinateRegion();
-}
-
 function getMarkersForAddresses(addresses: MapEntityResponse["addresses"]) {
-  var pins = [];
-  for (var address of addresses) {
-    const { lat, lon, label, status } = address;
-    const labelColor = status ? status[2] : null;
-    pins.push(
-      new mapkit.MarkerAnnotation(new mapkit.Coordinate(lat, lon), {
-        title: label,
-        color:
-          { green: "#0c7556", yellow: "#755600", red: "#A33417" }[labelColor] ||
-          "#0D2475",
-      })
+  return addresses.map(({ lat, lon, label, status }) =>
+    createCircleMarker(lat, lon, label, getMarkerColor(status))
+  );
+}
+
+export function renderEntityMap(el: HTMLElement, kennitala: string) {
+  return getEntityAddresses(kennitala).then(({ addresses }) => {
+    if (addresses.length === 0) return;
+    const map = L.map(el);
+    createTileLayer().addTo(map);
+    const markers = getMarkersForAddresses(addresses);
+    const group = L.featureGroup(markers).addTo(map);
+    map.fitBounds(group.getBounds().pad(0.1));
+  });
+}
+
+export function renderNearbyMap(
+  el: HTMLElement,
+  opts: { hnitnum: string; radius: string; days: string }
+) {
+  return getNearbyCaseAddresses(parseInt(opts.hnitnum, 10), {
+    days: parseInt(opts.days, 10),
+    radius: parseInt(opts.radius, 10),
+  }).then(({ address, addresses, plan }) => {
+    if (addresses.length === 0) return;
+    const map = L.map(el);
+    createTileLayer().addTo(map);
+
+    const markers = getMarkersForAddresses(addresses);
+
+    // Add the main address marker
+    markers.push(
+      createCircleMarker(address.lat, address.lon, address.label, "#2A1F6F")
     );
-  }
-  return pins;
-}
 
-export async function getEntityMapOptions(kennitala: string) {
-  const { addresses } = await getEntityAddresses(kennitala);
-  if (addresses.length === 0) return null;
-  const pins = getMarkersForAddresses(addresses);
-  const region = getRegion(addresses);
-  return { annotations: pins, region: region };
-}
+    const group = L.featureGroup(markers).addTo(map);
 
-export async function getNearbyMapOptions({
-  hnitnum,
-  radius,
-  days,
-}: {
-  hnitnum: string;
-  radius: string;
-  days: string;
-}) {
-  const { address, addresses, plan } = await getNearbyCaseAddresses(
-    parseInt(hnitnum, 10),
-    {
-      days: parseInt(days, 10),
-      radius: parseInt(radius, 10),
-    }
-  );
-  if (addresses.length === 0) return null;
-  const pins = getMarkersForAddresses(addresses);
-  const region = getRegion(addresses);
-  pins.push(
-    new mapkit.MarkerAnnotation(
-      new mapkit.Coordinate(address.lat, address.lon),
-      {
-        title: address.label,
-        color: "#2A1F6F",
-      }
-    )
-  );
-  const overlays = [];
-  if (plan !== null) {
-    const polygonOverlay = new mapkit.PolygonOverlay(
-      (plan.polygon as any).map(([x, y]) => {
-        return new mapkit.Coordinate(x, y);
-      }),
-      {
-        style: new mapkit.Style({
-          strokeOpacity: 0.2,
-          lineWidth: 2,
+    // Add plan polygon overlay if present
+    if (plan !== null) {
+      const polygon = L.polygon(
+        (plan.polygon as [number, number][]).map(([x, y]) => [x, y]),
+        {
+          color: "#333",
+          weight: 2,
+          opacity: 0.2,
+          fillOpacity: 0.05,
           lineJoin: "round",
-        }),
-      }
-    );
-    overlays.push(polygonOverlay);
-  }
-  return { annotations: pins, region: region, overlays: overlays };
+        }
+      ).addTo(map);
+      group.addLayer(polygon);
+    }
+
+    map.fitBounds(group.getBounds().pad(0.1));
+  });
 }

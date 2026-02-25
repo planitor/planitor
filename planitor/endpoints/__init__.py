@@ -1,9 +1,4 @@
-from fastapi import APIRouter, Request
-from fastapi.responses import PlainTextResponse
-from starlette.datastructures import Secret
-
-from planitor import config
-from planitor.mapkit import get_token as mapkit_get_token
+from fastapi import APIRouter
 
 from . import accounts, api, city, debug, notifications
 from .api import city as api_city
@@ -22,13 +17,6 @@ assert api_accounts
 
 
 router = APIRouter()
-
-
-@router.get("/mapkit-token")
-async def mapkit_token(request: Request):
-    return PlainTextResponse(
-        mapkit_get_token(config("MAPKIT_PRIVATE_KEY", cast=Secret))
-    )
 
 
 router.include_router(city.router)
