@@ -52,6 +52,15 @@ class ImageProxy:
         return Markup(str(proxy))
 
 
+def format_isk(amount) -> str:
+    """Format ISK amount with dot thousands separator: 57.000.000 kr."""
+    if amount is None:
+        return ""
+    amount = int(amount)
+    s = f"{amount:,}".replace(",", ".")
+    return f"{s} kr."
+
+
 def human_date(date: dt.datetime) -> str:
     MONTHS = [
         "janúar",
@@ -90,6 +99,7 @@ templates.env.globals.update(
         "timeago": timeago,
         "human_date": human_date,
         "imgproxy": ImageProxy(),
+        "format_isk": format_isk,
         "DEBUG": DEBUG,
         "FRONTEND": frontend_snippet,
     }

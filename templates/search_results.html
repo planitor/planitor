@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% from "includes/pagination.html" import pagination_nav %}
 
 {% block title %}Leitarniðurstöður fyrir '{{ q }}' — {{ super() }}{% endblock %}
 {% block og_title %}Leitarniðurstöður fyrir '{{ q }}' — {{ super() }}{% endblock %}
@@ -108,46 +109,8 @@
     {% endif %}
     </div>
 
-    {% macro page(number) %}
-    <div class="mr-3">
-      {% if number == results.page.number %}
-      <span class="font-bold text-planitor-blue">{{ number }}</span>
-      {% else %}
-      <a class="text-gray-600 hover:underline" href="{{ url_for('get_search') }}?q={{ q }}&page={{ number }}">
-        {{ number }}
-      </a>
-      {% endif %}
-    </div>
-    {% endmacro %}
-
-    {% macro ellipsis() %}
-    <div class="mr-3 text-gray-600">…</div>
-    {% endmacro %}
-
     {% if results %}
-    <div class="my-8 flex justify-between text-lg">
-      <div class="flex">
-        <div class="mr-3 text-gray-600">Síða</div>
-        {% set head, current, tail = results.page.get_page_segments() %}
-        {% if head %}
-          {% for number in head %} {{ page(number) }} {% endfor %} {{ ellipsis() if (head[-1] + 1) != current[0] }}
-        {% endif %}
-        {% for number in current %} {{ page(number) }} {% endfor %}
-        {% if tail %}
-          {{ ellipsis() if (tail[0] - 1 != current[-1]) }} {% for number in tail %} {{ page(number) }} {% endfor %}
-        {% endif %}
-      </div>
-      <div>
-        {% if results.page.has_next %}
-        <a
-          class="text-planitor-blue font-semibold"
-          href="{{ url_for('get_search') }}?q={{ q }}&page={{ results.page.number + 1 }}"
-        >
-          Næsta síða →
-        </a>
-        {% endif %}
-      </div>
-    </div>
+    {{ pagination_nav(results.page, "{}?q={}".format(url_for('get_search'), q)) }}
     {% endif %}
 
   </div>

@@ -13,17 +13,30 @@ from .crud import (
     get_or_create_attachment,
     get_or_create_case_entity,
     get_or_create_entity,
+    lookup_company_in_contacts,
     lookup_icelandic_company_in_entities,
     lookup_person_in_contacts,
 )
 from .database import db_context
-from .language.companies import extract_company_names
+from .language.companies import extract_company_names, parse_icelandic_companies
 from .language.persons import extract_person_names
 from .minutes import get_minute_lemmas
 from .models import Meeting, Minute, Response
 from .monitor import create_deliveries, send_meeting_emails
 from .notifications import send_applicant_notifications
 from .utils.kennitala import Kennitala
+
+# Matches "DDMMYY-NNNN " at the start of a company name regex match
+_KT_PREFIX_RE = re.compile(r"^(\d{6})-?(\d{4})\s+")
+
+
+def _split_kt_prefix(name):
+    """If name starts with a kennitala (e.g. '590269-1749 Skeljungur hf.'),
+    return (kennitala_digits, company_name). Otherwise return (None, name)."""
+    m = _KT_PREFIX_RE.match(name)
+    if m:
+        return m.group(1) + m.group(2), name[m.end():]
+    return None, name
 
 
 def _get_entity(db: Session, name: str):
@@ -33,18 +46,18 @@ def _get_entity(db: Session, name: str):
         return None
     if len(_all) == 1:
         return _all[0]
-    # Try doing a lookup in the RSK.is fyrirtækjaskrá
-    # RSK now applies a ReCAPTCHA so we will try again later:
-
-    """
-    kennitala = get_kennitala_from_rsk_search(name)
-    if kennitala is not None:
-        kennitala = Kennitala(kennitala)
-        entity, created = get_or_create_entity(db, kennitala, name, address=None)
-        if created:
-            db.commit()
-        return entity
-    """
+    # Fallback: check company_contacts lookup table (populated from skatturinn.is)
+    contact = lookup_company_in_contacts(db, name)
+    if contact is not None:
+        kennitala = Kennitala(contact.kennitala)
+        if kennitala.validate():
+            entity, created = get_or_create_entity(
+                db, kennitala, name, address=None
+            )
+            if created:
+                db.commit()
+            return entity
+    return None
 
 
 def update_minute_with_entity_relations(
@@ -105,14 +118,20 @@ def _update_minute_with_entity_mentions(db, minute):
     company_mentions = extract_company_names(minute.inquiry, sentences=sentences)
     person_mentions = extract_person_names(minute.inquiry, sentences=sentences)
 
-    if not company_mentions and not person_mentions:
+    # Also get regex-matched company names with positions (catches what Greynir misses)
+    regex_company_mentions = parse_icelandic_companies(minute.inquiry)
+
+    if not company_mentions and not person_mentions and not regex_company_mentions:
         _update_entity_mentions_raw(db, minute.id, {})
         return
 
     # We only want to persist mentions that have matching local entities
     _matched_mentions = {}
 
-    # Company mentions — lookup in entities table
+    # Track which text spans are already matched (to avoid duplicates)
+    matched_spans = set()
+
+    # 1. Greynir-normalized company mentions — lookup in entities table
     for co_name, locations in company_mentions.items():
         entity = _get_entity(db, co_name)
         if entity is None:
@@ -123,8 +142,79 @@ def _update_minute_with_entity_mentions(db, minute):
         if created:
             db.commit()
         _matched_mentions[entity.kennitala] = locations
+        for span in locations:
+            matched_spans.add(span)
 
-    # Person mentions — lookup in person_contacts table
+    # 2. Regex company mentions — lookup in company_contacts (catches Greynir failures)
+    for regex_name, locations in regex_company_mentions.items():
+        # Skip spans already matched by Greynir path
+        new_locations = [loc for loc in locations if loc not in matched_spans]
+        if not new_locations:
+            continue
+
+        # Check for inline kennitala prefix (e.g. "590269-1749 Skeljungur hf.")
+        kt_digits, company_name = _split_kt_prefix(regex_name)
+        if kt_digits:
+            kennitala = Kennitala(kt_digits)
+            if kennitala.validate():
+                entity, created = get_or_create_entity(
+                    db, kennitala, company_name, address=None
+                )
+                if created:
+                    db.commit()
+                case_entity, created = get_or_create_case_entity(
+                    db, minute.case, entity, applicant=False
+                )
+                if created:
+                    db.commit()
+                if entity.kennitala in _matched_mentions:
+                    _matched_mentions[entity.kennitala].extend(new_locations)
+                else:
+                    _matched_mentions[entity.kennitala] = new_locations
+                for span in new_locations:
+                    matched_spans.add(span)
+                continue
+
+        # Try entity table first (exact match on inflected form)
+        entity = _get_entity(db, regex_name)
+        if entity is not None:
+            case_entity, created = get_or_create_case_entity(
+                db, minute.case, entity, applicant=False
+            )
+            if created:
+                db.commit()
+            if entity.kennitala in _matched_mentions:
+                _matched_mentions[entity.kennitala].extend(new_locations)
+            else:
+                _matched_mentions[entity.kennitala] = new_locations
+            for span in new_locations:
+                matched_spans.add(span)
+            continue
+        # Fallback: check company_contacts for the inflected form
+        contact = lookup_company_in_contacts(db, regex_name)
+        if contact is None:
+            continue
+        kennitala = Kennitala(contact.kennitala)
+        if not kennitala.validate():
+            continue
+        entity, created = get_or_create_entity(
+            db, kennitala, regex_name, address=None
+        )
+        if created:
+            db.commit()
+        case_entity, created = get_or_create_case_entity(
+            db, minute.case, entity, applicant=False
+        )
+        if created:
+            db.commit()
+        if entity.kennitala in _matched_mentions:
+            _matched_mentions[entity.kennitala].extend(new_locations)
+        else:
+            _matched_mentions[entity.kennitala] = new_locations
+        for span in new_locations:
+            matched_spans.add(span)
+
+    # 3. Person mentions — lookup in person_contacts table
     for canonical_name, locations in person_mentions.items():
         contact = lookup_person_in_contacts(db, canonical_name)
         if contact is None:

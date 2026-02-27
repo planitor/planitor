@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% from "includes/property_transactions.html" import property_summary %}
 
 {% macro entity_label(entity) %}
 <span class="sf-symbol">
@@ -240,7 +241,9 @@
         <div class="hidden">{{ case.get_coordinates() }}</div>
       </div>
       {% endif %}
-      {% block right %}{% endblock %}
+      {% block right %}
+      {{ property_summary(property_transactions, case.iceaddr.landnr if case.iceaddr else None) }}
+      {% endblock %}
     </div>
 
   </div>

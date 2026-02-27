@@ -14,6 +14,7 @@ from planitor.models import (
     Entity,
     Meeting,
     Minute,
+    PropertyTransaction,
 )
 from planitor.models.enums import CaseStatusEnum, CouncilTypeEnum
 from planitor.schemas.city import (
@@ -44,7 +45,7 @@ def _minute_to_dict(minute: Minute) -> dict:
     }
 
 
-def _case_to_dict(case: Case, council_type=None, lat=None, lon=None) -> dict:
+def _case_to_dict(case: Case, council_type=None, lat=None, lon=None, last_sale=None) -> dict:
     if case.iceaddr:
         lat = float(case.iceaddr.lat_wgs84) if case.iceaddr.lat_wgs84 else None
         lon = float(case.iceaddr.long_wgs84) if case.iceaddr.long_wgs84 else None
@@ -57,7 +58,43 @@ def _case_to_dict(case: Case, council_type=None, lat=None, lon=None) -> dict:
         "lat": lat,
         "lon": lon,
         "council_type": council_type,
+        "last_sale_price": int(last_sale.kaupverd) if last_sale and last_sale.kaupverd else None,
+        "last_sale_date": last_sale.utgefid if last_sale else None,
     }
+
+
+def _get_latest_sales(db: Session, address_ids: list) -> dict:
+    """Batch-fetch the most recent PropertyTransaction per address_id."""
+    if not address_ids:
+        return {}
+    from sqlalchemy import and_
+    latest_sq = (
+        db.query(
+            PropertyTransaction.address_id,
+            func.max(PropertyTransaction.utgefid).label("max_date"),
+        )
+        .filter(PropertyTransaction.address_id.in_(address_ids))
+        .group_by(PropertyTransaction.address_id)
+        .subquery()
+    )
+    rows = (
+        db.query(PropertyTransaction)
+        .join(
+            latest_sq,
+            and_(
+                PropertyTransaction.address_id == latest_sq.c.address_id,
+                PropertyTransaction.utgefid == latest_sq.c.max_date,
+            ),
+        )
+        .all()
+    )
+    # Keep one per address_id (highest kaupverd if ties)
+    result = {}
+    for tx in rows:
+        prev = result.get(tx.address_id)
+        if prev is None or (tx.kaupverd or 0) > (prev.kaupverd or 0):
+            result[tx.address_id] = tx
+    return result
 
 
 @router.get("/cases/nearby", response_model=PaginatedResponse[ExploreCase])
@@ -102,10 +139,8 @@ def get_nearby_cases(
     total = query.count()
     cases = query.order_by(Case.updated.desc().nullslast()).offset(offset).limit(limit).all()
 
-    items = []
-    for case in cases:
-        d = _case_to_dict(case)
-        items.append(d)
+    sales = _get_latest_sales(db, [c.address_id for c in cases if c.address_id])
+    items = [_case_to_dict(c, last_sale=sales.get(c.address_id)) for c in cases]
 
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
@@ -263,6 +298,31 @@ def get_case_by_serial(
         if meeting and meeting.council:
             council_type = meeting.council.council_type
 
-    d = _case_to_dict(case, council_type=council_type)
+    # Property transactions at this address
+    transactions = []
+    last_sale = None
+    if case.address_id:
+        transactions = (
+            db.query(PropertyTransaction)
+            .filter(PropertyTransaction.address_id == case.address_id)
+            .order_by(PropertyTransaction.utgefid.desc().nullslast())
+            .all()
+        )
+        if transactions:
+            last_sale = transactions[0]
+
+    d = _case_to_dict(case, council_type=council_type, last_sale=last_sale)
     d["minutes"] = [_minute_to_dict(m) for m in minutes]
+    d["transactions"] = [
+        {
+            "fastnum": t.fastnum,
+            "kaupverd": int(t.kaupverd) if t.kaupverd else None,
+            "utgefid": t.utgefid,
+            "tegund": t.tegund,
+            "flatarmal": float(t.flatarmal) if t.flatarmal else None,
+            "fjoldi_herbergja": float(t.fjoldi_herbergja) if t.fjoldi_herbergja else None,
+            "byggingarar": t.byggingarar,
+        }
+        for t in transactions
+    ]
     return d

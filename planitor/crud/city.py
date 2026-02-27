@@ -16,6 +16,7 @@ from planitor.models import (
     Attachment,
     Case,
     CaseEntity,
+    CompanyContact,
     Council,
     CouncilTypeEnum,
     Entity,
@@ -367,6 +368,10 @@ def update_case_status(db: Session, case: Case):
 
 def lookup_person_in_contacts(db, canonical_name):
     return db.query(PersonContact).get(canonical_name)
+
+
+def lookup_company_in_contacts(db, name):
+    return db.query(CompanyContact).get(name)
 
 
 def lookup_icelandic_company_in_entities(db, name):

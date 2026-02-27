@@ -5,6 +5,7 @@ from .city import (  # noqa
     Applicant,
     Case,
     CaseEntity,
+    CompanyContact,
     Council,
     Entity,
     EntityMention,
@@ -16,6 +17,7 @@ from .city import (  # noqa
     PDFAttachment,
     PersonContact,
     Plan,
+    PropertyTransaction,
     Response,
     Permit,
 )

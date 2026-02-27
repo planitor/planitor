@@ -11,6 +11,8 @@
 {% from 'symbols/symbols.html' import arrow_up_right %}
 {% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}
 {% from 'includes/cases.html' import case_table %}
+{% from 'includes/property_transactions.html' import property_table %}
+
 
 {% block body %}
 
@@ -59,7 +61,7 @@
         <div class="border-b-2 flex-grow hidden md:flex"></div>
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold selected" data-target="content-1">{{ address }}</button>
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-2">Nálæg mál ({{ nearby_cases|length }})</button>
-        {# <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-3">{{ plan.heiti if plan else "Skipulag" }}</button> #}
+        <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-3">Kaupskrá ({{ property_transactions|map(attribute='fastnum')|unique|list|length }})</button>
         <div class="border-b-2 flex-grow"></div>
       </div>
       <div id="content-1" class="tabPage block">
@@ -68,8 +70,11 @@
       <div id="content-2" class="tabPage hidden">
       {{ case_table(request, nearby_cases) }}
       </div>
-      {#
       <div id="content-3" class="tabPage hidden">
+      {{ property_table(property_transactions, address.landnr) }}
+      </div>
+      {#
+      <div id="content-3-old" class="tabPage hidden">
         {% if plan %}
         <div>
           <a target="_blank" href="http://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ plan.skipnr }}">

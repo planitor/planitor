@@ -1,4 +1,5 @@
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
+{% from "includes/property_transactions.html" import property_summary, property_highlight %}
 
 {% macro meeting_card() %}
 {% set meeting_url = url_for('get_meeting', muni_slug = municipality.slug, council_slug = council.council_type.value, meeting_id = h.encode(meeting.id)) %}
@@ -91,6 +92,8 @@
   </div>
 </div>
 {% endif %}
+{{ property_highlight(property_transactions) }}
+{{ property_summary(property_transactions, case.iceaddr.landnr if case.iceaddr else None) }}
 {% if user.is_superuser %}
 <div class="mt-4">
   <div class="mb-2 font-bold text-xl flex">

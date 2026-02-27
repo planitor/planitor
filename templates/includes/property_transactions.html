@@ -1,0 +1,136 @@
+{# Property transaction macros for case sidebar and address page #}
+{# Transactions are grouped by fastnum (property unit) #}
+
+{% from 'symbols/symbols.html' import arrow_up_right %}
+
+{% macro property_summary(transactions, landnr=None) %}
+{# Compact card for case sidebar — one entry per unit, showing latest sale #}
+{% if transactions %}
+{% set units = {} %}
+{% for t in transactions %}
+  {% if t.fastnum not in units or (t.utgefid and (not units[t.fastnum].utgefid or t.utgefid > units[t.fastnum].utgefid)) %}
+    {% if units.update({t.fastnum: t}) %}{% endif %}
+  {% endif %}
+{% endfor %}
+{% set unit_list = units.values()|sort(attribute='utgefid', reverse=true) %}
+<div class="mt-6">
+  <div class="flex items-baseline mb-3">
+    <span class="text-sm font-bold">Kaupskrá</span>
+    <span class="text-xs text-gray-500 ml-2">{{ unit_list|length }} {{ 'eign' if unit_list|length == 1 else 'eignir' }}</span>
+  </div>
+  <div class="bg-white rounded-md shadow-lg overflow-hidden">
+    {% for t in unit_list[:5] %}
+    <div class="px-3 py-3 {{ 'border-b border-gray-100' if not loop.last }}">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-sm font-bold">{{ format_isk(t.kaupverd) }}</span>
+        {% if t.utgefid %}
+        <span class="text-xs text-gray-500">{{ t.utgefid.strftime('%d.%m.%Y') }}</span>
+        {% endif %}
+      </div>
+      <div class="text-xs text-gray-600">
+        {% if t.tegund %}{{ t.tegund }}{% endif %}
+        {% if t.flatarmal %} · {{ t.flatarmal|int }} m²{% endif %}
+        {% if t.fjoldi_herbergja %} · {{ t.fjoldi_herbergja|int }} herb.{% endif %}
+        {% if t.byggingarar %} · bygg. {{ t.byggingarar }}{% endif %}
+        {% if landnr and t.heinum %}
+        · <a class="underline" target="_blank" href="https://hms.is/fasteignaskra/{{ landnr }}/{{ t.heinum }}/{{ t.fastnum }}">HMS {{ arrow_up_right(class="h-1") }}</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% if unit_list|length > 5 %}
+    <div class="px-3 py-2 text-xs text-gray-500 text-center">
+      … og {{ unit_list|length - 5 }} {{ 'eign' if unit_list|length - 5 == 1 else 'eignir' }} til viðbótar
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro property_highlight(transactions) %}
+{# Highlighted latest sale price — for minute page header area #}
+{% if transactions %}
+{% set latest = transactions|sort(attribute='utgefid', reverse=true)|first %}
+{% if latest and latest.kaupverd %}
+<div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+  <div class="text-xs text-green-700 uppercase tracking-wide font-light mb-1">Síðasta markaðsverð</div>
+  <div class="text-lg font-bold text-green-900">{{ format_isk(latest.kaupverd) }}</div>
+  <div class="text-xs text-green-700">
+    {% if latest.tegund %}{{ latest.tegund }}{% endif %}
+    {% if latest.flatarmal %} · {{ latest.flatarmal|int }} m²{% endif %}
+    {% if latest.utgefid %} · {{ latest.utgefid.strftime('%d.%m.%Y') }}{% endif %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+{% endmacro %}
+
+
+{% macro property_table(transactions, landnr=None) %}
+{# Full table for address page tab — grouped by fastnum (property unit) #}
+{% if transactions %}
+{% set grouped = {} %}
+{% for t in transactions %}
+  {% if t.fastnum not in grouped %}
+    {% if grouped.update({t.fastnum: []}) %}{% endif %}
+  {% endif %}
+  {% if grouped[t.fastnum].append(t) %}{% endif %}
+{% endfor %}
+{# Sort groups by most recent sale date descending #}
+{% set groups = [] %}
+{% for fastnum, txs in grouped.items() %}
+  {% set latest = txs|sort(attribute='utgefid', reverse=true)|first %}
+  {% if groups.append((fastnum, latest, txs)) %}{% endif %}
+{% endfor %}
+{% set groups = groups|sort(attribute='1.utgefid', reverse=true) %}
+
+{% for fastnum, latest, txs in groups %}
+<div class="mb-6">
+  <div class="flex items-baseline mb-2">
+    <span class="text-sm font-bold">
+      {{ latest.tegund or 'Eign' }} · {{ latest.flatarmal|int if latest.flatarmal else '?' }} m²
+      {% if latest.fjoldi_herbergja %} · {{ latest.fjoldi_herbergja|int }} herb.{% endif %}
+      {% if latest.byggingarar %} · bygg. {{ latest.byggingarar }}{% endif %}
+    </span>
+    <span class="text-xs text-gray-400 ml-2">
+      {% if landnr and latest.heinum %}
+      <a class="hover:underline" target="_blank" href="https://hms.is/fasteignaskra/{{ landnr }}/{{ latest.heinum }}/{{ fastnum }}">fn. {{ fastnum }} {{ arrow_up_right(class="h-1") }}</a>
+      {% else %}
+      fn. {{ fastnum }}
+      {% endif %}
+    </span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-auto min-w-full">
+      <thead>
+        <tr>
+          <th class="px-2 py-1 minilabel text-left">Dags.</th>
+          <th class="px-2 py-1 minilabel text-right">Verð</th>
+          <th class="px-2 py-1 minilabel text-right">m²</th>
+          <th class="px-2 py-1 minilabel text-right hidden sm:table-cell">Herb.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in txs|sort(attribute='utgefid', reverse=true) %}
+        <tr class="{{ 'bg-white' if loop.index % 2 == 0 }}">
+          <td class="px-2 py-1.5 text-sm whitespace-nowrap">
+            {{ t.utgefid.strftime('%d.%m.%Y') if t.utgefid else '—' }}
+          </td>
+          <td class="px-2 py-1.5 text-sm text-right font-semibold whitespace-nowrap">
+            {{ format_isk(t.kaupverd) }}
+          </td>
+          <td class="px-2 py-1.5 text-sm text-right">{{ t.flatarmal|int if t.flatarmal else '—' }}</td>
+          <td class="px-2 py-1.5 text-sm text-right hidden sm:table-cell">{{ t.fjoldi_herbergja|int if t.fjoldi_herbergja else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="text-gray-500 text-sm py-4">Engar færslur í kaupskrá</div>
+{% endif %}
+{% endmacro %}

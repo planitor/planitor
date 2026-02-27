@@ -11,6 +11,7 @@ from .city import (
     get_or_create_meeting,
     get_or_create_municipality,
     levenshtein_company_lookup,
+    lookup_company_in_contacts,
     lookup_icelandic_company_in_entities,
     lookup_person_in_contacts,
     search_addresses,

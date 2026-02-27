@@ -504,6 +504,31 @@ class PersonContact(Base):
     kennitala = Column(String(10), nullable=False)
 
 
+class CompanyContact(Base):
+    __tablename__ = "company_contacts"
+    name = Column(String, primary_key=True)
+    kennitala = Column(String(10), nullable=False)
+
+
+class PropertyTransaction(Base):
+    __tablename__ = "property_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    faerslunumer = Column(Integer, index=True)  # HMS transaction ID (not unique per row)
+    heinum = Column(String)
+    fastnum = Column(String)
+    heimilisfang = Column(String)
+    kaupverd = Column(BIGINT)  # Full ISK amount
+    tegund = Column(String)  # Property type (Sérbýli, Fjölbýli, etc.)
+    flatarmal = Column(Numeric)  # Area in m²
+    fjoldi_herbergja = Column(Numeric)
+    byggingarar = Column(Integer)  # Year built
+    utgefid = Column(Date)  # Date issued/published
+    thinglyst = Column(Date)  # Date registered
+
+    address_id = Column(Integer, nullable=True, index=True)  # hnitnum, no FK (sparse addresses table)
+
+
 class Applicant(Base):
     __tablename__ = "applicants"
 

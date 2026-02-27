@@ -3,6 +3,7 @@
 {% from 'symbols/symbols.html' import house_fill, arrow_up_right %}
 {% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}
 {% from 'includes/cases.html' import case_table %}
+{% from 'includes/pagination.html' import pagination_nav %}
 
 {% block title %}{{ entity.name }} — {{ super() }}{% endblock %}
 {% block og_title %}{{ entity.name }} — {{ super() }}{% endblock %}
@@ -24,8 +25,10 @@
         <a class="block mt-2 sm:mt-0 sm:mr-6 order-last sm:order-none font-bold" href="https://www.rsk.is/fyrirtaekjaskra/leit/kennitala/{{ entity.kennitala }}">
           RSK.is <span class="sf-symbol">{{ arrow_up_right(class="h-2") }}</span>
         </a>
+        {% if user %}
         <div class="follow-entity" data-state="{{ 'following' if subscription }}" data-kennitala="{{ entity.kennitala }}">
         </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -36,9 +39,28 @@
     <div class="mb-4">
       <div class="entity-map shadow-lg rounded-md overflow-hidden bg-white w-full" data-kennitala="{{ entity.kennitala }}"></div>
     </div>
+
+    <form method="get" class="my-4">
+      <div class="flex items-center gap-2">
+        <input type="text" name="q" value="{{ q }}" placeholder="Leita í málum..."
+               class="border rounded px-3 py-2 w-full max-w-md" />
+        {% if q %}
+        <a href="{{ request.url_for('get_company', kennitala=entity.kennitala) }}" class="text-sm text-gray-600 hover:underline whitespace-nowrap">Hreinsa</a>
+        {% endif %}
+      </div>
+    </form>
+
+    {% if q %}
+    <div class="mb-4 text-sm text-gray-700">
+      {{ pagination.count }} {{ "niðurstaða" if pagination.count == 1 else "niðurstöður" }} fyrir „{{ q }}"
+    </div>
+    {% endif %}
+
     <div class="">
       {{ case_table(request, cases) }}
     </div>
+
+    {{ pagination_nav(pagination, "{}?q={}".format(request.url_for('get_company', kennitala=entity.kennitala), q)) }}
   </div>
 
   {% endblock %}

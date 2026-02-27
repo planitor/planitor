@@ -23,9 +23,10 @@ from planitor.models import (
     Meeting,
     Minute,
     Municipality,
+    PropertyTransaction,
     User,
 )
-from planitor.search import MinuteResults
+from planitor.search import MinuteResults, Pagination
 from planitor.security import get_current_active_user_or_none
 from planitor.templates import templates
 
@@ -414,6 +415,15 @@ async def get_case(
 
     address_subscription = crud.get_address_subscription(db, current_user, case.iceaddr)
 
+    property_transactions = []
+    if case.address_id:
+        property_transactions = (
+            db.query(PropertyTransaction)
+            .filter(PropertyTransaction.address_id == case.address_id)
+            .order_by(PropertyTransaction.utgefid.desc().nullslast())
+            .all()
+        )
+
     return templates.TemplateResponse(
         "case.html",
         {
@@ -427,6 +437,7 @@ async def get_case(
             "related_cases": related_cases,
             "subscription": subscription,
             "address_subscription": address_subscription,
+            "property_transactions": property_transactions,
         },
     )
 
@@ -516,6 +527,15 @@ def get_minute(
         .order_by(Meeting.start.desc())
     )
 
+    property_transactions = []
+    if case.address_id:
+        property_transactions = (
+            db.query(PropertyTransaction)
+            .filter(PropertyTransaction.address_id == case.address_id)
+            .order_by(PropertyTransaction.utgefid.desc().nullslast())
+            .all()
+        )
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -535,6 +555,7 @@ def get_minute(
             "subscription": subscription,
             "related_cases": related_cases,
             "address_subscription": address_subscription,
+            "property_transactions": property_transactions,
         },
     )
 
@@ -617,6 +638,13 @@ async def get_address(
             address.lat_wgs84, address.long_wgs84
         )
 
+    property_transactions = (
+        db.query(PropertyTransaction)
+        .filter(PropertyTransaction.address_id == hnitnum)
+        .order_by(PropertyTransaction.utgefid.desc().nullslast())
+        .all()
+    )
+
     return templates.TemplateResponse(
         "address.html",
         {
@@ -631,6 +659,7 @@ async def get_address(
             "subscription": subscription,
             "polygon": polygon,
             "plan": plan,
+            "property_transactions": property_transactions,
         },
     )
 
@@ -641,6 +670,8 @@ async def get_company(
     request: Request,
     kennitala: str,
     slug: str = None,
+    q: str = "",
+    page: int = 1,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
@@ -648,11 +679,6 @@ async def get_company(
 
     if slug is None:
         return RedirectResponse("/f/{}-{}".format(entity.slug, entity.kennitala))
-
-    if current_user is None:
-        return templates.TemplateResponse(
-            "company_paywall.html", {"request": request, "entity": entity}
-        )
 
     sq_count = (
         db.query(Case.id, func.count(Minute.id).label("minute_count"))
@@ -673,16 +699,32 @@ async def get_company(
         .join(CaseEntity)
         .filter(CaseEntity.entity == entity)
         .join(sq_count, sq_count.c.id == Case.id)
-        .order_by(Case.updated.desc())
     )
 
-    subscription = crud.get_entity_subscription(db, current_user, entity)
+    if q:
+        tsquery = func.websearch_to_tsquery("simple", q)
+        cases = (
+            cases.join(Minute, Case.id == Minute.case_id)
+            .filter(Minute.search_vector.op("@@")(tsquery))
+            .distinct()
+        )
+
+    cases = cases.order_by(Case.updated.desc())
+
+    count_query = db.query(func.count()).select_from(cases.subquery())
+    pagination = Pagination(cases, count_query, page)
+
+    subscription = None
+    if current_user:
+        subscription = crud.get_entity_subscription(db, current_user, entity)
 
     return templates.TemplateResponse(
         "company.html",
         {
             "entity": entity,
-            "cases": cases,
+            "cases": pagination.query,
+            "pagination": pagination,
+            "q": q,
             "request": request,
             "user": current_user,
             "subscription": subscription,

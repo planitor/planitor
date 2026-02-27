@@ -187,16 +187,40 @@ The container rebuilds and restarts automatically.
 - Password: `password`
 
 ```bash
-# Connect
-psql postgresql://planitor:password@localhost:5432/planitor
+# Connect (psql is at a non-standard path)
+/opt/homebrew/opt/postgresql@17/bin/psql postgresql://planitor:password@localhost:5432/planitor
+
+# IMPORTANT: Disable parallel workers to avoid UTF-8 encoding errors on ILIKE queries
+# Always prepend this to any query session:
+SET max_parallel_workers_per_gather = 0;
 
 # Useful queries
 SELECT COUNT(*) FROM minutes;
 SELECT COUNT(*) FROM cases;
-SELECT m.name, m.start, COUNT(min.id) FROM meetings m 
-  LEFT JOIN minutes min ON min.meeting_id = m.id 
+SELECT m.name, m.start, COUNT(min.id) FROM meetings m
+  LEFT JOIN minutes min ON min.meeting_id = m.id
   GROUP BY m.id ORDER BY m.start DESC LIMIT 10;
 ```
+
+### Schema quick reference
+
+Key tables and joins for ad-hoc analysis:
+
+```
+minutes → meetings (meeting_id) → councils (council_id)
+minutes → cases (case_id) → addresses (address_id = hnitnum)
+entities (kennitala PK, name)
+```
+
+- **addresses**: `hnitnum` (PK), `heiti_nf`, `husnr`, `lat_wgs84`, `long_wgs84`
+- **cases**: `address_id` links to `addresses.hnitnum` (NULL for un-geocoded addresses)
+- **entities**: `kennitala` PK, `name` — company registry entries
+- Kennitalas appear inline in `minutes.inquiry` text (pattern: `\d{6}-?\d{4}`)
+- Use `-x` flag for expanded output on wide result sets
+- Geofence query pattern (Haversine approx at 64°N):
+  ```sql
+  (111.0 * SQRT(POWER(a.lat_wgs84 - LAT, 2) + POWER((a.long_wgs84 - LON) * 0.44, 2))) < RADIUS_KM
+  ```
 
 ## Key Environment Variables
 

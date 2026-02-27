@@ -1,0 +1,45 @@
+{% macro pagination_nav(pagination, base_url) %}
+{% if pagination.total_pages > 1 %}
+
+  {% macro page(number) %}
+  <div class="mr-3">
+    {% if number == pagination.number %}
+    <span class="font-bold text-planitor-blue">{{ number }}</span>
+    {% else %}
+    <a class="text-gray-600 hover:underline" href="{{ base_url }}&page={{ number }}">
+      {{ number }}
+    </a>
+    {% endif %}
+  </div>
+  {% endmacro %}
+
+  {% macro ellipsis() %}
+  <div class="mr-3 text-gray-600">…</div>
+  {% endmacro %}
+
+  <div class="my-8 flex justify-between text-lg">
+    <div class="flex">
+      <div class="mr-3 text-gray-600">Síða</div>
+      {% set head, current, tail = pagination.get_page_segments() %}
+      {% if head %}
+        {% for number in head %} {{ page(number) }} {% endfor %} {{ ellipsis() if (head[-1] + 1) != current[0] }}
+      {% endif %}
+      {% for number in current %} {{ page(number) }} {% endfor %}
+      {% if tail %}
+        {{ ellipsis() if (tail[0] - 1 != current[-1]) }} {% for number in tail %} {{ page(number) }} {% endfor %}
+      {% endif %}
+    </div>
+    <div>
+      {% if pagination.has_next %}
+      <a
+        class="text-planitor-blue font-semibold"
+        href="{{ base_url }}&page={{ pagination.number + 1 }}"
+      >
+        Næsta síða →
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+{% endif %}
+{% endmacro %}

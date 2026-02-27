@@ -116,6 +116,21 @@ class ExploreCase(BaseModel):
     lat: Optional[float]
     lon: Optional[float]
     council_type: Optional[CouncilTypeEnum]
+    last_sale_price: Optional[int]
+    last_sale_date: Optional[dt.date]
+
+    class Config:
+        orm_mode = True
+
+
+class ExplorePropertyTransaction(BaseModel):
+    fastnum: Optional[str]
+    kaupverd: Optional[int]
+    utgefid: Optional[dt.date]
+    tegund: Optional[str]
+    flatarmal: Optional[float]
+    fjoldi_herbergja: Optional[float]
+    byggingarar: Optional[int]
 
     class Config:
         orm_mode = True
@@ -123,6 +138,7 @@ class ExploreCase(BaseModel):
 
 class ExploreCaseDetail(ExploreCase):
     minutes: List[ExploreMinute]
+    transactions: List[ExplorePropertyTransaction] = []
 
 
 class PaginatedResponse(GenericModel, Generic[T]):
