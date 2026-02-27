@@ -11,6 +11,7 @@ import botocore.exceptions
 import dramatiq
 import pypdfium2
 from PIL import Image
+from sentry_sdk import capture_exception
 from sqlalchemy.orm import Session
 
 from . import ENV, config
@@ -109,27 +110,23 @@ def _update_pdf_attachment(attachment: Attachment, db: Session) -> None:
     """Download PDF, upload to MinIO, render pages, and upsert PDFAttachment record."""
     if attachment.type != "application/pdf":
         return
-    pages_rendered_at = None
-    with get_url_bytestring(attachment.url) as resource_bytes:
-        page_count = get_pdf_page_count(resource_bytes)
-        key = f"{ENV}/attachments/{attachment.id}.pdf"
-        bytes_io = BytesIO(resource_bytes)
-        upload(bytes_io, key)
-        bytes_io.close()
-        # Render each page as JPEG and upload to MinIO
-        try:
-            page_count = render_pdf_pages(resource_bytes, attachment.id)
-            pages_rendered_at = dt.datetime.utcnow()
-        except Exception:
-            logger.exception(
-                "Failed to render PDF pages for attachment %s", attachment.id
-            )
-    # Upsert: update existing record or create new one
+    # Skip if already rendered
     existing = (
         db.query(PDFAttachment)
         .filter(PDFAttachment.attachment_id == attachment.id)
         .first()
     )
+    if existing and existing.pages_rendered_at:
+        return
+    with get_url_bytestring(attachment.url) as resource_bytes:
+        key = f"{ENV}/attachments/{attachment.id}.pdf"
+        bytes_io = BytesIO(resource_bytes)
+        upload(bytes_io, key)
+        bytes_io.close()
+        # Render each page as JPEG and upload to MinIO (exceptions propagate for retry)
+        page_count = render_pdf_pages(resource_bytes, attachment.id)
+        pages_rendered_at = dt.datetime.utcnow()
+    # Upsert: update existing record or create new one
     if existing:
         existing.bucket = MINIO_PDF_BUCKET
         existing.key = key
@@ -148,10 +145,14 @@ def _update_pdf_attachment(attachment: Attachment, db: Session) -> None:
     db.commit()
 
 
-@dramatiq.actor
+@dramatiq.actor(max_retries=3, time_limit=120_000)
 def update_pdf_attachment(id: int) -> None:
     with db_context() as db:
         attachment = db.query(Attachment).get(id)
         if attachment is None:
             return
-        _update_pdf_attachment(attachment, db)
+        try:
+            _update_pdf_attachment(attachment, db)
+        except Exception as e:
+            capture_exception(e)
+            raise
