@@ -66,6 +66,43 @@ function getMarkersForAddresses(addresses: MapEntityResponse["addresses"]) {
   );
 }
 
+interface FrontpagePin {
+  lat: number;
+  lon: number;
+  label: string;
+  status_color: string | null;
+  headline: string;
+  url: string;
+}
+
+function getFrontpageMarkerColor(color: string | null): string {
+  return (
+    { green: "#0c7556", yellow: "#755600", red: "#A33417" }[color] || "#0D2475"
+  );
+}
+
+export function renderFrontpageMap(el: HTMLElement) {
+  const scriptEl = el.querySelector<HTMLScriptElement>(
+    'script[type="application/json"]'
+  );
+  if (!scriptEl) return;
+
+  const pins: FrontpagePin[] = JSON.parse(scriptEl.textContent || "[]");
+  if (pins.length === 0) return;
+
+  const map = L.map(el).setView([64.14, -21.88], 13);
+  createTileLayer().addTo(map);
+
+  const markers = pins.map((pin) => {
+    const color = getFrontpageMarkerColor(pin.status_color);
+    const popupHtml = `<a href="${pin.url}" class="text-sm font-bold">${pin.label}</a>${pin.headline ? `<br><span class="text-xs">${pin.headline}</span>` : ""}`;
+    return createCircleMarker(pin.lat, pin.lon, popupHtml, color);
+  });
+
+  const group = L.featureGroup(markers).addTo(map);
+  map.fitBounds(group.getBounds().pad(0.1));
+}
+
 export function renderEntityMap(el: HTMLElement, kennitala: string) {
   return getEntityAddresses(kennitala).then(({ addresses }) => {
     if (addresses.length === 0) return;

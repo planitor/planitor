@@ -4,7 +4,7 @@ import { Login } from "./accounts";
 import { FollowAddress, FollowCase, FollowEntity } from "./follow";
 import { NewPasswordForm } from "./forms/new-password";
 import { PermitForm } from "./forms/permits";
-import { renderEntityMap, renderNearbyMap } from "./maps";
+import { renderEntityMap, renderFrontpageMap, renderNearbyMap } from "./maps";
 import { openModal } from "./modals";
 import { Navigation } from "./navigation";
 import { PDFViewer } from "./pdfViewer";
@@ -24,6 +24,12 @@ if (process.env.SENTRY_DSN) {
     const { email, id } = document._user || {};
     Sentry.setUser({ email, id });
   }
+}
+
+// Initialize frontpage map
+const frontpageMapEl = document.querySelector<HTMLElement>(".frontpage-map");
+if (frontpageMapEl) {
+  renderFrontpageMap(frontpageMapEl);
 }
 
 // Initialize Leaflet maps for entity and nearby views

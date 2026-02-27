@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block fullwidth %}
+{% if map_pins %}
+<div class="frontpage-map" style="height: 400px; width: 100%;">
+  <script type="application/json">{{ map_pins | tojson }}</script>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block body %}
 <div class="mt-4 sm:mt-6 mb-4">
 
