@@ -1,0 +1,78 @@
+{# Deiliskipulag plan display macros #}
+
+{% from 'symbols/symbols.html' import arrow_up_right %}
+
+{% macro deiliskipulag_card(plan, plan_data) %}
+{# Sidebar card showing plan name, date, and rendered zoning map thumbnails.
+   plan: DeiliskipulagPlan model instance (or None)
+   plan_data: dict from skipulagsstofnun shapefile (has .skipnr)
+#}
+{% if plan_data %}
+{% set skipnr = plan_data.skipnr|int %}
+<div class="mt-6">
+  <div class="flex items-baseline mb-3">
+    <span class="text-sm font-bold">Deiliskipulag</span>
+  </div>
+  <div class="bg-white rounded-md shadow-lg overflow-hidden">
+    <div class="px-3 py-3">
+      <div class="text-sm font-bold mb-1">
+        {% if plan %}{{ plan.heiti }}{% else %}{{ plan_data.heiti or "Deiliskipulag" }}{% endif %}
+      </div>
+      <div class="text-xs text-gray-600">
+        {% if plan and plan.dagsleidrett %}
+        Samþykkt {{ plan.dagsleidrett.strftime('%d.%m.%Y') }}
+        {% elif plan_data.dagsleidrett %}
+        Samþykkt {{ plan_data.dagsleidrett.strftime('%d.%m.%Y') }}
+        {% endif %}
+        {% if plan and plan.malsmed %}
+        <span class="ml-1">· {{ plan.malsmed }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Rendered uppdráttur thumbnails #}
+    {% if plan and plan.documents %}
+    {% set uppdrattir = plan.documents|selectattr("doc_type", "equalto", "uppdráttur")|selectattr("pages_rendered_at")|list %}
+    {% if uppdrattir %}
+    {% for doc in uppdrattir %}
+    <div class="px-3 pb-3">
+      <ul class="flex flex-wrap">
+        {% for i in range(doc.page_count or 0) %}
+        {% set page_key = "deiliskipulag-{}-up-page-{}.jpg".format(skipnr, i) %}
+        <li class="rounded overflow-hidden shadow-md mr-2 mb-2">
+          <a href="{{ imgproxy(page_key, {'dpr': '2', 'w': '1024'}) }}" target="_blank">
+            <img src="{{ imgproxy(page_key, {'h': '120'}) }}" alt="Skipulagsuppdráttur bls. {{ i + 1 }}" loading="lazy">
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {# Greinargerð cover page #}
+    {% set greinargerdir = plan.documents|selectattr("doc_type", "equalto", "greinargerð")|selectattr("pages_rendered_at")|list %}
+    {% if greinargerdir %}
+    {% for doc in greinargerdir %}
+    {% set page_key = "deiliskipulag-{}-gr-page-0.jpg".format(skipnr) %}
+    <div class="px-3 pb-3">
+      <div class="text-xs text-gray-500 mb-1">Greinargerð</div>
+      <a href="{{ imgproxy(page_key, {'dpr': '2', 'w': '1024'}) }}" target="_blank" class="rounded overflow-hidden shadow-md inline-block">
+        <img src="{{ imgproxy(page_key, {'h': '80'}) }}" alt="Greinargerð forsíða" loading="lazy">
+      </a>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+
+    <div class="px-3 pb-3">
+      <a class="text-xs text-planitor-blue hover:underline"
+         target="_blank"
+         href="https://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ skipnr }}">
+        Skipulagsstofnun {{ arrow_up_right(class="h-1") }}
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endmacro %}

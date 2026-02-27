@@ -12,6 +12,7 @@
 {% from 'includes/breadcrumbs.html' import breadcrumbs, breadcrumb %}
 {% from 'includes/cases.html' import case_table %}
 {% from 'includes/property_transactions.html' import property_table %}
+{% from 'includes/deiliskipulag.html' import deiliskipulag_card %}
 
 
 {% block body %}
@@ -30,8 +31,12 @@
       </div>
       <div class="flex flex-col sm:flex-row items-end sm:items-center">
         <div class="order-last sm:order-none font-bold flex flex-col sm:flex-row items-end">
-          {% if plan -%}
-          <a class="block mt-2 sm:mt-0 sm:mr-6" target="_blank" href="http://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ plan.skipnr }}">
+          {% if plan_data -%}
+          <a class="block mt-2 sm:mt-0 sm:mr-6" target="_blank" href="https://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ plan_data.skipnr }}">
+            Deiliskipulag <span class="sf-symbol">{{ arrow_up_right(class="h-1") }}</span>
+          </a>
+          {% elif plan -%}
+          <a class="block mt-2 sm:mt-0 sm:mr-6" target="_blank" href="https://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ plan.skipnr }}">
             Deiliskipulag <span class="sf-symbol">{{ arrow_up_right(class="h-1") }}</span>
           </a>
           {% endif -%}
@@ -62,6 +67,9 @@
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold selected" data-target="content-1">{{ address }}</button>
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-2">Nálæg mál ({{ nearby_cases|length }})</button>
         <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-3">Kaupskrá ({{ property_transactions|map(attribute='fastnum')|unique|list|length }})</button>
+        {% if plan_data or plan %}
+        <button class="py-4 px-6 sm:px-8 border-b-2 font-bold" data-target="content-4">Deiliskipulag</button>
+        {% endif %}
         <div class="border-b-2 flex-grow"></div>
       </div>
       <div id="content-1" class="tabPage block">
@@ -73,27 +81,11 @@
       <div id="content-3" class="tabPage hidden">
       {{ property_table(property_transactions, address.landnr) }}
       </div>
-      {#
-      <div id="content-3-old" class="tabPage hidden">
-        {% if plan %}
-        <div>
-          <a target="_blank" href="http://skipulagsaaetlanir.skipulagsstofnun.is/skipulagvefur/display.aspx?numer={{ plan.skipnr }}">
-            Uppdrættir
-          </a>
-        </div>
-        <table class="table-auto">
-          {% for key, value in plan.items() %}
-          <tr>
-            <td class="font-bold">{{ key }}</td>
-            <td>{{ value or "" }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-        {% else %}
-        Ekkert deiliskipulag fannst
-        {% endif %}
+      {% if plan_data or plan %}
+      <div id="content-4" class="tabPage hidden">
+        {{ deiliskipulag_card(db_plan, plan_data or plan) }}
       </div>
-      #}
+      {% endif %}
     </div>
   </div>
 

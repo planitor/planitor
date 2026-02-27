@@ -18,6 +18,7 @@ from planitor.models import (
     CaseStatusEnum,
     Council,
     CouncilTypeEnum,
+    DeiliskipulagPlan,
     Entity,
     EntityTypeEnum,
     Meeting,
@@ -33,6 +34,16 @@ from planitor.templates import templates
 from .utils import _get_entity
 
 router = APIRouter()
+
+
+def _get_deiliskipulag(db, lat, lon):
+    """Look up deiliskipulag for coordinates. Returns (plan_data, db_plan)."""
+    polygon, plan_data = skipulagsstofnun.plans.get_plan(lat, lon)
+    if plan_data is None:
+        return None, None
+    skipnr = int(plan_data["skipnr"])
+    db_plan = db.query(DeiliskipulagPlan).get(skipnr)
+    return plan_data, db_plan
 
 
 @router.get("/leit")
@@ -198,6 +209,60 @@ async def get_index(
         .all()
     )
 
+    # Map pins: distinct addresses with recent activity and coordinates
+    ninety_days_ago = dt.datetime.utcnow() - dt.timedelta(days=90)
+    # Capital area bounding box (approximate)
+    LAT_MIN, LAT_MAX = 64.05, 64.20
+    LON_MIN, LON_MAX = -22.05, -21.70
+
+    map_pin_rows = (
+        db.query(
+            Address.hnitnum,
+            Address.lat_wgs84,
+            Address.long_wgs84,
+            func.max(Case.id).label("latest_case_id"),
+        )
+        .join(Case, Case.address_id == Address.hnitnum)
+        .join(Minute, Minute.case_id == Case.id)
+        .join(Meeting, Minute.meeting_id == Meeting.id)
+        .filter(
+            Meeting.start >= ninety_days_ago,
+            Address.lat_wgs84.isnot(None),
+            Address.long_wgs84.isnot(None),
+            Address.lat_wgs84.between(LAT_MIN, LAT_MAX),
+            Address.long_wgs84.between(LON_MIN, LON_MAX),
+        )
+        .group_by(Address.hnitnum, Address.lat_wgs84, Address.long_wgs84)
+        .limit(150)
+        .all()
+    )
+
+    map_pins = []
+    if map_pin_rows:
+        case_ids = [row.latest_case_id for row in map_pin_rows]
+        cases_by_id = {
+            c.id: c
+            for c in db.query(Case).filter(Case.id.in_(case_ids)).all()
+        }
+        for row in map_pin_rows:
+            case = cases_by_id.get(row.latest_case_id)
+            if not case:
+                continue
+            address = case.iceaddr
+            if not address:
+                continue
+            status_color = case.status.value.color if case.status else None
+            map_pins.append(
+                {
+                    "lat": float(row.lat_wgs84),
+                    "lon": float(row.long_wgs84),
+                    "label": address.address or "",
+                    "status_color": status_color,
+                    "headline": case.headline or "",
+                    "url": f"/heimilisfong/{row.hnitnum}",
+                }
+            )
+
     # Themed case clusters — search index queries, no time window
     theme_clusters = [
         ("Kærur", "kæra"),
@@ -243,6 +308,7 @@ async def get_index(
             "busy_entities": busy_entities,
             "fresh_cases": fresh_cases,
             "themed_cases": themed_cases,
+            "map_pins": map_pins,
         },
     )
 
@@ -424,6 +490,11 @@ async def get_case(
             .all()
         )
 
+    plan_data, db_plan = None, None
+    coords = case.get_coordinates()
+    if coords:
+        plan_data, db_plan = _get_deiliskipulag(db, coords[0], coords[1])
+
     return templates.TemplateResponse(
         "case.html",
         {
@@ -438,6 +509,8 @@ async def get_case(
             "subscription": subscription,
             "address_subscription": address_subscription,
             "property_transactions": property_transactions,
+            "plan_data": plan_data,
+            "db_plan": db_plan,
         },
     )
 
@@ -536,6 +609,11 @@ def get_minute(
             .all()
         )
 
+    plan_data, db_plan = None, None
+    coords = case.get_coordinates()
+    if coords:
+        plan_data, db_plan = _get_deiliskipulag(db, coords[0], coords[1])
+
     return templates.TemplateResponse(
         "minute.html",
         {
@@ -556,6 +634,8 @@ def get_minute(
             "related_cases": related_cases,
             "address_subscription": address_subscription,
             "property_transactions": property_transactions,
+            "plan_data": plan_data,
+            "db_plan": db_plan,
         },
     )
 
@@ -633,10 +713,15 @@ async def get_address(
     municipality = db.query(Municipality).filter(Municipality.id == address.svfnr).first()
 
     polygon, plan = None, None
+    plan_data, db_plan = None, None
     if address:
         polygon, plan = skipulagsstofnun.plans.get_plan(
             address.lat_wgs84, address.long_wgs84
         )
+        if plan:
+            plan_data, db_plan = _get_deiliskipulag(
+                db, address.lat_wgs84, address.long_wgs84
+            )
 
     property_transactions = (
         db.query(PropertyTransaction)
@@ -659,6 +744,8 @@ async def get_address(
             "subscription": subscription,
             "polygon": polygon,
             "plan": plan,
+            "plan_data": plan_data,
+            "db_plan": db_plan,
             "property_transactions": property_transactions,
         },
     )
@@ -738,10 +825,12 @@ async def get_person(
     request: Request,
     kennitala: str,
     slug: str = None,
+    q: str = "",
+    page: int = 1,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
-    return await get_company(request, kennitala, slug, db, current_user)
+    return await get_company(request, kennitala, slug, q, page, db, current_user)
 
 
 @router.get("/minutes/{id}")

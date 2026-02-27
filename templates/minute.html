@@ -1,5 +1,6 @@
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 {% from "includes/property_transactions.html" import property_summary, property_highlight %}
+{% from "includes/deiliskipulag.html" import deiliskipulag_card %}
 
 {% macro meeting_card() %}
 {% set meeting_url = url_for('get_meeting', muni_slug = municipality.slug, council_slug = council.council_type.value, meeting_id = h.encode(meeting.id)) %}
@@ -94,6 +95,7 @@
 {% endif %}
 {{ property_highlight(property_transactions) }}
 {{ property_summary(property_transactions, case.iceaddr.landnr if case.iceaddr else None) }}
+{{ deiliskipulag_card(db_plan, plan_data) }}
 {% if user.is_superuser %}
 <div class="mt-4">
   <div class="mb-2 font-bold text-xl flex">

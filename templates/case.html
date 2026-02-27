@@ -2,6 +2,7 @@
 
 {% from "includes/breadcrumbs.html" import breadcrumbs, breadcrumb %}
 {% from "includes/property_transactions.html" import property_summary %}
+{% from "includes/deiliskipulag.html" import deiliskipulag_card %}
 
 {% macro entity_label(entity) %}
 <span class="sf-symbol">
@@ -23,16 +24,12 @@
   {% for case_entity in case_entities %}
   {% set e = case_entity.entity %}
   <div class="mb-1">
-    {% if e.entity_type.name == "company" %}
     <a href="{{ url_for('get_company', kennitala=e.kennitala, slug=e.slug)
                     if e.entity_type.name == 'company' else
                     url_for('get_person', kennitala=e.kennitala, slug=e.slug) }}"
       class="text-planitor-darkBlue font-semibold font-sm truncate">
       {{ entity_label(e) }}
     </a>
-    {% else %}
-    <span class="text-black">{{ entity_label(e) }}</span>
-    {% endif %}
   </div>
   {% endfor %}
 </div>
@@ -243,6 +240,7 @@
       {% endif %}
       {% block right %}
       {{ property_summary(property_transactions, case.iceaddr.landnr if case.iceaddr else None) }}
+      {{ deiliskipulag_card(db_plan, plan_data) }}
       {% endblock %}
     </div>
 

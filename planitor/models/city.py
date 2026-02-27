@@ -529,6 +529,29 @@ class PropertyTransaction(Base):
     address_id = Column(Integer, nullable=True, index=True)  # hnitnum, no FK (sparse addresses table)
 
 
+class DeiliskipulagPlan(Base):
+    __tablename__ = "deiliskipulag_plans"
+    skipnr = Column(Integer, primary_key=True)
+    heiti = Column(String)
+    sveitarfelag = Column(String)
+    dagsleidrett = Column(Date, nullable=True)
+    malsmed = Column(String, nullable=True)
+    numer_mals = Column(String, nullable=True)
+    documents = relationship("DeiliskipulagDocument", back_populates="plan")
+
+
+class DeiliskipulagDocument(Base):
+    __tablename__ = "deiliskipulag_documents"
+    id = Column(Integer, primary_key=True, index=True)
+    skipnr = Column(Integer, ForeignKey("deiliskipulag_plans.skipnr"))
+    doc_type = Column(String)  # "greinargerð", "uppdráttur", "skýringaruppdráttur"
+    source_url = Column(String)
+    file_size_mb = Column(Numeric, nullable=True)
+    page_count = Column(Integer, nullable=True)
+    pages_rendered_at = Column(DateTime, nullable=True)
+    plan = relationship("DeiliskipulagPlan", back_populates="documents")
+
+
 class Applicant(Base):
     __tablename__ = "applicants"
 

@@ -7,6 +7,8 @@ from .city import (  # noqa
     CaseEntity,
     CompanyContact,
     Council,
+    DeiliskipulagDocument,
+    DeiliskipulagPlan,
     Entity,
     EntityMention,
     Geoname,
