@@ -196,8 +196,7 @@ class MinuteResults:
                     contains_eager(Minute.meeting)
                     .contains_eager(Meeting.council)
                     .contains_eager(Council.municipality),
-                    contains_eager(Minute.case),
-                    joinedload(Minute.case, innerjoin=True)
+                    contains_eager(Minute.case)
                     .joinedload(Case.entities, innerjoin=False)
                     .joinedload(CaseEntity.entity, innerjoin=True),
                 )

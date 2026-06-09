@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, Request, Response
+from fastapi import Depends, Request, Response, status
 from fastapi.exceptions import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,8 +44,13 @@ async def get_subscriptions(
 
 
 @router.post("/subscriptions", response_model=Subscription)
-def create_subscription():
-    return None
+async def create_subscription(
+    current_user: models.User = Depends(get_current_active_user),
+):
+    raise HTTPException(
+        status.HTTP_501_NOT_IMPLEMENTED,
+        "Subscription creation is not implemented for this endpoint.",
+    )
 
 
 def set_subscription_council_types(

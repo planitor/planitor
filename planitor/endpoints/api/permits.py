@@ -50,10 +50,11 @@ async def get_permits(
     query = (
         select(models.Permit)
         .options(*PERMIT_LOAD_OPTIONS)
-        .join(models.Minute)
-        .join(models.Meeting)
-        .join(models.Case)
-        .join(models.Municipality)
+        .select_from(models.Permit)
+        .join(models.Permit.minute)
+        .join(models.Minute.meeting)
+        .join(models.Minute.case)
+        .join(models.Case.municipality)
         .order_by(models.Meeting.start.desc(), models.Minute.id)
     )
     page = await db.run_sync(

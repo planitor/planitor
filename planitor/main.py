@@ -71,9 +71,10 @@ async def _http_exception_handler(request: Request, exc: HTTPException):
     """An exception handler for an improved browser experience."""
     if "application/json" not in request.headers.get("Accept", ""):
         if exc.status_code == 403:
-            return RedirectResponse(
-                request.url_for("login_page") + f"?redirect_to={request.url.path}"
+            login_url = request.url_for("login_page").include_query_params(
+                redirect_to=request.url.path
             )
+            return RedirectResponse(str(login_url))
         template = "server_error.html"
         if exc.status_code == 404:
             template = "404.html"
