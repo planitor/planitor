@@ -366,6 +366,8 @@ class MinuteEntityMention(Base):
     minute = relationship("Minute", back_populates="entity_mention_rows")
     entity = relationship(Entity)
 
+    __table_args__ = (UniqueConstraint("minute_id", "entity_id", "start", "end_"),)
+
     def as_tuple(self):
         return (self.entity_id, self.start, self.end)
 
