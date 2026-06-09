@@ -43,8 +43,26 @@ class DatabasePipeline(object):
         self.db.close()
 
     def process_item(self, item, spider):
+        try:
+            return self._process_item(item, spider)
+        except DropItem:
+            self.db.rollback()
+            raise
+        except Exception:
+            self.db.rollback()
+            raise
+
+    def _process_item(self, item, spider):
         if item is None:
             raise DropItem
+        if not item.get("start"):
+            raise DropItem(
+                f"Meeting {item.get('url') or item.get('name')} has no start date"
+            )
+        if not item.get("name"):
+            raise DropItem(
+                f"Meeting {item.get('url') or item.get('start')} has no name"
+            )
 
         muni, created = get_or_create_municipality(self.db, spider.municipality_slug)
         if created:

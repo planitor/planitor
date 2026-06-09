@@ -10,7 +10,7 @@ import io
 import re
 import tempfile
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import unquote, urljoin, urlparse
 
 import pdfplumber
 import scrapy
@@ -20,28 +20,38 @@ BASE_URL = "https://reykjavik.is"
 FUNDARGERDIR_URL = "https://reykjavik.is/byggingarmal/fundargerdir-byggingarfulltrua"
 
 MONTHS_IS = {
-    "janúar": 1, "januar": 1,
-    "febrúar": 2, "februar": 2,
+    "janúar": 1,
+    "januar": 1,
+    "febrúar": 2,
+    "februar": 2,
     "mars": 3,
-    "apríl": 4, "april": 4,
-    "maí": 5, "mai": 5,
-    "júní": 6, "juni": 6,
-    "júlí": 7, "juli": 7,
-    "ágúst": 8, "agust": 8,
+    "apríl": 4,
+    "april": 4,
+    "maí": 5,
+    "mai": 5,
+    "júní": 6,
+    "juni": 6,
+    "júlí": 7,
+    "juli": 7,
+    "ágúst": 8,
+    "agust": 8,
     "september": 9,
-    "október": 10, "oktober": 10,
-    "nóvember": 11, "november": 11,
+    "október": 10,
+    "oktober": 10,
+    "nóvember": 11,
+    "november": 11,
     "desember": 12,
 }
 
 
 def parse_date_from_filename(filename: str):
     """Parse date from PDF filename like 'afgreidslufundur-byggingarfulltrua-3.-februar-2026.pdf'"""
+    filename = Path(unquote(urlparse(filename).path or filename)).name.lower()
     patterns = [
         r"(\d{1,2})[._-]\s*(\w+)[._-]\s*(\d{4})",
         r"(\d{1,2})[._\s]+(\w+)[._\s]+(\d{4})",
     ]
-    
+
     for pattern in patterns:
         match = re.search(pattern, filename.lower())
         if match:
@@ -58,7 +68,7 @@ def parse_date_from_text(text: str):
     match = re.search(
         r"Árið\s+(\d{4}).*?(\d{1,2})\.\s+(\w+)\s+kl\.\s+(\d{1,2}):(\d{2})",
         text,
-        re.IGNORECASE | re.DOTALL
+        re.IGNORECASE | re.DOTALL,
     )
     if match:
         year, day, month_name, hour, minute = match.groups()
@@ -78,7 +88,7 @@ def extract_meeting_number(text: str):
 
 def parse_pdf_content(pdf_bytes: bytes, url: str):
     """Parse PDF content and extract meeting data
-    
+
     PDF format (old, 2020-2021):
     1. Ármúli 17 (01.264.004) 103527 Mál nr. BN057410
     460616-0420 MAL ehf., Nökkvavogi 26, 104 Reykjavík
@@ -86,106 +96,105 @@ def parse_pdf_content(pdf_bytes: bytes, url: str):
     Gjald kr. 11.200
     Frestað.
     Lagfæra skráningu.
-    
+
     PDF format (new, 2024+):
     1. Ármúli 38 - USK24060289
     Sótt er um leyfi til að breyta notkun...
     Frestað. Vísað til athugasemda.
     """
-    
+
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         full_text = ""
         for page in pdf.pages:
             text = page.extract_text()
             if text:
                 full_text += text + "\n"
-    
+
     # Extract metadata
     date = parse_date_from_text(full_text) or parse_date_from_filename(url)
     meeting_num = extract_meeting_number(full_text)
-    
+
     # Parse agenda items - try both formats
     # Old format: "1. Ármúli 17 (01.264.004) 103527 Mál nr. BN057410"
     old_pattern = re.compile(
         r"^(\d+)\.\s+(.+?)\s+\(\d+\.\d+\.\d+\)\s+\d+\s+Mál\s+nr\.\s+(BN\d+)",
-        re.MULTILINE
+        re.MULTILINE,
     )
-    
+
     # New format: "1. Ármúli 38 - USK24060289"
-    new_pattern = re.compile(
-        r"^(\d+)\.\s+(.+?)\s+-\s+(USK\d+)",
-        re.MULTILINE
-    )
-    
+    new_pattern = re.compile(r"^(\d+)\.\s+(.+?)\s+-\s+(USK\d+)", re.MULTILINE)
+
     matches = list(old_pattern.finditer(full_text))
     if not matches:
         # Try new format
         matches = list(new_pattern.finditer(full_text))
-    
+
     minutes = []
-    
+
     for i, match in enumerate(matches):
         item_num = int(match.group(1))
         address = match.group(2).strip()
         case_serial = match.group(3)
-        
+
         # Get text until next item or end
         start_pos = match.end()
         end_pos = matches[i + 1].start() if i + 1 < len(matches) else len(full_text)
         item_text = full_text[start_pos:end_pos].strip()
-        
+
         # Split into lines
         lines = [ln.strip() for ln in item_text.split("\n") if ln.strip()]
-        
+
         # Parse the item content:
         # - First line is often the applicant (kennítala + name)
         # - Lines starting with "Sótt er um" are the inquiry
         # - "Gjald kr." is the fee line (skip)
         # - Status line: "Samþykkt." / "Frestað." / etc.
         # - Lines after status are additional remarks
-        
+
         inquiry_parts = []
         remarks_parts = []
         found_status = False
         status_line = None
-        
+
         for line in lines:
             # Skip fee line
             if line.startswith("Gjald kr."):
                 continue
-            
+
             # Skip page numbers
             if re.match(r"^\d+$", line):
                 continue
-                
+
             # Check for status line (standalone status word)
             if re.match(r"^(Samþykkt|Frestað|Synjað|Vísað)\b", line, re.IGNORECASE):
                 found_status = True
                 status_line = line
                 continue
-            
+
             if found_status:
                 remarks_parts.append(line)
             else:
                 inquiry_parts.append(line)
-        
+
         # Build remarks from status line + additional text
         remarks = status_line or ""
         if remarks_parts:
             remarks = (remarks + "\n" + "\n".join(remarks_parts)).strip()
-        
+
         inquiry = "\n".join(inquiry_parts) if inquiry_parts else ""
-        
-        minutes.append({
-            "serial": str(item_num),
-            "case_serial": case_serial,
-            "case_address": address,
-            "headline": address,  # Use address as headline
-            "inquiry": inquiry,
-            "remarks": remarks,
-            "entities": [],  # No individual kennitalas in PDF (removed by source)
-        })
-    
+
+        minutes.append(
+            {
+                "serial": str(item_num),
+                "case_serial": case_serial,
+                "case_address": address,
+                "headline": address,  # Use address as headline
+                "inquiry": inquiry,
+                "remarks": remarks,
+                "entities": [],  # No individual kennitalas in PDF (removed by source)
+            }
+        )
+
     return {
         "url": url,
         "name": meeting_num,
@@ -197,33 +206,34 @@ def parse_pdf_content(pdf_bytes: bytes, url: str):
 
 class ReykjavikByggingarfulltruiPdfSpider(scrapy.Spider):
     """Spider for PDF-based byggingarfulltrúi meetings (2021+)"""
-    
+
     municipality_slug = "reykjavik"
     council_type_slug = "byggingarfulltrui"
-    
+
     name = "reykjavik_byggingarfulltrui_pdf"
-    
+
     custom_settings = {
         "DOWNLOAD_MAXSIZE": 10485760,  # 10MB max for PDFs
         "DOWNLOAD_TIMEOUT": 60,
     }
-    
+
     def __init__(self, year=None, limit=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.year_filter = int(year) if year else None
         self.limit = int(limit) if limit else None
         self.start_urls = [FUNDARGERDIR_URL]
-    
+
     def parse(self, response):
         """Parse the fundargerdir page to find PDF links"""
         pdf_links = response.css('a[href*=".pdf"]::attr(href)').getall()
-        
+
         # Filter to byggingarfulltrui PDFs
         pdf_links = [
-            link for link in pdf_links 
+            link
+            for link in pdf_links
             if "byggingarfulltr" in link.lower() or "afgreidslufund" in link.lower()
         ]
-        
+
         count = 0
         for href in pdf_links:
             # Apply year filter if specified
@@ -231,23 +241,23 @@ class ReykjavikByggingarfulltruiPdfSpider(scrapy.Spider):
                 date = parse_date_from_filename(href)
                 if date and date.year != self.year_filter:
                     continue
-            
+
             full_url = urljoin(BASE_URL, href) if not href.startswith("http") else href
-            
+
             yield Request(
                 full_url,
                 callback=self.parse_pdf,
                 meta={"pdf_url": full_url},
             )
-            
+
             count += 1
             if self.limit and count >= self.limit:
                 break
-    
+
     def parse_pdf(self, response):
         """Parse a PDF response"""
         pdf_url = response.meta["pdf_url"]
-        
+
         try:
             meeting_data = parse_pdf_content(response.body, pdf_url)
             yield meeting_data
