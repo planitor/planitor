@@ -1,7 +1,9 @@
 from fastapi import Body, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from planitor import crud
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.endpoints.mail import send_reset_password_email
 from planitor.models import User as DBUser
 from planitor.schemas import Msg, Token, User
@@ -12,26 +14,24 @@ from planitor.security import (
     verify_password_reset_token,
 )
 from planitor.utils.passwords import get_password_hash
-from sqlalchemy.orm import Session
 
 from . import router
 
 
 @router.get("/me", response_model=User)
-def read_user_me(
-    db: Session = Depends(get_db),
+async def read_user_me(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     return current_user
 
 
 @router.post("/login/access-token", response_model=Token, tags=["login"])
-def login_access_token(
+async def login_access_token(
     response: Response,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     form_data: OAuth2PasswordRequestForm = Depends(),
 ):
-    user = crud.user.authenticate(
+    user = await crud.user.aauthenticate(
         db, email=form_data.username, password=form_data.password
     )
     if not user:
@@ -44,8 +44,10 @@ def login_access_token(
 
 
 @router.post("/password-recovery/{email}", tags=["login"], response_model=Msg)
-def recover_password(request: Request, email: str, db: Session = Depends(get_db)):
-    user = crud.user.get_by_email(db, email=email.strip())
+async def recover_password(
+    request: Request, email: str, db: AsyncSession = Depends(get_async_db)
+):
+    user = await crud.user.aget_by_email(db, email=email.strip())
 
     if not user:
         raise HTTPException(
@@ -62,16 +64,16 @@ def recover_password(request: Request, email: str, db: Session = Depends(get_db)
 
 
 @router.post("/reset-password", tags=["login"], response_model=Token)
-def reset_password(
+async def reset_password(
     response: Response,
     token: str = Body(...),
     new_password: str = Body(...),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
     email = verify_password_reset_token(token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid token")
-    user = crud.user.get_by_email(db, email=email)
+    user = await crud.user.aget_by_email(db, email=email)
     if not user:
         raise HTTPException(
             status_code=404,
@@ -88,5 +90,5 @@ def reset_password(
     hashed_password = get_password_hash(new_password)
     user.hashed_password = hashed_password
     db.add(user)
-    db.commit()
+    await db.commit()
     return get_login_response(user, response)

@@ -2,11 +2,13 @@ from typing import List
 
 from fastapi import Depends, Request, Response
 from fastapi.exceptions import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from planitor import models
 from planitor.crud import monitor as crud
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.models.city import CouncilTypeEnum
 from planitor.schemas.monitor import (
     Subscription,
@@ -18,20 +20,26 @@ from . import router
 
 
 @router.get("/subscriptions", response_model=List[Subscription])
-def get_subscriptions(
+async def get_subscriptions(
     request: Request,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: models.User = Depends(get_current_active_user),
 ):
-    subscriptions = (
-        db.query(models.Subscription)
-        .outerjoin(models.Entity)
-        .outerjoin(models.Address)
-        .outerjoin(models.Case)
-        .filter(models.Subscription.user == current_user)
+    result = await db.scalars(
+        select(models.Subscription)
+        .options(
+            selectinload(models.Subscription.entity),
+            selectinload(models.Subscription.address).selectinload(
+                models.Address.municipality
+            ),
+            selectinload(models.Subscription.case).selectinload(
+                models.Case.municipality
+            ),
+        )
+        .where(models.Subscription.user_id == current_user.id)
         .order_by(models.Subscription.created)
-        .all()
     )
+    subscriptions = result.all()
     return subscriptions
 
 
@@ -71,15 +79,27 @@ def set_subscription_council_types(
 
 
 @router.post("/subscriptions/{id}", response_model=Subscription)
-def update_subscription(
+async def update_subscription(
     id: int,
     request: Request,
     form: SubscriptionForm,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: models.User = Depends(get_current_active_user),
 ):
-    subscription = db.query(models.Subscription).get(id)
-    if subscription is None or subscription.user != current_user:
+    subscription = await db.scalar(
+        select(models.Subscription)
+        .options(
+            selectinload(models.Subscription.address)
+            .selectinload(models.Address.municipality)
+            .selectinload(models.Municipality.councils),
+            selectinload(models.Subscription.case)
+            .selectinload(models.Case.municipality)
+            .selectinload(models.Municipality.councils),
+            selectinload(models.Subscription.entity),
+        )
+        .where(models.Subscription.id == id)
+    )
+    if subscription is None or subscription.user_id != current_user.id:
         raise HTTPException(404)
     if form.active is not None:
         subscription.active = form.active
@@ -90,19 +110,21 @@ def update_subscription(
     if form.council_types is not None:
         set_subscription_council_types(subscription, form.council_types)
     db.add(subscription)
-    db.commit()
+    await db.commit()
     return subscription
 
 
 @router.delete("/subscriptions/{id}")
-def delete_subscription(
+async def delete_subscription(
     id: int,
     request: Request,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: models.User = Depends(get_current_active_user),
 ):
-    subscription = db.query(models.Subscription).get(id)
-    if subscription is None or subscription.user != current_user:
+    subscription = await db.scalar(
+        select(models.Subscription).where(models.Subscription.id == id)
+    )
+    if subscription is None or subscription.user_id != current_user.id:
         raise HTTPException(404)
-    crud.delete_subscription(db, subscription)
+    await crud.adelete_subscription(db, subscription)
     return Response(None, 204)

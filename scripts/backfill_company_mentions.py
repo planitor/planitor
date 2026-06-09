@@ -28,9 +28,13 @@ _KT_PREFIX_RE = re.compile(r"^(\d{6})-?(\d{4})\s+")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Fast backfill company mentions (regex only)")
+    parser = argparse.ArgumentParser(
+        description="Fast backfill company mentions (regex only)"
+    )
     parser.add_argument("--limit", type=int, default=0, help="Limit minutes to process")
-    parser.add_argument("--offset", type=int, default=0, help="Start from this minute ID")
+    parser.add_argument(
+        "--offset", type=int, default=0, help="Start from this minute ID"
+    )
     args = parser.parse_args()
 
     from planitor.database import db_context
@@ -39,8 +43,6 @@ def main():
     from planitor.crud.city import get_or_create_entity, get_or_create_case_entity
     from planitor.postprocess import _update_entity_mentions_raw
     from planitor.utils.kennitala import Kennitala
-    from sqlalchemy import text
-    from sqlalchemy.orm import defer
 
     processed = 0
     new_entities = 0
@@ -52,7 +54,6 @@ def main():
         with db_context() as db:
             batch = (
                 db.query(Minute)
-                .options(defer(Minute.entity_mentions))
                 .filter(
                     Minute.inquiry.isnot(None),
                     Minute.inquiry != "",
@@ -81,26 +82,19 @@ def main():
                 if args.limit and processed > args.limit:
                     logger.info(
                         "Limit reached. Processed %d, new entities %d, new mentions %d, errors %d.",
-                        processed - 1, new_entities, new_mentions, errors,
+                        processed - 1,
+                        new_entities,
+                        new_mentions,
+                        errors,
                     )
                     return
 
                 try:
-                    # Read existing entity_mentions via raw SQL
-                    row = db.execute(
-                        text("SELECT entity_mentions FROM minutes WHERE id = :id"),
-                        {"id": minute.id}
-                    ).first()
                     existing_mentions = {}
-                    if row and row[0]:
-                        # Parse the composite array: each element is (kennitala, start, end_)
-                        for item in row[0]:
-                            kt = item[0] if isinstance(item, (list, tuple)) else item.entity_id
-                            start = item[1] if isinstance(item, (list, tuple)) else item.start
-                            end = item[2] if isinstance(item, (list, tuple)) else item.end_
-                            if kt not in existing_mentions:
-                                existing_mentions[kt] = []
-                            existing_mentions[kt].append((start, end))
+                    for kt, start, end in minute.entity_mentions:
+                        if kt not in existing_mentions:
+                            existing_mentions[kt] = []
+                        existing_mentions[kt].append((start, end))
 
                     matched_spans = set()
                     for locs in existing_mentions.values():
@@ -112,7 +106,9 @@ def main():
                     added = False
 
                     for regex_name, locations in regex_mentions.items():
-                        new_locations = [loc for loc in locations if loc not in matched_spans]
+                        new_locations = [
+                            loc for loc in locations if loc not in matched_spans
+                        ]
                         if not new_locations:
                             continue
 
@@ -120,7 +116,7 @@ def main():
                         m = _KT_PREFIX_RE.match(regex_name)
                         if m:
                             kt_digits = m.group(1) + m.group(2)
-                            company_name = regex_name[m.end():]
+                            company_name = regex_name[m.end() :]
                             kennitala = Kennitala(kt_digits)
                             if kennitala.validate():
                                 entity, created = get_or_create_entity(
@@ -134,7 +130,9 @@ def main():
                                 )
                                 db.commit()
                                 if entity.kennitala in existing_mentions:
-                                    existing_mentions[entity.kennitala].extend(new_locations)
+                                    existing_mentions[entity.kennitala].extend(
+                                        new_locations
+                                    )
                                 else:
                                     existing_mentions[entity.kennitala] = new_locations
                                 for span in new_locations:
@@ -179,14 +177,21 @@ def main():
                 if processed % 1000 == 0:
                     logger.info(
                         "Progress: %d processed, %d new mentions, %d new entities, %d errors (last_id=%d)",
-                        processed, new_mentions, new_entities, errors, last_id,
+                        processed,
+                        new_mentions,
+                        new_entities,
+                        errors,
+                        last_id,
                     )
 
             db.expunge_all()
 
     logger.info(
         "Done. Processed %d, new mentions %d, new entities %d, errors %d.",
-        processed, new_mentions, new_entities, errors,
+        processed,
+        new_mentions,
+        new_entities,
+        errors,
     )
 
 

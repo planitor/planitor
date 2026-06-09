@@ -37,7 +37,6 @@ def main():
     from planitor.database import db_context
     from planitor.models import Minute
     from planitor.postprocess import _update_minute_with_entity_mentions
-    from sqlalchemy.orm import defer
 
     processed = 0
     errors = 0
@@ -48,7 +47,6 @@ def main():
         with db_context() as db:
             query = (
                 db.query(Minute)
-                .options(defer(Minute.entity_mentions))
                 .filter(
                     Minute.inquiry.isnot(None),
                     Minute.inquiry != "",

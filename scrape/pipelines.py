@@ -4,7 +4,6 @@ from scrapy.exceptions import DropItem
 from scrapy.utils.project import get_project_settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import register_composites
 
 from planitor import greynir
 from planitor.crud import (
@@ -39,7 +38,6 @@ class DatabasePipeline(object):
         engine = create_engine(connection_string, connect_args={})
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         self.db = SessionLocal()
-        register_composites(self.db.connection())
 
     def close_spider(self, spider):
         self.db.close()

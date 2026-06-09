@@ -1,4 +1,4 @@
-""" Purpose: Make it fast and easy to migrate dev database.
+"""Purpose: Make it fast and easy to migrate dev database.
 
 Compares two schemas
 
@@ -50,15 +50,8 @@ def sync(
         os.environ["DATABASE_URL"] = TEMP_DB_URL
         from planitor.database import Base, engine
         from planitor.models import _all  # noqa, needed to register models
-        from sqlalchemy_utils import register_composites
 
         engine.execute("CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;")
-        engine.execute(
-            "CREATE TYPE entity_mention_type AS "
-            "(entity_id VARCHAR, start INTEGER, end_ INTEGER);"
-        )
-        with engine.connect() as connection:
-            register_composites(connection)
         Base.metadata.create_all(engine)
 
         with S(DB_URL) as s_current, S(TEMP_DB_URL) as s_target:

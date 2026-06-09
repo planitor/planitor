@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from planitor.language.search import lemmatize_query
@@ -68,6 +70,17 @@ def get_case_subscription(db: Session, user: User, case: Case):
     return subscription
 
 
+async def aget_case_subscription(db: AsyncSession, user: User, case: Case):
+    result = await db.scalars(
+        select(Subscription).where(
+            Subscription.case == case,
+            Subscription.user == user,
+            Subscription.type == SubscriptionTypeEnum.case,
+        )
+    )
+    return result.first()
+
+
 def get_address_subscription(db: Session, user: User, address: Address):
     subscription = (
         db.query(Subscription)
@@ -79,6 +92,17 @@ def get_address_subscription(db: Session, user: User, address: Address):
         .first()
     )
     return subscription
+
+
+async def aget_address_subscription(db: AsyncSession, user: User, address: Address):
+    result = await db.scalars(
+        select(Subscription).where(
+            Subscription.address == address,
+            Subscription.user == user,
+            Subscription.type == SubscriptionTypeEnum.address,
+        )
+    )
+    return result.first()
 
 
 def get_entity_subscription(db: Session, user: User, entity: Entity):
@@ -94,6 +118,17 @@ def get_entity_subscription(db: Session, user: User, entity: Entity):
     return subscription
 
 
+async def aget_entity_subscription(db: AsyncSession, user: User, entity: Entity):
+    result = await db.scalars(
+        select(Subscription).where(
+            Subscription.entity == entity,
+            Subscription.user == user,
+            Subscription.type == SubscriptionTypeEnum.entity,
+        )
+    )
+    return result.first()
+
+
 def create_case_subscription(db: Session, user: User, case: Case):
     subscription = get_case_subscription(db, user, case)
     if subscription is None:
@@ -102,6 +137,18 @@ def create_case_subscription(db: Session, user: User, case: Case):
         )
         db.add(subscription)
         db.commit()
+    return subscription
+
+
+async def acreate_case_subscription(db: AsyncSession, user: User, case: Case):
+    subscription = await aget_case_subscription(db, user, case)
+    if subscription is None:
+        subscription = Subscription(
+            case=case, user=user, type=SubscriptionTypeEnum.case
+        )
+        db.add(subscription)
+        await db.commit()
+        await db.refresh(subscription)
     return subscription
 
 
@@ -116,6 +163,18 @@ def create_entity_subscription(db: Session, user: User, entity: Entity):
     return subscription
 
 
+async def acreate_entity_subscription(db: AsyncSession, user: User, entity: Entity):
+    subscription = await aget_entity_subscription(db, user, entity)
+    if subscription is None:
+        subscription = Subscription(
+            entity=entity, user=user, type=SubscriptionTypeEnum.entity
+        )
+        db.add(subscription)
+        await db.commit()
+        await db.refresh(subscription)
+    return subscription
+
+
 def create_address_subscription(db: Session, user: User, address: Address):
     subscription = get_address_subscription(db, user, address)
     if subscription is None:
@@ -124,6 +183,18 @@ def create_address_subscription(db: Session, user: User, address: Address):
         )
         db.add(subscription)
         db.commit()
+    return subscription
+
+
+async def acreate_address_subscription(db: AsyncSession, user: User, address: Address):
+    subscription = await aget_address_subscription(db, user, address)
+    if subscription is None:
+        subscription = Subscription(
+            address=address, user=user, type=SubscriptionTypeEnum.address
+        )
+        db.add(subscription)
+        await db.commit()
+        await db.refresh(subscription)
     return subscription
 
 
@@ -140,11 +211,32 @@ def delete_subscription(db: Session, subscription: Subscription) -> None:
     db.commit()
 
 
+async def adelete_subscription(db: AsyncSession, subscription: Subscription) -> None:
+    await db.execute(
+        update(Delivery)
+        .where(Delivery.subscription == subscription)
+        .values(
+            subscription_id=None,
+            deleted_subscription_id=subscription.id,
+            deleted_user_id=subscription.user_id,
+        )
+    )
+    await db.delete(subscription)
+    await db.commit()
+
+
 def delete_case_subscription(db: Session, user: User, case: Case):
     subscription = get_case_subscription(db, user, case)
     if subscription is None:
         return None
     delete_subscription(db, subscription)
+
+
+async def adelete_case_subscription(db: AsyncSession, user: User, case: Case):
+    subscription = await aget_case_subscription(db, user, case)
+    if subscription is None:
+        return None
+    await adelete_subscription(db, subscription)
 
 
 def delete_entity_subscription(db: Session, user: User, entity: Entity):
@@ -154,8 +246,22 @@ def delete_entity_subscription(db: Session, user: User, entity: Entity):
     delete_subscription(db, subscription)
 
 
+async def adelete_entity_subscription(db: AsyncSession, user: User, entity: Entity):
+    subscription = await aget_entity_subscription(db, user, entity)
+    if subscription is None:
+        return None
+    await adelete_subscription(db, subscription)
+
+
 def delete_address_subscription(db: Session, user: User, address: Address):
     subscription = get_address_subscription(db, user, address)
     if subscription is None:
         return None
     delete_subscription(db, subscription)
+
+
+async def adelete_address_subscription(db: AsyncSession, user: User, address: Address):
+    subscription = await aget_address_subscription(db, user, address)
+    if subscription is None:
+        return None
+    await adelete_subscription(db, subscription)

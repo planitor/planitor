@@ -4,7 +4,7 @@ from typing import Iterable, List
 from dramatiq import group, pipeline
 from sentry_sdk import capture_exception
 from sqlalchemy import func, text
-from sqlalchemy.orm import Session, defer
+from sqlalchemy.orm import Session
 
 from . import dramatiq, greynir
 from .attachments import update_pdf_attachment
@@ -35,7 +35,7 @@ def _split_kt_prefix(name):
     return (kennitala_digits, company_name). Otherwise return (None, name)."""
     m = _KT_PREFIX_RE.match(name)
     if m:
-        return m.group(1) + m.group(2), name[m.end():]
+        return m.group(1) + m.group(2), name[m.end() :]
     return None, name
 
 
@@ -51,9 +51,7 @@ def _get_entity(db: Session, name: str):
     if contact is not None:
         kennitala = Kennitala(contact.kennitala)
         if kennitala.validate():
-            entity, created = get_or_create_entity(
-                db, kennitala, name, address=None
-            )
+            entity, created = get_or_create_entity(db, kennitala, name, address=None)
             if created:
                 db.commit()
             return entity
@@ -85,26 +83,17 @@ def update_minute_with_entity_relations(
     db.commit()
 
 
-def _update_entity_mentions_raw(db, minute_id: int, mentions: dict):
-    """Update entity_mentions using raw SQL to avoid SQLAlchemy-Utils composite type bug."""
-    if not mentions:
-        # Set to empty array
-        db.execute(
-            text("UPDATE minutes SET entity_mentions = '{}' WHERE id = :id"),
-            {"id": minute_id}
-        )
-    else:
-        # Build array of ROW values
-        rows = []
-        for kennitala, locations in mentions.items():
-            for start, end in locations:
-                rows.append(f"ROW('{kennitala}', {start}, {end})::entity_mention_type")
-        array_literal = "ARRAY[" + ", ".join(rows) + "]"
-        db.execute(
-            text(f"UPDATE minutes SET entity_mentions = {array_literal} WHERE id = :id"),
-            {"id": minute_id}
-        )
+def _update_minute_entity_mentions(db: Session, minute: Minute, mentions: dict):
+    minute.assign_entity_mentions(mentions)
+    db.add(minute)
     db.commit()
+
+
+def _update_entity_mentions_raw(db, minute_id: int, mentions: dict):
+    minute = db.query(Minute).get(minute_id)
+    if minute is None:
+        return
+    _update_minute_entity_mentions(db, minute, mentions)
 
 
 def _update_minute_with_entity_mentions(db, minute):
@@ -119,7 +108,7 @@ def _update_minute_with_entity_mentions(db, minute):
     person_mentions = extract_person_names(minute.inquiry, sentences=sentences)
 
     if not company_mentions and not person_mentions:
-        _update_entity_mentions_raw(db, minute.id, {})
+        _update_minute_entity_mentions(db, minute, {})
         return
 
     # We only want to persist mentions that have matching local entities
@@ -177,15 +166,14 @@ def _update_minute_with_entity_mentions(db, minute):
         else:
             _matched_mentions[entity.kennitala] = locations
 
-    _update_entity_mentions_raw(db, minute.id, _matched_mentions)
+    _update_minute_entity_mentions(db, minute, _matched_mentions)
 
 
 @dramatiq.actor
 def update_minute_with_entity_mentions(minute_id: int):
 
     with db_context() as db:
-        # Defer entity_mentions to avoid SQLAlchemy-Utils composite type deserialization bug
-        minute = db.query(Minute).options(defer(Minute.entity_mentions)).get(minute_id)
+        minute = db.query(Minute).get(minute_id)
         _update_minute_with_entity_mentions(db, minute)
 
 
@@ -244,8 +232,7 @@ def _update_minute_search_vector(minute: Minute, db: Session):
 @dramatiq.actor
 def update_minute_search_vector(minute_id: int, force: bool = False):
     with db_context() as db:
-        # Defer entity_mentions to avoid SQLAlchemy-Utils composite type deserialization bug
-        minute = db.query(Minute).options(defer(Minute.entity_mentions)).get(minute_id)
+        minute = db.query(Minute).get(minute_id)
         if minute is None:
             return
         if not minute.search_vector or force:

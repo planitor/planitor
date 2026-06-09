@@ -20,6 +20,12 @@ from .city import (
     update_case_status,
 )
 from .monitor import (
+    acreate_address_subscription,
+    acreate_case_subscription,
+    acreate_entity_subscription,
+    adelete_address_subscription,
+    adelete_case_subscription,
+    adelete_entity_subscription,
     create_address_subscription,  # noqa
     create_case_subscription,
     create_delivery,

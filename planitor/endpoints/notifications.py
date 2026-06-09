@@ -1,11 +1,10 @@
-import asyncio
-
 from fastapi import APIRouter, Request, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from email_normalize import Normalizer
 
 from planitor import hashids
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.templates import templates
 from planitor.models.city import Applicant, Case
 
@@ -14,23 +13,26 @@ router = APIRouter()
 
 
 @router.post("/unsubscribe/{case_id}", tags=["login"])
-def unsubscribe(
-    request: Request, email: str, case_id: str, db: Session = Depends(get_db)
+async def unsubscribe(
+    request: Request, email: str, case_id: str, db: AsyncSession = Depends(get_async_db)
 ):
     try:
-        case = db.query(Case).get(hashids.decode(case_id)[0])
+        case = await db.get(Case, hashids.decode(case_id)[0])
     except IndexError:
         raise HTTPException(status_code=404, detail="Fundargerð fannst ekki")
     if not email or "@" not in email:
         return None
     normalizer = Normalizer()
-    result = asyncio.run(normalizer.normalize(email))
-    for applicant in db.query(Applicant).filter(
-        Applicant.email == result.normalized_address, Applicant.case == case
-    ):
+    result = await normalizer.normalize(email)
+    applicants = await db.scalars(
+        select(Applicant).where(
+            Applicant.email == result.normalized_address, Applicant.case == case
+        )
+    )
+    for applicant in applicants.all():
         applicant.unsubscribed = True
         db.add(applicant)
-    db.commit()
+    await db.commit()
     return None
 
 

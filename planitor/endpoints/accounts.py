@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, Request, Response
-from sqlalchemy.orm import Session
 
-from planitor.database import get_db
 from planitor.models import User as DBUser
 from planitor.schemas import User
 from planitor.security import COOKIE_NAME, get_current_active_user
@@ -18,17 +16,15 @@ def login_page(request: Request, redirect_to: str = ""):
 
 
 @router.get("/me/_error", response_model=User)
-def get_user_error(
-    db: Session = Depends(get_db),
+async def get_user_error(
     current_user: DBUser = Depends(get_current_active_user),
 ):
     1 / 0
 
 
 @router.get("/stillingar")
-def get_account(
+async def get_account(
     request: Request,
-    db: Session = Depends(get_db),
     current_user: DBUser = Depends(get_current_active_user),
 ):
     return templates.TemplateResponse(
@@ -38,7 +34,7 @@ def get_account(
 
 
 @router.get("/logout")
-def logout(
+async def logout(
     response: Response,
     request: Request,
     current_user: DBUser = Depends(get_current_active_user),

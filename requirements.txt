@@ -88,8 +88,8 @@ six==1.17.0
 skipulagsstofnun==0.2.1
 soupsieve==2.8.4
 sqlakeyset==2.0.1775222100
-sqlalchemy==1.4.54
-sqlalchemy-utils==0.37.9
+sqlalchemy==2.0.50
+sqlalchemy-utils==0.42.1
 starlette==0.46.2
 tldextract==5.3.1
 tokenizer==3.6.2

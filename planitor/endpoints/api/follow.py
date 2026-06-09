@@ -1,8 +1,8 @@
 from fastapi import Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from planitor import crud
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.models import Address, Case, Entity, User
 from planitor.security import get_current_active_user
 
@@ -10,82 +10,83 @@ from . import router
 
 
 @router.post("/follow/cases/{case_id}")
-def follow_case(
+async def follow_case(
     case_id: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    case = db.query(Case).get(case_id)
+    case = await db.get(Case, case_id)
     if case is None:
         raise HTTPException(404)
-    crud.create_case_subscription(db, current_user, case)
+    await crud.acreate_case_subscription(db, current_user, case)
     return {}
 
 
 @router.delete("/follow/cases/{case_id}")
-def unfollow_case(
+async def unfollow_case(
     case_id: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    case = db.query(Case).get(case_id)
+    case = await db.get(Case, case_id)
     if case is None:
         raise HTTPException(404)
-    crud.delete_case_subscription(db, current_user, case)
+    await crud.adelete_case_subscription(db, current_user, case)
     return {}
 
 
 @router.post("/follow/entities/{kennitala}")
-def follow_entity(
+async def follow_entity(
     kennitala: str,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    entity = db.query(Entity).get(kennitala)
+    entity = await db.get(Entity, kennitala)
     if entity is None:
         raise HTTPException(404)
-    crud.create_entity_subscription(db, current_user, entity)
+    await crud.acreate_entity_subscription(db, current_user, entity)
     return {}
 
 
 @router.delete("/follow/entities/{kennitala}")
-def unfollow_entity(
+async def unfollow_entity(
     kennitala: str,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    entity = db.query(Entity).get(kennitala)
+    entity = await db.get(Entity, kennitala)
     if entity is None:
         raise HTTPException(404)
-    crud.delete_entity_subscription(db, current_user, entity)
+    await crud.adelete_entity_subscription(db, current_user, entity)
     return {}
 
 
 @router.post("/follow/addresses/{hnitnum}")
-def follow_address(
+async def follow_address(
     hnitnum: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    address = db.query(Address).get(hnitnum)
+    address = await db.get(Address, hnitnum)
     if address is None:
         address = crud.get_and_init_address(hnitnum)
         if address is None:
             raise HTTPException(404)
         db.add(address)
-        db.commit()
-    crud.create_address_subscription(db, current_user, address)
+        await db.commit()
+        await db.refresh(address)
+    await crud.acreate_address_subscription(db, current_user, address)
     return {}
 
 
 @router.delete("/follow/addresses/{hnitnum}")
-def unfollow_address(
+async def unfollow_address(
     hnitnum: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    address = db.query(Address).get(hnitnum)
+    address = await db.get(Address, hnitnum)
     if address is None:
         raise HTTPException(404)
-    crud.delete_address_subscription(db, current_user, address)
+    await crud.adelete_address_subscription(db, current_user, address)
     return {}

@@ -4,6 +4,7 @@ QA Audit Script — Run via: docker compose exec -T planitor python < scripts/qa
 Compares source data quality across all NLP/processing features.
 Auto-selects 2 recent meetings per council type (4 total).
 """
+
 from hashids import Hashids
 from sqlalchemy import func, text
 
@@ -53,9 +54,7 @@ print("STEP 1: ITEM COUNTS")
 print("=" * 70)
 for mid in meeting_ids:
     count = (
-        session.query(func.count(Minute.id))
-        .filter(Minute.meeting_id == mid)
-        .scalar()
+        session.query(func.count(Minute.id)).filter(Minute.meeting_id == mid).scalar()
     )
     m = session.query(Meeting).get(mid)
     print(f"  Meeting {m.name} (id={mid}): {count} minutes")
@@ -98,9 +97,7 @@ for mid in meeting_ids:
     ).scalar()
     geocoded = total - len(failures)
     pct = 100 * geocoded / total if total else 0
-    print(
-        f"\n  Meeting {m.name} (id={mid}): {geocoded}/{total} geocoded ({pct:.0f}%)"
-    )
+    print(f"\n  Meeting {m.name} (id={mid}): {geocoded}/{total} geocoded ({pct:.0f}%)")
     for r in failures[:8]:
         print(f"    FAIL case={r[0]} address={r[1]!r} headline={r[2]!r}")
     if len(failures) > 8:
@@ -132,7 +129,9 @@ for mid in meeting_ids:
         ),
         {"mid": mid},
     ).fetchall()
-    print(f"  Meeting {m.name}: {len(leaked)} split failures, {len(fylgi)} Fylgigögn leaks")
+    print(
+        f"  Meeting {m.name}: {len(leaked)} split failures, {len(fylgi)} Fylgigögn leaks"
+    )
     for r in leaked:
         print(f"    LEAK serial={r[0]} case={r[1]} inquiry={r[2]!r}")
 
@@ -170,9 +169,9 @@ for mid in meeting_ids:
     ).scalar()
     with_mentions = session.execute(
         text(
-            "SELECT COUNT(*) FROM minutes min "
-            "WHERE min.meeting_id = :mid "
-            "AND min.entity_mentions IS NOT NULL AND min.entity_mentions != '{}'"
+            "SELECT COUNT(DISTINCT min.id) FROM minutes min "
+            "JOIN minute_entity_mentions mem ON mem.minute_id = min.id "
+            "WHERE min.meeting_id = :mid"
         ),
         {"mid": mid},
     ).scalar()

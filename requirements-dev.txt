@@ -135,9 +135,9 @@ six==1.17.0
 skipulagsstofnun==0.2.1
 soupsieve==2.8.4
 sqlakeyset==2.0.1775222100
-sqlalchemy==1.4.54
+sqlalchemy==2.0.50
 sqlalchemy-stubs==0.4
-sqlalchemy-utils==0.37.9
+sqlalchemy-utils==0.42.1
 sqlbag==0.1.1617247075
 stack-data==0.6.3
 starlette==0.46.2

@@ -13,13 +13,13 @@ import jwt
 from fastapi import Depends, HTTPException, Response, Security
 from fastapi.security import APIKeyCookie, OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError, PyJWTError
-from sentry_sdk import capture_exception, configure_scope
-from sqlalchemy.orm import Session
+from sentry_sdk import configure_scope
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
 from planitor import ENV, config, crud
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.models.accounts import User
 
 EMAIL_RESET_TOKEN_EXPIRE_HOURS = config(
@@ -52,7 +52,7 @@ async def auth(request: Request) -> Optional[str]:
 
 
 def get_login_response(user: User, response: Response) -> dict:
-    """ set-cookie but also return oauth2 compatible login response """
+    """set-cookie but also return oauth2 compatible login response"""
     token = create_access_token({"user_id": user.id})
     response.set_cookie(
         COOKIE_NAME,
@@ -76,32 +76,30 @@ def create_access_token(data: dict) -> str:
     return encoded_jwt.decode("utf-8")
 
 
-def get_current_user(db: Session = Depends(get_db), token: str = Security(auth)):
+async def get_current_user(
+    db: AsyncSession = Depends(get_async_db), token: str = Security(auth)
+):
     try:
         payload = jwt.decode(token, config("SECRET_KEY"), algorithms=[ALGORITHM])
     except PyJWTError:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
         )
-    user = crud.user.get(db, id=payload["user_id"])
+    user = await crud.user.aget(db, id=payload["user_id"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     with configure_scope() as scope:
         scope.user = {"id": user.id, "email": user.email}
-        try:
-            yield user
-        except Exception as e:
-            capture_exception(e)
-            raise
+    return user
 
 
-def get_current_active_user(current_user: User = Security(get_current_user)):
+async def get_current_active_user(current_user: User = Security(get_current_user)):
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-def get_current_active_superuser(
+async def get_current_active_superuser(
     current_user: User = Security(get_current_user),
 ) -> User:
     if not crud.user.is_superuser(current_user):
@@ -111,15 +109,15 @@ def get_current_active_superuser(
     return current_user
 
 
-def get_current_active_user_or_none(
-    db: Session = Depends(get_db), token: str = Security(auth)
+async def get_current_active_user_or_none(
+    db: AsyncSession = Depends(get_async_db), token: str = Security(auth)
 ):
     """HTML GET endpoints need this to render user/no-user versions of the same view."""
     try:
         payload = jwt.decode(token, config("SECRET_KEY"), algorithms=[ALGORITHM])
     except PyJWTError:
         return None
-    user = crud.user.get(db, id=payload["user_id"])
+    user = await crud.user.aget(db, id=payload["user_id"])
     if not user or not crud.user.is_active(user):
         return None
     return user

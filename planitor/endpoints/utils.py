@@ -1,4 +1,6 @@
 from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from planitor.models import Entity
@@ -6,6 +8,13 @@ from planitor.models import Entity
 
 def _get_entity(db: Session, kennitala: str, slug: str = None) -> Entity:
     entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
+    if entity is None or (slug is not None and entity.slug != slug):
+        raise HTTPException(status_code=404, detail="Kennitala fannst ekki")
+    return entity
+
+
+async def _aget_entity(db: AsyncSession, kennitala: str, slug: str = None) -> Entity:
+    entity = await db.scalar(select(Entity).where(Entity.kennitala == kennitala))
     if entity is None or (slug is not None and entity.slug != slug):
         raise HTTPException(status_code=404, detail="Kennitala fannst ekki")
     return entity

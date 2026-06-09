@@ -2,11 +2,13 @@ from typing import List
 
 from fastapi import Depends, Request, Response
 from fastapi.exceptions import HTTPException
-from sqlakeyset.paging import get_page
-from sqlalchemy.orm import Session
+from sqlakeyset.paging import select_page
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from planitor import models
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.models.enums import BuildingTypeEnum, PermitTypeEnum
 from planitor.schemas.permits import (
     Permit,
@@ -20,36 +22,63 @@ from planitor.security import get_current_active_superuser
 from . import router
 
 
+PERMIT_LOAD_OPTIONS = (
+    selectinload(models.Permit.minute).selectinload(models.Minute.meeting),
+    selectinload(models.Permit.minute)
+    .selectinload(models.Minute.case)
+    .selectinload(models.Case.municipality),
+    selectinload(models.Permit.minute)
+    .selectinload(models.Minute.case)
+    .selectinload(models.Case.iceaddr),
+)
+
+MINUTE_PERMIT_LOAD_OPTIONS = (
+    selectinload(models.Minute.permit),
+    selectinload(models.Minute.meeting),
+    selectinload(models.Minute.case).selectinload(models.Case.municipality),
+    selectinload(models.Minute.case).selectinload(models.Case.iceaddr),
+)
+
+
 @router.get("/permits", response_model=List[ApiResponsePermit])
-def get_permits(
+async def get_permits(
     request: Request,
     response: Response,
     cursor: str = None,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
     query = (
-        db.query(models.Permit)
+        select(models.Permit)
+        .options(*PERMIT_LOAD_OPTIONS)
         .join(models.Minute)
         .join(models.Meeting)
         .join(models.Case)
         .join(models.Municipality)
         .order_by(models.Meeting.start.desc(), models.Minute.id)
     )
-    page = get_page(query, per_page=100, page=cursor)
+    page = await db.run_sync(
+        lambda sync_db: select_page(sync_db, query, per_page=100, page=cursor)
+    )
     url = request.url_for("get_permits")
-    response.headers["Link"] = f'<{url}?cursor={page.paging.bookmark_next}>; rel: "next"'
-    permits = [ApiLoadPermit(request, permit) for permit in page]
+    response.headers["Link"] = (
+        f'<{url}?cursor={page.paging.bookmark_next}>; rel: "next"'
+    )
+    permits = [ApiLoadPermit(request, row[0]) for row in page]
     return permits
 
 
 @router.get("/minutes/{minute_id}/permit", response_model=Permit)
-def get_permit(
+async def get_permit(
     request: Request,
     minute_id: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: models.User = Depends(get_current_active_superuser),
 ):
-    minute = db.query(models.Minute).get(minute_id)
+    minute = await db.scalar(
+        select(models.Minute)
+        .options(*MINUTE_PERMIT_LOAD_OPTIONS)
+        .where(models.Minute.id == minute_id)
+    )
     if minute is None:
         raise HTTPException(404)
     permit = minute.permit
@@ -59,14 +88,18 @@ def get_permit(
 
 
 @router.put("/minutes/{minute_id}/permit", response_model=Permit)
-def update_permit(
+async def update_permit(
     request: Request,
     minute_id: int,
     form: PermitForm,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: models.User = Depends(get_current_active_superuser),
 ):
-    minute = db.query(models.Minute).get(minute_id)
+    minute = await db.scalar(
+        select(models.Minute)
+        .options(*MINUTE_PERMIT_LOAD_OPTIONS)
+        .where(models.Minute.id == minute_id)
+    )
     if minute is None:
         raise HTTPException(404)
     permit = minute.permit
@@ -85,6 +118,6 @@ def update_permit(
         permit.permit_type = getattr(PermitTypeEnum, form.permit_type)
 
     db.add(permit)
-    db.commit()
-    db.refresh(permit)
+    await db.commit()
+    await db.refresh(permit)
     return permit

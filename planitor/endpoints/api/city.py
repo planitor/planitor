@@ -2,12 +2,14 @@ import datetime as dt
 from typing import List
 
 from fastapi import Depends, HTTPException, Request
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from starlette.concurrency import run_in_threadpool
 import skipulagsstofnun
 
 from planitor.crud.city import get_and_init_address
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.models import (
     Address,
     Case,
@@ -17,31 +19,34 @@ from planitor.models import (
 )
 from planitor.schemas import city as schemas
 
-from ..utils import _get_entity
+from ..utils import _aget_entity
 from . import router
 
 
 @router.get("/municipalities", response_model=List[schemas.Municipality])
-def get_municipalities(
+async def get_municipalities(
     request: Request,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    return db.query(Municipality).outerjoin(Council).all()
+    result = await db.scalars(
+        select(Municipality).options(selectinload(Municipality.councils))
+    )
+    return result.all()
 
 
 @router.get("/addresses/{hnitnum}/addresses", response_model=schemas.MapCasesResponse)
-def get_nearby_case_addresses(
+async def get_nearby_case_addresses(
     request: Request,
     hnitnum: int,
     radius: int = 500,
     days: int = 30,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    address = get_and_init_address(hnitnum)
+    address = await run_in_threadpool(get_and_init_address, hnitnum)
     if not address:
         raise HTTPException(404)
 
-    _db_address = db.query(Address).filter(Address.hnitnum == hnitnum).first()
+    _db_address = await db.scalar(select(Address).where(Address.hnitnum == hnitnum))
 
     if _db_address is not None:
         address = _db_address
@@ -68,23 +73,24 @@ def get_nearby_case_addresses(
     )
 
     most_recent_nearby_addresses = (
-        db.query(Case.address_id, Case.id, Case.status, Case.updated)
+        select(Case.address_id, Case.id, Case.status, Case.updated)
         .join(Address)
         .distinct(Case.address_id)
-        .filter(*filters)
+        .where(*filters)
         .order_by(Case.address_id, Case.updated.desc())
     )
     sq = most_recent_nearby_addresses.subquery()
 
     query = (
-        db.query(Address, sq.c.status)
+        select(Address, sq.c.status)
         .select_from(Address)
         .join(sq, sq.c.address_id == Address.hnitnum)
         .order_by(sq.c.updated.desc())
+        .limit(100)
     )
 
-    polygon, plan = skipulagsstofnun.plans.get_plan(
-        address.lat_wgs84, address.long_wgs84
+    polygon, plan = await run_in_threadpool(
+        skipulagsstofnun.plans.get_plan, address.lat_wgs84, address.long_wgs84
     )
     if polygon is not None:
         polygon = list(polygon.exterior.coords)
@@ -103,33 +109,33 @@ def get_nearby_case_addresses(
                 label=str(address),
                 status=status,
             )
-            for address, status in query.limit(100)
+            for address, status in (await db.execute(query)).all()
         ],
     }
 
 
 @router.get("/entities/{kennitala}/addresses", response_model=schemas.MapEntityResponse)
-def get_entity_addresses(
-    request: Request, kennitala: str, db: Session = Depends(get_db)
+async def get_entity_addresses(
+    request: Request, kennitala: str, db: AsyncSession = Depends(get_async_db)
 ):
-    entity = _get_entity(db, kennitala)
+    entity = await _aget_entity(db, kennitala)
 
     most_recent_addresses = (
-        db.query(Case.address_id, func.max(Case.updated).label("last_updated"))
+        select(Case.address_id, func.max(Case.updated).label("last_updated"))
         .select_from(Case)
         .join(CaseEntity)
-        .filter(CaseEntity.entity == entity)
+        .where(CaseEntity.entity == entity)
         .group_by(Case.address_id)
     )
     sq = most_recent_addresses.subquery()
 
     query = (
-        db.query(Address, Case)
+        select(Address, Case)
         .select_from(Address)
         .join(sq, sq.c.address_id == Address.hnitnum)
         .join(Case, sq.c.last_updated == Case.updated)
         .join(CaseEntity)
-        .filter(CaseEntity.entity == entity)
+        .where(CaseEntity.entity == entity)
     )
 
     return {
@@ -140,6 +146,6 @@ def get_entity_addresses(
                 label=str(address),
                 status=case.status,
             )
-            for address, case in query
+            for address, case in (await db.execute(query)).all()
         ]
     }

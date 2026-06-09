@@ -15,6 +15,7 @@ from .city import (  # noqa
     Housenumber,
     Meeting,
     Minute,
+    MinuteEntityMention,
     Municipality,
     PDFAttachment,
     PersonContact,

@@ -1,9 +1,11 @@
-from planitor.models import Entity
+from planitor.models import CompanyContact, Entity
 from planitor.postprocess import _update_minute_with_entity_mentions
 
 
 def test_update_minute_with_entity_mentions_creates_new_entity(db, minute):
     # Tag
+    db.add(CompanyContact(name="Veitur ohf.", kennitala="5012131870"))
+    db.commit()
     assert db.query(Entity).count() == 0
     minute.inquiry = "Skjal barst frá Veitum ohf. í gær."
     _update_minute_with_entity_mentions(db, minute)

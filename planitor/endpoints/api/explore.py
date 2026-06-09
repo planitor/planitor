@@ -2,10 +2,11 @@ import datetime as dt
 from typing import List, Optional
 
 from fastapi import Depends, HTTPException, Query
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from planitor.database import get_db
+from planitor.database import get_async_db
 from planitor.models import (
     Address,
     Case,
@@ -45,7 +46,9 @@ def _minute_to_dict(minute: Minute) -> dict:
     }
 
 
-def _case_to_dict(case: Case, council_type=None, lat=None, lon=None, last_sale=None) -> dict:
+def _case_to_dict(
+    case: Case, council_type=None, lat=None, lon=None, last_sale=None
+) -> dict:
     if case.iceaddr:
         lat = float(case.iceaddr.lat_wgs84) if case.iceaddr.lat_wgs84 else None
         lon = float(case.iceaddr.long_wgs84) if case.iceaddr.long_wgs84 else None
@@ -58,39 +61,46 @@ def _case_to_dict(case: Case, council_type=None, lat=None, lon=None, last_sale=N
         "lat": lat,
         "lon": lon,
         "council_type": council_type,
-        "last_sale_price": int(last_sale.kaupverd) if last_sale and last_sale.kaupverd else None,
+        "last_sale_price": (
+            int(last_sale.kaupverd) if last_sale and last_sale.kaupverd else None
+        ),
         "last_sale_date": last_sale.utgefid if last_sale else None,
     }
 
 
-def _get_latest_sales(db: Session, address_ids: list) -> dict:
+MINUTE_LOAD_OPTIONS = (
+    selectinload(Minute.meeting).selectinload(Meeting.council),
+    selectinload(Minute.case),
+)
+
+CASE_LOAD_OPTIONS = (selectinload(Case.iceaddr),)
+
+
+async def _get_latest_sales(db: AsyncSession, address_ids: list) -> dict:
     """Batch-fetch the most recent PropertyTransaction per address_id."""
     if not address_ids:
         return {}
-    from sqlalchemy import and_
     latest_sq = (
-        db.query(
+        select(
             PropertyTransaction.address_id,
             func.max(PropertyTransaction.utgefid).label("max_date"),
         )
-        .filter(PropertyTransaction.address_id.in_(address_ids))
+        .where(PropertyTransaction.address_id.in_(address_ids))
         .group_by(PropertyTransaction.address_id)
         .subquery()
     )
-    rows = (
-        db.query(PropertyTransaction)
-        .join(
+    rows = await db.scalars(
+        select(PropertyTransaction).join(
             latest_sq,
             and_(
                 PropertyTransaction.address_id == latest_sq.c.address_id,
                 PropertyTransaction.utgefid == latest_sq.c.max_date,
             ),
         )
-        .all()
     )
     # Keep one per address_id (highest kaupverd if ties)
     result = {}
-    for tx in rows:
+    for tx in rows.all():
         prev = result.get(tx.address_id)
         if prev is None or (tx.kaupverd or 0) > (prev.kaupverd or 0):
             result[tx.address_id] = tx
@@ -98,7 +108,7 @@ def _get_latest_sales(db: Session, address_ids: list) -> dict:
 
 
 @router.get("/cases/nearby", response_model=PaginatedResponse[ExploreCase])
-def get_nearby_cases(
+async def get_nearby_cases(
     lat: float = Query(..., description="Latitude (WGS84)"),
     lon: float = Query(..., description="Longitude (WGS84)"),
     radius_m: int = Query(500, ge=1, le=5000, description="Radius in meters"),
@@ -107,20 +117,28 @@ def get_nearby_cases(
     updated_after: Optional[dt.date] = None,
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    geo_filter = func.earth_distance(
-        func.ll_to_earth(lat, lon),
-        func.ll_to_earth(Address.lat_wgs84, Address.long_wgs84),
-    ) < radius_m
+    geo_filter = (
+        func.earth_distance(
+            func.ll_to_earth(lat, lon),
+            func.ll_to_earth(Address.lat_wgs84, Address.long_wgs84),
+        )
+        < radius_m
+    )
 
     # Base query: cases within radius
-    query = db.query(Case).join(Address, Case.address_id == Address.hnitnum).filter(geo_filter)
+    query = (
+        select(Case)
+        .options(*CASE_LOAD_OPTIONS)
+        .join(Address, Case.address_id == Address.hnitnum)
+        .where(geo_filter)
+    )
 
     if status is not None:
-        query = query.filter(Case.status == status)
+        query = query.where(Case.status == status)
     if updated_after is not None:
-        query = query.filter(
+        query = query.where(
             Case.updated >= dt.datetime.combine(updated_after, dt.time.min)
         )
     if council_type is not None:
@@ -128,25 +146,29 @@ def get_nearby_cases(
             query.join(Minute, Minute.case_id == Case.id)
             .join(Meeting, Minute.meeting_id == Meeting.id)
             .join(Council, Meeting.council_id == Council.id)
-            .filter(Council.council_type == council_type)
+            .where(Council.council_type == council_type)
             .distinct(Case.id)
             .order_by(Case.id)
         )
         # Wrap in subquery to re-sort
-        case_ids = query.with_entities(Case.id).subquery()
-        query = db.query(Case).filter(Case.id.in_(case_ids))
+        case_ids = select(query.subquery().c.id)
+        query = select(Case).options(*CASE_LOAD_OPTIONS).where(Case.id.in_(case_ids))
 
-    total = query.count()
-    cases = query.order_by(Case.updated.desc().nullslast()).offset(offset).limit(limit).all()
+    total = await db.scalar(select(func.count()).select_from(query.subquery()))
+    cases = (
+        await db.scalars(
+            query.order_by(Case.updated.desc().nullslast()).offset(offset).limit(limit)
+        )
+    ).all()
 
-    sales = _get_latest_sales(db, [c.address_id for c in cases if c.address_id])
+    sales = await _get_latest_sales(db, [c.address_id for c in cases if c.address_id])
     items = [_case_to_dict(c, last_sale=sales.get(c.address_id)) for c in cases]
 
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
 @router.get("/minutes/search", response_model=PaginatedResponse[ExploreMinute])
-def search_minutes(
+async def search_minutes(
     q: Optional[str] = None,
     lat: Optional[float] = None,
     lon: Optional[float] = None,
@@ -159,13 +181,14 @@ def search_minutes(
     before: Optional[dt.date] = None,
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
     if not any([q, lat and lon, entity, address, council_type, status, after, before]):
         raise HTTPException(400, "At least one filter parameter is required")
 
     query = (
-        db.query(Minute)
+        select(Minute)
+        .options(*MINUTE_LOAD_OPTIONS)
         .join(Meeting, Minute.meeting_id == Meeting.id)
         .join(Council, Meeting.council_id == Council.id)
         .outerjoin(Case, Minute.case_id == Case.id)
@@ -206,90 +229,94 @@ def search_minutes(
     if before is not None:
         filters.append(Meeting.start < dt.datetime.combine(before, dt.time.min))
 
-    query = query.filter(*filters).order_by(Meeting.start.desc())
+    query = query.where(*filters).order_by(Meeting.start.desc())
 
-    total = query.count()
-    minutes = query.offset(offset).limit(limit).all()
+    total = await db.scalar(select(func.count()).select_from(query.subquery()))
+    minutes = (await db.scalars(query.offset(offset).limit(limit))).all()
 
     items = [_minute_to_dict(m) for m in minutes]
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
 @router.get("/entities/search", response_model=List[ExploreEntity])
-def search_entities(
+async def search_entities(
     q: str = Query(..., min_length=1, description="Name search"),
     limit: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
     tsquery = func.websearch_to_tsquery("simple", q)
-    entities = (
-        db.query(Entity)
-        .filter(Entity.search_vector.op("@@")(tsquery))
+    entities = await db.scalars(
+        select(Entity)
+        .where(Entity.search_vector.op("@@")(tsquery))
         .order_by(func.ts_rank(Entity.search_vector, tsquery).desc())
         .limit(limit)
-        .all()
     )
-    return [{"kennitala": e.kennitala, "name": e.name} for e in entities]
+    return [{"kennitala": e.kennitala, "name": e.name} for e in entities.all()]
 
 
 @router.get(
     "/entities/{kennitala}/minutes",
     response_model=PaginatedResponse[ExploreMinute],
 )
-def get_entity_minutes(
+async def get_entity_minutes(
     kennitala: str,
     council_type: Optional[CouncilTypeEnum] = None,
     after: Optional[dt.date] = None,
     before: Optional[dt.date] = None,
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    entity = db.query(Entity).filter(Entity.kennitala == kennitala).first()
+    entity = await db.scalar(select(Entity).where(Entity.kennitala == kennitala))
     if not entity:
         raise HTTPException(404, "Entity not found")
 
     query = (
-        db.query(Minute)
+        select(Minute)
+        .options(*MINUTE_LOAD_OPTIONS)
         .join(Case, Minute.case_id == Case.id)
         .join(CaseEntity, CaseEntity.case_id == Case.id)
         .join(Meeting, Minute.meeting_id == Meeting.id)
         .join(Council, Meeting.council_id == Council.id)
-        .filter(CaseEntity.entity_id == kennitala)
+        .where(CaseEntity.entity_id == kennitala)
     )
 
     if council_type is not None:
-        query = query.filter(Council.council_type == council_type)
+        query = query.where(Council.council_type == council_type)
     if after is not None:
-        query = query.filter(Meeting.start >= dt.datetime.combine(after, dt.time.min))
+        query = query.where(Meeting.start >= dt.datetime.combine(after, dt.time.min))
     if before is not None:
-        query = query.filter(Meeting.start < dt.datetime.combine(before, dt.time.min))
+        query = query.where(Meeting.start < dt.datetime.combine(before, dt.time.min))
 
     query = query.order_by(Meeting.start.desc())
 
-    total = query.count()
-    minutes = query.offset(offset).limit(limit).all()
+    total = await db.scalar(select(func.count()).select_from(query.subquery()))
+    minutes = (await db.scalars(query.offset(offset).limit(limit))).all()
 
     items = [_minute_to_dict(m) for m in minutes]
     return {"items": items, "total": total, "limit": limit, "offset": offset}
 
 
 @router.get("/cases/{serial}", response_model=ExploreCaseDetail)
-def get_case_by_serial(
+async def get_case_by_serial(
     serial: str,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
-    case = db.query(Case).filter(Case.serial == serial).first()
+    case = await db.scalar(
+        select(Case).options(*CASE_LOAD_OPTIONS).where(Case.serial == serial)
+    )
     if not case:
         raise HTTPException(404, "Case not found")
 
     minutes = (
-        db.query(Minute)
-        .join(Meeting, Minute.meeting_id == Meeting.id)
-        .filter(Minute.case_id == case.id)
-        .order_by(Meeting.start.desc())
-        .all()
-    )
+        await db.scalars(
+            select(Minute)
+            .options(*MINUTE_LOAD_OPTIONS)
+            .join(Meeting, Minute.meeting_id == Meeting.id)
+            .where(Minute.case_id == case.id)
+            .order_by(Meeting.start.desc())
+        )
+    ).all()
 
     # Get council_type from the most recent minute's meeting
     council_type = None
@@ -303,11 +330,12 @@ def get_case_by_serial(
     last_sale = None
     if case.address_id:
         transactions = (
-            db.query(PropertyTransaction)
-            .filter(PropertyTransaction.address_id == case.address_id)
-            .order_by(PropertyTransaction.utgefid.desc().nullslast())
-            .all()
-        )
+            await db.scalars(
+                select(PropertyTransaction)
+                .where(PropertyTransaction.address_id == case.address_id)
+                .order_by(PropertyTransaction.utgefid.desc().nullslast())
+            )
+        ).all()
         if transactions:
             last_sale = transactions[0]
 
@@ -320,7 +348,9 @@ def get_case_by_serial(
             "utgefid": t.utgefid,
             "tegund": t.tegund,
             "flatarmal": float(t.flatarmal) if t.flatarmal else None,
-            "fjoldi_herbergja": float(t.fjoldi_herbergja) if t.fjoldi_herbergja else None,
+            "fjoldi_herbergja": (
+                float(t.fjoldi_herbergja) if t.fjoldi_herbergja else None
+            ),
             "byggingarar": t.byggingarar,
         }
         for t in transactions
