@@ -3,9 +3,9 @@
 version: "3.8"
 
 services:
-  poetry:
+  uv:
     build:
-      dockerfile: poetry.Dockerfile
+      dockerfile: Dockerfile
       context: .
     volumes:
       - .:/code

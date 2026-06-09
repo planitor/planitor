@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
+.venv/
 
 # VSCode
 .vscode
@@ -13,6 +14,13 @@ __pycache__/
 node_modules
 yarn.lock
 yarn-error.log
+
+# Tool caches
+.mypy_cache
+.parcel-cache
+.pytest_cache
+.ruff_cache
+htmlcov
 
 # Project
 .pytest_cache

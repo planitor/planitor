@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1.3
-FROM python:3.9
+FROM python:3.11
 
 WORKDIR /code
 
@@ -9,10 +9,18 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /code/requirements.txt
+RUN pip install --no-cache-dir uv==0.9.28
 
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade -r requirements.txt
+COPY pyproject.toml uv.lock /code/
+
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --no-dev
 
 COPY . /code/
 
-CMD ["uvicorn", "--proxy-headers", "--host", "0.0.0.0", "--port", "80", "planitor.main:app"]
+ENV PATH="/code/.venv/bin:$PATH"
+
+ENV PLANITOR_UVICORN_WORKERS=3
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1/healthz', timeout=3).read()" || exit 1
+
+CMD uvicorn --proxy-headers --host 0.0.0.0 --port 80 --workers "${PLANITOR_UVICORN_WORKERS}" planitor.main:app

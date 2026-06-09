@@ -47,7 +47,7 @@ def _get_deiliskipulag(db, lat, lon):
 
 
 @router.get("/leit")
-async def get_search(
+def get_search(
     request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
@@ -76,7 +76,7 @@ async def get_search(
 
 
 @router.get("/s")
-async def get_index(
+def get_index(
     request: Request,
     current_user: User = Depends(get_current_active_user_or_none),
     db: Session = Depends(get_db),
@@ -315,7 +315,7 @@ async def get_index(
 
 @router.get("/s/{muni_slug}")
 @router.get("/s/{muni_slug}/{council_slug}")
-async def get_municipality(
+def get_municipality(
     request: Request,
     muni_slug: str,
     council_slug: str = None,
@@ -383,7 +383,7 @@ async def get_municipality(
 
 
 @router.get("/s/{muni_slug}/{council_slug}/fundir/{meeting_id}")
-async def get_meeting(
+def get_meeting(
     request: Request,
     muni_slug: str,
     council_slug: str,
@@ -435,7 +435,7 @@ async def get_meeting(
 
 
 @router.get("/s/{muni_slug}/{council_slug}/nr/{case_id}")
-async def get_case_legacy_redirect(
+def get_case_legacy_redirect(
     request: Request,
     muni_slug: str,
     council_slug: str,
@@ -445,7 +445,7 @@ async def get_case_legacy_redirect(
 
 
 @router.get("/s/{muni_slug}/nr/{case_id}")
-async def get_case(
+def get_case(
     request: Request,
     muni_slug: str,
     case_id: str,
@@ -641,7 +641,7 @@ def get_minute(
 
 
 @router.get("/heimilisfong/{hnitnum}")
-async def get_address(
+def get_address(
     request: Request,
     hnitnum: int,
     db: Session = Depends(get_db),
@@ -753,7 +753,7 @@ async def get_address(
 
 @router.get("/f/{kennitala}")
 @router.get("/f/{slug}-{kennitala}")
-async def get_company(
+def get_company(
     request: Request,
     kennitala: str,
     slug: str = None,
@@ -821,7 +821,7 @@ async def get_company(
 
 @router.get("/p/{kennitala}")
 @router.get("/p/{slug}-{kennitala}")
-async def get_person(
+def get_person(
     request: Request,
     kennitala: str,
     slug: str = None,
@@ -830,7 +830,7 @@ async def get_person(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user_or_none),
 ):
-    return await get_company(request, kennitala, slug, q, page, db, current_user)
+    return get_company(request, kennitala, slug, q, page, db, current_user)
 
 
 @router.get("/minutes/{id}")

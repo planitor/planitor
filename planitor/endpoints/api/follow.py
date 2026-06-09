@@ -10,7 +10,7 @@ from . import router
 
 
 @router.post("/follow/cases/{case_id}")
-async def follow_case(
+def follow_case(
     case_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
@@ -23,7 +23,7 @@ async def follow_case(
 
 
 @router.delete("/follow/cases/{case_id}")
-async def unfollow_case(
+def unfollow_case(
     case_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
@@ -36,7 +36,7 @@ async def unfollow_case(
 
 
 @router.post("/follow/entities/{kennitala}")
-async def follow_entity(
+def follow_entity(
     kennitala: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
@@ -49,7 +49,7 @@ async def follow_entity(
 
 
 @router.delete("/follow/entities/{kennitala}")
-async def unfollow_entity(
+def unfollow_entity(
     kennitala: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
@@ -62,7 +62,7 @@ async def unfollow_entity(
 
 
 @router.post("/follow/addresses/{hnitnum}")
-async def follow_address(
+def follow_address(
     hnitnum: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
@@ -79,7 +79,7 @@ async def follow_address(
 
 
 @router.delete("/follow/addresses/{hnitnum}")
-async def unfollow_address(
+def unfollow_address(
     hnitnum: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),

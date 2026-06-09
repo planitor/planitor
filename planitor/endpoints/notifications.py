@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session
 from email_normalize import Normalizer
@@ -12,7 +14,7 @@ router = APIRouter()
 
 
 @router.post("/unsubscribe/{case_id}", tags=["login"])
-async def unsubscribe(
+def unsubscribe(
     request: Request, email: str, case_id: str, db: Session = Depends(get_db)
 ):
     try:
@@ -22,7 +24,7 @@ async def unsubscribe(
     if not email or "@" not in email:
         return None
     normalizer = Normalizer()
-    result = await normalizer.normalize(email)
+    result = asyncio.run(normalizer.normalize(email))
     for applicant in db.query(Applicant).filter(
         Applicant.email == result.normalized_address, Applicant.case == case
     ):

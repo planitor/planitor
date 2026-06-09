@@ -20,7 +20,7 @@ hashids = Hashids(salt="planitor", min_length=4)
 config = Config(".env")
 DEBUG = config("DEBUG", cast=bool, default=False)
 ENV = config("ENV", default="production")
-SENTRY_DSN = config("SENTRY_DSN", cast=Secret)
+SENTRY_DSN = config("SENTRY_DSN", cast=Secret, default="")
 
 if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(

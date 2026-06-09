@@ -30,7 +30,7 @@ def get_municipalities(
 
 
 @router.get("/addresses/{hnitnum}/addresses", response_model=schemas.MapCasesResponse)
-async def get_nearby_case_addresses(
+def get_nearby_case_addresses(
     request: Request,
     hnitnum: int,
     radius: int = 500,
@@ -109,7 +109,7 @@ async def get_nearby_case_addresses(
 
 
 @router.get("/entities/{kennitala}/addresses", response_model=schemas.MapEntityResponse)
-async def get_entity_addresses(
+def get_entity_addresses(
     request: Request, kennitala: str, db: Session = Depends(get_db)
 ):
     entity = _get_entity(db, kennitala)

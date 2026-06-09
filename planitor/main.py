@@ -31,17 +31,22 @@ else:
 
 
 @app.router.get("/")
-async def get_index():
+def get_index():
     return RedirectResponse("/s")
 
 
+@app.router.get("/healthz", include_in_schema=False)
+def get_healthz():
+    return {"status": "ok"}
+
+
 @app.router.get("/_error")
-async def get_server_error(request: Request):
+def get_server_error(request: Request):
     return 1 / 0
 
 
 @app.router.get("/_403")
-async def get_permission_denied(request: Request):
+def get_permission_denied(request: Request):
     raise HTTPException(403)
 
 

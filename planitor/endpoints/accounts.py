@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/innskraning")
-async def login_page(request: Request, redirect_to: str = ""):
+def login_page(request: Request, redirect_to: str = ""):
     return templates.TemplateResponse(
         "login.html", {"request": request, "redirect_to": redirect_to}
     )
