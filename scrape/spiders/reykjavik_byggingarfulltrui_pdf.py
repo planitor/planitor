@@ -86,6 +86,15 @@ def extract_meeting_number(text: str):
     return None
 
 
+def get_meeting_name(text: str, date: dt.datetime):
+    meeting_num = extract_meeting_number(text)
+    if meeting_num:
+        return meeting_num
+    if date:
+        return date.strftime("%Y-%m-%d")
+    return None
+
+
 def parse_pdf_content(pdf_bytes: bytes, url: str):
     """Parse PDF content and extract meeting data
 
@@ -112,7 +121,7 @@ def parse_pdf_content(pdf_bytes: bytes, url: str):
 
     # Extract metadata
     date = parse_date_from_text(full_text) or parse_date_from_filename(url)
-    meeting_num = extract_meeting_number(full_text)
+    meeting_num = get_meeting_name(full_text, date)
 
     # Parse agenda items - try both formats
     # Old format: "1. Ármúli 17 (01.264.004) 103527 Mál nr. BN057410"

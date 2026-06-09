@@ -4,7 +4,10 @@ import pytest
 from scrapy.exceptions import DropItem
 
 from scrape.pipelines import DatabasePipeline
-from scrape.spiders.reykjavik_byggingarfulltrui_pdf import parse_date_from_filename
+from scrape.spiders.reykjavik_byggingarfulltrui_pdf import (
+    get_meeting_name,
+    parse_date_from_filename,
+)
 
 
 class DummySpider:
@@ -19,6 +22,10 @@ def test_parse_date_from_urlencoded_reykjavik_pdf_filename():
     )
 
     assert parse_date_from_filename(url) == dt.datetime(2026, 3, 24)
+
+
+def test_get_meeting_name_falls_back_to_date():
+    assert get_meeting_name("", dt.datetime(2023, 7, 11)) == "2023-07-11"
 
 
 def test_database_pipeline_drops_meetings_without_start(db):
