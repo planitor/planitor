@@ -46,21 +46,24 @@ class BaseApiPermit(PermitBase):
 
 class ApiLoadPermit(BaseApiPermit):
     def __init__(self, request: Request, permit: models.Permit):
-        self.units = permit.units
-        self.area_added = permit.area_added
-        self.area_subtracted = permit.area_subtracted
-        self.building_type = permit.building_type
-        self.permit_type = permit.permit_type
-
         minute = permit.minute
-        self.url = request.url_for("get_minute_by_id", id=minute.id)
-        self.approved = minute.meeting.start
-        self.municipality = BaseMunicipality.from_orm(minute.case.municipality)
+        data = {
+            "units": permit.units,
+            "area_added": permit.area_added,
+            "area_subtracted": permit.area_subtracted,
+            "building_type": permit.building_type,
+            "permit_type": permit.permit_type,
+            "url": str(request.url_for("get_minute_by_id", id=minute.id)),
+            "approved": minute.meeting.start,
+            "municipality": BaseMunicipality.from_orm(minute.case.municipality),
+        }
 
         if minute.case.iceaddr:
             case = minute.case
-            self.address = str(case.iceaddr)
-            self.postcode = str(case.iceaddr.postnr)
+            data["address"] = str(case.iceaddr)
+            data["postcode"] = str(case.iceaddr.postnr)
+
+        super().__init__(**data)
 
 
 def to_camel(string: str) -> str:
