@@ -206,6 +206,7 @@ async def get_index(
     fresh_cases = (
         await db.scalars(
             select(Case)
+            .options(selectinload(Case.municipality), selectinload(Case.iceaddr))
             .where(Case.created >= sixty_days_ago)
             .order_by(Case.created.desc())
             .limit(5)
@@ -296,6 +297,7 @@ async def get_index(
         cases = (
             await db.scalars(
                 select(Case)
+                .options(selectinload(Case.municipality), selectinload(Case.iceaddr))
                 .where(Case.id.in_(select(case_ids_sq.c.id)))
                 .order_by(Case.updated.desc().nullslast())
             )
