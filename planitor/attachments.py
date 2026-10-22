@@ -23,12 +23,13 @@ logger = logging.getLogger(__name__)
 pdf_page_pattern = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE | re.DOTALL)
 
 
+# Page images and PDFs live in Cloudflare R2 (S3 API). Buckets keep their MinIO-era names.
 minio = boto3.client(
     "s3",
-    endpoint_url="http://minio:9000",
-    aws_access_key_id=config.get("MINIO_ROOT_USER", default=""),
-    aws_secret_access_key=config.get("MINIO_ROOT_PASSWORD", default=""),
-    region_name="us-east-1",
+    endpoint_url=config.get("S3_ENDPOINT_URL", default=""),
+    aws_access_key_id=config.get("S3_ACCESS_KEY_ID", default=""),
+    aws_secret_access_key=config.get("S3_SECRET_ACCESS_KEY", default=""),
+    region_name="auto",
 )
 MINIO_PAGES_BUCKET = "planitor-pages"
 MINIO_PDF_BUCKET = "planitor-pdfs"

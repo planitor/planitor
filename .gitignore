@@ -31,3 +31,6 @@ public
 
 # openapi
 openapi.json
+
+# Local DB dumps
+backups/

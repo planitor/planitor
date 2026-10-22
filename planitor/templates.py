@@ -12,13 +12,13 @@ from planitor.imgproxy import ImgProxy
 
 # imgproxy URL builder for S3 attachments
 _imgproxy_builder = ImgProxy.factory(
-    proxy_host='https://imgproxy.plex.uno',
+    proxy_host=config.get("IMGPROXY_HOST", default="https://imgproxy.solberg.club"),
     key=config.get("IMGPROXY_KEY", default=""),
     salt=config.get("IMGPROXY_SALT", default=""),
 )
 
 
-MINIO_PUBLIC_BASE = "https://link.plex.uno/planitor-pages"
+MINIO_PUBLIC_BASE = config.get("PAGES_PUBLIC_BASE", default="https://planitor-pages.solberg.club")
 
 
 class ImageProxy:
